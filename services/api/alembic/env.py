@@ -17,17 +17,25 @@ sys.path.insert(0, api_dir)
 
 try:
     from app.models.base import Base
+    from app.core.config import settings
 except ImportError:
     # Fallback: try to add the app directory directly
     app_dir = os.path.join(api_dir, 'app')
     sys.path.insert(0, app_dir)
     from app.models.base import Base
+    from app.core.config import settings
+
+# Import all models to ensure they're registered with Base
+from app.models import Tenant, User, UserPreference
 
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 target_metadata = Base.metadata
+
+# Override sqlalchemy.url from settings
+config.set_main_option('sqlalchemy.url', settings.DATABASE_URL)
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

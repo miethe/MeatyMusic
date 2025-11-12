@@ -7,18 +7,29 @@ authentication provider (e.g., Clerk).
 
 from __future__ import annotations
 
-from sqlalchemy import String, DateTime, Boolean
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import String, DateTime, Boolean, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 from datetime import datetime
+from typing import TYPE_CHECKING
+from uuid import UUID
 
 from app.models.base import Base
+
+if TYPE_CHECKING:
+    from app.models.tenant import Tenant
+    from app.models.user_preference import UserPreference
 
 
 class User(Base):
     """User model representing an authenticated user."""
 
     __tablename__ = "users"
+
+    # Tenant relationship (multi-tenancy)
+    tenant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False, index=True
+    )
 
     # Primary identifier from auth provider (e.g., Clerk user ID)
     clerk_user_id: Mapped[str] = mapped_column(String, unique=True, nullable=False, index=True)
@@ -45,6 +56,12 @@ class User(Base):
     )
     last_login_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
+    )
+
+    # Relationships
+    tenant: Mapped["Tenant"] = relationship("Tenant", back_populates="users")
+    preferences: Mapped["UserPreference"] = relationship(
+        "UserPreference", back_populates="user", uselist=False, cascade="all, delete-orphan"
     )
 
     def __repr__(self) -> str:
