@@ -1,0 +1,202 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { Button } from './components/Button/Button';
+import { Card, CardHeader, CardContent } from './components/Card/Card';
+
+<Meta title="Introduction" />
+
+# MeatyPrompts Design System
+
+Welcome to the MeatyPrompts design system - a comprehensive collection of reusable components, design tokens, and patterns built for creating consistent, accessible user interfaces.
+
+## 🎯 Mission
+
+Our design system makes world-class prompt-crafting as simple, repeatable, and measurable as spell-check. We provide the building blocks for creating interfaces that are:
+
+- **Consistent** across all MeatyPrompts applications
+- **Accessible** to users of all abilities (WCAG 2.1 AA)
+- **Scalable** for rapid product development
+- **Maintainable** with centralized design decisions
+
+## 🏗️ Architecture
+
+### Foundation Layer
+- **Design Tokens** - Colors, spacing, typography, shadows, borders
+- **Themes** - Light, Dark, Ocean, Sand, High Contrast variants
+- **Accessibility** - WCAG 2.1 AA compliance built-in
+
+### Component Layer
+- **Primitives** - Button, Input, Card, Modal, FormField, Skeleton
+- **Compositions** - Complex UI patterns and layouts
+- **Patterns** - Reusable interaction and navigation patterns
+
+### Complications & Adapter System
+The `PromptCard` component exposes named slots where small widgets—called
+**complications**—can render additional context. Each complication is provided
+through an adapter that receives card state and returns a React element. This
+adapter pattern lets applications extend cards with metrics, status indicators,
+or custom plugins without changing the core component.
+
+```tsx
+import { PromptCard } from '@meaty/ui';
+import { MetricComplication } from './complications/examples/MetricComplication';
+
+<PromptCard
+  title="My Prompt"
+  complications={{
+    bottomRight: { component: MetricComplication, props: { value: 42, unit: '%' } },
+  }}
+/>;
+```
+
+### Documentation Layer
+- **Component Docs** - Usage guidelines and API reference
+- **Pattern Library** - Common UI patterns and best practices
+- **Migration Guide** - Moving from custom to system components
+
+## 🎨 Design Principles
+
+### Consumer Polish
+Inspired by Fluent 2 and Adobe Spectrum, our components feature rounded corners, subtle shadows, and friendly micro-interactions that feel polished and approachable.
+
+### PatternFly Density
+We adopt PatternFly's thoughtful approach to information density, particularly in dashboards and data-heavy interfaces, while maintaining visual clarity.
+
+### Radix Foundation
+Built on Radix primitives for robust accessibility, keyboard navigation, and screen reader support that meets WAI-ARIA authoring practices.
+
+## 🚀 Quick Start
+
+### Installation
+```bash
+npm install @meaty/ui @meaty/tokens
+```
+
+### Basic Usage
+```jsx
+import { Button, Card, CardHeader, CardContent } from '@meaty/ui';
+
+function MyComponent() {
+  return (
+    <Card>
+      <CardHeader>
+        <h2>Welcome to MeatyPrompts</h2>
+      </CardHeader>
+      <CardContent>
+        <p>Start building with our design system components.</p>
+        <Button>Get Started</Button>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+<div style={{ display: 'flex', gap: '16px', margin: '24px 0' }}>
+  <Button variant="default">Primary Button</Button>
+  <Button variant="secondary">Secondary Button</Button>
+  <Button variant="outline">Outline Button</Button>
+</div>
+
+### Theme Integration
+```css
+/* Import design tokens */
+@import '@meaty/tokens/css/tokens.css';
+
+/* Apply theme */
+[data-theme="light"] {
+  /* Light theme tokens applied automatically */
+}
+
+[data-theme="dark"] {
+  /* Dark theme tokens applied automatically */
+}
+```
+
+## 📚 Documentation Structure
+
+### Components
+Detailed documentation for each component including:
+- **Anatomy** - Visual breakdown of component parts
+- **Variants** - Different styles and configurations
+- **States** - Interactive states (hover, focus, disabled)
+- **Accessibility** - WCAG compliance features
+- **API Reference** - Props and customization options
+
+### Patterns
+Reusable UI patterns covering:
+- **Forms** - Input layouts, validation, multi-step flows
+- **Navigation** - Top nav, sidebar, mobile patterns
+- **Data Display** - Lists, grids, tables, empty states
+
+### Tokens
+Complete token reference including:
+- **Colors** - Semantic color system with theme variants
+- **Spacing** - Consistent spacing scale based on 4px grid
+- **Typography** - Font sizes, weights, and line heights
+- **Shadows** - Elevation system for depth and hierarchy
+- **Borders** - Radius values for consistent corner rounding
+
+## ♿ Accessibility First
+
+Every component is built with accessibility as a core requirement:
+
+- **Keyboard Navigation** - Full keyboard operability
+- **Screen Readers** - Proper ARIA attributes and semantic HTML
+- **Focus Management** - Visible focus indicators and logical tab order
+- **Color Contrast** - WCAG AA contrast ratios across all themes
+- **Motion Sensitivity** - Respects `prefers-reduced-motion`
+
+## 🎛️ Theming System
+
+Six carefully crafted themes ensure your interface works in any environment:
+
+| Theme | Description | Best For |
+|-------|-------------|----------|
+| **Light** | Clean, bright default | General daytime use |
+| **Dark** | Easy on the eyes | Low-light environments |
+| **Ocean** | Blue-tinted professional | Business applications |
+| **Sand** | Warm, comfortable | Extended reading sessions |
+| **Light HC** | High contrast light | Visual accessibility |
+| **Dark HC** | High contrast dark | Visual accessibility |
+
+## 🛠️ Development Tools
+
+### Storybook
+Interactive component playground for:
+- Component exploration and testing
+- Visual regression testing
+- Accessibility validation
+- Documentation and examples
+
+### Testing
+Comprehensive testing setup including:
+- Unit tests with Jest and React Testing Library
+- Accessibility tests with axe-core
+- Visual regression tests with Chromatic
+- End-to-end tests with Playwright
+
+### Build Tools
+Optimized build pipeline featuring:
+- TypeScript for type safety
+- Vite for fast development builds
+- Tailwind CSS for utility-first styling
+- Design token compilation and optimization
+
+## 🤝 Contributing
+
+We welcome contributions to the design system! See our [Contributing Guide](https://github.com/miethe/meatyprompts/blob/main/docs/design/contributing.md) for:
+
+- How to add new components
+- Token contribution process
+- Documentation requirements
+- Review and release process
+
+## 📖 Resources
+
+- [Component Documentation](https://storybook.meatyprompts.com)
+- [Design Token Reference](https://github.com/miethe/meatyprompts/blob/main/docs/design/tokens/reference.md)
+- [Accessibility Checklist](https://github.com/miethe/meatyprompts/blob/main/docs/design/accessibility/checklist.md)
+- [Migration Guide](https://github.com/miethe/meatyprompts/blob/main/docs/design/migration.md)
+
+---
+
+Ready to build amazing interfaces? Explore the components in the sidebar to get started! 🚀

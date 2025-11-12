@@ -49,6 +49,9 @@ export default clerkMiddleware((auth, req) => {
   if (isProtectedRoute(req)) {
     auth().protect();
   }
+
+  // Explicitly return undefined for unprotected routes
+  return undefined;
 });
 
 export const config = {

@@ -1,0 +1,136 @@
+{
+  "color": {
+    "bg": {
+      "value": "#0B0F17"
+    },
+    "surface": {
+      "value": "#0F172A"
+    },
+    "panel": {
+      "value": "#111827"
+    },
+    "border": {
+      "value": "#232B3A"
+    },
+    "ring": {
+      "value": "#9B8BFF"
+    },
+    "text": {
+      "strong": {
+        "value": "#E6EAF2"
+      },
+      "base": {
+        "value": "#D1D6E0"
+      },
+      "muted": {
+        "value": "#8E96A3"
+      }
+    },
+    "primary": {
+      "value": "#8E7CFF"
+    },
+    "primaryForeground": {
+      "value": "#0B0F17"
+    },
+    "secondary": {
+      "value": "#0BD1C5"
+    },
+    "accent": {
+      "value": "#FFD285"
+    },
+    "success": {
+      "value": "#48D26B"
+    },
+    "warning": {
+      "value": "#F8B84E"
+    },
+    "danger": {
+      "value": "#FF7A85"
+    },
+    "info": {
+      "value": "#58AFFF"
+    },
+    "collection": {
+      "primary": {
+        "value": "#8E7CFF"
+      },
+      "secondary": {
+        "value": "#0BD1C5"
+      },
+      "accent": {
+        "value": "#FFD285"
+      },
+      "purple": {
+        "value": "#A78BFA"
+      },
+      "green": {
+        "value": "#34D399"
+      },
+      "orange": {
+        "value": "#FB923C"
+      },
+      "blue": {
+        "value": "#60A5FA"
+      },
+      "red": {
+        "value": "#F87171"
+      }
+    }
+  },
+  "badge": {
+    "default": {
+      "border": {
+        "value": "#232B3A"
+      },
+      "bg": {
+        "value": "#0F172A"
+      },
+      "text": {
+        "value": "#D1D6E0"
+      },
+      "hoverBg": {
+        "value": "#111827"
+      },
+      "shadow": {
+        "value": "0 1px 2px rgba(0,0,0,.2)"
+      }
+    },
+    "secondary": {
+      "border": {
+        "value": "#232B3A"
+      },
+      "bg": {
+        "value": "#111827"
+      },
+      "text": {
+        "value": "#8E7CFF"
+      },
+      "hoverBg": {
+        "value": "#1E1B33"
+      },
+      "shadow": {
+        "value": "0 1px 2px rgba(142,124,255,.15)"
+      }
+    },
+    "outline": {
+      "border": {
+        "value": "#232B3A"
+      },
+      "bg": {
+        "value": "transparent"
+      },
+      "text": {
+        "value": "#D1D6E0"
+      },
+      "hoverBg": {
+        "value": "#111827"
+      },
+      "hoverBorder": {
+        "value": "#8E7CFF"
+      },
+      "shadow": {
+        "value": "none"
+      }
+    }
+  }
+}

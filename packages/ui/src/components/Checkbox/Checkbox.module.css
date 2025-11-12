@@ -1,0 +1,64 @@
+/* Checkbox Component Styles */
+
+/**
+ * Check Mark "Pop" Effect
+ * - Animates from 0 → 110% → 100% for tactile feel
+ * - Uses micro-duration (70ms) with spring easing
+ * - Respects prefers-reduced-motion
+ */
+@keyframes checkmarkPop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/**
+ * Unchecked animation - smooth scale out
+ */
+@keyframes checkmarkUnpop {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+/**
+ * Apply animation to checkmark indicator
+ */
+.checkmarkIcon {
+  animation: checkmarkPop var(--mp-motion-duration-micro) var(--mp-motion-easing-enter) forwards;
+}
+
+/**
+ * Respect prefers-reduced-motion
+ * - Disable pop animation for accessibility
+ * - Keep opacity transition for visual feedback
+ */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes checkmarkPop {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  .checkmarkIcon {
+    animation: none;
+    transition: opacity var(--mp-motion-duration-micro);
+  }
+}

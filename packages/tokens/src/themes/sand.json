@@ -1,0 +1,80 @@
+{
+  "color": {
+    "bg": {
+      "value": "#FFFEF7"
+    },
+    "surface": {
+      "value": "#FFFFFF"
+    },
+    "panel": {
+      "value": "#FEF9E7"
+    },
+    "border": {
+      "value": "#F5E6C1"
+    },
+    "ring": {
+      "value": "#D97706"
+    },
+    "text": {
+      "strong": {
+        "value": "#1C1917"
+      },
+      "base": {
+        "value": "#44403C"
+      },
+      "muted": {
+        "value": "#78716C"
+      }
+    },
+    "primary": {
+      "value": "#D97706"
+    },
+    "primaryForeground": {
+      "value": "#FFFFFF"
+    },
+    "secondary": {
+      "value": "#EA580C"
+    },
+    "accent": {
+      "value": "#F59E0B"
+    },
+    "success": {
+      "value": "#059669"
+    },
+    "warning": {
+      "value": "#DC2626"
+    },
+    "danger": {
+      "value": "#DC2626"
+    },
+    "info": {
+      "value": "#2563EB"
+    },
+    "collection": {
+      "primary": {
+        "value": "#D97706"
+      },
+      "secondary": {
+        "value": "#EA580C"
+      },
+      "accent": {
+        "value": "#F59E0B"
+      },
+      "purple": {
+        "value": "#7C3AED"
+      },
+      "green": {
+        "value": "#059669"
+      },
+      "orange": {
+        "value": "#EA580C"
+      },
+      "blue": {
+        "value": "#2563EB"
+      },
+      "red": {
+        "value": "#DC2626"
+      }
+    }
+  }
+}

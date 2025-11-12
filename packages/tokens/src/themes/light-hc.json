@@ -1,0 +1,135 @@
+{
+  "color": {
+    "bg": {
+      "value": "#FFFFFF",
+      "type": "color",
+      "description": "High contrast light background - pure white for maximum contrast"
+    },
+    "surface": {
+      "value": "#FFFFFF",
+      "type": "color",
+      "description": "High contrast light surface - pure white"
+    },
+    "panel": {
+      "value": "#F8F9FA",
+      "type": "color",
+      "description": "High contrast light panel - very light gray for subtle differentiation"
+    },
+    "border": {
+      "value": "#000000",
+      "type": "color",
+      "description": "High contrast light border - pure black for maximum definition"
+    },
+    "ring": {
+      "value": "#B8860B",
+      "type": "color",
+      "description": "High contrast light focus ring - dark gold for 3:1+ contrast"
+    },
+    "text": {
+      "strong": {
+        "value": "#000000",
+        "type": "color",
+        "description": "High contrast light strong text - pure black (∞:1 contrast)"
+      },
+      "base": {
+        "value": "#000000",
+        "type": "color",
+        "description": "High contrast light base text - pure black (∞:1 contrast)"
+      },
+      "muted": {
+        "value": "#404040",
+        "type": "color",
+        "description": "High contrast light muted text - dark gray (8.5:1 contrast on white)"
+      }
+    },
+    "primary": {
+      "value": "#1F1FB8",
+      "type": "color",
+      "description": "High contrast light primary - darkened blue for 7:1 contrast on white"
+    },
+    "primaryForeground": {
+      "value": "#FFFFFF",
+      "type": "color",
+      "description": "High contrast light primary foreground - white text on dark primary"
+    },
+    "secondary": {
+      "value": "#006B61",
+      "type": "color",
+      "description": "High contrast light secondary - darkened teal for 7:1 contrast"
+    },
+    "accent": {
+      "value": "#B8750A",
+      "type": "color",
+      "description": "High contrast light accent - darkened orange for 7:1 contrast"
+    },
+    "success": {
+      "value": "#1F7A2F",
+      "type": "color",
+      "description": "High contrast light success - darkened green for 7:1 contrast"
+    },
+    "warning": {
+      "value": "#8B5500",
+      "type": "color",
+      "description": "High contrast light warning - darkened yellow for 7:1+ contrast"
+    },
+    "danger": {
+      "value": "#B51E23",
+      "type": "color",
+      "description": "High contrast light danger - darkened red for 7:1 contrast"
+    },
+    "info": {
+      "value": "#004C99",
+      "type": "color",
+      "description": "High contrast light info - darkened blue for 7:1+ contrast"
+    },
+    "collection": {
+      "primary": {
+        "value": "#1F1FB8",
+        "type": "color",
+        "description": "High contrast collection primary - darkened blue for 7:1 contrast"
+      },
+      "secondary": {
+        "value": "#006B61",
+        "type": "color",
+        "description": "High contrast collection secondary - darkened teal for 7:1 contrast"
+      },
+      "accent": {
+        "value": "#B8750A",
+        "type": "color",
+        "description": "High contrast collection accent - darkened orange for 7:1 contrast"
+      },
+      "purple": {
+        "value": "#5B21B6",
+        "type": "color",
+        "description": "High contrast collection purple - darkened for 7:1 contrast"
+      },
+      "green": {
+        "value": "#1F7A2F",
+        "type": "color",
+        "description": "High contrast collection green - darkened for 7:1 contrast"
+      },
+      "orange": {
+        "value": "#B85C00",
+        "type": "color",
+        "description": "High contrast collection orange - darkened for 7:1 contrast"
+      },
+      "blue": {
+        "value": "#1E40AF",
+        "type": "color",
+        "description": "High contrast collection blue - darkened for 7:1 contrast"
+      },
+      "red": {
+        "value": "#B51E23",
+        "type": "color",
+        "description": "High contrast collection red - darkened for 7:1 contrast"
+      }
+    }
+  },
+  "focus": {
+    "ringWidth": {
+      "value": "3px",
+      "type": "dimension",
+      "description": "Enhanced focus ring width for high contrast accessibility"
+    }
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "color": {
+    "bg": {
+      "value": "#FBFCFE"
+    },
+    "surface": {
+      "value": "#FFFFFF"
+    },
+    "panel": {
+      "value": "#F5F7FB"
+    },
+    "border": {
+      "value": "#E6EAF2"
+    },
+    "ring": {
+      "value": "#7C3AED"
+    },
+    "text": {
+      "strong": {
+        "value": "#0B1220"
+      },
+      "base": {
+        "value": "#1F2937"
+      },
+      "muted": {
+        "value": "#6B7280"
+      }
+    },
+    "primary": {
+      "value": "#6E56CF"
+    },
+    "primaryForeground": {
+      "value": "#FFFFFF"
+    },
+    "secondary": {
+      "value": "#00B3A4"
+    },
+    "accent": {
+      "value": "#FFB224"
+    },
+    "success": {
+      "value": "#2BA84A"
+    },
+    "warning": {
+      "value": "#F59E0B"
+    },
+    "danger": {
+      "value": "#E5484D"
+    },
+    "info": {
+      "value": "#0091FF"
+    },
+    "collection": {
+      "primary": {
+        "value": "#6E56CF"
+      },
+      "secondary": {
+        "value": "#00B3A4"
+      },
+      "accent": {
+        "value": "#FFB224"
+      },
+      "purple": {
+        "value": "#8B5CF6"
+      },
+      "green": {
+        "value": "#10B981"
+      },
+      "orange": {
+        "value": "#F97316"
+      },
+      "blue": {
+        "value": "#3B82F6"
+      },
+      "red": {
+        "value": "#EF4444"
+      }
+    }
+  }
+}
