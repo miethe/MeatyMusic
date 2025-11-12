@@ -99,7 +99,7 @@ async def get_security_context(
             user = UserORM(
                 id=dev_user_id,
                 clerk_user_id="dev_bypass_user",
-                email="dev@meatyprompts.local",
+                email="dev@meatymusic.local",
                 username="dev_bypass_user"
             )
             db.add(user)
@@ -403,7 +403,7 @@ async def get_current_user_with_context_async(
                 user = UserORM(
                     id=dev_user_id,
                     clerk_user_id="dev_bypass_user",
-                    email="dev@meatyprompts.local",
+                    email="dev@meatymusic.local",
                     username="dev_bypass_user"
                 )
                 db.add(user)

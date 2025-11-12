@@ -8,7 +8,7 @@ T = TypeVar('T')
 
 
 class PageInfo(BaseModel):
-    """Page information for cursor-based pagination following MeatyPrompts standards.
+    """Page information for cursor-based pagination following MeatyMusic AMCS standards.
 
     Fields use frontend-friendly names (cursor, hasNext, total) but accept backend
     field names (next_cursor, has_more, total_count) via populate_by_name.
@@ -37,7 +37,7 @@ class PageInfo(BaseModel):
 
 
 class CursorPaginatedResponse(BaseModel, Generic[T]):
-    """Cursor-paginated response envelope following MeatyPrompts patterns."""
+    """Cursor-paginated response envelope following MeatyMusic AMCS patterns."""
 
     items: List[T] = Field(..., description="Items for current page")
     page_info: PageInfo = Field(

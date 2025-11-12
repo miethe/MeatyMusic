@@ -2,7 +2,7 @@
 
 This package provides the UnifiedRowGuard implementation and supporting
 infrastructure for consistent security filtering across all table patterns
-in MeatyPrompts.
+in MeatyMusic AMCS.
 """
 
 from .exceptions import SecurityContextError, UnsupportedTableError, SecurityFilterError

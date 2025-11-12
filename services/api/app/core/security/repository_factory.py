@@ -1,4 +1,4 @@
-"""Security-aware repository factory for MeatyPrompts.
+"""Security-aware repository factory for MeatyMusic AMCS.
 
 This factory provides convenient methods for creating repository instances
 with appropriate security contexts based on the enhanced BaseRepository
@@ -70,8 +70,8 @@ class RepositoryFactory:
 
         Example:
             >>> factory = RepositoryFactory(db)
-            >>> repo = factory.create_user_scoped_repository(PromptORM, user_id)
-            >>> prompts = repo.list_paginated(PromptORM, limit=10)
+            >>> repo = factory.create_user_scoped_repository(SongORM, user_id)
+            >>> songs = repo.list_paginated(SongORM, limit=10)
         """
         if not isinstance(user_id, UUID):
             raise SecurityContextError(
@@ -290,13 +290,13 @@ def create_user_scoped_repository_factory(db: Session) -> RepositoryFactory:
         >>> def get_repo_factory(db: Session = Depends(get_db)) -> RepositoryFactory:
         ...     return create_user_scoped_repository_factory(db)
         >>>
-        >>> @router.get("/prompts")
-        >>> async def list_prompts(
+        >>> @router.get("/songs")
+        >>> async def list_songs(
         ...     factory: RepositoryFactory = Depends(get_repo_factory),
         ...     current_user: User = Depends(get_current_user)
         ... ):
-        ...     repo = factory.create_user_scoped_repository(PromptORM, current_user.id)
-        ...     return repo.list_paginated(PromptORM)
+        ...     repo = factory.create_user_scoped_repository(SongORM, current_user.id)
+        ...     return repo.list_paginated(SongORM)
     """
     return RepositoryFactory(db)
 

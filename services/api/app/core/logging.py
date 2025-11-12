@@ -82,7 +82,7 @@ def add_correlation_ids(logger: Any, method_name: str, event_dict: Dict[str, Any
             event_dict["span_id"] = f"{span_context.span_id:016x}"
 
     # Add service name for log correlation
-    event_dict["service"] = "meatyprompts-api"
+    event_dict["service"] = "meatymusic-api"
 
     return event_dict
 

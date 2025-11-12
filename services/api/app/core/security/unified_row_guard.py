@@ -1,4 +1,4 @@
-"""Unified security guard supporting all MeatyPrompts table patterns.
+"""Unified security guard supporting all MeatyMusic AMCS table patterns.
 
 The UnifiedRowGuard provides a single interface for applying row-level security
 across user-owned, tenant-owned, and scope-based resources. It intelligently
@@ -33,12 +33,12 @@ T = TypeVar('T')
 
 
 class UnifiedRowGuard(Generic[T]):
-    """Unified security guard supporting all MeatyPrompts table patterns.
+    """Unified security guard supporting all MeatyMusic AMCS table patterns.
 
     This guard intelligently determines the appropriate security filtering strategy
     based on table schema and resource type, supporting:
 
-    - User-owned tables: prompts, collections, share_tokens (filtered by user_id/owner_id)
+    - User-owned tables: songs, personas, sources (filtered by user_id/owner_id)
     - Tenant-owned tables: model_* (filtered by tenant_id)
     - Scope-based tables: workspaces, analytics (complex scope-based filtering)
     - System-managed tables: users, lookup_values (no filtering applied)
@@ -48,7 +48,7 @@ class UnifiedRowGuard(Generic[T]):
 
     Example:
         # User-owned resource filtering
-        guard = UnifiedRowGuard(PromptORM, security_context)
+        guard = UnifiedRowGuard(SongORM, security_context)
         filtered_query = guard.with_user_context().filter_query(query)
 
         # Tenant-owned resource filtering

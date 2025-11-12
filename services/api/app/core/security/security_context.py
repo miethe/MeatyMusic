@@ -1,7 +1,7 @@
 """Enhanced security context for dual ownership patterns.
 
 This module provides the SecurityContext dataclass and related utilities
-for managing both user and tenant security contexts in MeatyPrompts'
+for managing both user and tenant security contexts in MeatyMusic AMCS's
 hybrid security model.
 """
 

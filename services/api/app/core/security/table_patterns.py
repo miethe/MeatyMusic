@@ -1,6 +1,6 @@
 """Table pattern classification for unified security filtering.
 
-This module defines the ownership patterns for all tables in MeatyPrompts
+This module defines the ownership patterns for all tables in MeatyMusic AMCS
 and provides utilities for determining the appropriate security filtering
 strategy for each table type.
 """
@@ -12,22 +12,20 @@ from typing import Dict, Type, Any
 
 
 class TablePattern(Enum):
-    """Types of table ownership patterns in MeatyPrompts."""
+    """Types of table ownership patterns in MeatyMusic AMCS."""
 
-    USER_OWNED = "user_owned"      # prompts, collections, share_tokens
+    USER_OWNED = "user_owned"      # songs, personas, sources (user resources)
     TENANT_OWNED = "tenant_owned"  # model_*, workspace_* (tenant resources)
     SCOPE_BASED = "scope_based"    # complex scope hierarchies
     SYSTEM_MANAGED = "system"      # system-only resources
 
 
 # Table pattern mapping for all known tables
+# Will be populated with AMCS domain tables in Phase 3
 TABLE_PATTERNS: Dict[str, TablePattern] = {
     # User-owned resources (filtered by user_id/owner_id)
-    'prompts': TablePattern.USER_OWNED,
-    'collections': TablePattern.USER_OWNED,
-    'share_tokens': TablePattern.USER_OWNED,
+    # TODO Phase 3: Add AMCS tables: songs, personas, sources, etc.
     'user_preferences': TablePattern.USER_OWNED,
-    'prompt_run_metrics': TablePattern.USER_OWNED,
 
     # Tenant-owned model resources (filtered by tenant_id)
     'model_providers': TablePattern.TENANT_OWNED,
