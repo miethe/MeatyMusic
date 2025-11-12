@@ -3,9 +3,10 @@
  * Uses Clerk middleware to protect routes with optional development bypass
  */
 
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
-import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
+
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
 /**
  * Define protected routes that require authentication
@@ -41,6 +42,7 @@ function isDevelopmentBypass(req: NextRequest): boolean {
 export default clerkMiddleware((auth, req) => {
   // Development bypass for MCP/agent testing (secure by environment check)
   if (isDevelopmentBypass(req)) {
+    // eslint-disable-next-line no-console
     console.log('[DEV] Auth bypass enabled for request:', req.url);
     return NextResponse.next();
   }

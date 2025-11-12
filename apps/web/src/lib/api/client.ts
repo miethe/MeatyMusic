@@ -23,6 +23,7 @@ export const apiClient: AxiosInstance = axios.create({
   timeout: API_CONFIG.TIMEOUT,
   headers: {
     'Content-Type': 'application/json',
+    'X-Service-Name': 'meatymusic-web',
   },
   // Serialize array params as repeated params (not indexed) for FastAPI compatibility
   // FastAPI expects: ?genre=pop&genre=rock
