@@ -1,0 +1,331 @@
+name: Security Testing Framework
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run security tests nightly at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      test_suite:
+        description: 'Test suite to run'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - boundary
+          - performance
+          - migration
+          - penetration
+          - concurrent
+
+jobs:
+  security-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: meatymusic_security_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    strategy:
+      matrix:
+        test-suite:
+          - boundary
+          - performance
+          - migration
+          - penetration
+          - concurrent
+      fail-fast: false
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v2
+      with:
+        version: "latest"
+
+    - name: Install dependencies
+      run: |
+        cd services/api
+        uv sync --dev
+
+    - name: Set up test database
+      env:
+        PGPASSWORD: test
+      run: |
+        # Create test databases
+        psql -h localhost -U postgres -c "CREATE DATABASE meatymusic_test;"
+        psql -h localhost -U postgres -c "CREATE DATABASE security_test;"
+
+        # Run migrations on test databases
+        cd services/api
+        export DATABASE_URL_TEST="postgresql://postgres:test@localhost:5432/meatymusic_test"
+        uv run alembic upgrade head
+
+        export DATABASE_URL_TEST="postgresql://postgres:test@localhost:5432/security_test"
+        uv run alembic upgrade head
+
+    - name: Run Security Tests - ${{ matrix.test-suite }}
+      env:
+        DATABASE_URL_TEST: postgresql://postgres:test@localhost:5432/meatymusic_test
+        CLERK_JWT_VERIFICATION_KEY: test-security-key-ci
+        CLERK_WEBHOOK_SECRET: whsec_test_ci
+        SECURITY_TEST_MODE: true
+        LOG_LEVEL: INFO
+      run: |
+        cd services/api
+        case "${{ matrix.test-suite }}" in
+          "boundary")
+            uv run pytest app/tests/security/test_boundary_isolation.py -v --tb=short --durations=10
+            ;;
+          "performance")
+            uv run pytest app/tests/performance/test_security_benchmarks.py -v --tb=short --durations=10
+            ;;
+          "migration")
+            uv run pytest app/tests/migration/ -v --tb=short --durations=10
+            ;;
+          "penetration")
+            uv run pytest app/tests/security/test_penetration.py -v --tb=short --durations=10
+            ;;
+          "concurrent")
+            uv run pytest app/tests/security/test_concurrent_access.py -v --tb=short --durations=10
+            ;;
+          *)
+            echo "Unknown test suite: ${{ matrix.test-suite }}"
+            exit 1
+            ;;
+        esac
+
+    - name: Run Attack Vector Tests
+      if: matrix.test-suite == 'penetration' || github.event.inputs.test_suite == 'all'
+      env:
+        DATABASE_URL_TEST: postgresql://postgres:test@localhost:5432/security_test
+        CLERK_JWT_VERIFICATION_KEY: test-security-key-ci
+        SECURITY_TEST_MODE: true
+      run: |
+        cd services/api
+        uv run pytest app/tests/security/test_attack_vectors.py -v --tb=short
+
+    - name: Generate Security Report
+      if: always()
+      run: |
+        cd services/api
+        mkdir -p security-reports
+
+        # Generate test report
+        echo "# Security Test Report - ${{ matrix.test-suite }}" > security-reports/report-${{ matrix.test-suite }}.md
+        echo "**Date**: $(date)" >> security-reports/report-${{ matrix.test-suite }}.md
+        echo "**Test Suite**: ${{ matrix.test-suite }}" >> security-reports/report-${{ matrix.test-suite }}.md
+        echo "**Status**: ${{ job.status }}" >> security-reports/report-${{ matrix.test-suite }}.md
+        echo "" >> security-reports/report-${{ matrix.test-suite }}.md
+
+        if [ -f pytest.log ]; then
+          echo "## Test Output" >> security-reports/report-${{ matrix.test-suite }}.md
+          echo '```' >> security-reports/report-${{ matrix.test-suite }}.md
+          tail -50 pytest.log >> security-reports/report-${{ matrix.test-suite }}.md
+          echo '```' >> security-reports/report-${{ matrix.test-suite }}.md
+        fi
+
+    - name: Upload Security Report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-report-${{ matrix.test-suite }}
+        path: services/api/security-reports/
+        retention-days: 30
+
+    - name: Comment PR with Security Status
+      if: github.event_name == 'pull_request' && always()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const testSuite = '${{ matrix.test-suite }}';
+          const status = '${{ job.status }}';
+          const emoji = status === 'success' ? '✅' : '❌';
+
+          const body = `${emoji} Security Tests - **${testSuite}**: ${status}`;
+
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: body
+          });
+
+  security-summary:
+    runs-on: ubuntu-latest
+    needs: security-tests
+    if: always()
+
+    steps:
+    - name: Download all security reports
+      uses: actions/download-artifact@v4
+      with:
+        path: security-reports
+
+    - name: Generate Security Summary
+      run: |
+        echo "# Security Test Summary" > security-summary.md
+        echo "**Date**: $(date)" >> security-summary.md
+        echo "**Workflow**: ${{ github.workflow }}" >> security-summary.md
+        echo "**Run ID**: ${{ github.run_id }}" >> security-summary.md
+        echo "" >> security-summary.md
+
+        # Count results
+        total_suites=$(find security-reports -name "report-*.md" | wc -l)
+        echo "**Total Test Suites**: $total_suites" >> security-summary.md
+        echo "" >> security-summary.md
+
+        echo "## Test Results by Suite" >> security-summary.md
+        for report in security-reports/*/report-*.md; do
+          if [ -f "$report" ]; then
+            suite_name=$(basename "$report" .md | sed 's/report-//')
+            echo "- **$suite_name**: $(grep 'Status:' "$report" | cut -d' ' -f2-)" >> security-summary.md
+          fi
+        done
+
+        echo "" >> security-summary.md
+        echo "## Security Compliance Status" >> security-summary.md
+
+        if [ "${{ needs.security-tests.result }}" = "success" ]; then
+          echo "🟢 **PASS**: All security tests passed" >> security-summary.md
+          echo "- User isolation: ✅ Verified" >> security-summary.md
+          echo "- Tenant isolation: ✅ Verified" >> security-summary.md
+          echo "- Attack resistance: ✅ Verified" >> security-summary.md
+          echo "- Performance targets: ✅ Met" >> security-summary.md
+          echo "- Migration integrity: ✅ Verified" >> security-summary.md
+        else
+          echo "🔴 **FAIL**: Security tests failed" >> security-summary.md
+          echo "⚠️ **ACTION REQUIRED**: Review security test failures" >> security-summary.md
+        fi
+
+    - name: Upload Security Summary
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-summary
+        path: security-summary.md
+
+    - name: Fail workflow if security tests failed
+      if: needs.security-tests.result != 'success'
+      run: |
+        echo "Security tests failed. Failing workflow."
+        exit 1
+
+  performance-regression-check:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: meatymusic_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v2
+
+    - name: Install dependencies
+      run: |
+        cd services/api
+        uv sync --dev
+
+    - name: Set up test database
+      env:
+        PGPASSWORD: test
+      run: |
+        psql -h localhost -U postgres -c "CREATE DATABASE meatymusic_test;"
+        cd services/api
+        export DATABASE_URL_TEST="postgresql://postgres:test@localhost:5432/meatymusic_test"
+        uv run alembic upgrade head
+
+    - name: Run Performance Baseline Tests
+      env:
+        DATABASE_URL_TEST: postgresql://postgres:test@localhost:5432/meatymusic_test
+        SECURITY_TEST_MODE: true
+      run: |
+        cd services/api
+        uv run pytest app/tests/performance/test_security_benchmarks.py::TestRLSQueryOverhead::test_simple_query_overhead -v --benchmark-json=benchmark-results.json
+
+    - name: Check Performance Regression
+      run: |
+        cd services/api
+        if [ -f benchmark-results.json ]; then
+          # Extract mean time from benchmark results
+          mean_time=$(python -c "
+          import json
+          with open('benchmark-results.json') as f:
+              data = json.load(f)
+              if 'benchmarks' in data and len(data['benchmarks']) > 0:
+                  print(data['benchmarks'][0]['stats']['mean'])
+              else:
+                  print('0')
+          ")
+
+          # Check if performance is acceptable (< 20ms for security queries)
+          if (( $(echo "$mean_time > 0.02" | bc -l) )); then
+            echo "⚠️ Performance regression detected: ${mean_time}s > 0.02s threshold"
+            echo "performance_regression=true" >> $GITHUB_ENV
+          else
+            echo "✅ Performance within acceptable limits: ${mean_time}s"
+            echo "performance_regression=false" >> $GITHUB_ENV
+          fi
+        fi
+
+    - name: Comment on PR with Performance Results
+      if: always()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const perfRegression = process.env.performance_regression === 'true';
+          const emoji = perfRegression ? '⚠️' : '✅';
+          const status = perfRegression ? 'Performance regression detected' : 'Performance within limits';
+
+          const body = `${emoji} **Security Performance Check**: ${status}
+
+          This PR was tested for security performance impact. ${perfRegression ? 'Please review performance implications.' : 'No performance regression detected.'}`;
+
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: body
+          });

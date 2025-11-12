@@ -1,0 +1,72 @@
+[project]
+name = "meatymusic-api"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.29",
+  "pydantic[email] (>=2.11.7,<3.0.0)",
+  "sqlalchemy>=2.0",
+  "alembic>=1.13",
+  "httpx==0.24.1",
+  "psycopg2-binary (>=2.9.10,<3.0.0)",
+  "pydantic-settings>=2.10.1,<3.0.0",
+  "python-dotenv (>=1.1.1,<2.0.0)",
+  "pre-commit (>=4.2.0,<5.0.0)",
+  "pytest (>=8.4.0,<9.0.0)",
+  "pytest-asyncio (>=0.23.8,<0.24.0)",
+  "itsdangerous (>=2.2.0,<3.0.0)",
+  "requests (>=2.32.4,<3.0.0)",
+  "pgvector (>=0.2.5,<0.3.0)",
+  "python-multipart (>=0.0.20,<0.0.21)",
+  "python-jose[cryptography] (>=3.5.0,<4.0.0)",
+  "opentelemetry-api>=1.27.0,<2.0.0",
+  "opentelemetry-sdk>=1.27.0,<2.0.0",
+  "opentelemetry-exporter-otlp>=1.27.0,<2.0.0",
+  "opentelemetry-instrumentation>=0.45b0,<2.0.0",
+  "opentelemetry-instrumentation-fastapi>=0.45b0,<2.0.0",
+  "opentelemetry-instrumentation-sqlalchemy>=0.45b0,<2.0.0",
+  "opentelemetry-instrumentation-httpx>=0.45b0,<2.0.0",
+  "structlog>=24.1.0,<25.0.0",
+  "python-json-logger>=2.0.7,<3.0.0",
+  "redis>=5.0.0,<6.0.0",
+  "psutil>=7.0.0",
+  "pyyaml>=6.0.2",
+  "asyncpg>=0.30.0",
+  "jsonschema>=4.25.1",
+  "greenlet>=3.2.3",
+  "tiktoken>=0.5.1,<1.0.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["app"]
+
+[tool.ruff]
+# Adopt stricter rules inspired by Daily Joe's configuration
+line-length = 88
+select = [
+  "E",  # pycodestyle
+  "W",  # pycodestyle warnings
+  "F",  # pyflakes
+  "I",  # isort
+  "UP", # pyupgrade
+  "B",  # flake8-bugbear
+  "SIM",# flake8-simplify
+  "PL", # pylint
+  "C",  # McCabe complexity
+  "ANN",# flake8-annotations
+  "ASYNC", # flake8-async
+  "S",  # bandit security rules
+  "PTH",# flake8-use-pathlib
+  "TRY",# tryceratops
+  "RUF" # Ruff specific rules
+]
+ignore = ["ANN101", "ANN102", "ANN204", "ANN401", "S101"]
+target-version = "py311"
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+exclude = ["alembic/"]
