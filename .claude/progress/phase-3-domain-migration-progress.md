@@ -264,6 +264,50 @@ Full validation report: `/docs/validation/phase-3-validation-report.md`
 
 ## Work Log
 
+### 2025-11-12 (16:08) - Test Fixes: Resolved Critical Test Failures
+
+**Commit**: b75f002
+
+**Work Completed:**
+- Fixed 18 test failures (82→100 passing, 71%→86% pass rate)
+- Resolved CRITICAL-2: Service initialization parameter mismatches
+  - Fixed test fixtures to use correct kwarg names (repo= → style_repo=/song_repo=)
+  - Updated test_style_service.py, test_song_workflow.py
+- Resolved CRITICAL-3: JSON schema validation test data mismatches
+  - Aligned all test data with actual JSON schema definitions
+  - Fixed 9 schema validation tests across 8 entity types
+  - Major fixes: Style (tempo_bpm, key object), Lyrics (constraints), SDS (embedded entities)
+- Fixed repository test failures
+  - Changed get_unified_guard mocking from module-level patch to instance method mocking
+  - Fixed 6 repository tests
+- Enhanced validation service error formatting
+  - Added proper quoting of field names in error messages
+
+**Test Results:**
+- Before: 82/116 passing (71%)
+- After: 100/116 passing (86%)
+- Fixed: 18 tests
+- Remaining: 16 failures (application code issues)
+
+**Files Modified:**
+- `services/api/app/tests/test_services/test_style_service.py` - Fixed service init
+- `services/api/app/tests/test_integration/test_song_workflow.py` - Fixed service init
+- `services/api/app/tests/test_repositories/test_style_repo.py` - Fixed mocking
+- `services/api/app/tests/test_services/test_validation_service.py` - Fixed all schema test data
+- `services/api/app/services/validation_service.py` - Fixed error message formatting
+
+**Remaining Issues (Not Test Issues):**
+- Service methods need to handle tenant_id/owner_id parameters
+- Missing repository method: get_by_mood
+- Service validation method signature issues: _validate_tag_conflicts needs blueprint_id
+
+**Next Steps:**
+- These are application code issues, not test issues
+- Should be addressed in separate commits focused on service/repository implementation
+- Tests are now correctly validating the API contracts
+
+---
+
 ### 2025-11-12 - Testing Phase: Comprehensive Test Suite Created
 
 **Work Completed:**
@@ -333,16 +377,28 @@ Full validation report: `/docs/validation/phase-3-validation-report.md`
 - SQLAlchemy inspect() for model introspection tests
 - Coverage reporting with pytest-cov
 
-**Known Issues & Gaps:**
-1. **Service __init__ signatures** - Tests assume `repo=` kwarg, actual services use different patterns
-2. **JSON schema mismatches** - Test data doesn't match actual schema structure (missing required fields, extra properties)
+**Known Issues & Gaps (UPDATED 2025-11-12):**
+1. ~~Service __init__ signatures~~ - **FIXED** (commit b75f002)
+2. ~~JSON schema mismatches~~ - **FIXED** (commit b75f002)
 3. **Repository RLS tests** - Mock-based tests need real DB for RLS policy verification
 4. **Integration tests** - Need real database for cascade delete, transaction rollback, multi-tenant isolation
 5. **Coverage targets** - Models met target (>90%), repositories and services need real DB tests to reach targets
+6. **Service method signatures** - Tests call methods with tenant_id, services don't accept it
+7. **Missing repository methods** - get_by_mood not implemented in StyleRepository
+8. **Service validation logic** - _validate_tag_conflicts signature issues
+
+**Test Results After Fixes (2025-11-12 16:08):**
+- **Before**: 82 passing / 116 total (71% pass rate)
+- **After**: 100 passing / 116 total (86% pass rate)
+- **Fixed**: 18 tests (service init + JSON schema issues)
+- **Remaining**: 16 failures (application code issues, not test issues)
 
 **Next Steps for Full Coverage:**
-- Fix service test mocks to match actual service __init__ signatures
-- Align JSON schema test data with actual schema definitions
+- ~~Fix service test mocks to match actual service __init__ signatures~~ ✅ DONE
+- ~~Align JSON schema test data with actual schema definitions~~ ✅ DONE
+- Fix service method signatures to handle tenant_id/owner_id properly
+- Implement missing repository methods (get_by_mood)
+- Fix service validation method signatures
 - Create DB integration tests with real PostgreSQL database
 - Implement RLS policy tests with actual session context
 - Add end-to-end workflow tests with database transactions
