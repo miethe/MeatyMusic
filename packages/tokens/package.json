@@ -1,0 +1,25 @@
+{
+  "name": "@meatymusic/tokens",
+  "version": "0.0.1",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "npm run build:tokens && tsc -p tsconfig.build.json && copyfiles -u 1 \"css/**/*.css\" dist",
+    "build:tokens": "node src/build.js",
+    "lint": "eslint src --ext .ts,.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "watch": "npm run build:tokens -- --watch"
+  },
+  "files": [
+    "dist",
+    "css"
+  ],
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.20.0",
+    "@typescript-eslint/parser": "^6.20.0",
+    "copyfiles": "^2.4.1",
+    "typescript": "^5.4.0"
+  }
+}

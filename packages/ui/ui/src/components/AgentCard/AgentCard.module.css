@@ -1,0 +1,483 @@
+/* AgentCard Design Token-Based Styles */
+
+/* Base card styles using design tokens - inherits from PromptCard pattern */
+.card {
+  min-width: 360px;
+  max-width: 420px;
+  width: 100%;
+  padding: var(--mp-spacing-4);
+  border-radius: var(--mp-radius-md);
+  background-color: var(--mp-color-surface);
+  border: 1px solid var(--mp-color-border);
+  box-shadow: var(--mp-elevation-1);
+  transition-property: box-shadow, border-color, transform;
+  transition-duration: var(--mp-motion-duration-ui, 150ms);
+  transition-timing-function: var(--mp-motion-easing-enter, ease-out);
+  position: relative;
+  overflow: visible;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  isolation: isolate;
+}
+
+/* Border glow effect for hover */
+.card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: var(--mp-radius-md);
+  background: linear-gradient(
+    135deg,
+    var(--mp-color-primary) 0%,
+    var(--mp-color-accent) 100%
+  );
+  opacity: 0;
+  transition: opacity var(--mp-motion-duration-panel, 250ms) var(--mp-motion-easing-enter, ease-out);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.card:hover::before {
+  opacity: 0.15;
+}
+
+/* Enhanced hover state with elevation lift */
+.card:hover {
+  box-shadow: var(--mp-elevation-3);
+  border-color: var(--mp-color-primary);
+  transform: translateY(-2px);
+}
+
+/* Active state for press feedback */
+.card:active {
+  transform: translateY(-1px);
+  box-shadow: var(--mp-elevation-2);
+  transition-duration: 50ms;
+}
+
+/* Enhanced focus-visible state */
+.card:focus-visible {
+  outline: 2px solid var(--mp-color-ring);
+  outline-offset: 3px;
+  box-sizing: border-box;
+  box-shadow:
+    var(--mp-elevation-2),
+    0 0 0 4px rgba(124, 58, 237, 0.1);
+}
+
+/* ============================================================================
+   CHECKBOX SELECTION STYLES
+   ============================================================================ */
+
+.checkboxContainer {
+  position: absolute;
+  top: var(--mp-spacing-3);
+  left: var(--mp-spacing-3);
+  z-index: 100;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity var(--mp-motion-duration-ui, 150ms) var(--mp-motion-easing-enter),
+              transform var(--mp-motion-duration-ui, 150ms) var(--mp-motion-easing-enter);
+  pointer-events: none;
+}
+
+.checkboxVisible {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+
+.checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  background-color: var(--mp-color-surface);
+  box-shadow: var(--mp-elevation-2);
+  transition: transform var(--mp-motion-duration-micro, 70ms) var(--mp-motion-easing-enter);
+}
+
+.checkbox:hover {
+  transform: scale(1.05);
+}
+
+/* ============================================================================
+   SIZE VARIANTS
+   ============================================================================ */
+
+.compact {
+  min-width: 288px;
+  max-width: 288px;
+  width: 288px;
+  height: 220px;
+  overflow: visible;
+}
+
+.compact:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--mp-elevation-2);
+}
+
+.standard {
+  min-width: 360px;
+  max-width: 420px;
+  width: 100%;
+  height: 280px;
+}
+
+.xl {
+  min-width: 560px;
+  max-width: 560px;
+  width: 560px;
+  height: 320px;
+}
+
+.xl:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--mp-elevation-4);
+}
+
+/* ============================================================================
+   STATE VARIANTS
+   ============================================================================ */
+
+.running {
+  border-left: 4px solid var(--mp-color-info);
+  animation: runningPulse 2s ease-in-out infinite;
+}
+
+.running:hover {
+  box-shadow: var(--mp-elevation-2);
+  transform: translateY(-1px);
+}
+
+.error {
+  border-left: 4px solid var(--mp-color-danger);
+}
+
+.error:hover {
+  border-color: var(--mp-color-danger);
+}
+
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.disabled:hover {
+  box-shadow: var(--mp-elevation-1);
+  transform: none;
+}
+
+.selected {
+  border: 2px solid var(--mp-color-primary);
+  box-sizing: border-box;
+  box-shadow: var(--mp-elevation-2),
+              0 0 0 1px var(--mp-color-primary),
+              0 0 20px rgba(124, 58, 237, 0.15);
+  background-color: rgba(124, 58, 237, 0.02);
+}
+
+.selected:hover {
+  border-color: var(--mp-color-primary);
+  box-shadow: var(--mp-elevation-3),
+              0 0 0 1px var(--mp-color-primary),
+              0 0 24px rgba(124, 58, 237, 0.2);
+  background-color: rgba(124, 58, 237, 0.03);
+}
+
+/* ============================================================================
+   PROGRESS BAR (RUNNING STATE)
+   ============================================================================ */
+
+.progressBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: var(--mp-color-panel);
+  overflow: hidden;
+  border-radius: var(--mp-radius-md) var(--mp-radius-md) 0 0;
+  z-index: 10;
+}
+
+.progressIndicator {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--mp-color-info) 0%,
+    var(--mp-color-primary) 50%,
+    var(--mp-color-info) 100%
+  );
+  background-size: 200% 100%;
+  animation: progressFlow 1.5s linear infinite;
+  position: relative;
+}
+
+@keyframes progressFlow {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes runningPulse {
+  0%, 100% {
+    border-left-color: var(--mp-color-info);
+  }
+  50% {
+    border-left-color: var(--mp-color-info-subtle);
+  }
+}
+
+/* ============================================================================
+   TYPOGRAPHY
+   ============================================================================ */
+
+.titleText {
+  color: var(--mp-color-text-strong);
+  font-weight: 600;
+  line-height: var(--mp-typography-lineHeight-heading);
+  font-size: var(--mp-typography-fontSize-3);
+  letter-spacing: var(--mp-typography-letterSpacing-tight, -0.01em);
+  transition: color var(--mp-motion-duration-ui) var(--mp-motion-easing-enter),
+              transform var(--mp-motion-duration-ui) var(--mp-motion-easing-enter);
+}
+
+.card:hover .titleText {
+  color: var(--mp-color-primary);
+  transform: translateX(1px);
+}
+
+.mutedText {
+  color: var(--mp-color-text-muted);
+  font-size: var(--mp-typography-fontSize-1);
+  transition: color var(--mp-motion-duration-ui) var(--mp-motion-easing-enter);
+}
+
+/* ============================================================================
+   ZONE-BASED LAYOUT SYSTEM
+   ============================================================================ */
+
+.headerZone {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: var(--mp-spacing-3);
+  min-width: 0;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.headerContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--mp-spacing-3);
+  min-width: 0;
+  width: 100%;
+}
+
+.titleContainer {
+  flex: 1;
+  min-width: 0;
+}
+
+.metadataContainer {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--mp-spacing-2);
+  flex-shrink: 0;
+  max-width: 35%;
+}
+
+.runtimeZone {
+  margin-bottom: var(--mp-spacing-3);
+  min-width: 0;
+  width: 100%;
+}
+
+.entryPromptZone {
+  margin-bottom: var(--mp-spacing-3);
+  min-width: 0;
+  width: 100%;
+}
+
+.toolsZone {
+  margin-bottom: var(--mp-spacing-2);
+  min-width: 0;
+  width: 100%;
+}
+
+.variablesZone {
+  margin-bottom: var(--mp-spacing-3);
+  min-width: 0;
+  width: 100%;
+}
+
+.tagsZone {
+  margin-bottom: var(--mp-spacing-3);
+  min-width: 0;
+  width: 100%;
+}
+
+.bodyArea {
+  flex-grow: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.actionsRow {
+  padding-top: var(--mp-spacing-3);
+  border-top: 1px solid var(--mp-color-border-subtle);
+  min-width: 0;
+  width: 100%;
+  margin-top: auto;
+  flex-shrink: 0;
+}
+
+.actionsRow button {
+  transition: all var(--mp-motion-duration-micro, 70ms) var(--mp-motion-easing-enter);
+}
+
+.actionsRow button:hover {
+  transform: scale(1.02);
+  box-shadow: var(--mp-elevation-1);
+}
+
+.actionsRow button:active {
+  transform: scale(0.98);
+  transition-duration: 50ms;
+}
+
+/* ============================================================================
+   ERROR BANNER
+   ============================================================================ */
+
+.errorMessage {
+  margin-top: var(--mp-spacing-3);
+  padding: var(--mp-spacing-3);
+  background-color: var(--mp-color-surface-muted);
+  border: 1px solid var(--mp-color-danger);
+  border-left: 4px solid var(--mp-color-danger);
+  border-radius: var(--mp-radius-sm);
+  color: var(--mp-color-danger);
+  position: relative;
+  animation: errorSlideIn 200ms var(--mp-motion-easing-enter);
+}
+
+@keyframes errorSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================================
+   REDUCED MOTION SUPPORT
+   ============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .card::before,
+  .titleText,
+  .mutedText,
+  .checkboxContainer,
+  .checkbox,
+  .progressIndicator,
+  .actionsRow button {
+    transition: none;
+    animation: none;
+  }
+
+  .card:hover,
+  .card:active,
+  .card:hover .titleText,
+  .checkbox:hover,
+  .actionsRow button:hover,
+  .actionsRow button:active {
+    transform: none;
+  }
+
+  .checkboxContainer {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .progressIndicator {
+    background: var(--mp-color-info);
+  }
+
+  .running {
+    animation: none;
+  }
+
+  .errorMessage {
+    animation: none;
+  }
+}
+
+/* ============================================================================
+   MOBILE RESPONSIVE
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  .card {
+    min-width: 280px;
+    max-width: 100%;
+    padding: var(--mp-spacing-3);
+  }
+
+  .standard {
+    min-width: 280px;
+    max-width: 100%;
+    min-height: 260px;
+  }
+
+  .xl {
+    min-width: 280px;
+    max-width: 100%;
+    min-height: 280px;
+  }
+
+  .headerZone {
+    margin-bottom: var(--mp-spacing-2);
+  }
+
+  .headerContent {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mp-spacing-2);
+  }
+
+  .metadataContainer {
+    max-width: 100%;
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  /* Disable hover effects on mobile */
+  .card:hover {
+    transform: none;
+    box-shadow: var(--mp-elevation-1);
+  }
+
+  .card:hover::before {
+    opacity: 0;
+  }
+
+  .card:hover .titleText {
+    transform: none;
+  }
+
+  .actionsRow button:hover {
+    transform: none;
+  }
+}

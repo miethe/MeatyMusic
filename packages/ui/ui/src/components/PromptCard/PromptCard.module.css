@@ -1,0 +1,1093 @@
+/* PromptCard Design Token-Based Styles */
+
+/* Base card styles using design tokens */
+.card {
+  min-width: 360px;
+  max-width: 420px;
+  width: 100%;
+  padding: var(--mp-spacing-4);
+  border-radius: var(--mp-radius-md);
+  background-color: var(--mp-color-surface);
+  border: 1px solid var(--mp-color-border);
+  box-shadow: var(--mp-elevation-1);
+  transition-property: box-shadow, border-color, transform;
+  transition-duration: var(--mp-motion-duration-ui, 150ms);
+  transition-timing-function: var(--mp-motion-easing-enter, ease-out);
+  position: relative;
+  overflow: visible; /* Allow complications to extend beyond card bounds in controlled manner */
+  box-sizing: border-box;
+  cursor: pointer;
+  /* Fixed layout structure */
+  display: flex;
+  flex-direction: column;
+  /* Create containing block for absolutely positioned complications */
+  isolation: isolate;
+}
+
+/* Border glow effect for hover - Section 2.1.2 */
+.card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: var(--mp-radius-md);
+  background: linear-gradient(
+    135deg,
+    var(--mp-color-primary) 0%,
+    var(--mp-color-accent) 100%
+  );
+  opacity: 0;
+  transition: opacity var(--mp-motion-duration-panel, 250ms) var(--mp-motion-easing-enter, ease-out);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.card:hover::before {
+  opacity: 0.15;
+}
+
+/* Enhanced hover state with elevation lift - Section 2.1.1 */
+.card:hover {
+  box-shadow: var(--mp-elevation-3);
+  border-color: var(--mp-color-primary);
+  transform: translateY(-2px);
+}
+
+/* Active state for press feedback */
+.card:active {
+  transform: translateY(-1px);
+  box-shadow: var(--mp-elevation-2);
+  transition-duration: 50ms;
+}
+
+/* Enhanced focus-visible state with pulse animation - Section 2.1.3 */
+.card:focus-visible {
+  outline: 2px solid var(--mp-color-ring);
+  outline-offset: 3px;
+  box-sizing: border-box;
+  box-shadow:
+    var(--mp-elevation-2),
+    0 0 0 4px rgba(124, 58, 237, 0.1); /* Primary color glow */
+  animation: focusRingPulse 2s ease-in-out infinite;
+}
+
+/* ============================================================================
+   CHECKBOX SELECTION STYLES
+   ============================================================================ */
+
+/* Checkbox container - positioned absolutely in top-left corner */
+.checkboxContainer {
+  position: absolute;
+  top: var(--mp-spacing-3);
+  left: var(--mp-spacing-3);
+  z-index: 100; /* Above complications (complications have z-index: 10 max) */
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity var(--mp-motion-duration-ui, 150ms) var(--mp-motion-easing-enter),
+              transform var(--mp-motion-duration-ui, 150ms) var(--mp-motion-easing-enter);
+  pointer-events: none;
+  /* Ensure proper hit area */
+  min-width: 20px;
+  min-height: 20px;
+}
+
+/* Show checkbox when visible */
+.checkboxVisible {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+
+/* Checkbox styling */
+.checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  background-color: var(--mp-color-surface);
+  box-shadow: var(--mp-elevation-2);
+  transition: transform var(--mp-motion-duration-micro, 70ms) var(--mp-motion-easing-enter);
+}
+
+.checkbox:hover {
+  transform: scale(1.05);
+}
+
+.checkbox:focus-visible {
+  outline: 2px solid var(--mp-color-ring);
+  outline-offset: 2px;
+  box-shadow: var(--mp-elevation-2), 0 0 0 4px rgba(124, 58, 237, 0.1);
+}
+
+/* Checkbox disabled state */
+.checkbox:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.checkbox:disabled:hover {
+  transform: none;
+}
+
+@keyframes focusRingPulse {
+  0%, 100% {
+    outline-offset: 3px;
+    transform: scale(1);
+  }
+  50% {
+    outline-offset: 4px;
+    transform: scale(1.02);
+  }
+}
+
+.card:focus-within {
+  outline: 2px solid var(--mp-color-ring);
+  outline-offset: 2px;
+  /* Ensure focus ring stays within component bounds */
+  box-sizing: border-box;
+}
+
+/* Size variants - Section 2.1.1 */
+.compact {
+  min-width: 288px;
+  max-width: 288px;
+  width: 288px;
+  height: 220px;
+  overflow: visible; /* Allow complications to extend beyond compact card bounds */
+  transition-property: box-shadow, border-color, transform;
+  transition-duration: var(--mp-motion-duration-ui, 150ms);
+  transition-timing-function: var(--mp-motion-easing-enter, ease-out);
+}
+
+/* Compact hover: more subtle elevation */
+.compact:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--mp-elevation-2);
+}
+
+.standard {
+  min-width: 360px;
+  max-width: 420px;
+  width: 100%;
+  height: 340px; /* Increased from 280px to accommodate 3-line content preview */
+}
+
+.xl {
+  min-width: 560px;
+  max-width: 560px;
+  width: 560px;
+  height: 400px; /* Increased from 320px to accommodate 4-line content preview */
+}
+
+/* XL hover: more dramatic elevation */
+.xl:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--mp-elevation-4);
+}
+
+/* State variants */
+.running {
+  border-left: 4px solid var(--mp-color-info);
+  animation: runningPulse 2s ease-in-out infinite;
+}
+
+.running:hover {
+  /* Running cards should have subtle hover */
+  box-shadow: var(--mp-elevation-2);
+  transform: translateY(-1px);
+}
+
+.error {
+  border-left: 4px solid var(--mp-color-danger);
+}
+
+.error:hover {
+  border-color: var(--mp-color-danger);
+}
+
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.disabled:hover {
+  /* Disabled cards should not respond to hover */
+  box-shadow: var(--mp-elevation-1);
+  transform: none;
+}
+
+.selected {
+  border: 2px solid var(--mp-color-primary);
+  box-sizing: border-box;
+  box-shadow: var(--mp-elevation-2),
+              0 0 0 1px var(--mp-color-primary),
+              0 0 20px rgba(124, 58, 237, 0.15);
+  background-color: rgba(124, 58, 237, 0.02); /* Subtle blue tint */
+}
+
+.selected:hover {
+  border-color: var(--mp-color-primary);
+  box-shadow: var(--mp-elevation-3),
+              0 0 0 1px var(--mp-color-primary),
+              0 0 24px rgba(124, 58, 237, 0.2);
+  background-color: rgba(124, 58, 237, 0.03);
+}
+
+/* Typography using design tokens */
+.titleText {
+  color: var(--mp-color-text-strong);
+  font-weight: 600;
+  line-height: var(--mp-typography-lineHeight-heading);
+  font-size: var(--mp-typography-fontSize-3);
+  letter-spacing: var(--mp-typography-letterSpacing-tight, -0.01em);
+  transition: color var(--mp-motion-duration-ui) var(--mp-motion-easing-enter),
+              transform var(--mp-motion-duration-ui) var(--mp-motion-easing-enter);
+}
+
+/* Title enhancement with horizontal shift - Section 2.1.2 */
+.card:hover .titleText {
+  color: var(--mp-color-primary);
+  transform: translateX(1px);
+}
+
+.mutedText {
+  color: var(--mp-color-text-muted);
+  font-size: var(--mp-typography-fontSize-1);
+  font-weight: 500; /* Medium weight for improved readability */
+  transition: color var(--mp-motion-duration-ui) var(--mp-motion-easing-enter);
+}
+
+.bodyText {
+  color: var(--mp-color-text-muted);
+  line-height: var(--mp-typography-lineHeight-body);
+  font-size: var(--mp-typography-fontSize-2);
+}
+
+/* Description text enhancement - lighten on hover */
+.card:hover .descriptionZone p {
+  color: var(--mp-color-text-base);
+  transition: color var(--mp-motion-duration-ui) var(--mp-motion-easing-enter);
+}
+
+/* Progress bar for running state - Section 2.1.5 */
+.progressBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: var(--mp-color-panel);
+  overflow: hidden;
+  border-radius: var(--mp-radius-md) var(--mp-radius-md) 0 0;
+  z-index: 10;
+}
+
+.progressIndicator {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--mp-color-info) 0%,
+    var(--mp-color-primary) 50%,
+    var(--mp-color-info) 100%
+  );
+  background-size: 200% 100%;
+  animation: progressFlow 1.5s linear infinite;
+  position: relative;
+}
+
+/* Enhanced progress animation with shimmer effect */
+.progressIndicator::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  right: 100%;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.5) 40%,
+    rgba(255, 255, 255, 0.8) 50%,
+    rgba(255, 255, 255, 0.5) 60%,
+    transparent 100%
+  );
+  animation: progressShimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes progressFlow {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes progressShimmer {
+  0% {
+    left: -100%;
+    right: 100%;
+  }
+  100% {
+    left: 100%;
+    right: -100%;
+  }
+}
+
+/* Error message styling - enhanced for MP-PCARD-CMP-004 */
+.errorMessage {
+  margin-top: var(--mp-spacing-3);
+  padding: var(--mp-spacing-3);
+  background-color: var(--mp-color-surface-muted);
+  border: 1px solid var(--mp-color-danger);
+  border-left: 4px solid var(--mp-color-danger); /* 4px left border as specified */
+  border-radius: var(--mp-radius-sm);
+  color: var(--mp-color-danger);
+  position: relative;
+  animation: errorSlideIn 200ms var(--mp-motion-easing-enter);
+}
+
+/* Error panel with retry action */
+.errorPanel {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--mp-spacing-2);
+}
+
+.errorContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.errorTitle {
+  font-weight: 600;
+  font-size: var(--mp-typography-fontSize-1);
+  color: var(--mp-color-danger);
+  margin-bottom: var(--mp-spacing-1);
+}
+
+.errorDescription {
+  font-size: var(--mp-typography-fontSize-1);
+  color: var(--mp-color-text-muted);
+  line-height: var(--mp-typography-lineHeight-body);
+}
+
+.retryButton {
+  flex-shrink: 0;
+}
+
+/* Spacing utilities using design tokens */
+.headerSpacing {
+  padding-bottom: var(--mp-spacing-3);
+}
+
+.metaSpacing {
+  margin-top: var(--mp-spacing-3);
+  padding-top: var(--mp-spacing-3);
+  border-top: 1px solid var(--mp-color-border);
+}
+
+.compactMetaSpacing {
+  margin-top: var(--mp-spacing-2);
+  padding-top: var(--mp-spacing-2);
+}
+
+.contentSpacing {
+  padding-top: 0;
+}
+
+.statsSpacing {
+  padding: var(--mp-spacing-3) 0;
+  margin-bottom: var(--mp-spacing-4);
+  border-top: 1px solid var(--mp-color-border);
+}
+
+/* Badge and chip spacing with overflow control - Section 2.1.4 */
+.badgeSpacing {
+  gap: var(--mp-spacing-2);
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Badge micro-animation on card hover */
+.metadataContainer > * {
+  transition: transform var(--mp-motion-duration-micro, 70ms) var(--mp-motion-easing-enter),
+              box-shadow var(--mp-motion-duration-ui) var(--mp-motion-easing-enter);
+}
+
+.card:hover .metadataContainer > * {
+  transform: scale(1.05);
+  box-shadow: var(--mp-elevation-1);
+}
+
+/* Truncation utilities */
+.truncateContainer {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+.truncateContent {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.badgeContainer {
+  display: flex;
+  align-items: center;
+  gap: var(--mp-spacing-1);
+  min-width: 0;
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+
+.badgeOverflow {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* ============================================================================
+   ZONE-BASED LAYOUT SYSTEM
+   ============================================================================ */
+
+/**
+ * New zone-based layout replacing the problematic grid system
+ * Creates deterministic layouts with graceful degradation
+ * Prevents overlap issues while maintaining complication compatibility
+ */
+
+/* Zone Architecture - Single column layout with reserved space */
+.headerZone {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: var(--mp-spacing-3);
+  min-width: 0;
+  width: 100%;
+  /* Reserve space for top complications */
+  padding-top: var(--complication-reserve-top, 0);
+  position: relative;
+  z-index: 1;
+}
+
+/* Header content wrapper - handles title and essential metadata */
+.headerContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--mp-spacing-3);
+  min-width: 0;
+  width: 100%;
+}
+
+/* Title container with smart truncation */
+.titleContainer {
+  flex: 1;
+  min-width: 0; /* Enable text truncation */
+  /* Reserve space for topRight complications */
+  margin-right: var(--complication-reserve-right, 0);
+}
+
+/* Metadata container for essential badges/indicators */
+.metadataContainer {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--mp-spacing-2);
+  flex-shrink: 0;
+  /* Ensure metadata doesn't overwhelm title or overlap complications */
+  max-width: 35%;
+  /* Reserve space for topRight complications */
+  margin-right: var(--complication-reserve-right, 0);
+}
+
+/* Description zone - conditionally visible */
+.descriptionZone {
+  margin-bottom: var(--mp-spacing-2);
+  /* Only show when description exists and not compact */
+  display: var(--description-display, block);
+}
+
+/* Legacy header row for backward compatibility - DEPRECATED */
+.headerRow {
+  /* Replaced by headerZone system */
+  display: none;
+}
+
+.metaStrip {
+  margin-bottom: var(--mp-spacing-3);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--mp-spacing-2);
+  min-height: 24px; /* Ensure consistent height even when empty */
+  min-width: 0; /* Allow flex children to shrink */
+  width: 100%;
+}
+
+.metaZoneLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--mp-spacing-1);
+  min-width: 0;
+  flex: 1;
+  max-width: 65%;
+}
+
+.metaZoneRight {
+  display: flex;
+  align-items: center;
+  gap: var(--mp-spacing-1);
+  flex-shrink: 0;
+  max-width: 35%;
+}
+
+.bodyPreview {
+  margin-bottom: var(--mp-spacing-4);
+  position: relative;
+  min-width: 0; /* Allow text truncation */
+  width: 100%;
+}
+
+/* Enhanced body preview fade - Section 2.1.6 */
+.bodyPreview::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2em; /* Increased from 1em for smoother fade */
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    var(--mp-color-surface) 100%
+  );
+  pointer-events: none;
+  opacity: 0.9;
+  transition: opacity var(--mp-motion-duration-ui) var(--mp-motion-easing-enter);
+}
+
+.card:hover .bodyPreview::after {
+  opacity: 0.7; /* Reveal more content on hover */
+}
+
+/* ============================================================================
+   ADAPTIVE ZONE MANAGEMENT
+   ============================================================================ */
+
+/* Variable content zones that adapt based on data availability */
+.adaptiveZone {
+  /* Default hidden, shown when content is available */
+  display: none;
+  min-width: 0;
+  width: 100%;
+}
+
+.adaptiveZone.hasContent {
+  display: block;
+}
+
+/* Extended content zone for XL variant */
+.extendedZone {
+  display: none;
+  margin-bottom: var(--mp-spacing-3);
+}
+
+.xl .extendedZone {
+  display: block;
+}
+
+/* Stats row styling */
+.statsRow {
+  margin-bottom: var(--mp-spacing-3);
+  padding-top: var(--mp-spacing-3);
+  border-top: 1px solid var(--mp-color-border-subtle);
+  min-width: 0;
+  width: 100%;
+}
+
+/* Actions row styling - pinned to bottom */
+.actionsRow {
+  padding-top: var(--mp-spacing-3);
+  border-top: 1px solid var(--mp-color-border-subtle);
+  min-width: 0;
+  width: 100%;
+  margin-top: auto; /* Pin to bottom of flex container */
+  flex-shrink: 0; /* Prevent shrinking when content overflows */
+}
+
+/* Action button polish - Section 2.1.3 */
+.actionsRow button {
+  transition: all var(--mp-motion-duration-micro, 70ms) var(--mp-motion-easing-enter);
+}
+
+.actionsRow button:hover {
+  transform: scale(1.02);
+  box-shadow: var(--mp-elevation-1);
+}
+
+.actionsRow button:active {
+  transform: scale(0.98);
+  transition-duration: 50ms;
+}
+
+/* Card content area that grows to fill space */
+.cardContent {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-height: 0; /* Allow flex children to shrink */
+}
+
+/* Body area that can scroll if content overflows */
+.bodyArea {
+  flex-grow: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Animation keyframes - enhanced for MP-PCARD-CMP-004 */
+@keyframes errorSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes runningPulse {
+  0%, 100% {
+    border-left-color: var(--mp-color-info);
+  }
+  50% {
+    border-left-color: var(--mp-color-info-subtle);
+  }
+}
+
+@keyframes hoverElevation {
+  0% {
+    box-shadow: var(--mp-elevation-1);
+  }
+  100% {
+    box-shadow: var(--mp-elevation-2);
+  }
+}
+
+/* Accessibility improvements - enhanced for MP-PCARD-CMP-004 */
+.card:focus-within:not(:focus-visible) {
+  outline: none;
+}
+
+/* Enhanced focus state with animation */
+.card:focus-within {
+  outline: 2px solid var(--mp-color-ring);
+  outline-offset: 2px;
+  box-sizing: border-box;
+  transition: outline-color var(--mp-motion-duration-ui) var(--mp-motion-easing-enter);
+}
+
+/* State combination rules */
+.card.selected:focus-within {
+  outline-color: var(--mp-color-primary);
+  outline-width: 2px;
+}
+
+/* Reduced motion support - Section 2.1.3 and throughout */
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+
+  .card::before {
+    transition: none;
+  }
+
+  .card:hover {
+    transform: none;
+  }
+
+  .card:active {
+    transform: none;
+  }
+
+  .card:focus-visible {
+    animation: none;
+  }
+
+  .titleText {
+    transition: none;
+  }
+
+  .card:hover .titleText {
+    transform: none;
+  }
+
+  .mutedText {
+    transition: none;
+  }
+
+  .progressIndicator {
+    animation: none;
+    background: var(--mp-color-info);
+  }
+
+  .progressIndicator::after {
+    animation: none;
+    display: none;
+  }
+
+  .errorMessage {
+    animation: none;
+  }
+
+  .running {
+    animation: none;
+  }
+
+  .metadataContainer > * {
+    transition: none;
+  }
+
+  .card:hover .metadataContainer > * {
+    transform: none;
+  }
+
+  .actionsRow button {
+    transition: none;
+  }
+
+  .actionsRow button:hover {
+    transform: none;
+  }
+
+  .actionsRow button:active {
+    transform: none;
+  }
+
+  .bodyPreview::after {
+    transition: none;
+  }
+
+  /* Instant state changes for reduced motion */
+  .card:hover {
+    transition: none;
+  }
+
+  .card:focus-within {
+    transition: none;
+  }
+
+  /* Checkbox animations */
+  .checkboxContainer {
+    transition: none;
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .checkbox {
+    transition: none;
+  }
+
+  .checkbox:hover {
+    transform: none;
+  }
+}
+
+/* Loading state for skeleton animation */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--mp-color-surface-muted) 25%,
+    var(--mp-color-surface) 50%,
+    var(--mp-color-surface-muted) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite linear;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Skeleton animation respects reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+    background: var(--mp-color-surface-muted);
+  }
+}
+
+/* Sparkline specific styles */
+.sparklineContainer {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
+.sparklineContainer svg {
+  display: block;
+}
+
+/* Sparkline animations - respects reduced motion */
+@media (prefers-reduced-motion: no-preference) {
+  .sparklineContainer path {
+    transition: stroke-dasharray 0.3s ease-in-out;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .card {
+    border-color: var(--mp-color-text-strong);
+  }
+
+  .titleText {
+    color: var(--mp-color-text-strong);
+    font-weight: 700;
+  }
+
+  /* Ensure sparkline is visible in high contrast */
+  .sparklineContainer path {
+    stroke: var(--mp-color-text-strong) !important;
+    stroke-width: 2;
+  }
+}
+
+/* ============================================================================
+   COMPLICATION SPACE RESERVATION SYSTEM
+   ============================================================================ */
+
+/**
+ * CSS Custom Properties for dynamic space reservation
+ * These are set by the ComplicationProvider based on active complications
+ */
+
+/* Dynamic space reservation based on card size */
+.compact {
+  --complication-max-width: var(--mp-spacing-8); /* 32px */
+  --complication-max-height: var(--mp-spacing-8);
+}
+
+.standard {
+  --complication-max-width: var(--mp-spacing-12); /* 48px */
+  --complication-max-height: var(--mp-spacing-12);
+}
+
+.xl {
+  --complication-max-width: var(--mp-spacing-16); /* 64px */
+  --complication-max-height: var(--mp-spacing-16)
+}
+
+/* Badge container responsive adjustments */
+.compact .badgeContainer {
+  max-width: calc(288px - 2 * var(--mp-spacing-4) - var(--mp-spacing-3) - var(--complication-reserve-right, 0));
+}
+
+.standard .badgeContainer {
+  max-width: calc(420px - 2 * var(--mp-spacing-4) - var(--mp-spacing-3) - var(--complication-reserve-right, 0));
+}
+
+.xl .badgeContainer {
+  max-width: calc(560px - 2 * var(--mp-spacing-4) - var(--mp-spacing-3) - var(--complication-reserve-right, 0));
+}
+
+/* Complication positioning with guaranteed clearance */
+.complication-topRight {
+  position: absolute;
+  top: var(--mp-spacing-3);
+  right: var(--mp-spacing-3);
+  min-width: 80px;
+  max-width: 140px;
+  z-index: 10; /* Below checkbox (z-index: 100) */
+  transition: top var(--mp-motion-duration-ui, 150ms) var(--mp-motion-easing-exit);
+}
+
+.complication-topLeft {
+  position: absolute;
+  top: var(--mp-spacing-3);
+  left: var(--mp-spacing-3);
+  max-width: 120px;
+  z-index: 10; /* Below checkbox (z-index: 100) */
+  transition: top var(--mp-motion-duration-ui, 150ms) var(--mp-motion-easing-exit);
+}
+
+/* Shift topLeft complication down when checkbox is visible to prevent overlap */
+.card:has(.checkboxVisible) .complication-topLeft {
+  top: calc(var(--mp-spacing-3) + 32px); /* 32px = checkbox height + clearance */
+}
+
+/* ============================================================================
+   COMPONENT PRIORITY & OVERFLOW MANAGEMENT
+   ============================================================================ */
+
+/**
+ * Priority-based component visibility for space-constrained layouts
+ * Components with higher priority (lower numbers) show first
+ */
+
+/* Priority 1: Essential (always visible) */
+.priority-essential {
+  display: flex;
+  order: 1;
+}
+
+/* Priority 2: Important (hidden only in extreme space constraints) */
+.priority-important {
+  display: flex;
+  order: 2;
+}
+
+/* Priority 3: Supplementary (hidden in compact/mobile) */
+.priority-supplementary {
+  display: flex;
+  order: 3;
+}
+
+.compact .priority-supplementary {
+  display: none;
+}
+
+/* Priority 4: Extended (XL only) */
+.priority-extended {
+  display: none;
+  order: 4;
+}
+
+.xl .priority-extended {
+  display: flex;
+}
+
+/* Overflow handling for metadata */
+.metadataOverflow {
+  position: relative;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.metadataOverflow::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--mp-spacing-2);
+  background: linear-gradient(to left, var(--mp-color-surface), transparent);
+  pointer-events: none;
+  opacity: var(--overflow-indicator, 0);
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .card {
+    min-width: 280px;
+    max-width: 100%;
+    padding: var(--mp-spacing-3);
+  }
+
+  .standard {
+    min-width: 280px;
+    max-width: 100%;
+    min-height: 320px; /* Increased from 260px to accommodate 3-line preview on mobile */
+  }
+
+  .xl {
+    min-width: 280px;
+    max-width: 100%;
+    min-height: 360px; /* Increased from 280px to accommodate 4-line preview on mobile */
+  }
+
+  .headerZone {
+    margin-bottom: var(--mp-spacing-2);
+  }
+
+  .headerContent {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mp-spacing-2);
+  }
+
+  .metadataContainer {
+    max-width: 100%;
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .metaStrip {
+    margin-bottom: var(--mp-spacing-2);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mp-spacing-2);
+  }
+
+  .metaZoneLeft,
+  .metaZoneRight {
+    max-width: 100%;
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .bodyPreview {
+    margin-bottom: var(--mp-spacing-3);
+  }
+
+  /* Mobile complications get moved to block flow */
+  .priority-supplementary {
+    display: flex;
+    order: 10; /* Move to end */
+    margin-top: var(--mp-spacing-2);
+  }
+
+  /* Disable hover effects on mobile */
+  .card:hover {
+    transform: none;
+    box-shadow: var(--mp-elevation-1);
+  }
+
+  .card:hover::before {
+    opacity: 0;
+  }
+
+  .card:hover .titleText {
+    transform: none;
+  }
+
+  .card:hover .metadataContainer > * {
+    transform: none;
+  }
+
+  .actionsRow button:hover {
+    transform: none;
+  }
+}
+
+/* Tablet responsive adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .card {
+    min-width: 320px;
+    max-width: 380px;
+  }
+
+  .standard {
+    min-width: 320px;
+    max-width: 380px;
+  }
+
+  .xl {
+    min-width: 480px;
+    max-width: 520px;
+  }
+}
+
+/* ============================================================================
+   LAYOUT ZONE STYLES
+   ============================================================================ */
+
+/**
+ * Zone-specific styling for the new layout system
+ * Each zone has specific behavior and responsive characteristics
+ */

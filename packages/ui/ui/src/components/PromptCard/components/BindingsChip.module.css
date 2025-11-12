@@ -1,0 +1,108 @@
+/* BindingsChip Component Styles */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: var(--mp-radius-sm);
+  background: var(--mp-color-panel);
+  border: 1px solid var(--mp-color-border);
+  font-size: 13px;
+  font-family: var(--mp-typography-font-family-ui);
+  color: var(--mp-color-text-base);
+  transition: all var(--mp-motion-duration-micro) var(--mp-motion-easing-enter);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+/* Hover state - elevation, border color, slight scale */
+.chip:hover:not(.disabled) {
+  background: var(--mp-color-surface);
+  border-color: var(--mp-color-primary);
+  box-shadow: var(--mp-elevation-1);
+  transform: scale(1.02);
+}
+
+/* Focus state - visible outline ring */
+.chip:focus-visible {
+  outline: 2px solid var(--mp-color-ring);
+  outline-offset: 2px;
+}
+
+/* Active state - slight press effect */
+.chip:active:not(.disabled) {
+  transform: scale(0.98);
+  transition-duration: 50ms;
+}
+
+/* Disabled state - reduced opacity, not-allowed cursor */
+.chip.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Type-specific icon colors */
+.chip.context .icon {
+  color: var(--mp-color-info);
+}
+
+.chip.agent .icon {
+  color: var(--mp-color-secondary);
+}
+
+.chip.variable .icon {
+  color: var(--mp-color-accent);
+}
+
+.chip.model .icon {
+  color: var(--mp-color-primary);
+}
+
+/* Icon styling */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  transition: color var(--mp-motion-duration-micro) var(--mp-motion-easing-enter);
+}
+
+/* Name styling with text overflow */
+.name {
+  flex: 1;
+  min-width: 0;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* Accessibility: High contrast mode support */
+@media (prefers-contrast: high) {
+  .chip {
+    border-width: 2px;
+  }
+
+  .chip:focus-visible {
+    outline-width: 3px;
+  }
+}
+
+/* Accessibility: Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .chip,
+  .icon {
+    transition: none;
+  }
+
+  .chip:hover:not(.disabled),
+  .chip:active:not(.disabled) {
+    transform: none;
+  }
+}
