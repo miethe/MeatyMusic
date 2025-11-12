@@ -223,8 +223,15 @@ class CacheSettings(BaseSettings):
 class Settings(BaseSettings):
     """Top-level application settings."""
 
+    # Service identification
+    SERVICE_NAME: str = "meatymusic-api"
+
+    # Database configuration
     DATABASE_URL: str
     DATABASE_URL_TEST: str
+    POSTGRES_DB: str = "meatymusic"
+
+    # API configuration
     API_V1_STR: str = "/api/v1"
     PROJECT_NAME: str = "MeatyMusic"
     PROJECT_DESCRIPTION: str = "Agentic Music Creation System (AMCS)"

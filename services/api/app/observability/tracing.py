@@ -96,9 +96,9 @@ def init_tracing(app: FastAPI, engine: Engine) -> None:
     exporter_name: str = settings.OBS.OTEL_EXPORTER_TYPE
     resource: Resource = Resource.create(
         {
-            "service.name": "meatymusic-api",
+            "service.name": settings.SERVICE_NAME,
             "service.version": os.getenv("API_VERSION", "0.1.0"),
-            "deployment.environment": os.getenv("ENVIRONMENT", "development"),
+            "deployment.environment": settings.ENVIRONMENT,
         }
     )
 
