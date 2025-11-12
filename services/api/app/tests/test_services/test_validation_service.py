@@ -38,22 +38,33 @@ class TestValidationService:
     def test_validate_sds_valid(self, service):
         """Test SDS validation with valid data."""
         valid_sds = {
-            "version": "1.0.0",
-            "song_id": "550e8400-e29b-41d4-a716-446655440000",
-            "global_seed": 12345,
-            "style_id": "550e8400-e29b-41d4-a716-446655440001",
-            "lyrics_id": "550e8400-e29b-41d4-a716-446655440002",
-            "producer_notes_id": "550e8400-e29b-41d4-a716-446655440003",
-            "persona_id": "550e8400-e29b-41d4-a716-446655440004",
-            "blueprint": {
-                "id": "pop-2025-01",
+            "title": "Test Song",
+            "blueprint_ref": {
+                "genre": "Pop",
                 "version": "2025.01"
             },
-            "feature_flags": {},
-            "render_config": {
-                "enabled": False,
+            "style": {
+                "genre_detail": {"primary": "Pop"},
+                "tempo_bpm": 120,
+                "key": {"primary": "C major"},
+                "mood": ["upbeat"],
+                "tags": ["catchy"]
+            },
+            "lyrics": {
+                "language": "en",
+                "section_order": ["Verse", "Chorus"],
+                "constraints": {}
+            },
+            "producer_notes": {
+                "structure": "Verse-Chorus",
+                "hooks": 1
+            },
+            "sources": [],
+            "prompt_controls": {},
+            "render": {
                 "engine": "none"
-            }
+            },
+            "seed": 12345
         }
 
         is_valid, errors = service.validate_sds(valid_sds)
@@ -64,8 +75,8 @@ class TestValidationService:
     def test_validate_sds_missing_required(self, service):
         """Test SDS validation with missing required fields."""
         invalid_sds = {
-            "version": "1.0.0",
-            # Missing song_id, global_seed, style_id
+            "title": "Test",
+            # Missing required: blueprint_ref, style, lyrics, producer_notes, sources, prompt_controls, render, seed
         }
 
         is_valid, errors = service.validate_sds(invalid_sds)
@@ -79,10 +90,18 @@ class TestValidationService:
     def test_validate_sds_invalid_version(self, service):
         """Test SDS validation with invalid version format."""
         invalid_sds = {
-            "version": "invalid-version",  # Should be semver (X.Y.Z)
-            "song_id": "550e8400-e29b-41d4-a716-446655440000",
-            "global_seed": 12345,
-            "style_id": "550e8400-e29b-41d4-a716-446655440001"
+            "title": "Test Song",
+            "blueprint_ref": {
+                "genre": "Pop",
+                "version": "invalid-version"  # Should be YYYY.MM format
+            },
+            "style": {"genre_detail": {"primary": "Pop"}, "tempo_bpm": 120, "key": {"primary": "C major"}, "mood": ["upbeat"], "tags": []},
+            "lyrics": {"language": "en", "section_order": ["Verse"], "constraints": {}},
+            "producer_notes": {"structure": "Verse", "hooks": 1},
+            "sources": [],
+            "prompt_controls": {},
+            "render": {"engine": "none"},
+            "seed": 12345
         }
 
         is_valid, errors = service.validate_sds(invalid_sds)
@@ -93,10 +112,15 @@ class TestValidationService:
     def test_validate_sds_negative_seed(self, service):
         """Test SDS validation with negative global seed."""
         invalid_sds = {
-            "version": "1.0.0",
-            "song_id": "550e8400-e29b-41d4-a716-446655440000",
-            "global_seed": -1,  # Should be non-negative
-            "style_id": "550e8400-e29b-41d4-a716-446655440001"
+            "title": "Test Song",
+            "blueprint_ref": {"genre": "Pop", "version": "2025.01"},
+            "style": {"genre_detail": {"primary": "Pop"}, "tempo_bpm": 120, "key": {"primary": "C major"}, "mood": ["upbeat"], "tags": []},
+            "lyrics": {"language": "en", "section_order": ["Verse"], "constraints": {}},
+            "producer_notes": {"structure": "Verse", "hooks": 1},
+            "sources": [],
+            "prompt_controls": {},
+            "render": {"engine": "none"},
+            "seed": -1  # Should be non-negative
         }
 
         is_valid, errors = service.validate_sds(invalid_sds)
@@ -107,24 +131,22 @@ class TestValidationService:
     def test_validate_style_valid(self, service):
         """Test style validation with valid data."""
         valid_style = {
-            "name": "Test Style",
             "genre_detail": {
                 "primary": "Pop",
                 "subgenres": ["Dance Pop"],
                 "fusions": []
             },
-            "bpm": 120,
-            "key": "C major",
+            "tempo_bpm": 120,
+            "key": {
+                "primary": "C major"
+            },
             "time_signature": "4/4",
+            "mood": ["upbeat", "energetic"],
             "energy": "high",
             "instrumentation": ["synth", "bass", "drums"],
-            "vocal": {
-                "voice": "male",
-                "range": "baritone",
-                "delivery": "smooth"
-            },
-            "tags_positive": ["bright", "catchy"],
-            "tags_negative": []
+            "vocal_profile": "male baritone smooth",
+            "tags": ["bright", "catchy"],
+            "negative_tags": []
         }
 
         is_valid, errors = service.validate_style(valid_style)
@@ -135,16 +157,17 @@ class TestValidationService:
     def test_validate_style_invalid_bpm(self, service):
         """Test style validation with invalid BPM range."""
         invalid_style = {
-            "name": "Test Style",
             "genre_detail": {
                 "primary": "Pop",
                 "subgenres": [],
                 "fusions": []
             },
-            "bpm": 300,  # Out of range (40-220)
+            "tempo_bpm": 300,  # Out of range (40-220)
+            "key": {"primary": "C major"},
+            "mood": ["upbeat"],
+            "tags": [],
             "instrumentation": ["synth"],
-            "tags_positive": [],
-            "tags_negative": []
+            "negative_tags": []
         }
 
         is_valid, errors = service.validate_style(invalid_style)
@@ -163,11 +186,11 @@ class TestValidationService:
             "syllables_per_line": 8,
             "imagery_density": 0.7,
             "section_order": ["Verse", "Chorus", "Verse", "Chorus", "Bridge", "Chorus"],
-            "sections": {
-                "Verse": ["Line 1", "Line 2"],
-                "Chorus": ["Hook line"]
+            "constraints": {
+                "explicit": False,
+                "max_lines": 100
             },
-            "citations": []
+            "source_citations": []
         }
 
         is_valid, errors = service.validate_lyrics(valid_lyrics)
@@ -205,12 +228,12 @@ class TestValidationService:
             "section_meta": {
                 "Chorus": {
                     "tags": ["big", "anthemic"],
-                    "duration_sec": 30
+                    "target_duration_sec": 30
                 }
             },
             "mix": {
                 "lufs": -8,
-                "space": 0.6,
+                "space": "roomy",
                 "stereo_width": "wide"
             }
         }
@@ -227,17 +250,17 @@ class TestValidationService:
             "meta": {
                 "title": "Test Song",
                 "genre": "Pop",
-                "tempo": 120,
-                "structure": "Verse-Chorus-Verse-Chorus-Bridge-Chorus"
-            },
-            "style_tags": ["bright", "catchy"],
-            "negative_tags": ["muddy"],
-            "section_tags": {
-                "Chorus": ["big", "anthemic"]
-            },
-            "model_limits": {
-                "style_max": 200,
-                "prompt_max": 3000
+                "tempo_bpm": 120,
+                "structure": "Verse-Chorus-Verse-Chorus-Bridge-Chorus",
+                "style_tags": ["bright", "catchy"],
+                "negative_tags": ["muddy"],
+                "section_tags": {
+                    "Chorus": ["big", "anthemic"]
+                },
+                "model_limits": {
+                    "style_max": 200,
+                    "prompt_max": 3000
+                }
             }
         }
 
@@ -276,12 +299,11 @@ class TestValidationService:
             "rules": {
                 "tempo_bpm": [100, 140],
                 "required_sections": ["Verse", "Chorus"],
-                "lexicons": {
-                    "pop": ["catchy", "upbeat", "melodic"]
-                },
+                "lexicon_positive": ["catchy", "upbeat", "melodic"],
+                "lexicon_negative": ["muddy", "sluggish"],
                 "section_lines": {
-                    "Verse": [8, 12],
-                    "Chorus": [4, 8]
+                    "Verse": {"min": 8, "max": 12},
+                    "Chorus": {"min": 4, "max": 8}
                 }
             },
             "eval_rubric": {
@@ -296,14 +318,6 @@ class TestValidationService:
                     "min_total": 0.75,
                     "max_profanity": 0.1
                 }
-            },
-            "conflict_matrix": {
-                "whisper": ["anthemic"],
-                "intimate": ["stadium"]
-            },
-            "tag_categories": {
-                "era": ["1940s", "1980s"],
-                "energy": ["whisper", "intimate", "anthemic", "stadium"]
             }
         }
 
@@ -317,16 +331,10 @@ class TestValidationService:
         valid_persona = {
             "name": "Frank Sinatra-inspired",
             "kind": "artist",
-            "vocal": {
-                "voice": "male",
-                "vocal_range": "baritone",
-                "delivery": "smooth, crooning"
-            },
+            "voice": "smooth male baritone",
+            "vocal_range": "baritone",
+            "delivery": ["smooth", "crooning"],
             "influences": ["Frank Sinatra", "Dean Martin"],
-            "defaults": {
-                "style": {},
-                "lyrics": {}
-            },
             "policy": {
                 "public_release": False,
                 "disallow_named_style_of": True
@@ -345,14 +353,9 @@ class TestValidationService:
             "kind": "file",
             "weight": 0.8,
             "mcp_server_id": "lyrics-db-server",
-            "scoping": {
-                "allow": ["christmas", "holiday", "winter"],
-                "deny": ["halloween", "easter"]
-            },
-            "provenance": {
-                "url": None,
-                "last_synced": "2025-11-01T00:00:00Z"
-            }
+            "allow": ["christmas", "holiday", "winter"],
+            "deny": ["halloween", "easter"],
+            "provenance": True
         }
 
         is_valid, errors = service.validate_source(valid_source)
@@ -367,11 +370,9 @@ class TestValidationService:
             "kind": "api",
             "weight": 1.5,  # Out of range (0-1)
             "mcp_server_id": "test-server",
-            "scoping": {
-                "allow": [],
-                "deny": []
-            },
-            "provenance": {}
+            "allow": [],
+            "deny": [],
+            "provenance": True
         }
 
         is_valid, errors = service.validate_source(invalid_source)

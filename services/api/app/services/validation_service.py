@@ -111,7 +111,9 @@ class ValidationService:
 
             # Add validator context if helpful
             if error.validator == "required":
-                message = f"Missing required field: {error.message.split("'")[1]}"
+                # Extract field name from error message (handles both 'field' and field formats)
+                field_name = error.message.split("'")[1] if "'" in error.message else error.message.strip()
+                message = f"Missing required field: '{field_name}'"
             elif error.validator == "enum":
                 message = f"{path}: Value must be one of {error.validator_value}"
             elif error.validator == "pattern":

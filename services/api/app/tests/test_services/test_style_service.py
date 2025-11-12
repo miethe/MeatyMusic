@@ -29,7 +29,7 @@ class TestStyleService:
     @pytest.fixture
     def service(self, mock_repo):
         """StyleService instance for testing."""
-        return StyleService(repo=mock_repo)
+        return StyleService(style_repo=mock_repo)
 
     @pytest.fixture
     def valid_style_create(self):
@@ -49,8 +49,8 @@ class TestStyleService:
 
     def test_init(self, mock_repo):
         """Test service initialization."""
-        service = StyleService(repo=mock_repo)
-        assert service.repo == mock_repo
+        service = StyleService(style_repo=mock_repo)
+        assert service.style_repo == mock_repo
 
     @pytest.mark.asyncio
     async def test_create_style_valid(self, service, mock_repo, valid_style_create):

@@ -87,21 +87,20 @@ class TestStyleRepository:
         mock_query.filter.return_value = mock_query
         mock_db.query.return_value = mock_query
 
-        # Mock security filtering
-        with patch('app.repositories.style_repo.get_unified_guard') as mock_guard:
-            mock_guard_instance = Mock()
-            mock_guard_instance.filter_query.return_value = mock_query
-            mock_guard.return_value = mock_guard_instance
+        # Mock security filtering on the repo instance
+        mock_guard_instance = Mock()
+        mock_guard_instance.filter_query.return_value = mock_query
+        repo.get_unified_guard = Mock(return_value=mock_guard_instance)
 
-            mock_query.all.return_value = [sample_style]
+        mock_query.all.return_value = [sample_style]
 
-            # Call method
-            results = repo.get_by_genre("Pop")
+        # Call method
+        results = repo.get_by_genre("Pop")
 
-            # Verify query was filtered
-            assert mock_db.query.called
-            assert mock_query.filter.called
-            assert mock_guard_instance.filter_query.called
+        # Verify query was filtered
+        assert mock_db.query.called
+        assert mock_query.filter.called
+        assert mock_guard_instance.filter_query.called
 
     def test_get_by_bpm_range(self, repo, mock_db, sample_style):
         """Test getting styles by BPM range."""
@@ -109,20 +108,19 @@ class TestStyleRepository:
         mock_query.filter.return_value = mock_query
         mock_db.query.return_value = mock_query
 
-        # Mock security filtering
-        with patch('app.repositories.style_repo.get_unified_guard') as mock_guard:
-            mock_guard_instance = Mock()
-            mock_guard_instance.filter_query.return_value = mock_query
-            mock_guard.return_value = mock_guard_instance
+        # Mock security filtering on the repo instance
+        mock_guard_instance = Mock()
+        mock_guard_instance.filter_query.return_value = mock_query
+        repo.get_unified_guard = Mock(return_value=mock_guard_instance)
 
-            mock_query.all.return_value = [sample_style]
+        mock_query.all.return_value = [sample_style]
 
-            # Call method
-            results = repo.get_by_bpm_range(100, 140)
+        # Call method
+        results = repo.get_by_bpm_range(100, 140)
 
-            # Verify query was called
-            assert mock_db.query.called
-            assert mock_guard_instance.filter_query.called
+        # Verify query was called
+        assert mock_db.query.called
+        assert mock_guard_instance.filter_query.called
 
     def test_search_by_tags(self, repo, mock_db, sample_style):
         """Test searching styles by tags (array overlap)."""
@@ -130,20 +128,19 @@ class TestStyleRepository:
         mock_query.filter.return_value = mock_query
         mock_db.query.return_value = mock_query
 
-        # Mock security filtering
-        with patch('app.repositories.style_repo.get_unified_guard') as mock_guard:
-            mock_guard_instance = Mock()
-            mock_guard_instance.filter_query.return_value = mock_query
-            mock_guard.return_value = mock_guard_instance
+        # Mock security filtering on the repo instance
+        mock_guard_instance = Mock()
+        mock_guard_instance.filter_query.return_value = mock_query
+        repo.get_unified_guard = Mock(return_value=mock_guard_instance)
 
-            mock_query.all.return_value = [sample_style]
+        mock_query.all.return_value = [sample_style]
 
-            # Call method
-            results = repo.search_by_tags(["bright", "catchy"])
+        # Call method
+        results = repo.search_by_tags(["bright", "catchy"])
 
-            # Verify query was called
-            assert mock_db.query.called
-            assert mock_guard_instance.filter_query.called
+        # Verify query was called
+        assert mock_db.query.called
+        assert mock_guard_instance.filter_query.called
 
     def test_get_by_mood(self, repo, mock_db, sample_style):
         """Test getting styles by mood (array contains)."""
@@ -151,20 +148,19 @@ class TestStyleRepository:
         mock_query.filter.return_value = mock_query
         mock_db.query.return_value = mock_query
 
-        # Mock security filtering
-        with patch('app.repositories.style_repo.get_unified_guard') as mock_guard:
-            mock_guard_instance = Mock()
-            mock_guard_instance.filter_query.return_value = mock_query
-            mock_guard.return_value = mock_guard_instance
+        # Mock security filtering on the repo instance
+        mock_guard_instance = Mock()
+        mock_guard_instance.filter_query.return_value = mock_query
+        repo.get_unified_guard = Mock(return_value=mock_guard_instance)
 
-            mock_query.all.return_value = [sample_style]
+        mock_query.all.return_value = [sample_style]
 
-            # Call method
-            results = repo.get_by_mood("upbeat")
+        # Call method
+        results = repo.get_by_mood("upbeat")
 
-            # Verify query was called
-            assert mock_db.query.called
-            assert mock_guard_instance.filter_query.called
+        # Verify query was called
+        assert mock_db.query.called
+        assert mock_guard_instance.filter_query.called
 
     def test_get_by_energy_level(self, repo, mock_db, sample_style):
         """Test getting styles by energy level range."""
@@ -172,20 +168,19 @@ class TestStyleRepository:
         mock_query.filter.return_value = mock_query
         mock_db.query.return_value = mock_query
 
-        # Mock security filtering
-        with patch('app.repositories.style_repo.get_unified_guard') as mock_guard:
-            mock_guard_instance = Mock()
-            mock_guard_instance.filter_query.return_value = mock_query
-            mock_guard.return_value = mock_guard_instance
+        # Mock security filtering on the repo instance
+        mock_guard_instance = Mock()
+        mock_guard_instance.filter_query.return_value = mock_query
+        repo.get_unified_guard = Mock(return_value=mock_guard_instance)
 
-            mock_query.all.return_value = [sample_style]
+        mock_query.all.return_value = [sample_style]
 
-            # Call method
-            results = repo.get_by_energy_level(7, 10)
+        # Call method
+        results = repo.get_by_energy_level(7, 10)
 
-            # Verify query was called
-            assert mock_db.query.called
-            assert mock_guard_instance.filter_query.called
+        # Verify query was called
+        assert mock_db.query.called
+        assert mock_guard_instance.filter_query.called
 
     def test_security_filtering_applied(self, repo, mock_db):
         """Test that all queries apply security filtering."""
@@ -193,21 +188,21 @@ class TestStyleRepository:
         mock_query = Mock()
         mock_db.query.return_value = mock_query
 
-        with patch('app.repositories.style_repo.get_unified_guard') as mock_guard:
-            mock_guard_instance = Mock()
-            mock_guard_instance.filter_query.return_value = mock_query
-            mock_guard.return_value = mock_guard_instance
+        # Mock security filtering on the repo instance
+        mock_guard_instance = Mock()
+        mock_guard_instance.filter_query.return_value = mock_query
+        repo.get_unified_guard = Mock(return_value=mock_guard_instance)
 
-            mock_query.all.return_value = []
+        mock_query.all.return_value = []
 
-            # Test multiple methods to ensure RLS is applied
-            repo.get_by_genre("Pop")
-            assert mock_guard_instance.filter_query.called
+        # Test multiple methods to ensure RLS is applied
+        repo.get_by_genre("Pop")
+        assert mock_guard_instance.filter_query.called
 
-            mock_guard_instance.reset_mock()
-            repo.get_by_bpm_range(100, 140)
-            assert mock_guard_instance.filter_query.called
+        mock_guard_instance.reset_mock()
+        repo.get_by_bpm_range(100, 140)
+        assert mock_guard_instance.filter_query.called
 
-            mock_guard_instance.reset_mock()
-            repo.search_by_tags(["tag"])
-            assert mock_guard_instance.filter_query.called
+        mock_guard_instance.reset_mock()
+        repo.search_by_tags(["tag"])
+        assert mock_guard_instance.filter_query.called

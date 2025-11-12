@@ -45,14 +45,14 @@ class TestSongWorkflowIntegration:
     def song_service(self, mock_song_repo, mock_validation_service):
         """SongService instance for testing."""
         return SongService(
-            repo=mock_song_repo,
+            song_repo=mock_song_repo,
             validation_service=mock_validation_service
         )
 
     @pytest.fixture
     def style_service(self, mock_style_repo):
         """StyleService instance for testing."""
-        return StyleService(repo=mock_style_repo)
+        return StyleService(style_repo=mock_style_repo)
 
     @pytest.fixture
     def tenant_id(self):
