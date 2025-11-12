@@ -169,15 +169,21 @@
 - [x] ComposedPromptRepository with validation status filtering
 
 #### Services
-- [ ] StyleService with tag conflict validation
-- [ ] SongService with SDS validation
-- [ ] ValidationService with JSON schema loading
+- [x] StyleService with tag conflict validation
+- [x] SongService with SDS validation
+- [x] WorkflowRunService with node output tracking
+- [x] ValidationService placeholder (full JSON schema validation in Week 2-3)
 
 #### Pydantic Schemas
-- [ ] StyleCreate/StyleUpdate with BPM range validation
-- [ ] LyricsCreate/LyricsUpdate with section validation
-- [ ] ProducerNotesCreate/ProducerNotesUpdate
-- [ ] SongCreate/SongUpdate with seed validation
+- [x] StyleCreate/StyleUpdate with BPM range validation
+- [x] LyricsCreate/LyricsUpdate with section validation
+- [x] ProducerNotesCreate/ProducerNotesUpdate
+- [x] SongCreate/SongUpdate with seed validation
+- [x] BlueprintCreate/BlueprintUpdate
+- [x] PersonaCreate/PersonaUpdate
+- [x] SourceCreate/SourceUpdate
+- [x] ComposedPromptCreate/ComposedPromptUpdate
+- [x] WorkflowRunCreate/WorkflowRunUpdate
 
 ### Week 2-3: JSON Schema Validation
 
@@ -211,6 +217,79 @@
 - [ ] Overall: >80%
 
 ## Work Log
+
+### 2025-11-12 - Week 2: Service Layer + Pydantic Schemas Complete
+
+**Work Completed:**
+- Created comprehensive Pydantic schemas for all 8 AMCS entities
+- Implemented service layer with business logic validation
+- All schemas include Create/Update/Response variants with field validators
+- Services follow MeatyPrompts patterns with repository injection and async methods
+- Updated __init__.py files with alphabetical exports
+
+**Pydantic Schemas Created (8 entities):**
+1. StyleCreate/Update/Response - BPM range, energy level, instrumentation limit validators
+2. SongCreate/Update/Response + WorkflowRunCreate/Update/Response - Global seed, status enums
+3. LyricsCreate/Update/Response - Section order (must have Chorus), POV/tense enums, reading level
+4. ProducerNotesCreate/Update/Response - Structure, hook count, mix targets
+5. BlueprintCreate/Update/Response - Genre rules, eval rubric, conflict matrix
+6. PersonaCreate/Update/Response - Vocal characteristics, influences, policy settings
+7. SourceCreate/Update/Response - MCP integration, scoping, weight validation (0.0-1.0)
+8. ComposedPromptCreate/Update/Response - Validation status, character limits (10k max)
+
+**Schema Validation Highlights:**
+- BPM range validation: bpm_max >= bpm_min
+- Energy level: 1-10, imagery density: 0-10, reading level: 0-100
+- Section order must include at least one Chorus
+- Global seed non-negative, fix iterations 0-3
+- Syllables per line: 4-16 (reasonable range for singability)
+- Instrumentation limited to 3 items to avoid mix dilution
+- Type-safe enums for all status fields, POV, tense, hook strategy
+
+**Services Created (4 services):**
+1. **StyleService** - Tag conflict validation and energy/tempo coherence
+   - Detects conflicting era tags (only one era allowed)
+   - Detects conflicting energy tags (whisper vs anthemic, intimate vs stadium)
+   - Validates energy/tempo coherence (high energy with slow BPM triggers error)
+   - TODO: Load blueprint conflict matrix for comprehensive validation
+
+2. **SongService** - SDS validation and artifact management
+   - Validates global seed is set (required for determinism)
+   - Validates referenced entities exist (style, persona, blueprint)
+   - get_song_with_artifacts() - Eager loads all related entities (style, lyrics, producer notes, prompts)
+   - update_song_status() - Convenience method for status transitions
+   - validate_sds() - Basic validation (full JSON schema TBD in Week 2-3)
+
+3. **WorkflowRunService** - Run execution tracking
+   - update_node_output() - Store artifacts/scores/citations for each node
+   - add_event() - Append to event stream for observability
+   - fail_run()/complete_run() - Status transitions with error tracking
+   - get_active_runs()/get_failed_runs() - Monitoring queries
+
+4. **ValidationService** - JSON schema validation (placeholder)
+   - Placeholder for Week 2-3 implementation
+   - Basic SDS structure validation (required fields)
+   - TODO: Load JSON schemas from /schemas directory
+   - TODO: Implement full jsonschema validation
+
+**Technical Highlights:**
+- All Pydantic schemas use ConfigDict for ORM mapping (from_attributes=True)
+- Field validators use @field_validator with info parameter for cross-field validation
+- Enums for all status fields provide type safety and OpenAPI documentation
+- Services use async methods and proper error handling (ValueError for validation failures)
+- Structured logging with contextual information (operation, entity IDs, field changes)
+- Business logic in service layer, repositories remain pure data access
+- Services coordinate across multiple repositories (SongService loads from 5 repos)
+
+**Pattern Adherence:**
+- ✅ Pydantic Create/Update/Response variants for all entities
+- ✅ Field validators enforce PRD constraints
+- ✅ Services accept repository via dependency injection
+- ✅ Async methods with proper type hints
+- ✅ ValueError for validation failures, not exceptions
+- ✅ Structured logging via structlog
+- ✅ Alphabetical exports in __init__.py
+- ✅ Follow MeatyPrompts service patterns
 
 ### 2025-11-12 - Week 2: Repository Layer Complete
 
@@ -341,11 +420,23 @@
 - `/services/api/app/repositories/composed_prompt_repo.py` - ComposedPromptRepository
 - `/services/api/app/repositories/__init__.py` - Updated exports
 
-### Services
-_Not yet created - planned for Week 2_
-
 ### Schemas
-_Not yet created - planned for Week 2-3_
+- `/services/api/app/schemas/style.py` - Style Create/Update/Response with validators
+- `/services/api/app/schemas/song.py` - Song + WorkflowRun Create/Update/Response
+- `/services/api/app/schemas/lyrics.py` - Lyrics Create/Update/Response with validators
+- `/services/api/app/schemas/producer_notes.py` - ProducerNotes Create/Update/Response
+- `/services/api/app/schemas/blueprint.py` - Blueprint Create/Update/Response
+- `/services/api/app/schemas/persona.py` - Persona Create/Update/Response
+- `/services/api/app/schemas/source.py` - Source Create/Update/Response
+- `/services/api/app/schemas/composed_prompt.py` - ComposedPrompt Create/Update/Response
+- `/services/api/app/schemas/__init__.py` - Updated exports
+
+### Services
+- `/services/api/app/services/style_service.py` - StyleService with tag conflict validation
+- `/services/api/app/services/song_service.py` - SongService with SDS validation
+- `/services/api/app/services/workflow_run_service.py` - WorkflowRunService
+- `/services/api/app/services/validation_service.py` - ValidationService placeholder
+- `/services/api/app/services/__init__.py` - Updated exports
 
 ### Tests
 _Not yet created - planned for Week 2-3_
