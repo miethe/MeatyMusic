@@ -15,6 +15,7 @@ from app.repositories.producer_notes_repo import ProducerNotesRepository
 from app.repositories.composed_prompt_repo import ComposedPromptRepository
 from app.schemas.song import SongCreate, SongUpdate, SongStatus
 from app.models.song import Song
+from app.services.validation_service import ValidationService
 
 logger = structlog.get_logger(__name__)
 
@@ -29,6 +30,7 @@ class SongService:
         lyrics_repo: Optional[LyricsRepository] = None,
         producer_notes_repo: Optional[ProducerNotesRepository] = None,
         composed_prompt_repo: Optional[ComposedPromptRepository] = None,
+        validation_service: Optional[ValidationService] = None,
     ):
         """Initialize the song service.
 
@@ -38,12 +40,14 @@ class SongService:
             lyrics_repo: Optional repository for lyrics entities
             producer_notes_repo: Optional repository for producer notes
             composed_prompt_repo: Optional repository for composed prompts
+            validation_service: Optional validation service for JSON schema validation
         """
         self.song_repo = song_repo
         self.style_repo = style_repo
         self.lyrics_repo = lyrics_repo
         self.producer_notes_repo = producer_notes_repo
         self.composed_prompt_repo = composed_prompt_repo
+        self.validation_service = validation_service or ValidationService()
 
     async def create_song(self, data: SongCreate) -> Song:
         """Create a new song with validation.
@@ -223,10 +227,7 @@ class SongService:
         return success
 
     async def validate_sds(self, sds_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Validate a Song Design Spec (placeholder).
-
-        This will be implemented with JSON schema validation in Week 2-3.
-        For now, performs basic structure checks.
+        """Validate a Song Design Spec using JSON schema validation.
 
         Args:
             sds_data: SDS dictionary to validate
@@ -237,22 +238,15 @@ class SongService:
         Raises:
             ValueError: If SDS structure is invalid
         """
-        # TODO: Implement JSON schema validation in Week 2-3
-        errors = []
+        # Use ValidationService for JSON schema validation
+        is_valid, errors = self.validation_service.validate_sds(sds_data)
 
-        # Basic required field checks
-        required_fields = ["title", "global_seed", "style"]
-        for field in required_fields:
-            if field not in sds_data:
-                errors.append(f"Missing required field: {field}")
-
-        # Validate global seed
-        if "global_seed" in sds_data:
-            seed = sds_data["global_seed"]
-            if not isinstance(seed, int) or seed < 0:
-                errors.append("global_seed must be a non-negative integer")
-
-        if errors:
+        if not is_valid:
+            logger.warning(
+                "song.sds_validation_failed",
+                error_count=len(errors),
+                errors=errors
+            )
             raise ValueError(f"SDS validation failed: {'; '.join(errors)}")
 
         logger.debug("song.sds_validated", field_count=len(sds_data))

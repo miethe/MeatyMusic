@@ -11,8 +11,8 @@
 
 - [x] All entity models created
 - [x] All repositories follow base pattern
-- [ ] Services enforce business rules
-- [ ] JSON schema validation works
+- [x] Services enforce business rules
+- [x] JSON schema validation works
 - [x] Migrations apply cleanly (ready to test with database)
 - [ ] Tests pass (>80% coverage)
 
@@ -187,14 +187,25 @@
 
 ### Week 2-3: JSON Schema Validation
 
-- [ ] `/schemas/sds.schema.json` - Song Design Spec schema
-- [ ] `/schemas/style.schema.json` - Style specification schema
-- [ ] `/schemas/lyrics.schema.json` - Lyrics constraints schema
-- [ ] `/schemas/producer_notes.schema.json` - Producer guidance schema
-- [ ] ValidationService JSON schema loading
-- [ ] ValidationService SDS validation method
-- [ ] ValidationService style validation method
-- [ ] ValidationService lyrics validation method
+- [x] `/schemas/sds.schema.json` - Song Design Spec schema
+- [x] `/schemas/style.schema.json` - Style specification schema
+- [x] `/schemas/lyrics.schema.json` - Lyrics constraints schema
+- [x] `/schemas/producer_notes.schema.json` - Producer guidance schema
+- [x] `/schemas/composed_prompt.schema.json` - Composed prompt schema
+- [x] `/schemas/blueprint.schema.json` - Blueprint schema
+- [x] `/schemas/persona.schema.json` - Persona schema
+- [x] `/schemas/source.schema.json` - Source schema
+- [x] `/schemas/README.md` - Schema documentation
+- [x] ValidationService JSON schema loading
+- [x] ValidationService SDS validation method
+- [x] ValidationService style validation method
+- [x] ValidationService lyrics validation method
+- [x] ValidationService producer notes validation method
+- [x] ValidationService composed prompt validation method
+- [x] ValidationService blueprint validation method
+- [x] ValidationService persona validation method
+- [x] ValidationService source validation method
+- [x] SongService integration with ValidationService
 
 ### Testing
 
@@ -217,6 +228,136 @@
 - [ ] Overall: >80%
 
 ## Work Log
+
+### 2025-11-12 - Week 2-3: JSON Schema Validation Complete
+
+**Work Completed:**
+- Created 8 JSON Schema Draft-07 schemas for all AMCS entities and SDS
+- Implemented full ValidationService with schema loading and validation methods
+- Integrated ValidationService into SongService for SDS validation
+- Created comprehensive schema documentation (README.md)
+- All schemas follow PRD specifications exactly
+
+**JSON Schemas Created (8 schemas):**
+1. **sds.schema.json** - Song Design Spec (PRIMARY)
+   - Aggregates all entities: style, lyrics, producer_notes, sources
+   - Blueprint reference with version pattern (YYYY.MM)
+   - Render config with engine enum (suno, udio, none, external)
+   - Global seed validation (non-negative integer)
+   - Prompt controls with character limits
+   - Inline definitions for nested entities
+
+2. **style.schema.json** - Style Entity
+   - Genre detail with primary/subgenres/fusions
+   - BPM: 40-220 (single or [min, max] range)
+   - Key pattern: `^[A-G](#|b)?\s?(major|minor)$`
+   - Energy enum: low, medium, high, anthemic
+   - Instrumentation max 3 items
+   - Time signature pattern validation
+
+3. **lyrics.schema.json** - Lyrics Entity
+   - Language: ISO 639-1 code pattern
+   - POV enum: 1st, 2nd, 3rd
+   - Tense enum: past, present, future, mixed
+   - Hook strategy enum: melodic, lyrical, call-response, chant
+   - Repetition policy enum: sparse, moderate, hook-heavy
+   - Syllables per line: 4-16
+   - Imagery density: 0-1
+   - Section order must have at least one section
+   - Source citations with weight validation
+
+4. **producer_notes.schema.json** - Producer Notes Entity
+   - Structure string (non-empty)
+   - Hooks: minimum 0
+   - Section meta with tags and durations
+   - Mix targets: lufs, space, stereo_width enum
+   - Stereo width: narrow, normal, wide
+
+5. **composed_prompt.schema.json** - Composed Prompt Entity
+   - Text: 1-10,000 characters
+   - Meta object with title, genre, tempo, structure
+   - Style/negative tags arrays
+   - Section tags mapping
+   - Model limits: style_max (1-5000), prompt_max (1-10000)
+
+6. **blueprint.schema.json** - Blueprint Entity
+   - Genre and version (YYYY.MM pattern)
+   - Rules: tempo_bpm, required_sections, lexicons, section_lines
+   - Eval rubric: weights (hook_density, singability, rhyme_tightness, etc.)
+   - Thresholds: min_total, max_profanity (0-1)
+   - Weights should sum to 1.0
+
+7. **persona.schema.json** - Persona Entity
+   - Kind enum: artist, band
+   - Vocal characteristics (voice, vocal_range, delivery)
+   - Influences array
+   - Style/lyrics defaults (refs to other schemas)
+   - Policy: public_release, disallow_named_style_of
+
+8. **source.schema.json** - Source Entity
+   - Kind enum: file, web, api
+   - Weight: 0-1
+   - MCP server ID required
+   - Allow/deny term lists
+   - Provenance tracking
+
+**ValidationService Implementation:**
+- `_load_schemas()` - Loads all 8 schemas from /schemas directory at initialization
+- `_format_validation_errors()` - Formats jsonschema errors into human-readable messages
+- 8 validation methods: `validate_sds()`, `validate_style()`, `validate_lyrics()`, `validate_producer_notes()`, `validate_composed_prompt()`, `validate_blueprint()`, `validate_persona()`, `validate_source()`
+- Returns `(is_valid: bool, errors: List[str])` tuple
+- Uses Draft7Validator from jsonschema library
+- Comprehensive error logging with structlog
+
+**SongService Integration:**
+- Updated `__init__()` to accept ValidationService (with default instantiation)
+- Updated `validate_sds()` to use ValidationService instead of placeholder
+- Validation errors are raised as ValueError with detailed messages
+- Maintains backward compatibility with existing API
+
+**Schema Documentation:**
+- Created comprehensive `/schemas/README.md`
+- Documents all 8 schemas with key validations
+- Explains validation strategy and integration points
+- Provides usage examples for ValidationService
+- Documents determinism requirements
+- Includes references to PRDs and phase plan
+
+**Technical Highlights:**
+- All schemas use JSON Schema Draft-07 (`http://json-schema.org/draft-07/schema#`)
+- Custom $id URIs: `amcs://schemas/style-1.0.json`
+- Pattern validation for versions (semver), keys, language codes
+- Enum validation for all status and type fields
+- Min/max constraints for numbers (BPM, energy, weights)
+- Array validation with minItems/maxItems
+- Inline definitions in SDS schema for nested entities
+- ValidationService caches schemas at initialization for performance
+- Detailed error formatting with field paths and validator context
+
+**Pattern Adherence:**
+- ✅ JSON Schema Draft-07 specification
+- ✅ All schemas align with Pydantic models
+- ✅ All schemas follow PRD specifications
+- ✅ ValidationService returns (bool, List[str]) tuple
+- ✅ Error messages are actionable and detailed
+- ✅ Schema loading is robust (missing schemas logged as warnings)
+- ✅ SongService integration maintains existing API
+- ✅ Comprehensive documentation for developers
+
+**Files Created:**
+- `/schemas/sds.schema.json`
+- `/schemas/style.schema.json`
+- `/schemas/lyrics.schema.json`
+- `/schemas/producer_notes.schema.json`
+- `/schemas/composed_prompt.schema.json`
+- `/schemas/blueprint.schema.json`
+- `/schemas/persona.schema.json`
+- `/schemas/source.schema.json`
+- `/schemas/README.md`
+
+**Files Updated:**
+- `/services/api/app/services/validation_service.py` - Full implementation
+- `/services/api/app/services/song_service.py` - ValidationService integration
 
 ### 2025-11-12 - Week 2: Service Layer + Pydantic Schemas Complete
 

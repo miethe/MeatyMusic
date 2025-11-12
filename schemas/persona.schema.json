@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "amcs://schemas/persona-1.0.json",
+  "title": "Persona Entity",
+  "description": "Performing artist or band profile with vocal characteristics, influences, and policy settings",
+  "type": "object",
+  "required": ["name", "kind"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "description": "Display name of the persona"
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["artist", "band"],
+      "description": "Solo performer (artist) or group (band)"
+    },
+    "bio": {
+      "type": "string",
+      "description": "Biographical text for marketing or creative backstory"
+    },
+    "voice": {
+      "type": "string",
+      "maxLength": 500,
+      "description": "Timbre or character (e.g., 'airy soprano', 'gritty baritone')"
+    },
+    "vocal_range": {
+      "type": "string",
+      "maxLength": 100,
+      "description": "Range classification (e.g., 'soprano', 'baritone')"
+    },
+    "delivery": {
+      "type": "array",
+      "items": {"type": "string"},
+      "default": [],
+      "description": "Delivery styles (e.g., 'crooning', 'belting', 'rap', 'whispered')"
+    },
+    "influences": {
+      "type": "array",
+      "items": {"type": "string"},
+      "default": [],
+      "description": "Artists or genres influencing this persona"
+    },
+    "style_defaults": {
+      "$ref": "amcs://schemas/style-1.0.json",
+      "description": "Default style spec to bias new songs"
+    },
+    "lyrics_defaults": {
+      "$ref": "amcs://schemas/lyrics-1.0.json",
+      "description": "Default lyrics spec to bias new songs"
+    },
+    "policy": {
+      "type": "object",
+      "properties": {
+        "public_release": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether persona may be used for publicly released songs"
+        },
+        "disallow_named_style_of": {
+          "type": "boolean",
+          "default": true,
+          "description": "Prohibit explicit 'style of [Living Artist]' references in prompts"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Policy settings for copyright and release management"
+    }
+  },
+  "additionalProperties": false
+}
