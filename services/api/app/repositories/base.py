@@ -17,13 +17,13 @@ from sqlalchemy.exc import SQLAlchemyError
 from opentelemetry import trace
 
 
-# Use relative imports for local modules
-from ..security.row_guard import RowGuard
+# Use absolute imports for local modules
+from app.security.row_guard import RowGuard
 # Import moved to avoid circular imports - imported locally in methods where needed
-# from ..core.security import SecurityContext, UnifiedRowGuard, SecurityContextError, SecurityFilterError
+# from app.core.security import SecurityContext, UnifiedRowGuard, SecurityContextError, SecurityFilterError
 # Import moved to avoid circular imports - imported in methods where needed
-# from ..core.pagination import CursorPagination, create_page_info
-from ..errors import AppError, ForbiddenError, NotFoundError, BadRequestError
+# from app.core.pagination import CursorPagination, create_page_info
+from app.errors import AppError, ForbiddenError, NotFoundError, BadRequestError
 
 
 # Define protocol for models that have an ID field
@@ -79,28 +79,28 @@ class BaseRepository(Generic[T]):
         use with_user_context() or with_tenant_context() instead.
         """
         # Create a security context from the owner_id for backward compatibility
-        from ..core.security import SecurityContext
+        from app.core.security import SecurityContext
         security_context = SecurityContext(user_id=owner_id)
         return replace(self, owner_id=owner_id, security_context=security_context)
 
 
     def with_user_context(self, user_id: UUID) -> "BaseRepository":
         """Return a copy of this repository scoped to user context."""
-        from ..core.security import SecurityContext
+        from app.core.security import SecurityContext
         security_context = SecurityContext(user_id=user_id)
         return replace(self, security_context=security_context)
 
 
     def with_tenant_context(self, tenant_id: UUID, user_id: Optional[UUID] = None) -> "BaseRepository":
         """Return a copy of this repository scoped to tenant context."""
-        from ..core.security import SecurityContext
+        from app.core.security import SecurityContext
         security_context = SecurityContext(tenant_id=tenant_id, user_id=user_id)
         return replace(self, security_context=security_context)
 
 
     def with_dual_context(self, user_id: UUID, tenant_id: UUID) -> "BaseRepository":
         """Return a copy of this repository with both user and tenant context."""
-        from ..core.security import SecurityContext
+        from app.core.security import SecurityContext
         security_context = SecurityContext(user_id=user_id, tenant_id=tenant_id)
         return replace(self, security_context=security_context)
 
@@ -129,7 +129,7 @@ class BaseRepository(Generic[T]):
         """
         if self.security_context is None:
             return None
-        from ..core.security import UnifiedRowGuard
+        from app.core.security import UnifiedRowGuard
         return UnifiedRowGuard(model_class, self.security_context)
 
     def require_unified_guard(self, model_class: Type[T]) -> Any:  # UnifiedRowGuard
@@ -163,7 +163,7 @@ class BaseRepository(Generic[T]):
         Returns:
             An appropriate AppError instance with clear messaging
         """
-        from ..core.security import SecurityContextError, SecurityFilterError
+        from app.core.security import SecurityContextError, SecurityFilterError
 
         model_name = model_class.__name__
 
@@ -272,7 +272,7 @@ class BaseRepository(Generic[T]):
                 result: T | None = query.first()
                 return result
         except (Exception, SQLAlchemyError) as e:
-            from ..core.security import SecurityContextError, SecurityFilterError
+            from app.core.security import SecurityContextError, SecurityFilterError
             if isinstance(e, (SecurityContextError, SecurityFilterError)):
                 raise self._handle_security_error(e, "get", model_class)
             elif isinstance(e, SQLAlchemyError):
@@ -349,7 +349,7 @@ class BaseRepository(Generic[T]):
                         query = query.filter(filter_condition)
 
                 # Use the new CursorPagination module with security context
-                from ..core.pagination import CursorPagination
+                from app.core.pagination import CursorPagination
                 pagination_result = CursorPagination.paginate(
                     query=query,
                     cursor=cursor,
@@ -364,7 +364,7 @@ class BaseRepository(Generic[T]):
                 return pagination_result.items, pagination_result.next_cursor
 
         except (Exception, SQLAlchemyError) as e:
-            from ..core.security import SecurityContextError, SecurityFilterError
+            from app.core.security import SecurityContextError, SecurityFilterError
             if isinstance(e, (SecurityContextError, SecurityFilterError)):
                 raise self._handle_security_error(e, "list", model_class)
             elif isinstance(e, SQLAlchemyError):
@@ -434,7 +434,7 @@ class BaseRepository(Generic[T]):
                         query = query.filter(filter_condition)
 
                 # Use the new CursorPagination module with security context
-                from ..core.pagination import CursorPagination
+                from app.core.pagination import CursorPagination
                 pagination_result = CursorPagination.paginate(
                     query=query,
                     cursor=cursor,
@@ -447,12 +447,12 @@ class BaseRepository(Generic[T]):
                 )
 
                 # Return in standard pagination format
-                from ..core.pagination import create_page_info
+                from app.core.pagination import create_page_info
                 result: dict[str, Any] = create_page_info(pagination_result)
                 return result
 
         except Exception as e:
-            from ..core.security import SecurityContextError, SecurityFilterError
+            from app.core.security import SecurityContextError, SecurityFilterError
             if isinstance(e, (SecurityContextError, SecurityFilterError)):
                 raise self._handle_security_error(e, "list", model_class)
             else:
@@ -495,7 +495,7 @@ class BaseRepository(Generic[T]):
 
                 return instance
         except Exception as e:
-            from ..core.security import SecurityContextError, SecurityFilterError
+            from app.core.security import SecurityContextError, SecurityFilterError
             if isinstance(e, (SecurityContextError, SecurityFilterError)):
                 raise self._handle_security_error(e, "create", model_class)
             else:
@@ -539,7 +539,7 @@ class BaseRepository(Generic[T]):
 
                 return entity
         except Exception as e:
-            from ..core.security import SecurityContextError, SecurityFilterError
+            from app.core.security import SecurityContextError, SecurityFilterError
             if isinstance(e, (SecurityContextError, SecurityFilterError)):
                 raise self._handle_security_error(e, "update", model_class)
             else:
@@ -581,7 +581,7 @@ class BaseRepository(Generic[T]):
 
                 return True
         except Exception as e:
-            from ..core.security import SecurityContextError, SecurityFilterError
+            from app.core.security import SecurityContextError, SecurityFilterError
             if isinstance(e, (SecurityContextError, SecurityFilterError)):
                 raise self._handle_security_error(e, "delete", model_class)
             else:
@@ -607,7 +607,7 @@ class BaseRepository(Generic[T]):
         )
 
         # Delegate to the new pagination module's implementation
-        from ..core.pagination import encode_cursor as new_encode_cursor
+        from app.core.pagination import encode_cursor as new_encode_cursor
         try:
             return new_encode_cursor(item, sort_field)
         except Exception:
@@ -682,7 +682,7 @@ class BaseRepository(Generic[T]):
         )
 
         # Delegate to the new pagination module's implementation
-        from ..core.pagination import decode_cursor as new_decode_cursor
+        from app.core.pagination import decode_cursor as new_decode_cursor
         try:
             result: dict[str, Any] = new_decode_cursor(cursor)
             return result
@@ -744,7 +744,7 @@ class BaseRepository(Generic[T]):
         # if security context is available, otherwise fall back to legacy behavior
         if self.security_context:
             try:
-                from ..core.pagination import CursorPagination
+                from app.core.pagination import CursorPagination
                 pagination_result = CursorPagination.paginate(
                     query=query,
                     cursor=cursor,
