@@ -113,9 +113,10 @@ async def global_exception_handler(request: Request, exc: Exception):
     )
 
 
-# Future: Add API routers here
-# from app.api.v1 import api_router
-# app.include_router(api_router, prefix=settings.API_V1_STR)
+# Add API routers
+from app.api.v1 import api_router
+
+app.include_router(api_router)
 
 
 if __name__ == "__main__":

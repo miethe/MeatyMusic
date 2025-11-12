@@ -8,6 +8,15 @@ from app.schemas.blueprint import (
     BlueprintUpdate,
 )
 
+# Common schemas
+from app.schemas.common import (
+    ErrorResponse,
+    NodeOutputUpdate,
+    PageInfo,
+    PaginatedResponse,
+    StatusUpdateRequest,
+)
+
 # ComposedPrompt schemas
 from app.schemas.composed_prompt import (
     ComposedPromptBase,
@@ -83,6 +92,12 @@ __all__ = [
     "BlueprintCreate",
     "BlueprintResponse",
     "BlueprintUpdate",
+    # Common
+    "ErrorResponse",
+    "NodeOutputUpdate",
+    "PageInfo",
+    "PaginatedResponse",
+    "StatusUpdateRequest",
     # ComposedPrompt
     "ComposedPromptBase",
     "ComposedPromptCreate",
