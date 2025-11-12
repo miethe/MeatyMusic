@@ -153,7 +153,7 @@ class Lyrics(BaseModel):
     )
 
     # Additional metadata
-    metadata = Column(
+    extra_metadata = Column(
         JSONB,
         nullable=False,
         server_default="{}",
