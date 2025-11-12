@@ -7,7 +7,7 @@
 | File | Purpose | Size | Usage |
 |------|---------|------|-------|
 | `claude-fundamentals-spec.md` | Generic patterns across all projects | ~250 lines | Base layer |
-| `meatyprompts-spec.md` | MeatyPrompts-specific patterns | ~200 lines | Project layer |
+| `meatymusic-spec.md` | MeatyMusic AMCS-specific patterns | ~420 lines | Project layer |
 | `doc-policy-spec.md` | Documentation policy (compressed) | ~250 lines | Policy layer |
 
 ## Composition Pattern
@@ -19,9 +19,9 @@ CLAUDE.md = fundamentals + project-specific + doc-policy
 **Example Usage:**
 
 ```markdown
-# Generate CLAUDE.md for MeatyPrompts
+# Generate CLAUDE.md for MeatyMusic
 1. Load claude-fundamentals-spec.md (generic patterns)
-2. Load meatyprompts-spec.md (project architecture)
+2. Load meatymusic-spec.md (AMCS architecture)
 3. Load doc-policy-spec.md (documentation rules)
 4. Compose → output CLAUDE.md
 ```
@@ -36,12 +36,13 @@ CLAUDE.md = fundamentals + project-specific + doc-policy
 - Git workflow
 - Professional objectivity
 
-**meatyprompts-spec.md** → Project-specific:
-- Layered architecture patterns
-- Package structure
-- Error/pagination patterns
-- UI constraints
-- Symbols system
+**meatymusic-spec.md** → Project-specific:
+- AMCS workflow patterns (PLAN → STYLE → LYRICS → ...)
+- Determinism requirements (seed propagation, pinned retrieval)
+- Blueprint & rubric system
+- Workflow node contracts
+- Policy guards (content, citations)
+- Performance targets (P95 latency, pass rate, repro rate)
 - Observability requirements
 
 **doc-policy-spec.md** → Documentation rules:
@@ -53,7 +54,6 @@ CLAUDE.md = fundamentals + project-specific + doc-policy
 
 ## Token Efficiency
 
-- **Before**: 1323 lines (verbose explanations)
-- **After**: ~700 lines total (3 files, structured)
-- **Reduction**: ~47% while preserving all rules
 - **Format**: Tables, decision trees, shorthand notation
+- **Focus**: Dense, structured, AI-optimized content
+- **Target**: ~250 lines per spec (meatymusic-spec is ~420 due to domain complexity)
