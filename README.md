@@ -107,20 +107,47 @@ MeatyMusic/
 
 ## Development
 
-### Running Locally
+### Quick Start for Local Development
 
-**Backend:**
-```bash
-cd services/api
-source .venv/bin/activate
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
+1. **Clone and Install**
+   ```bash
+   git clone https://github.com/yourusername/MeatyMusic.git
+   cd MeatyMusic
+   pnpm install
+   ```
 
-**Frontend:**
-```bash
-cd apps/web
-pnpm dev
-```
+2. **Backend Setup**
+   ```bash
+   cd services/api
+   python -m venv .venv
+   source .venv/bin/activate
+   pip install -e .
+   cp .env.example .env
+   ```
+
+3. **Start Infrastructure**
+   ```bash
+   cd infra
+   docker-compose up -d meatymusic-postgres meatymusic-redis
+   ```
+
+4. **Run Backend**
+   ```bash
+   cd services/api
+   source .venv/bin/activate
+   uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+   ```
+
+5. **Run Frontend (new terminal)**
+   ```bash
+   cd apps/web
+   pnpm dev
+   ```
+
+Access:
+- Backend API: http://localhost:8000
+- API Documentation: http://localhost:8000/docs
+- Frontend: http://localhost:3000
 
 ### Running Tests
 
@@ -135,6 +162,32 @@ pytest
 # Frontend tests
 cd apps/web
 pnpm test
+
+# E2E tests
+cd apps/web
+pnpm test:e2e
+```
+
+### Type Checking
+
+```bash
+# Backend
+cd services/api
+mypy app
+
+# Frontend
+pnpm typecheck
+```
+
+### Linting
+
+```bash
+# Backend
+cd services/api
+ruff check --fix
+
+# Frontend
+pnpm lint
 ```
 
 ### Database Migrations
@@ -145,6 +198,15 @@ make migrate                          # Run migrations
 make migrate-create MSG="description" # Create new migration
 make migrate-down                     # Rollback
 ```
+
+### Development Workflow
+
+1. **Read First**: Review [CLAUDE.md](./CLAUDE.md) for architecture and constraints
+2. **Check PRDs**: Identify relevant PRDs in `docs/project_plans/PRDs/`
+3. **Review Blueprints**: For music-specific work, check `docs/hit_song_blueprint/`
+4. **Implement**: Follow architectural patterns and constraints
+5. **Test**: Write tests for new functionality
+6. **Document**: Update docstrings and READMEs as needed
 
 ## Documentation
 
@@ -173,9 +235,103 @@ make migrate-down                     # Rollback
 - **Policy Guards**: Profanity filters, PII redaction, artist normalization
 - **Provenance**: Every source chunk tracked with hash citations
 
+## Deployment
+
+### Production Build
+
+```bash
+# Build frontend
+pnpm --filter "./apps/web" build
+
+# Build backend
+cd services/api
+pip install -e .
+
+# Build Docker images
+cd infra
+make build
+```
+
+### Environment Variables
+
+Configure via `.env` files:
+- `infra/.env.docker` - Docker environment
+- `services/api/.env` - Backend configuration
+- `apps/web/.env.local` - Frontend configuration
+
+See `.env.example` files for required variables.
+
+### Health Checks
+
+```bash
+# Backend health
+curl http://localhost:8000/health
+
+# Frontend health
+curl http://localhost:3000
+```
+
+## Project Structure
+
+```
+MeatyMusic/
+├── apps/
+│   └── web/                  # Next.js web application
+├── packages/
+│   ├── ui/                   # Shared React component library
+│   ├── tokens/               # Design tokens (colors, spacing, etc.)
+│   ├── api/                  # Typed API client for frontend
+│   └── store/                # Zustand state management stores
+├── services/
+│   └── api/                  # FastAPI backend service
+├── infra/
+│   ├── docker-compose.yml    # Service orchestration
+│   ├── Makefile              # Development commands
+│   └── migrations/           # Database migrations
+├── docs/
+│   ├── project_plans/        # PRDs and implementation plans
+│   ├── hit_song_blueprint/   # Genre-specific composition rules
+│   └── architecture/         # System design documentation
+├── schemas/                  # JSON schemas for entities
+└── CLAUDE.md                 # AI agent instructions
+```
+
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for development guidelines.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
+- Code style guidelines
+- Pull request process
+- Commit message conventions
+- Issue reporting guidelines
+
+## Resources
+
+- **Primary Reference**: [CLAUDE.md](./CLAUDE.md) - Complete project overview
+- **Architecture**: [amcs-overview.md](./docs/amcs-overview.md) - System design
+- **Product Requirements**: [docs/project_plans/PRDs/](./docs/project_plans/PRDs/)
+- **Music Composition**: [Hit Song Blueprints](./docs/hit_song_blueprint/)
+- **Getting Started**: [Getting Started Guide](./docs/development/getting-started.md)
+
+## Troubleshooting
+
+### Common Issues
+
+**Backend won't start**
+- Ensure PostgreSQL is running: `docker ps | grep postgres`
+- Check `.env` file exists and has correct settings
+- Verify database migrations: `alembic current`
+
+**Frontend won't build**
+- Clear cache: `rm -rf .next node_modules && pnpm install`
+- Check Node version: `node --version` (requires 20+)
+- Verify TypeScript: `pnpm typecheck`
+
+**Database connection issues**
+- Check Docker network: `docker network ls`
+- View PostgreSQL logs: `docker logs meatymusic-postgres`
+- Verify connection string in `.env`
+
+See [Troubleshooting Guide](./docs/development/troubleshooting.md) for more solutions.
 
 ## License
 
@@ -183,6 +339,12 @@ See [LICENSE](./LICENSE) for details.
 
 ## Status
 
-**Pre-implementation (Design Phase)**
+**Bootstrap Phase 1: Infrastructure Complete**
 
-Currently in Phase 1: Bootstrap implementation from MeatyPrompts infrastructure.
+- Phase 1A: Repository setup from MeatyPrompts
+- Phase 1B: Infrastructure validation
+- Phase 1C: Configuration and secrets
+- Phase 1D: Documentation updates (current)
+- Phase 2: Database schema and migrations (next)
+
+See [Implementation Plans](./docs/project_plans/) for detailed phases.

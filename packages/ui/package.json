@@ -2,6 +2,7 @@
   "name": "@meatymusic/ui",
   "version": "0.0.1",
   "private": true,
+  "description": "MeatyMusic AMCS shared UI component library - accessible, themeable React components for music creation workflows",
   "main": "dist/index.js",
   "type": "module",
   "types": "dist/index.d.ts",

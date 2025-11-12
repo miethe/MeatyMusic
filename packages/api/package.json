@@ -2,7 +2,7 @@
   "name": "@meatymusic/api",
   "version": "0.0.1",
   "private": true,
-  "description": "Centralized typed API client for MeatyMusic applications",
+  "description": "MeatyMusic AMCS TypeScript API client - strongly typed requests and responses for frontend applications",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

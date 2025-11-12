@@ -2,6 +2,7 @@
   "name": "@meatymusic/store",
   "version": "0.0.1",
   "private": true,
+  "description": "MeatyMusic AMCS Zustand state management stores - global application state for songs, workflows, and user session",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

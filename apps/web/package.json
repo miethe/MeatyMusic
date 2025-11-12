@@ -2,7 +2,7 @@
   "name": "@meatymusic/web",
   "version": "0.1.0",
   "private": true,
-  "description": "MeatyMusic AMCS Web Application",
+  "description": "MeatyMusic AMCS Web Application - AI-powered music creation platform with song design, composition workflow, and audio rendering",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
