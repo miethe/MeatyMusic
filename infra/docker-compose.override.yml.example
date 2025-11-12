@@ -1,0 +1,79 @@
+# Docker Compose Override for Development with Hot Reload
+# Copy this file to docker-compose.override.yml to enable hot reload
+# Usage: cp docker-compose.override.yml.example docker-compose.override.yml
+
+version: '3.8'
+
+services:
+  # API Service with Hot Reload
+  api:
+    build:
+      context: ../services/api
+      dockerfile: Dockerfile
+      target: builder  # Use builder stage for development
+    volumes:
+      # Mount source code for hot reload
+      - ../services/api:/app:cached
+      # Exclude Python cache
+      - /app/__pycache__
+      - /app/.pytest_cache
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    environment:
+      # Override for development
+      OBS_LOG_LEVEL: DEBUG
+      OBS_OTEL_EXPORTER_TYPE: console
+
+  # Web Service with Hot Reload
+  web:
+    build:
+      context: ..
+      dockerfile: ./apps/web/Dockerfile
+      target: deps  # Use deps stage for development
+    volumes:
+      # Mount workspace for hot reload
+      - ../package.json:/app/package.json:ro
+      - ../pnpm-workspace.yaml:/app/pnpm-workspace.yaml:ro
+      - ../pnpm-lock.yaml:/app/pnpm-lock.yaml:ro
+
+      # Mount packages
+      - ../packages/ui:/app/packages/ui:cached
+      - ../packages/tokens:/app/packages/tokens:cached
+
+      # Mount web app
+      - ../apps/web:/app/apps/web:cached
+
+      # Exclude node_modules and build artifacts
+      - /app/node_modules
+      - /app/packages/ui/node_modules
+      - /app/packages/tokens/node_modules
+      - /app/apps/web/node_modules
+      - /app/apps/web/.next
+    working_dir: /app
+    command: ["sh", "-c", "cd apps/web && pnpm dev"]
+    environment:
+      # Override for development
+      NODE_ENV: development
+      # Disable Next.js telemetry
+      NEXT_TELEMETRY_DISABLED: 1
+
+  # Override PostgreSQL for development (optional)
+  postgres:
+    ports:
+      - "5432:5432"  # Expose on host for direct access
+    environment:
+      # Enable verbose logging
+      POSTGRES_INITDB_ARGS: "-E UTF8 --locale=en_US.UTF-8 --debug"
+    command:
+      - postgres
+      - -c
+      - log_statement=all
+      - -c
+      - log_destination=stderr
+      - -c
+      - logging_collector=off
+
+  # Override Redis for development (optional)
+  redis:
+    ports:
+      - "6379:6379"  # Expose on host for direct access
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru --loglevel debug

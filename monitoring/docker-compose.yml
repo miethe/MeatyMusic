@@ -1,0 +1,151 @@
+# Docker Compose for MeatyMusic Security Monitoring Stack
+# This provides a complete local monitoring environment for development and testing
+
+version: '3.8'
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    container_name: meatymusic-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./alerts/security-rules.yml:/etc/prometheus/rules/security-rules.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+      - '--web.enable-admin-api'
+      - '--storage.tsdb.retention.time=30d'
+    networks:
+      - monitoring
+    environment:
+      - TZ=UTC
+
+  grafana:
+    image: grafana/grafana:10.1.0
+    container_name: meatymusic-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./dashboards:/var/lib/grafana/dashboards:ro
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=meatymusic_admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+      - TZ=UTC
+    networks:
+      - monitoring
+    depends_on:
+      - prometheus
+
+  alertmanager:
+    image: prom/alertmanager:v0.26.0
+    container_name: meatymusic-alertmanager
+    restart: unless-stopped
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager_data:/alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+      - '--web.external-url=http://localhost:9093'
+    networks:
+      - monitoring
+    environment:
+      - TZ=UTC
+
+  node-exporter:
+    image: prom/node-exporter:v1.6.1
+    container_name: meatymusic-node-exporter
+    restart: unless-stopped
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    networks:
+      - monitoring
+    environment:
+      - TZ=UTC
+
+  # Mock API service for testing metrics collection
+  metrics-simulator:
+    image: python:3.11-alpine
+    container_name: meatymusic-metrics-simulator
+    restart: unless-stopped
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./scripts/metrics-simulator.py:/app/simulator.py:ro
+    working_dir: /app
+    command: |
+      sh -c "
+        pip install prometheus-client fastapi uvicorn &&
+        python simulator.py
+      "
+    networks:
+      - monitoring
+    environment:
+      - TZ=UTC
+
+  # Jaeger for distributed tracing (optional)
+  jaeger:
+    image: jaegertracing/all-in-one:1.49
+    container_name: meatymusic-jaeger
+    restart: unless-stopped
+    ports:
+      - "16686:16686"  # Jaeger UI
+      - "14268:14268"  # HTTP collector
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+      - TZ=UTC
+    networks:
+      - monitoring
+
+  # Redis for caching (if needed by monitoring components)
+  redis:
+    image: redis:7.2-alpine
+    container_name: meatymusic-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - monitoring
+    environment:
+      - TZ=UTC
+
+volumes:
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  alertmanager_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  monitoring:
+    driver: bridge
+    name: meatymusic-monitoring

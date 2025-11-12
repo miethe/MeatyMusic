@@ -1,0 +1,26 @@
+# Grafana Dashboard Provisioning Configuration
+
+apiVersion: 1
+
+providers:
+  - name: 'MeatyMusic Security Dashboards'
+    orgId: 1
+    folder: 'Security'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards/security
+      foldersFromFilesStructure: true
+
+  - name: 'MeatyMusic General Dashboards'
+    orgId: 1
+    folder: 'General'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 60
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards/general
+      foldersFromFilesStructure: false
