@@ -10,7 +10,7 @@
 ## Success Criteria
 
 - [x] All entity models created
-- [ ] All repositories follow base pattern
+- [x] All repositories follow base pattern
 - [ ] Services enforce business rules
 - [ ] JSON schema validation works
 - [x] Migrations apply cleanly (ready to test with database)
@@ -158,12 +158,15 @@
 ### Week 2: Repositories & Services
 
 #### Repositories
-- [ ] StyleRepository with genre filtering
-- [ ] LyricsRepository with song association
-- [ ] ProducerNotesRepository with song association
-- [ ] SongRepository with status filtering
-- [ ] WorkflowRunRepository with active runs query
-- [ ] PersonaRepository with profile queries
+- [x] StyleRepository with genre filtering
+- [x] LyricsRepository with song association
+- [x] ProducerNotesRepository with song association
+- [x] SongRepository with status filtering
+- [x] WorkflowRunRepository with active runs query
+- [x] PersonaRepository with profile queries
+- [x] BlueprintRepository with genre filtering and tag search
+- [x] SourceRepository with scope filtering
+- [x] ComposedPromptRepository with validation status filtering
 
 #### Services
 - [ ] StyleService with tag conflict validation
@@ -208,6 +211,44 @@
 - [ ] Overall: >80%
 
 ## Work Log
+
+### 2025-11-12 - Week 2: Repository Layer Complete
+
+**Work Completed:**
+- Created 9 repository classes following MeatyPrompts BaseRepository[T] pattern
+- Implemented RLS security filtering via UnifiedRowGuard on all queries
+- Added entity-specific query methods with proper type hints
+- Used async/await patterns and proper relationship loading (joinedload/selectinload)
+- All repositories inherit from BaseRepository[T] with generic type safety
+- Updated __init__.py with alphabetical exports
+
+**Repositories Created:**
+1. BlueprintRepository - Genre filtering, tag search in JSONB
+2. PersonaRepository - Influence search, vocal range queries
+3. SourceRepository - MCP scope filtering, source type queries
+4. StyleRepository - Genre/BPM/mood/energy filtering, tag search
+5. SongRepository - Status filtering, eager loading of style/artifacts
+6. WorkflowRunRepository - Active runs, failed runs, high fix iteration queries
+7. LyricsRepository - Song association, rhyme scheme, reading level
+8. ProducerNotesRepository - Song association, hook count, structure patterns
+9. ComposedPromptRepository - Song association, validation status, character length
+
+**Technical Highlights:**
+- All queries apply row-level security via `get_unified_guard()` and `filter_query()`
+- PostgreSQL-specific operators: `&&` (array overlap), `@>` (JSONB contains), `?` (JSONB key exists)
+- Proper relationship loading to avoid N+1 queries (joinedload for 1:1, selectinload for 1:many)
+- Entity-specific methods match Phase 3 plan requirements
+- Generic type hints with BaseRepository[T] for type safety
+- Consistent error handling and query patterns across all repositories
+
+**Pattern Adherence:**
+- ✅ Inherit from BaseRepository[T]
+- ✅ Apply security filtering via _apply_security() → get_unified_guard().filter_query()
+- ✅ Use async/await patterns (dataclass, not async def - follows MeatyPrompts)
+- ✅ Proper type hints with generics (List[Style], Optional[Song], etc.)
+- ✅ Entity-specific query methods as specified in Phase 3 plan
+- ✅ No raw SQL - pure SQLAlchemy ORM
+- ✅ Alphabetical exports in __init__.py
 
 ### 2025-11-12 - Week 1: Entity Models & Migrations Complete
 
@@ -288,7 +329,17 @@
 - `/services/api/alembic/versions/20251112_1505_3ee6b70e3330_amcs_artifact_tables.py` - Migration 003
 
 ### Repositories
-_Not yet created - planned for Week 2_
+- `/services/api/app/repositories/base.py` - BaseRepository (from MeatyPrompts)
+- `/services/api/app/repositories/blueprint_repo.py` - BlueprintRepository
+- `/services/api/app/repositories/persona_repo.py` - PersonaRepository
+- `/services/api/app/repositories/source_repo.py` - SourceRepository
+- `/services/api/app/repositories/style_repo.py` - StyleRepository
+- `/services/api/app/repositories/song_repo.py` - SongRepository
+- `/services/api/app/repositories/workflow_run_repo.py` - WorkflowRunRepository
+- `/services/api/app/repositories/lyrics_repo.py` - LyricsRepository
+- `/services/api/app/repositories/producer_notes_repo.py` - ProducerNotesRepository
+- `/services/api/app/repositories/composed_prompt_repo.py` - ComposedPromptRepository
+- `/services/api/app/repositories/__init__.py` - Updated exports
 
 ### Services
 _Not yet created - planned for Week 2_
