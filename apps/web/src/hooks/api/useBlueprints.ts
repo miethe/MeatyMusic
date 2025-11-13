@@ -12,7 +12,7 @@ import type { BlueprintFilters } from '@/lib/api/blueprints';
 
 export function useBlueprints(filters?: BlueprintFilters) {
   return useQuery({
-    queryKey: queryKeys.blueprints.list(filters),
+    queryKey: queryKeys.blueprints.list(filters as Record<string, unknown> | undefined),
     queryFn: () => blueprintsApi.list(filters),
     staleTime: getStaleTime('BLUEPRINTS'),
   });
