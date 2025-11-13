@@ -47,9 +47,8 @@ Create `apps/web/.env.local`:
 NEXT_PUBLIC_API_URL=http://localhost:8000
 NEXT_PUBLIC_WS_URL=ws://localhost:8000/events
 
-# Authentication (Clerk)
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_key_here
-CLERK_SECRET_KEY=your_secret_here
+# Development Auth Bypass (for MCP/agents - DEV ONLY)
+NEXT_PUBLIC_DEV_AUTH_BYPASS_SECRET=your-super-secret-token
 
 # Optional: OpenTelemetry
 NEXT_PUBLIC_OTEL_ENDPOINT=http://localhost:4318/v1/traces

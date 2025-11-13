@@ -46,17 +46,7 @@ const nextConfig = {
   // Redirects
   async redirects() {
     return [
-      {
-        source: '/',
-        destination: '/dashboard',
-        permanent: false,
-        has: [
-          {
-            type: 'cookie',
-            key: '__clerk_db_jwt',
-          },
-        ],
-      },
+      // No automatic redirects - auth will be handled in Phase 2+
     ];
   },
 };

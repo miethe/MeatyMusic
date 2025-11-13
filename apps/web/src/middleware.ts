@@ -1,22 +1,10 @@
 /**
- * Middleware for route protection
- * Uses Clerk middleware to protect routes with optional development bypass
+ * Middleware for development bypass
+ * Allows API client to work in development without authentication
  */
 
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
-
-/**
- * Define protected routes that require authentication
- */
-const isProtectedRoute = createRouteMatcher([
-  '/dashboard(.*)',
-  '/songs(.*)',
-  '/library(.*)',
-  '/settings(.*)',
-]);
 
 /**
  * Check if request should bypass authentication (development only)
@@ -39,22 +27,17 @@ function isDevelopmentBypass(req: NextRequest): boolean {
   return bypassHeader === expectedSecret;
 }
 
-export default clerkMiddleware((auth, req) => {
+export function middleware(req: NextRequest) {
   // Development bypass for MCP/agent testing (secure by environment check)
   if (isDevelopmentBypass(req)) {
     // eslint-disable-next-line no-console
     console.log('[DEV] Auth bypass enabled for request:', req.url);
-    return NextResponse.next();
   }
 
-  // Protect routes that require authentication
-  if (isProtectedRoute(req)) {
-    auth().protect();
-  }
-
-  // Explicitly return undefined for unprotected routes
-  return undefined;
-});
+  // Allow all requests to pass through
+  // Backend will handle authentication via JWT tokens
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: [

@@ -433,12 +433,14 @@ function SongDetailPage({ song }: { song: Song }) {
 ```typescript
 // middleware.ts
 
-import { authMiddleware } from '@clerk/nextjs';
-import { ROUTE_CATEGORIES } from '@/config/routes';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
-export default authMiddleware({
-  publicRoutes: ROUTE_CATEGORIES.PUBLIC,
-});
+export function middleware(req: NextRequest) {
+  // Development bypass for MCP/agent testing
+  // Full JWT authentication will be added in Phase 2+
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
@@ -452,10 +454,10 @@ import { useAuth } from '@/hooks/useAuth';
 import { redirect } from 'next/navigation';
 
 function ProtectedPage() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isSignedIn, isLoading } = useAuth();
 
   if (isLoading) return <div>Loading...</div>;
-  if (!isAuthenticated) redirect('/sign-in');
+  if (!isSignedIn) redirect('/sign-in');
 
   return <div>Protected content</div>;
 }

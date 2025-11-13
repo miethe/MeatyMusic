@@ -9,8 +9,10 @@
  * - Workflow runs: 10s during active run, 5min after completion
  */
 
-import { QueryClient } from '@tanstack/react-query';
-
+/**
+ * Stale time constants for different entity types
+ * Used by query hooks to determine cache freshness
+ */
 const STALE_TIME_MS = {
   SONGS: 1000 * 30, // 30 seconds
   ENTITIES: 1000 * 60 * 2, // 2 minutes
@@ -20,37 +22,13 @@ const STALE_TIME_MS = {
   DEFAULT: 1000 * 60 * 5, // 5 minutes
 };
 
-const GC_TIME_MS = 1000 * 60 * 10; // 10 minutes
-
 /**
- * React Query client with optimized defaults
+ * QueryClient configuration is now in app/providers.tsx
+ * This file only exports query keys and helper functions
+ *
+ * @deprecated queryClient export removed to prevent Next.js serialization errors
+ * Use the QueryClient from providers.tsx via useQueryClient() hook instead
  */
-export const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: STALE_TIME_MS.DEFAULT,
-      gcTime: GC_TIME_MS,
-      retry: (failureCount, error) => {
-        // Don't retry on 4xx errors
-        if (error && typeof error === 'object' && 'status' in error) {
-          const status = error.status as number;
-          if (status >= 400 && status < 500) {
-            return false;
-          }
-        }
-        return failureCount < 3;
-      },
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: true,
-      networkMode: 'offlineFirst', // Use cache first
-      structuralSharing: true, // Prevent unnecessary re-renders
-    },
-    mutations: {
-      retry: 1,
-      networkMode: 'online',
-    },
-  },
-});
 
 /**
  * Query key factory for type-safe, hierarchical query keys

@@ -3,7 +3,7 @@
  * Central export for all API client modules
  */
 
-export { apiClient, queryClient } from './client';
+export { apiClient } from './client';
 
 export { songsApi } from './songs';
 export type { SongFilters } from './songs';

@@ -11,7 +11,7 @@ Next.js 14 web application for the MeatyMusic AMCS (Agentic Music Creation Syste
 - **State Management**:
   - React Query for server state
   - Zustand for client state
-- **Authentication**: Clerk
+- **Authentication**: Backend JWT tokens (Phase 2+)
 - **Telemetry**: OpenTelemetry API
 - **Testing**:
   - Jest for unit tests
@@ -51,8 +51,7 @@ cp .env.example .env.local
 
 Key variables:
 - `NEXT_PUBLIC_API_BASE_URL`: Backend API URL (default: http://localhost:8000)
-- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`: Clerk authentication key
-- `CLERK_SECRET_KEY`: Clerk secret key
+- `NEXT_PUBLIC_DEV_AUTH_BYPASS_SECRET`: Development auth bypass (optional, for MCP/agents)
 
 ### Building
 
@@ -108,16 +107,16 @@ apps/web/
 
 The application uses axios with React Query for data fetching:
 - Configured in `src/lib/api/client.ts`
-- Automatic Clerk token injection
 - Request/response interceptors for telemetry
 - Error normalization
+- Development bypass header injection
 
 ### Authentication
 
-Authentication is handled by Clerk:
-- Protected routes defined in `src/middleware.ts`
+Authentication is handled by the backend via JWT tokens:
+- Middleware in `src/middleware.ts` provides development bypass
 - Auth state accessible via `useAuth()` hook
-- Development bypass available for testing
+- Full JWT implementation planned for Phase 2+
 
 ### Telemetry
 

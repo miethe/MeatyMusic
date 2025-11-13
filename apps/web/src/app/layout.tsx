@@ -1,11 +1,8 @@
 import { Inter } from 'next/font/google';
+
 import type { Metadata } from 'next';
 
-import { ClerkProvider } from '@clerk/nextjs';
-import { QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-
-import { queryClient } from '@/lib/api/client';
+import { Providers } from './providers';
 
 import './globals.css';
 
@@ -50,17 +47,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
-      <html lang="en" className={inter.variable}>
-        <body className="antialiased">
-          <QueryClientProvider client={queryClient}>
-            {children}
-            {process.env.NODE_ENV === 'development' && (
-              <ReactQueryDevtools initialIsOpen={false} />
-            )}
-          </QueryClientProvider>
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en" className={inter.variable}>
+      <body className="antialiased">
+        <Providers>{children}</Providers>
+      </body>
+    </html>
   );
 }
