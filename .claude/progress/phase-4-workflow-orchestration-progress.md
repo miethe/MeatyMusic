@@ -175,14 +175,18 @@
 
 ## Development Checklist
 
-### Phase 4.1: Orchestrator Foundation
-- [ ] Read claude_code_orchestration.prd.md thoroughly
-- [ ] Design workflow graph state machine
-- [ ] Implement orchestrator service (backend/src/services/workflow/)
-- [ ] Create workflow execution API endpoints (/api/v1/workflows)
-- [ ] Implement run manifest parser and validator
-- [ ] Add WebSocket event streaming (/events endpoint)
-- [ ] Create workflow run database schema (runs table, node_executions table)
+### Phase 4.1: Orchestrator Foundation (COMPLETED 2025-11-12)
+- [x] Read claude_code_orchestration.prd.md thoroughly
+- [x] Design workflow graph state machine
+- [x] Implement orchestrator service (app/workflows/orchestrator.py)
+- [x] Create workflow execution API endpoints (/api/v1/runs)
+- [x] Implement run manifest parser and validator
+- [x] Add WebSocket event streaming (/api/v1/runs/events endpoint)
+- [x] Create workflow run database schema (node_executions, workflow_events tables)
+- [x] Implement @workflow_skill decorator framework
+- [x] Implement EventPublisher with WebSocket support
+- [x] Create workflow repositories (NodeExecutionRepository, WorkflowEventRepository)
+- [x] Implement WorkflowService with run lifecycle management
 
 ### Phase 4.2: Core Workflow Skills
 - [ ] Implement PLAN skill (.claude/skills/workflow/plan/)
@@ -220,12 +224,48 @@
 
 ## Work Log
 
-### [Date] - Task Description
-**What**:
-**Subagents**:
+### 2025-11-12 - Phase 4.1 Orchestrator Foundation (COMPLETED)
+**What**: Implemented complete orchestrator foundation infrastructure
+**Subagents**: python-backend-engineer
 **Commits**:
-**Blockers**:
-**Next**:
+- ae249f1: feat(workflow): add orchestrator foundation (Phase 4.1)
+- f23f8c8: feat(workflow): add repositories and orchestrator core
+- 6bef38c: feat(workflow): add service layer and API endpoints
+**Blockers**: None
+**Next**: Phase 4.2 - Core Workflow Skills implementation
+
+**Summary**:
+- Created database migration for node_executions and workflow_events tables
+- Implemented NodeExecution and WorkflowEvent ORM models
+- Built @workflow_skill decorator with input/output validation, seed injection, and telemetry
+- Implemented EventPublisher with WebSocket streaming and DB persistence
+- Created NodeExecutionRepository and WorkflowEventRepository with RLS
+- Built WorkflowOrchestrator DAG execution engine with fix loop support
+- Implemented WorkflowService business logic layer
+- Created API endpoints: POST /runs, GET /runs/{run_id}, POST /runs/{run_id}/execute, POST /runs/{run_id}/retry, POST /runs/{run_id}/cancel, WebSocket /runs/events
+- Registered /runs router in API v1
+- All components follow MP architectural patterns (Router → Service → Repository → DB)
+- Full observability with OpenTelemetry, structured logging, and event streaming
+- Determinism enforcement via seed propagation, hashing, and model parameter tracking
+
+**Files Created** (10):
+1. services/api/alembic/versions/20251112_2046_339cf8360a4f_add_workflow_execution_tables.py
+2. services/api/app/models/workflow.py
+3. services/api/app/workflows/__init__.py
+4. services/api/app/workflows/skill.py
+5. services/api/app/workflows/events.py
+6. services/api/app/workflows/orchestrator.py
+7. services/api/app/repositories/node_execution_repo.py
+8. services/api/app/repositories/workflow_event_repo.py
+9. services/api/app/services/workflow_service.py
+10. services/api/app/api/v1/endpoints/runs.py
+
+**Files Modified** (2):
+1. services/api/app/models/__init__.py
+2. services/api/app/api/v1/router.py
+
+**Completion**: 100% (7/7 core tasks completed)
+**Status**: APPROVED for Phase 4.2
 
 ## Architectural Decisions
 
@@ -345,17 +385,49 @@
 
 ## Files Changed
 
-### Created
-- Path: Description
+### Created (Phase 4.1)
+- services/api/alembic/versions/20251112_2046_339cf8360a4f_add_workflow_execution_tables.py: Database migration for node_executions and workflow_events tables
+- services/api/app/models/workflow.py: NodeExecution and WorkflowEvent ORM models
+- services/api/app/workflows/__init__.py: Workflows package exports
+- services/api/app/workflows/skill.py: @workflow_skill decorator and WorkflowContext
+- services/api/app/workflows/events.py: EventPublisher with WebSocket and DB persistence
+- services/api/app/workflows/orchestrator.py: WorkflowOrchestrator DAG execution engine
+- services/api/app/repositories/node_execution_repo.py: NodeExecution repository with RLS
+- services/api/app/repositories/workflow_event_repo.py: WorkflowEvent repository with RLS
+- services/api/app/services/workflow_service.py: WorkflowService business logic layer
+- services/api/app/api/v1/endpoints/runs.py: API endpoints for workflow operations
+- .claude/summaries/phase-4.1-orchestrator-foundation-summary.md: Comprehensive implementation summary
 
-### Modified
-- Path: Changes made
+### Modified (Phase 4.1)
+- services/api/app/models/__init__.py: Added NodeExecution and WorkflowEvent exports
+- services/api/app/api/v1/router.py: Registered /runs router in API v1
 
 ### Deleted
-- Path: Reason
+- None
 
 ## Next Steps
 
-1. Read claude_code_orchestration.prd.md
-2. Design workflow graph state machine
-3. Implement orchestrator service foundation
+1. **Phase 4.2: Core Workflow Skills** (3-5 days)
+   - Implement PLAN skill (.claude/skills/workflow/plan/ + app/skills/workflow/plan.py)
+   - Implement STYLE skill (.claude/skills/workflow/style/)
+   - Implement LYRICS skill (.claude/skills/workflow/lyrics/)
+   - Implement PRODUCER skill (.claude/skills/workflow/producer/)
+   - Implement COMPOSE skill (.claude/skills/workflow/compose/)
+   - Register all skills with orchestrator
+   - Test end-to-end workflow execution with mock SDS
+
+2. **Phase 4.3: Validation & Fix** (2-3 days)
+   - Implement VALIDATE skill with rubric scoring
+   - Implement FIX skill with targeted improvements
+   - Test fix loop (max 3 iterations)
+
+3. **Phase 4.4: Render & Review** (1-2 days)
+   - Implement RENDER skill interface (feature-flagged)
+   - Implement REVIEW skill for finalization
+   - Test complete workflow end-to-end
+
+4. **Phase 4.5: Testing & Validation** (2-3 days)
+   - Write unit tests (orchestrator, skill decorator, repositories)
+   - Write integration tests (workflow execution, event streaming)
+   - Determinism tests (10 replays, ≥99% match)
+   - Performance tests (P95 ≤60s)
