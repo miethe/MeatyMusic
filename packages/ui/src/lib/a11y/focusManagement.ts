@@ -48,7 +48,7 @@ export function getFocusableElements(container: HTMLElement | null): HTMLElement
 export function focusFirst(container: HTMLElement | null): boolean {
   const focusableElements = getFocusableElements(container)
   if (focusableElements.length > 0) {
-    focusableElements[0].focus()
+    focusableElements[0]?.focus()
     return true
   }
   return false
@@ -60,7 +60,7 @@ export function focusFirst(container: HTMLElement | null): boolean {
 export function focusLast(container: HTMLElement | null): boolean {
   const focusableElements = getFocusableElements(container)
   if (focusableElements.length > 0) {
-    focusableElements[focusableElements.length - 1].focus()
+    focusableElements[focusableElements.length - 1]?.focus()
     return true
   }
   return false
@@ -85,7 +85,7 @@ export function useFocusTrap(
     // Focus the first element in the container
     const focusableElements = getFocusableElements(container)
     if (focusableElements.length > 0) {
-      focusableElements[0].focus()
+      focusableElements[0]?.focus()
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -102,13 +102,13 @@ export function useFocusTrap(
         // Shift + Tab: move focus backward
         if (currentElement === firstElement || !focusableElements.includes(currentElement)) {
           event.preventDefault()
-          lastElement.focus()
+          lastElement?.focus()
         }
       } else {
         // Tab: move focus forward
         if (currentElement === lastElement || !focusableElements.includes(currentElement)) {
           event.preventDefault()
-          firstElement.focus()
+          firstElement?.focus()
         }
       }
     }
@@ -223,7 +223,7 @@ export function useArrowNavigation(
       }
 
       if (focusableElements[nextIndex]) {
-        focusableElements[nextIndex].focus()
+        focusableElements[nextIndex]?.focus()
       }
     }
 

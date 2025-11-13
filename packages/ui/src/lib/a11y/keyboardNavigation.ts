@@ -361,7 +361,7 @@ export function useRovingTabindex(
     const elements = Array.from(container.querySelectorAll(selector)) as HTMLElement[]
     if (index >= 0 && index < elements.length) {
       setActiveIndex(index)
-      elements[index].focus()
+      elements[index]?.focus()
     }
   }, [containerRef, selector])
 
