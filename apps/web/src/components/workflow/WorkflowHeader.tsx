@@ -11,8 +11,8 @@
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Button } from '@meaty/ui/components/Button';
-import { Badge } from '@meaty/ui/components/Badge';
+import { Button } from '@meatymusic/ui';
+import { Badge } from '@meatymusic/ui';
 import { WorkflowRunStatus, type Song } from '@/types/api';
 
 export interface WorkflowHeaderProps {

@@ -11,7 +11,7 @@
 
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-import { Badge } from '@meaty/ui/components/Badge';
+import { Badge } from '@meatymusic/ui';
 import type { ValidationScores, WorkflowSummary } from '@/types/api';
 import type { NodeExecutionResult } from '@/types/api';
 

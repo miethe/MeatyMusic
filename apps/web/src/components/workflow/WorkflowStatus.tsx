@@ -7,8 +7,8 @@
 
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-import { Badge } from '@meaty/ui/components/Badge';
-import { Progress } from '@meaty/ui/components/Progress';
+import { Badge } from '@meatymusic/ui';
+import { Progress } from '@meatymusic/ui';
 import type { WorkflowRunStatus } from '@/types/api';
 import type { WorkflowNodeState } from './WorkflowGraph';
 

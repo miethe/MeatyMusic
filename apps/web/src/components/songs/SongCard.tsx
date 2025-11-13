@@ -9,11 +9,11 @@
 import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
-import { Card } from '@meaty/ui/components/Card';
-import { Badge } from '@meaty/ui/components/Badge';
-import { Checkbox } from '@meaty/ui/components/Checkbox';
-import { Button } from '@meaty/ui/components/Button';
-import { Progress } from '@meaty/ui/components/Progress';
+import { Card } from '@meatymusic/ui';
+import { Badge } from '@meatymusic/ui';
+import { Checkbox } from '@meatymusic/ui';
+import { Button } from '@meatymusic/ui';
+import { Progress } from '@meatymusic/ui';
 import type { Song, WorkflowRunStatus } from '@/types/api';
 
 const songCardVariants = cva(

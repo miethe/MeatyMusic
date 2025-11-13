@@ -8,3 +8,6 @@ export * from './songs';
 
 // Workflow components
 export * from './workflow';
+
+// Entity editors
+export * from './entities';

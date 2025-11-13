@@ -8,9 +8,9 @@
 
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-import { Button } from '@meaty/ui/components/Button';
-import { Badge } from '@meaty/ui/components/Badge';
-import { Tabs } from '@meaty/ui/components/Tabs';
+import { Button } from '@meatymusic/ui';
+import { Badge } from '@meatymusic/ui';
+import { Tabs } from '@meatymusic/ui';
 
 export interface ArtifactData {
   lyrics?: {

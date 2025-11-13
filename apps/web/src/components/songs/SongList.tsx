@@ -8,8 +8,8 @@
 
 import * as React from 'react';
 import { SongCard, type EntitySummary, type WorkflowState } from './SongCard';
-import { EmptyState } from '@meaty/ui/components/EmptyState';
-import { Skeleton } from '@meaty/ui/components/Skeleton';
+import { EmptyState } from '@meatymusic/ui';
+import { Skeleton } from '@meatymusic/ui';
 import type { Song, SongStatus } from '@/types/api';
 
 export interface SongFilters {

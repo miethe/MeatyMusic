@@ -1,34 +1,37 @@
 # UI Components
 
-This directory will contain MeatyMusic AMCS React components in Phase 5:
+MeatyMusic AMCS React components for Phase 5:
 
-## Planned Component Structure
+## Component Structure
 
-### Song Creation Flow
-- **SongCreator/** - Multi-step song creation wizard
-- **EntityEditors/** - Form components for each entity type
-  - StyleEditor
-  - LyricsEditor
-  - PersonaEditor
-  - ProducerNotesEditor
-- **ConstraintValidators/** - Real-time validation feedback
+### Song Management
+- **songs/** - Song list, cards, and management
+  - `SongCard.tsx` - Song display card with workflow state
+  - `SongList.tsx` - Paginated song list with filters
+
+### Entity Editors
+- **entities/** - Form components for all entity types
+  - `StyleEditor.tsx` - Genre, tempo, mood, instrumentation
+  - `LyricsEditor.tsx` - Section structure, rhyme scheme, themes
+  - `PersonaEditor.tsx` - Voice characteristics, influences, policy
+  - `ProducerNotesEditor.tsx` - Arrangement structure, hooks, mix parameters
+  - `SongEditor.tsx` - Top-level song configuration
+  - `BlueprintEditor.tsx` - Genre rules and evaluation rubrics
+
+#### Common Entity Components
+- **entities/common/** - Reusable form components
+  - `ChipSelector.tsx` - Multi-select chip input with autocomplete
+  - `RangeSlider.tsx` - Dual-handle range selector with presets
+  - `SectionEditor.tsx` - Drag-and-drop section ordering
+  - `RhymeSchemeInput.tsx` - Visual rhyme pattern editor
+  - `EntityPreviewPanel.tsx` - Live JSON preview with validation
 
 ### Workflow Visualization
-- **WorkflowDashboard/** - Real-time workflow monitoring
-- **WorkflowGraph/** - Visual node execution graph
-- **EventStream/** - Live event feed with metrics
-
-### Artifact Viewers
-- **ArtifactViewer/** - Display generated artifacts
-- **StylePreview/** - Style specification display
-- **LyricsDisplay/** - Formatted lyrics with sections
-- **ComposedPromptViewer/** - Final prompt display with metadata
-
-### Shared/UI Components
-- **Layout/** - Page layouts and navigation
-- **Forms/** - Reusable form components
-- **DataDisplay/** - Tables, cards, lists
-- **Feedback/** - Toasts, alerts, loading states
+- **workflow/** - Real-time workflow monitoring
+  - `WorkflowGraph.tsx` - Visual node execution graph
+  - `WorkflowStatus.tsx` - Status indicators and badges
+  - `NodeDetails.tsx` - Node-level execution details
+  - `ArtifactPreview.tsx` - Generated artifact viewer
 
 ## Implementation Reference
 

@@ -7,8 +7,8 @@
 
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-import { Badge } from '@meaty/ui/components/Badge';
-import { Tabs } from '@meaty/ui/components/Tabs';
+import { Badge } from '@meatymusic/ui';
+import { Tabs } from '@meatymusic/ui';
 import type { WorkflowNodeState } from './WorkflowGraph';
 
 export interface NodeDetailsProps {
