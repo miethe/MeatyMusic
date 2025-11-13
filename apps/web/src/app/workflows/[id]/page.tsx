@@ -19,7 +19,7 @@ import { WorkflowHeader } from '@/components/workflow/WorkflowHeader';
 import { WorkflowGraph, type WorkflowNodeState } from '@/components/workflow/WorkflowGraph';
 import { MetricsPanel } from '@/components/workflow/MetricsPanel';
 import { ArtifactPreview, type ArtifactData } from '@/components/workflow/ArtifactPreview';
-import { WorkflowNode, WorkflowRunStatus, type Song, type WorkflowSummary } from '@/types/api';
+import { WorkflowNode, WorkflowRunStatus, SongStatus, type Song, type WorkflowSummary } from '@/types/api';
 
 /**
  * Mock data for development (Wave 2B)
@@ -35,7 +35,7 @@ const MOCK_SONG: Song = {
   style_id: 'style-abc',
   persona_id: 'persona-xyz',
   blueprint_id: 'blueprint-pop',
-  status: 'rendered',
+  status: SongStatus.RENDERED,
   created_at: '2025-11-13T10:00:00Z',
   updated_at: '2025-11-13T10:05:00Z',
   extra_metadata: {},
