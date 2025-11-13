@@ -129,3 +129,157 @@ def init_tracing(app: FastAPI, engine: Engine) -> None:
 def get_tracer(name: str):
     """Get a tracer instance for the given module name."""
     return trace.get_tracer(name)
+
+
+# =============================================================================
+# Workflow-Specific Tracing Decorators
+# =============================================================================
+
+
+def trace_workflow_execution(tracer_name: str = "workflow"):
+    """Decorator to trace workflow execution with comprehensive metadata.
+
+    Creates a span for the entire workflow run, including:
+    - run_id, song_id, seed
+    - duration_ms, status
+    - fix_iterations
+    - validation_scores
+    - genre, user context
+
+    Example:
+        ```python
+        @trace_workflow_execution()
+        async def execute_workflow(run_id: UUID) -> dict:
+            # ... workflow logic ...
+            return {"status": "completed", ...}
+        ```
+
+    Args:
+        tracer_name: Name for the tracer instance
+
+    Returns:
+        Decorator function
+    """
+
+    def decorator(func):
+        async def wrapper(*args, **kwargs):
+            tracer = trace.get_tracer(tracer_name)
+            with tracer.start_as_current_span("workflow.execute") as span:
+                # Extract run_id if available
+                run_id = kwargs.get("run_id") or (args[0] if args else None)
+                if run_id:
+                    span.set_attribute("workflow.run_id", str(run_id))
+
+                try:
+                    result = await func(*args, **kwargs)
+
+                    # Add result metadata to span
+                    if isinstance(result, dict):
+                        span.set_attribute(
+                            "workflow.status", result.get("status", "unknown")
+                        )
+                        span.set_attribute(
+                            "workflow.duration_ms", result.get("duration_ms", 0)
+                        )
+                        span.set_attribute(
+                            "workflow.fix_iterations", result.get("fix_iterations", 0)
+                        )
+
+                        # Add validation scores
+                        if "validation_scores" in result:
+                            for metric, score in result["validation_scores"].items():
+                                span.set_attribute(f"workflow.score.{metric}", score)
+
+                    return result
+
+                except Exception as e:
+                    span.set_attribute("workflow.status", "failed")
+                    span.set_attribute("workflow.error", str(e))
+                    span.set_attribute("workflow.error_type", type(e).__name__)
+                    raise
+
+        return wrapper
+
+    return decorator
+
+
+def trace_skill_execution(skill_name: str, tracer_name: str = "workflow.skill"):
+    """Decorator to trace individual skill execution.
+
+    Creates a span for skill execution with:
+    - skill_name, node_name, node_index
+    - seed, input_hash, output_hash
+    - duration_ms, status
+    - LLM token usage (if applicable)
+    - Model parameters (temperature, top_p)
+
+    Example:
+        ```python
+        @trace_skill_execution("amcs.plan.generate")
+        async def generate_plan(inputs: dict, context: WorkflowContext) -> dict:
+            # ... skill logic ...
+            return {"plan": {...}}
+        ```
+
+    Args:
+        skill_name: Full skill name (e.g., "amcs.plan.generate")
+        tracer_name: Name for the tracer instance
+
+    Returns:
+        Decorator function
+    """
+
+    def decorator(func):
+        async def wrapper(*args, **kwargs):
+            tracer = trace.get_tracer(tracer_name)
+            with tracer.start_as_current_span(f"skill.{skill_name}") as span:
+                span.set_attribute("skill.name", skill_name)
+
+                # Extract context if available
+                context = kwargs.get("context") or (args[1] if len(args) > 1 else None)
+                if context and hasattr(context, "run_id"):
+                    span.set_attribute("workflow.run_id", str(context.run_id))
+                    span.set_attribute("workflow.song_id", str(context.song_id))
+                    span.set_attribute("skill.seed", context.seed)
+                    span.set_attribute("skill.node_index", context.node_index)
+                    span.set_attribute("skill.node_name", context.node_name)
+
+                try:
+                    result = await func(*args, **kwargs)
+
+                    # Add metadata from result
+                    if isinstance(result, dict):
+                        metadata = result.get("_metadata", {})
+                        if metadata:
+                            span.set_attribute(
+                                "skill.duration_ms", metadata.get("duration_ms", 0)
+                            )
+                            span.set_attribute(
+                                "skill.input_hash", metadata.get("input_hash", "")
+                            )
+                            span.set_attribute(
+                                "skill.output_hash", metadata.get("output_hash", "")
+                            )
+
+                            # Add model parameters
+                            model_params = metadata.get("model_params", {})
+                            if model_params:
+                                span.set_attribute(
+                                    "skill.temperature", model_params.get("temperature")
+                                )
+                                span.set_attribute(
+                                    "skill.top_p", model_params.get("top_p")
+                                )
+
+                    span.set_attribute("skill.status", "completed")
+                    return result
+
+                except Exception as e:
+                    span.set_attribute("skill.status", "failed")
+                    span.set_attribute("skill.error", str(e))
+                    span.set_attribute("skill.error_type", type(e).__name__)
+                    raise
+
+        return wrapper
+
+    return decorator

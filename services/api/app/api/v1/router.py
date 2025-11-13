@@ -9,6 +9,7 @@ from fastapi import APIRouter
 from app.api.v1.endpoints import (
     blueprints,
     lyrics,
+    monitoring,
     personas,
     producer_notes,
     runs,
@@ -24,6 +25,7 @@ api_router = APIRouter(prefix="/api/v1")
 # Include all entity routers
 api_router.include_router(blueprints.router)
 api_router.include_router(lyrics.router)
+api_router.include_router(monitoring.router, prefix="/monitoring", tags=["monitoring"])
 api_router.include_router(personas.router)
 api_router.include_router(producer_notes.router)
 api_router.include_router(runs.router)  # Workflow execution endpoints

@@ -20,6 +20,8 @@ import structlog
 from opentelemetry import trace
 from pydantic import BaseModel, ValidationError
 
+from app.observability import metrics
+
 logger = structlog.get_logger(__name__)
 tracer = trace.get_tracer(__name__)
 
@@ -218,6 +220,7 @@ def workflow_skill(
 
                     # Calculate duration
                     duration_ms = int((time.time() - start_time) * 1000)
+                    duration_seconds = duration_ms / 1000.0
                     span.set_attribute("skill.duration_ms", duration_ms)
 
                     logger.info(
@@ -227,6 +230,13 @@ def workflow_skill(
                         node_index=context.node_index,
                         duration_ms=duration_ms,
                         output_hash=output_hash,
+                    )
+
+                    # Record skill execution metrics
+                    metrics.record_skill_execution(
+                        skill_name=name,
+                        duration_seconds=duration_seconds,
+                        status="completed",
                     )
 
                     # Emit end event
@@ -258,6 +268,7 @@ def workflow_skill(
                 except SkillValidationError as e:
                     # Validation errors are skill bugs, not user errors
                     duration_ms = int((time.time() - start_time) * 1000)
+                    duration_seconds = duration_ms / 1000.0
                     span.set_attribute("skill.error", str(e))
                     span.set_attribute("skill.error_type", "validation")
                     span.set_attribute("skill.duration_ms", duration_ms)
@@ -268,6 +279,13 @@ def workflow_skill(
                         run_id=str(context.run_id),
                         error=str(e),
                         duration_ms=duration_ms,
+                    )
+
+                    # Record validation error metric
+                    metrics.record_skill_execution(
+                        skill_name=name,
+                        duration_seconds=duration_seconds,
+                        status="validation_error",
                     )
 
                     # Emit fail event
@@ -289,6 +307,7 @@ def workflow_skill(
                 except Exception as e:
                     # Execution errors (LLM, network, etc.)
                     duration_ms = int((time.time() - start_time) * 1000)
+                    duration_seconds = duration_ms / 1000.0
                     error_trace = traceback.format_exc()
 
                     span.set_attribute("skill.error", str(e))
@@ -303,6 +322,13 @@ def workflow_skill(
                         error_type=type(e).__name__,
                         duration_ms=duration_ms,
                         stack_trace=error_trace,
+                    )
+
+                    # Record execution error metric
+                    metrics.record_skill_execution(
+                        skill_name=name,
+                        duration_seconds=duration_seconds,
+                        status="failed",
                     )
 
                     # Emit fail event

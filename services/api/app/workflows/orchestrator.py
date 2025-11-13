@@ -21,6 +21,8 @@ from app.repositories.node_execution_repo import NodeExecutionRepository
 from app.repositories.workflow_run_repo import WorkflowRunRepository
 from app.workflows.events import EventPublisher
 from app.workflows.skill import WorkflowContext
+from app.observability import metrics
+from app.observability.workflow_logger import WorkflowLogger
 
 logger = structlog.get_logger(__name__)
 tracer = trace.get_tracer(__name__)
@@ -109,6 +111,9 @@ class WorkflowOrchestrator:
 
             logger.info("workflow.run.start", run_id=str(run_id))
 
+            # Record workflow start in metrics
+            metrics.record_workflow_start()
+
             # Load workflow run
             run = self.workflow_run_repo.get_by_run_id(run_id)
             if not run:
@@ -116,6 +121,9 @@ class WorkflowOrchestrator:
 
             span.set_attribute("run.song_id", str(run.song_id))
             span.set_attribute("run.seed", run.extra_metadata.get("seed", 0))
+
+            # Initialize workflow logger
+            workflow_logger = WorkflowLogger(run_id=run_id, song_id=run.song_id)
 
             # Update run status to running
             run.status = "running"
@@ -127,12 +135,20 @@ class WorkflowOrchestrator:
                 manifest = run.extra_metadata.get("manifest", {})
                 global_seed = run.extra_metadata.get("seed", 42)
                 graph = manifest.get("graph", [])
+                genre = manifest.get("genre")
 
                 logger.info(
                     "workflow.manifest.loaded",
                     run_id=str(run_id),
                     graph_nodes=len(graph),
                     seed=global_seed,
+                )
+
+                # Log workflow start with context
+                workflow_logger.log_workflow_start(
+                    seed=global_seed,
+                    genre=genre,
+                    manifest=manifest,
                 )
 
                 # Execute workflow graph
@@ -203,6 +219,7 @@ class WorkflowOrchestrator:
                 # Calculate total duration
                 end_time = datetime.now(timezone.utc)
                 duration_ms = int((end_time - start_time).total_seconds() * 1000)
+                duration_seconds = duration_ms / 1000.0
 
                 # Mark run as completed
                 run.status = "completed"
@@ -215,6 +232,22 @@ class WorkflowOrchestrator:
                     run_id=str(run_id),
                     duration_ms=duration_ms,
                     fix_iterations=fix_iterations,
+                )
+
+                # Record metrics and log completion
+                metrics.record_workflow_complete(
+                    duration_seconds=duration_seconds,
+                    genre=genre,
+                    success=True,
+                )
+                metrics.record_fix_iterations(fix_iterations)
+                metrics.record_validation_scores(run.validation_scores)
+
+                workflow_logger.log_workflow_complete(
+                    duration_ms=duration_ms,
+                    status="completed",
+                    fix_iterations=fix_iterations,
+                    validation_scores=run.validation_scores,
                 )
 
                 span.set_attribute("run.status", "completed")
@@ -230,6 +263,10 @@ class WorkflowOrchestrator:
                 }
 
             except Exception as e:
+                # Calculate duration for failed run
+                end_time = datetime.now(timezone.utc)
+                duration_seconds = (end_time - start_time).total_seconds()
+
                 # Mark run as failed
                 run.status = "failed"
                 run.error = {
@@ -246,6 +283,20 @@ class WorkflowOrchestrator:
                     error_type=type(e).__name__,
                     current_node=run.current_node,
                 )
+
+                # Record failed workflow metrics
+                metrics.record_workflow_complete(
+                    duration_seconds=duration_seconds,
+                    genre=manifest.get("genre") if "manifest" in locals() else None,
+                    success=False,
+                )
+
+                # Log workflow error
+                if "workflow_logger" in locals():
+                    workflow_logger.log_workflow_error(
+                        error=e,
+                        current_node=run.current_node,
+                    )
 
                 span.set_attribute("run.status", "failed")
                 span.set_attribute("run.error", str(e))
