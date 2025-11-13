@@ -8,4 +8,6 @@ export * from './theme';
 export * from './lib/utils';
 
 // Export complications slots
-export * from './complications';
+// DISABLED: MeatyPrompts-specific code causing TypeScript errors
+// TODO: Re-enable or replace with AMCS-specific complications when needed
+// export * from './complications';

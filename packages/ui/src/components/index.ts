@@ -43,14 +43,22 @@ export * from './Badge';
 export * from './Chip';
 export * from './Toast';
 export * from './Skeleton';
-export * from './PromptCard';
-export * from './TemplateCard';
-export * from './ContextCard';
-export * from './AgentCard';
+
+// DISABLED: MeatyPrompts-specific components causing TypeScript errors
+// TODO: Remove or adapt these components for AMCS when needed
+// export * from './PromptCard';
+// export * from './TemplateCard';
+// export * from './ContextCard';
+// export * from './AgentCard';
+
 export * from './Sidebar';
-export * from './ModelFilter';
-export * from './ModelPicker';
-export * from './ModelDisplay';
+
+// DISABLED: MeatyPrompts-specific model components causing TypeScript errors
+// TODO: Replace with AMCS-specific engine/style components when needed
+// export * from './ModelFilter';
+// export * from './ModelPicker';
+// export * from './ModelDisplay';
+
 export * from './MarkdownEditor';
 export * from './SaveStatusIndicator';
 export * from './DraftBanner';
@@ -124,4 +132,7 @@ export {
   type SessionWarningProps,
   type ToastProps as LegacyToastProps
 } from '../session-warning';
-export * from './PromptCard/complications';
+
+// DISABLED: MeatyPrompts-specific PromptCard complications causing TypeScript errors
+// TODO: Remove or replace with AMCS-specific complications when needed
+// export * from './PromptCard/complications';
