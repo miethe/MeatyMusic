@@ -128,7 +128,7 @@ const SongCardHeader: React.FC<{
  */
 const SongCardMetaStrip: React.FC<{
   moods?: string[];
-  status: string;
+  status?: string;
 }> = ({ moods = [], status }) => {
   const displayMoods = moods.slice(0, 3);
 
@@ -147,9 +147,11 @@ const SongCardMetaStrip: React.FC<{
           {mood}
         </Badge>
       ))}
-      <Badge className={cn('text-xs font-medium', statusColors[status as keyof typeof statusColors])}>
-        {status}
-      </Badge>
+      {status && (
+        <Badge className={cn('text-xs font-medium', statusColors[status as keyof typeof statusColors])}>
+          {status}
+        </Badge>
+      )}
     </div>
   );
 };
