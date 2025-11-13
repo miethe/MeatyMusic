@@ -11,7 +11,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { WorkflowGraph } from '@/components/workflow/WorkflowGraph';
 import { WorkflowStatus } from '@/components/workflow/WorkflowStatus';
 import { Card } from '@meatymusic/ui';
-import { WorkflowNode } from '@/types/api';
+import { WorkflowNode, WorkflowRunStatus } from '@/types/api';
 
 export default function SongWorkflowPage() {
   const params = useParams();
@@ -46,7 +46,7 @@ export default function SongWorkflowPage() {
         {/* Workflow Status Summary */}
         <div className="mb-8">
           <WorkflowStatus
-            status="running"
+            status={WorkflowRunStatus.RUNNING}
             currentNode="LYRICS"
             progress={33}
             durationMs={60000}

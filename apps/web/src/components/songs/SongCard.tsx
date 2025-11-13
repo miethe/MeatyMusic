@@ -14,7 +14,8 @@ import { Badge } from '@meatymusic/ui';
 import { Checkbox } from '@meatymusic/ui';
 import { Button } from '@meatymusic/ui';
 import { Progress } from '@meatymusic/ui';
-import type { Song, WorkflowRunStatus } from '@/types/api';
+import type { Song } from '@/types/api';
+import { WorkflowRunStatus } from '@/types/api';
 
 const songCardVariants = cva(
   'relative rounded-xl border border-border/10 bg-background-secondary p-6 shadow-md transition-all duration-200 hover:shadow-xl hover:-translate-y-1',

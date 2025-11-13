@@ -129,7 +129,7 @@ const JSONViewer: React.FC<{
   title: string;
   onCopy: () => void;
   onDownload: () => void;
-}> = ({ data, title, onCopy, onDownload }) => {
+}> = ({ data, onCopy, onDownload }) => {
   return (
     <div className="space-y-4">
       <pre className="p-4 bg-background-tertiary rounded-lg overflow-auto max-h-96 text-xs text-text-primary font-mono">
@@ -207,7 +207,7 @@ export const ArtifactPreview: React.FC<ArtifactPreviewProps> = ({
   React.useEffect(() => {
     const currentTabAvailable = availableTabs.some(tab => tab.id === activeTab);
     if (!currentTabAvailable && availableTabs.length > 0) {
-      setActiveTab(availableTabs[0].id);
+      setActiveTab(availableTabs[0]?.id ?? '');
     }
   }, [activeTab, availableTabs]);
 

@@ -16,7 +16,8 @@ import { useEffect, useRef, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useWorkflowStore } from '@/stores/workflowStore';
 import { queryKeys } from '@/lib/query/config';
-import type { WorkflowEvent, WorkflowNode } from '@/types/api';
+import type { WorkflowEvent } from '@/types/api';
+import { WorkflowNode, WorkflowRunStatus } from '@/types/api';
 
 /**
  * WebSocket hook options
@@ -112,9 +113,9 @@ export function useWorkflowWebSocket(
       } else {
         // Run-level event
         if (phase === 'end') {
-          updateRunStatus(run_id, { status: 'completed' });
+          updateRunStatus(run_id, { status: WorkflowRunStatus.COMPLETED });
         } else if (phase === 'fail') {
-          updateRunStatus(run_id, { status: 'failed' });
+          updateRunStatus(run_id, { status: WorkflowRunStatus.FAILED });
         }
       }
 

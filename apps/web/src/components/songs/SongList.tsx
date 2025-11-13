@@ -11,7 +11,8 @@ import { SongCard, type EntitySummary, type WorkflowState } from './SongCard';
 import { EmptyState } from '@meatymusic/ui';
 import { Skeleton } from '@meatymusic/ui';
 import { Search, Music2, AlertCircle } from 'lucide-react';
-import type { Song, SongStatus } from '@/types/api';
+import type { Song } from '@/types/api';
+import { SongStatus } from '@/types/api';
 
 export interface SongFilters {
   q?: string;
@@ -154,7 +155,7 @@ export const SongList: React.FC<SongListProps> = ({
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
+        if (entries[0]?.isIntersecting) {
           onLoadMore();
         }
       },

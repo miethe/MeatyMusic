@@ -8,7 +8,6 @@ import { workflowsApi } from '@/lib/api';
 import { queryKeys, getStaleTime } from '@/lib/query/config';
 import { useWorkflowStore, useUIStore } from '@/stores';
 import type {
-  WorkflowRun,
   WorkflowExecutionRequest,
   UUID,
 } from '@/types/api';

@@ -9,8 +9,7 @@ import * as React from 'react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@meatymusic/ui';
 import { Progress } from '@meatymusic/ui';
-import type { WorkflowRunStatus } from '@/types/api';
-import type { WorkflowNodeState } from './WorkflowGraph';
+import { WorkflowRunStatus } from '@/types/api';
 
 export interface WorkflowStatusProps {
   /** Overall workflow status */
@@ -33,35 +32,30 @@ export interface WorkflowStatusProps {
  * Status badge with icon and color
  */
 const StatusBadge: React.FC<{ status: WorkflowRunStatus }> = ({ status }) => {
-  const statusConfig = {
-    queued: {
-      icon: '●',
-      label: 'Queued',
-      className: 'bg-status-pending/20 text-status-pending border-status-pending/30',
-    },
-    running: {
+  const statusConfig: Record<WorkflowRunStatus, { icon: string; label: string; className: string }> = {
+    [WorkflowRunStatus.RUNNING]: {
       icon: '⟳',
       label: 'Running',
       className: 'bg-status-running/20 text-status-running border-status-running/30 animate-pulse',
     },
-    success: {
+    [WorkflowRunStatus.COMPLETED]: {
       icon: '✓',
       label: 'Success',
       className: 'bg-status-complete/20 text-status-complete border-status-complete/30',
     },
-    failed: {
+    [WorkflowRunStatus.FAILED]: {
       icon: '✗',
       label: 'Failed',
       className: 'bg-status-failed/20 text-status-failed border-status-failed/30',
     },
-    cancelled: {
+    [WorkflowRunStatus.CANCELLED]: {
       icon: '○',
       label: 'Cancelled',
       className: 'bg-status-skipped/20 text-status-skipped border-status-skipped/30',
     },
   };
 
-  const config = statusConfig[status] || statusConfig.queued;
+  const config = statusConfig[status] || statusConfig[WorkflowRunStatus.RUNNING];
 
   return (
     <Badge className={cn('font-medium', config.className)}>
@@ -100,9 +94,9 @@ export const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
     ? Object.values(scores).reduce((sum, score) => sum + score, 0) / Object.keys(scores).length
     : null;
 
-  const isRunning = status === 'running';
-  const isComplete = status === 'success';
-  const isFailed = status === 'failed';
+  const isRunning = status === WorkflowRunStatus.RUNNING;
+  const isComplete = status === WorkflowRunStatus.COMPLETED;
+  const isFailed = status === WorkflowRunStatus.FAILED;
 
   return (
     <div className={cn('p-6 bg-background-secondary rounded-xl border border-border/10', className)}>

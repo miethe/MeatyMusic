@@ -8,7 +8,6 @@
 import { apiClient } from './client';
 import type {
   WorkflowRun,
-  WorkflowRunCreate,
   WorkflowRunUpdate,
   WorkflowExecutionRequest,
   WorkflowExecutionResponse,

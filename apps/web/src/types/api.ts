@@ -11,7 +11,7 @@
  */
 
 // Re-export all API types from the centralized location
-export * from './api';
+export * from './api/index';
 
 /**
  * Legacy User Type (from MeatyPrompts)

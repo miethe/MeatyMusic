@@ -13,7 +13,8 @@ import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@meatymusic/ui';
 import { Badge } from '@meatymusic/ui';
-import { WorkflowRunStatus, type Song } from '@/types/api';
+import type { Song } from '@/types/api';
+import { WorkflowRunStatus } from '@/types/api';
 
 export interface WorkflowHeaderProps {
   /** Song information */
@@ -62,6 +63,13 @@ const getStatusConfig = (status: WorkflowRunStatus) => {
         icon: '○',
         variant: 'outline' as const,
         className: 'bg-status-skipped/20 text-status-skipped border-status-skipped/30',
+      };
+    default:
+      return {
+        label: 'Unknown',
+        icon: '?',
+        variant: 'outline' as const,
+        className: 'bg-background-tertiary/20 text-text-tertiary border-border/30',
       };
   }
 };

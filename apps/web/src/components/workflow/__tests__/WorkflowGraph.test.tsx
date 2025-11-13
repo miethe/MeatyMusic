@@ -6,8 +6,8 @@
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { WorkflowGraph } from '../WorkflowGraph';
-import { WorkflowNode } from '@/types/api';
 import type { WorkflowNodeState } from '../WorkflowGraph';
+import { WorkflowNode } from '@/types/api';
 
 describe('WorkflowGraph', () => {
   const mockNodes: WorkflowNodeState[] = [
