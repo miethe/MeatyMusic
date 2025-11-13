@@ -133,8 +133,8 @@ export const CapabilityFilter: React.FC<CapabilityFilterProps> = ({
       onFiltersChange({
         ...filters,
         confidenceLevel: {
-          min: values[0] / 100,
-          max: values[1] / 100
+          min: (values[0] ?? 0) / 100,
+          max: (values[1] ?? 100) / 100
         }
       });
     },

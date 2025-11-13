@@ -245,7 +245,7 @@ export const CostCalculator: React.FC<CostCalculatorProps> = ({
               </Label>
               <Slider
                 value={[totalTokens]}
-                onValueChange={([value]) => setTotalTokens(value)}
+                onValueChange={([value]) => setTotalTokens(value ?? 1000)}
                 min={1000}
                 max={10000000}
                 step={1000}
@@ -265,7 +265,7 @@ export const CostCalculator: React.FC<CostCalculatorProps> = ({
               </Label>
               <Slider
                 value={[inputRatio]}
-                onValueChange={([value]) => setInputRatio(value)}
+                onValueChange={([value]) => setInputRatio(value ?? 70)}
                 min={10}
                 max={90}
                 step={5}

@@ -46,6 +46,7 @@ const Toast = React.forwardRef<HTMLDivElement, ToastProps>(
 
         return () => clearTimeout(timer);
       }
+      return undefined;
     }, [duration, onClose]);
 
     return (
