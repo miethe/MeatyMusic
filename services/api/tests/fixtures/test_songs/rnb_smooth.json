@@ -1,0 +1,73 @@
+{
+  "title": "Test R&B Smooth",
+  "blueprint_ref": {
+    "genre": "R&B",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "R&B",
+      "subgenres": ["Contemporary R&B"],
+      "fusions": ["Neo-Soul"]
+    },
+    "tempo_bpm": 90,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "D minor",
+      "modulations": []
+    },
+    "mood": ["sensual", "smooth", "romantic"],
+    "energy": "medium",
+    "instrumentation": ["keys", "bass", "subtle drums"],
+    "vocal_profile": "female lead, melismatic",
+    "tags": ["Era:2010s", "Voice:melismatic", "Mix:lush"],
+    "negative_tags": ["harsh", "aggressive"]
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "present",
+    "themes": ["love", "desire", "intimacy"],
+    "rhyme_scheme": "ABCB",
+    "meter": "triplet feel",
+    "syllables_per_line": 10,
+    "hook_strategy": "melodic",
+    "repetition_policy": "moderate",
+    "section_order": ["Intro", "Verse", "Chorus", "Verse", "Chorus", "Bridge", "Chorus", "Outro"],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 60,
+      "section_requirements": {
+        "Chorus": {
+          "min_lines": 4,
+          "max_lines": 8,
+          "must_end_with_hook": true
+        }
+      }
+    },
+    "source_citations": []
+  },
+  "producer_notes": {
+    "structure": "",
+    "hooks": 1,
+    "instrumentation": ["keys", "bass"],
+    "section_meta": {
+      "Bridge": {
+        "tags": ["vocal-runs", "minimal-production"],
+        "target_duration_sec": 25
+      }
+    },
+    "mix": {
+      "lufs": -13.0,
+      "space": "lush",
+      "stereo_width": "normal"
+    }
+  },
+  "prompt_controls": {
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  }
+}

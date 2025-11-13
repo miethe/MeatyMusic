@@ -1,0 +1,32 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "declarationDir": "dist",
+    "emitDeclarationOnly": false,
+    "outDir": "dist",
+    "module": "esnext",
+    "target": "es2019",
+    "moduleResolution": "node"
+  },
+  "include": ["src/**/*"],
+  "exclude": [
+    "src/**/__tests__/**/*",
+    "src/**/*.test.tsx",
+    "src/**/*.test.ts",
+    "src/**/*.stories.tsx",
+    "src/test-setup.ts",
+    "src/complications/**/*",
+    "src/components/PromptCard/**/*",
+    "src/components/ModelDisplay/**/*",
+    "src/components/ModelFilter/**/*",
+    "src/components/ModelPicker/**/*",
+    "src/components/TemplateCard/**/*",
+    "src/components/ContextCard/**/*",
+    "src/components/AgentCard/**/*",
+    "src/components/capabilities/**/*",
+    "src/components/pricing/**/*",
+    "src/components/providers/**/*"
+  ]
+}

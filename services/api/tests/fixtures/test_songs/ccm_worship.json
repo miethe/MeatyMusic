@@ -1,0 +1,73 @@
+{
+  "title": "Test CCM Worship",
+  "blueprint_ref": {
+    "genre": "CCM",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "CCM",
+      "subgenres": ["Modern Worship"],
+      "fusions": []
+    },
+    "tempo_bpm": 76,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "D major",
+      "modulations": []
+    },
+    "mood": ["uplifting", "spiritual", "reverent"],
+    "energy": "medium",
+    "instrumentation": ["piano", "strings", "light drums"],
+    "vocal_profile": "mixed choir, soaring",
+    "tags": ["Era:2010s", "Voice:anthemic", "Mix:spacious"],
+    "negative_tags": ["dark", "aggressive"]
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st-plural",
+    "tense": "present",
+    "themes": ["faith", "praise", "worship"],
+    "rhyme_scheme": "ABAB",
+    "meter": "4/4",
+    "syllables_per_line": 10,
+    "hook_strategy": "melodic",
+    "repetition_policy": "hook-heavy",
+    "section_order": ["Intro", "Verse", "Chorus", "Verse", "Chorus", "Bridge", "Chorus", "Chorus"],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 70,
+      "section_requirements": {
+        "Chorus": {
+          "min_lines": 4,
+          "max_lines": 8,
+          "must_end_with_hook": true
+        }
+      }
+    },
+    "source_citations": []
+  },
+  "producer_notes": {
+    "structure": "",
+    "hooks": 1,
+    "instrumentation": ["piano", "strings"],
+    "section_meta": {
+      "Bridge": {
+        "tags": ["build", "spiritual-climax"],
+        "target_duration_sec": 30
+      }
+    },
+    "mix": {
+      "lufs": -14.0,
+      "space": "cathedral",
+      "stereo_width": "wide"
+    }
+  },
+  "prompt_controls": {
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  }
+}

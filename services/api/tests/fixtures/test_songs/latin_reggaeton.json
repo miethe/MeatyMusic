@@ -1,0 +1,73 @@
+{
+  "title": "Test Latin Reggaeton",
+  "blueprint_ref": {
+    "genre": "Latin",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "Latin",
+      "subgenres": ["Reggaeton"],
+      "fusions": []
+    },
+    "tempo_bpm": 95,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "E minor",
+      "modulations": []
+    },
+    "mood": ["sensual", "party", "confident"],
+    "energy": "high",
+    "instrumentation": ["dembow rhythm", "synth", "bass"],
+    "vocal_profile": "male rap/sung, Spanish",
+    "tags": ["Era:2020s", "Rhythm:dembow"],
+    "negative_tags": ["soft"]
+  },
+  "lyrics": {
+    "language": "es",
+    "pov": "1st",
+    "tense": "present",
+    "themes": ["romance", "party", "dance"],
+    "rhyme_scheme": "AABB",
+    "meter": "reggaeton flow",
+    "syllables_per_line": 10,
+    "hook_strategy": "chant",
+    "repetition_policy": "hook-heavy",
+    "section_order": ["Intro", "Verse", "Chorus", "Verse", "Chorus", "Bridge", "Chorus"],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 60,
+      "section_requirements": {
+        "Chorus": {
+          "min_lines": 4,
+          "max_lines": 8,
+          "must_end_with_hook": true
+        }
+      }
+    },
+    "source_citations": []
+  },
+  "producer_notes": {
+    "structure": "",
+    "hooks": 2,
+    "instrumentation": ["dembow rhythm", "synth"],
+    "section_meta": {
+      "Chorus": {
+        "tags": ["perreo"],
+        "target_duration_sec": 20
+      }
+    },
+    "mix": {
+      "lufs": -9.0,
+      "space": "tight",
+      "stereo_width": "wide"
+    }
+  },
+  "prompt_controls": {
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  }
+}

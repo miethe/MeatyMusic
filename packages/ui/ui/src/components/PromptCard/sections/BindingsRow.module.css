@@ -1,0 +1,87 @@
+/* BindingsRow Section Styles */
+
+.bindingsRow {
+  display: flex;
+  align-items: center;
+  gap: var(--mp-spacing-2);
+  padding: var(--mp-spacing-3) 0;
+  border-top: 1px solid var(--mp-color-border);
+}
+
+/* Label styling - uppercase, small, secondary color */
+.label {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--mp-typography-font-family-ui);
+  color: var(--mp-color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  user-select: none;
+}
+
+/* Chips container - flex layout with wrapping */
+.chips {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--mp-spacing-2);
+  flex: 1;
+  min-width: 0;
+}
+
+/* Tooltip item styling for overflow badges */
+.tooltipItem {
+  display: flex;
+  align-items: center;
+  padding: 2px 0;
+}
+
+/* Type-specific badge colors in tooltip */
+.badgeContext {
+  border-color: var(--mp-color-info);
+  color: var(--mp-color-info);
+}
+
+.badgeAgent {
+  border-color: var(--mp-color-secondary);
+  color: var(--mp-color-secondary);
+}
+
+.badgeVariable {
+  border-color: var(--mp-color-accent);
+  color: var(--mp-color-accent);
+}
+
+.badgeModel {
+  border-color: var(--mp-color-primary);
+  color: var(--mp-color-primary);
+}
+
+/* Responsive: Compact layout for narrow screens */
+@media (max-width: 640px) {
+  .bindingsRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mp-spacing-2);
+  }
+
+  .label {
+    margin-bottom: 2px;
+  }
+
+  .chips {
+    width: 100%;
+  }
+}
+
+/* Accessibility: High contrast mode support */
+@media (prefers-contrast: high) {
+  .bindingsRow {
+    border-top-width: 2px;
+  }
+
+  .label {
+    font-weight: 700;
+  }
+}

@@ -1,0 +1,510 @@
+/**
+ * PromptCard Complications Slot Positioning System
+ *
+ * Defines absolute positioning for 7 complication slots around the card.
+ * Uses design tokens and responds to card size variants.
+ * Ensures proper z-index layering and accessibility.
+ */
+
+/* ============================================================================
+   SLOT CONTAINER
+   ============================================================================ */
+
+/**
+ * Container for all complications - positioned relative to card
+ * This wrapper ensures complications don't affect card's intrinsic dimensions
+ * Uses padding to create safe zones for complications
+ */
+.complicationsContainer {
+  position: absolute;
+  top: var(--mp-spacing-1); /* Provide top padding to prevent cutoff */
+  left: var(--mp-spacing-1);
+  right: var(--mp-spacing-1);
+  bottom: var(--mp-spacing-1);
+  pointer-events: none; /* Allow clicks to pass through to card content */
+  z-index: var(--mp-z-complications, 10);
+  overflow: visible;
+  /* Ensure complications stay within reasonable bounds */
+  box-sizing: border-box;
+}
+
+/* ============================================================================
+   INDIVIDUAL SLOT POSITIONING
+   ============================================================================ */
+
+/**
+ * Base slot styling - enables pointer events for interactive complications
+ * All slots are absolutely positioned with specific anchors
+ */
+.slot {
+  position: absolute;
+  pointer-events: auto;
+  /* Ensure complications don't interfere with card focus */
+  z-index: 1;
+}
+
+/* TOP CORNERS */
+.slotTopLeft {
+  top: 0; /* Position at container edge instead of extending beyond */
+  left: 0;
+  transform-origin: top left;
+  transition: top var(--mp-motion-duration-ui, 150ms) var(--mp-motion-easing-exit);
+}
+
+.slotTopRight {
+  top: 0; /* Position at container edge instead of extending beyond */
+  right: 0;
+  transform-origin: top right;
+  transition: top var(--mp-motion-duration-ui, 150ms) var(--mp-motion-easing-exit);
+}
+
+/* BOTTOM CORNERS */
+.slotBottomLeft {
+  bottom: 0; /* Position at container edge */
+  left: 0;
+  transform-origin: bottom left;
+}
+
+.slotBottomRight {
+  bottom: 0; /* Position at container edge */
+  right: 0;
+  transform-origin: bottom right;
+}
+
+/* EDGE POSITIONS */
+.slotEdgeLeft {
+  left: calc(-1 * var(--mp-spacing-1)); /* Reduce extension beyond card */
+  top: 50%;
+  transform: translateY(-50%);
+  transform-origin: left center;
+}
+
+.slotEdgeRight {
+  right: calc(-1 * var(--mp-spacing-1)); /* Reduce extension beyond card */
+  top: 50%;
+  transform: translateY(-50%);
+  transform-origin: right center;
+}
+
+/* FOOTER POSITION */
+.slotFooter {
+  bottom: calc(-1 * var(--mp-spacing-2)); /* Reduce extension to prevent excessive overflow */
+  left: 50%;
+  transform: translateX(-50%);
+  transform-origin: bottom center;
+  /* Footer can be wider than other slots but within reason */
+  max-width: calc(100% + var(--mp-spacing-4));
+}
+
+/* ============================================================================
+   CARD SIZE RESPONSIVE POSITIONING
+   ============================================================================ */
+
+/* COMPACT CARD ADJUSTMENTS */
+.compact .slotTopLeft,
+.compact .slotTopRight {
+  top: 0; /* Keep corners within container bounds */
+}
+
+.compact .slotTopLeft,
+.compact .slotBottomLeft {
+  left: 0; /* Keep corners within container bounds */
+}
+
+.compact .slotTopRight,
+.compact .slotBottomRight {
+  right: 0; /* Keep corners within container bounds */
+}
+
+.compact .slotBottomLeft,
+.compact .slotBottomRight {
+  bottom: 0; /* Keep corners within container bounds */
+}
+
+.compact .slotEdgeLeft {
+  left: calc(-1 * var(--mp-spacing-1)); /* Minimal extension for compact cards */
+}
+
+.compact .slotEdgeRight {
+  right: calc(-1 * var(--mp-spacing-1)); /* Minimal extension for compact cards */
+}
+
+.compact .slotFooter {
+  bottom: calc(-1 * var(--mp-spacing-1));
+  max-width: calc(100% + var(--mp-spacing-2));
+}
+
+/* XL CARD ADJUSTMENTS */
+.xl .slotTopLeft,
+.xl .slotTopRight {
+  top: 0; /* Keep corners within container bounds even for XL */
+}
+
+.xl .slotTopLeft,
+.xl .slotBottomLeft {
+  left: 0; /* Keep corners within container bounds */
+}
+
+.xl .slotTopRight,
+.xl .slotBottomRight {
+  right: 0; /* Keep corners within container bounds */
+}
+
+.xl .slotBottomLeft,
+.xl .slotBottomRight {
+  bottom: 0; /* Keep corners within container bounds */
+}
+
+.xl .slotEdgeLeft {
+  left: calc(-1 * var(--mp-spacing-2)); /* Controlled extension for XL cards */
+}
+
+.xl .slotEdgeRight {
+  right: calc(-1 * var(--mp-spacing-2)); /* Controlled extension for XL cards */
+}
+
+.xl .slotFooter {
+  bottom: calc(-1 * var(--mp-spacing-3)); /* Reasonable extension for XL cards */
+  max-width: calc(100% + var(--mp-spacing-6));
+}
+
+/* ============================================================================
+   SLOT SIZE CONSTRAINTS
+   ============================================================================ */
+
+/**
+ * Maximum dimensions for different slot positions
+ * Prevents complications from overwhelming card content
+ */
+
+/* Corner slots are constrained to small badges/indicators */
+.slotTopLeft,
+.slotTopRight,
+.slotBottomLeft,
+.slotBottomRight {
+  max-width: var(--mp-spacing-12); /* ~48px */
+  max-height: var(--mp-spacing-12);
+}
+
+/* Increase max-width for topRight to accommodate provider badges with text truncation */
+.slotTopRight {
+  max-width: 140px; /* Increased from 48px to allow provider name display */
+}
+
+/* Edge slots can be taller but narrow */
+.slotEdgeLeft,
+.slotEdgeRight {
+  max-width: var(--mp-spacing-8); /* ~32px */
+  max-height: 60%; /* Don't exceed card height */
+}
+
+/* Footer slot can span width but stay low */
+.slotFooter {
+  max-height: var(--mp-spacing-10); /* ~40px */
+}
+
+/* Compact card gets smaller constraints */
+.compact .slotTopLeft,
+.compact .slotTopRight,
+.compact .slotBottomLeft,
+.compact .slotBottomRight {
+  max-width: var(--mp-spacing-8); /* ~32px */
+  max-height: var(--mp-spacing-8);
+}
+
+.compact .slotEdgeLeft,
+.compact .slotEdgeRight {
+  max-width: var(--mp-spacing-6); /* ~24px */
+  max-height: 50%;
+}
+
+.compact .slotFooter {
+  max-height: var(--mp-spacing-6); /* ~24px */
+}
+
+/* XL card gets larger constraints */
+.xl .slotTopLeft,
+.xl .slotTopRight,
+.xl .slotBottomLeft,
+.xl .slotBottomRight {
+  max-width: var(--mp-spacing-16); /* ~64px */
+  max-height: var(--mp-spacing-16);
+}
+
+.xl .slotEdgeLeft,
+.xl .slotEdgeRight {
+  max-width: var(--mp-spacing-12); /* ~48px */
+  max-height: 70%;
+}
+
+.xl .slotFooter {
+  max-height: var(--mp-spacing-14); /* ~56px */
+}
+
+/* ============================================================================
+   CARD STATE RESPONSIVE STYLING
+   ============================================================================ */
+
+/**
+ * Complications styling adjustments based on card state
+ * Ensures complications don't compete with state indicators
+ */
+
+/* Running state - reduce opacity to not distract */
+.running .slot {
+  opacity: 0.8;
+  transition: opacity var(--mp-motion-duration-ui) var(--mp-motion-easing-enter);
+}
+
+/* Error state - hide non-essential complications */
+.error .slotTopLeft,
+.error .slotTopRight,
+.error .slotEdgeLeft,
+.error .slotEdgeRight {
+  opacity: 0.5;
+}
+
+/* Disabled state - reduce all complications */
+.disabled .slot {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* Selected state - enhance complications */
+.selected .slot {
+  filter: brightness(1.1);
+}
+
+/* ============================================================================
+   Z-INDEX LAYERING SYSTEM
+   ============================================================================ */
+
+/**
+ * Ensures proper layering without interfering with card content
+ * Higher priority slots get higher z-index values
+ */
+
+.slotFooter {
+  z-index: 1; /* Lowest - can be covered by other content */
+}
+
+.slotEdgeLeft,
+.slotEdgeRight {
+  z-index: 2; /* Middle - visible but not dominant */
+}
+
+.slotTopLeft,
+.slotTopRight,
+.slotBottomLeft,
+.slotBottomRight {
+  z-index: 3; /* Highest - corner badges should be visible */
+}
+
+/* ============================================================================
+   ACCESSIBILITY ENHANCEMENTS
+   ============================================================================ */
+
+/**
+ * Accessibility improvements for screen readers and keyboard navigation
+ */
+
+.slot {
+  /* Ensure complications are properly announced */
+  border-radius: var(--mp-radius-sm);
+}
+
+/* Focus management for interactive complications */
+.slot:focus-within {
+  outline: 2px solid var(--mp-color-ring);
+  outline-offset: 2px;
+  z-index: 100; /* Bring focused complications to front */
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .slot {
+    filter: contrast(1.2);
+  }
+
+  .running .slot,
+  .error .slot,
+  .disabled .slot {
+    opacity: 1; /* Don't reduce opacity in high contrast */
+  }
+}
+
+/* ============================================================================
+   ANIMATION & MOTION SUPPORT
+   ============================================================================ */
+
+/**
+ * Smooth transitions for dynamic complications
+ * Respects user's reduced motion preferences
+ */
+
+.slot {
+  transition:
+    opacity var(--mp-motion-duration-ui) var(--mp-motion-easing-enter),
+    transform var(--mp-motion-duration-ui) var(--mp-motion-easing-enter),
+    filter var(--mp-motion-duration-ui) var(--mp-motion-easing-enter);
+}
+
+/* Entrance animation for newly mounted complications */
+.slotEntering {
+  animation: complicationEnter 200ms var(--mp-motion-easing-enter) forwards;
+}
+
+.slotExiting {
+  animation: complicationExit 150ms var(--mp-motion-easing-exit) forwards;
+}
+
+@keyframes complicationEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes complicationExit {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .slot {
+    transition: none;
+  }
+
+  .slotEntering,
+  .slotExiting {
+    animation: none;
+  }
+}
+
+/* ============================================================================
+   ERROR STATE STYLING
+   ============================================================================ */
+
+/**
+ * Styling for complications in error states
+ * Provides visual feedback without breaking the design
+ */
+
+.slotError {
+  background-color: var(--mp-color-surface-muted);
+  border: 1px solid var(--mp-color-danger);
+  border-radius: var(--mp-radius-sm);
+  padding: var(--mp-spacing-1);
+  opacity: 0.7;
+}
+
+.slotError::after {
+  content: "!";
+  color: var(--mp-color-danger);
+  font-size: var(--mp-typography-fontSize-0);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-width: 16px;
+  min-height: 16px;
+}
+
+/* Hide error indicators in compact mode */
+.compact .slotError {
+  border: none;
+  background-color: transparent;
+}
+
+.compact .slotError::after {
+  font-size: var(--mp-typography-fontSize-00);
+}
+
+/* ============================================================================
+   DEBUG MODE STYLING
+   ============================================================================ */
+
+/**
+ * Development mode styling to visualize slot boundaries
+ * Only active when debug flag is enabled
+ */
+
+.debug .slot {
+  border: 1px dashed var(--mp-color-warning);
+  background-color: rgba(255, 193, 7, 0.1);
+}
+
+.debug .slot::before {
+  content: attr(data-slot-name);
+  position: absolute;
+  top: -16px;
+  left: 0;
+  font-size: 10px;
+  color: var(--mp-color-warning);
+  font-family: monospace;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.debug .complicationsContainer {
+  outline: 2px solid var(--mp-color-info);
+  outline-offset: 2px;
+}
+
+/* ============================================================================
+   PERFORMANCE OPTIMIZATIONS
+   ============================================================================ */
+
+/**
+ * CSS optimizations for better rendering performance
+ */
+
+.complicationsContainer {
+  /* Create new stacking context */
+  isolation: isolate;
+  /* Promote to new layer for better compositing */
+  will-change: transform;
+}
+
+.slot {
+  /* Promote interactive complications to new layers */
+  will-change: transform, opacity;
+  /* Optimize repaints */
+  backface-visibility: hidden;
+  /* Subpixel antialiasing */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Remove will-change after animations complete */
+.slot:not(.slotEntering):not(.slotExiting) {
+  will-change: auto;
+}
+
+/* ============================================================================
+   CHECKBOX CLEARANCE SYSTEM
+   ============================================================================ */
+
+/**
+ * Shift topLeft complication when checkbox is visible to prevent overlap
+ * The checkbox is positioned at top: 12px, left: 12px with z-index: 100
+ * We shift topLeft down by 32px (checkbox height + margin) to maintain clearance
+ */
+
+/* Selector using data attribute to detect checkbox visibility */
+[data-checkbox-visible="true"] .slotTopLeft {
+  top: calc(var(--mp-spacing-3) + 32px); /* Shift down by checkbox height + clearance */
+}

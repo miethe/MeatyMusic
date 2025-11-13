@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "amcs://schemas/composed-prompt-0.2.json",
+  "title": "Composed Prompt Entity",
+  "description": "Final text sent to music engine merging style, lyrics, and producer notes with engine-specific constraints",
+  "type": "object",
+  "required": ["text", "meta"],
+  "properties": {
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 10000,
+      "description": "Full prompt string for the music engine"
+    },
+    "meta": {
+      "type": "object",
+      "required": [],
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Song title"
+        },
+        "genre": {
+          "type": "string",
+          "description": "Genre from style spec"
+        },
+        "tempo_bpm": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 40,
+              "maximum": 220
+            },
+            {
+              "type": "array",
+              "items": {"type": "integer"},
+              "minItems": 2,
+              "maxItems": 2
+            }
+          ],
+          "description": "BPM or BPM range from style spec"
+        },
+        "structure": {
+          "type": "string",
+          "description": "Arrangement string (e.g., 'Intro–Verse–Pre-Chorus–Chorus–Bridge–Chorus')"
+        },
+        "style_tags": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Ordered list of tags used in style field"
+        },
+        "negative_tags": {
+          "type": "array",
+          "items": {"type": "string"},
+          "default": [],
+          "description": "Tags to avoid certain qualities"
+        },
+        "section_tags": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "description": "Tags per section shaping mood and energy"
+        },
+        "model_limits": {
+          "type": "object",
+          "properties": {
+            "style_max": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5000,
+              "description": "Maximum characters for style/tags part"
+            },
+            "prompt_max": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "description": "Maximum characters for full prompt"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false,
+      "description": "Prompt metadata and composition details"
+    }
+  },
+  "additionalProperties": false
+}

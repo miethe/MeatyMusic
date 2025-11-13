@@ -1,0 +1,71 @@
+{
+  "title": "Test EDM Festival",
+  "blueprint_ref": {
+    "genre": "Electronic",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "Electronic",
+      "subgenres": ["Progressive House"],
+      "fusions": []
+    },
+    "tempo_bpm": 128,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "A minor",
+      "modulations": []
+    },
+    "mood": ["euphoric", "energetic", "uplifting"],
+    "energy": "very-high",
+    "instrumentation": ["synth leads", "big bass", "festival drums"],
+    "vocal_profile": "female topline, soaring",
+    "tags": ["Era:2010s", "Rhythm:four-on-the-floor", "Mix:festival-loud"],
+    "negative_tags": ["minimal", "dark"]
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "present",
+    "themes": ["freedom", "unity", "celebration"],
+    "rhyme_scheme": "ABAB",
+    "meter": "4/4",
+    "syllables_per_line": 8,
+    "hook_strategy": "melodic",
+    "repetition_policy": "hook-heavy",
+    "section_order": ["Intro", "Verse", "Build", "Drop", "Verse", "Build", "Drop", "Breakdown", "Build", "Drop", "Outro"],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 65,
+      "section_requirements": {}
+    },
+    "source_citations": []
+  },
+  "producer_notes": {
+    "structure": "",
+    "hooks": 1,
+    "instrumentation": ["synth leads", "big bass"],
+    "section_meta": {
+      "Drop": {
+        "tags": ["festival-anthem", "hands-up"],
+        "target_duration_sec": 30
+      },
+      "Breakdown": {
+        "tags": ["minimal", "vocal-focus"],
+        "target_duration_sec": 20
+      }
+    },
+    "mix": {
+      "lufs": -8.0,
+      "space": "stadium",
+      "stereo_width": "extreme"
+    }
+  },
+  "prompt_controls": {
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  }
+}

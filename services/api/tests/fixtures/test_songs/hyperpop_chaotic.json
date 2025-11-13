@@ -1,0 +1,72 @@
+{
+  "title": "Test Hyperpop Chaotic",
+  "blueprint_ref": {
+    "genre": "Hyperpop",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "Hyperpop",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 160,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "B minor",
+      "modulations": [
+        {
+          "at_section": "Drop",
+          "to_key": "C# minor"
+        }
+      ]
+    },
+    "mood": ["chaotic", "euphoric", "experimental"],
+    "energy": "extreme",
+    "instrumentation": ["distorted synths", "glitchy drums", "auto-tune"],
+    "vocal_profile": "pitched-up, glitchy",
+    "tags": ["Era:2020s", "Mix:hyper-compressed", "Voice:auto-tune-heavy"],
+    "negative_tags": ["organic", "natural"]
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "present",
+    "themes": ["digital life", "chaos", "internet culture"],
+    "rhyme_scheme": "free",
+    "meter": "irregular",
+    "syllables_per_line": 6,
+    "hook_strategy": "chant",
+    "repetition_policy": "hook-heavy",
+    "section_order": ["Intro", "Verse", "Build", "Drop", "Verse", "Build", "Drop", "Outro"],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 55,
+      "section_requirements": {}
+    },
+    "source_citations": []
+  },
+  "producer_notes": {
+    "structure": "",
+    "hooks": 2,
+    "instrumentation": ["distorted synths", "glitchy drums"],
+    "section_meta": {
+      "Drop": {
+        "tags": ["bass-drop", "glitch"],
+        "target_duration_sec": 25
+      }
+    },
+    "mix": {
+      "lufs": -6.0,
+      "space": "hyper-compressed",
+      "stereo_width": "extreme"
+    }
+  },
+  "prompt_controls": {
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  }
+}

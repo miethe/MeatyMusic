@@ -62,7 +62,7 @@ grep -E "(type|util|constant|config)" ai/symbols-shared.json
 
 ### Domain-Specific Chunking
 
-**MeatyPrompts Architecture Layers**:
+**MeatyMusic Architecture Layers**:
 ```typescript
 // Layered architecture: routers → services → repositories → DB
 interface SymbolChunks {

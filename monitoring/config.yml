@@ -1,0 +1,267 @@
+# MeatyMusic Security Monitoring Configuration
+# This file defines the monitoring stack configuration for security metrics
+
+# Grafana Configuration
+grafana:
+  url: "${GRAFANA_URL:-http://localhost:3000}"
+  admin_user: "${GRAFANA_ADMIN_USER:-admin}"
+  admin_password: "${GRAFANA_ADMIN_PASSWORD:-admin}"
+  org_id: 1
+
+  # Dashboard provisioning settings
+  dashboard_config:
+    folder_name: "Security"
+    refresh_interval: "30s"
+    time_range:
+      from: "now-1h"
+      to: "now"
+
+  # Data source configuration
+  datasources:
+    prometheus:
+      name: "MeatyMusic Prometheus"
+      type: "prometheus"
+      url: "${PROMETHEUS_URL:-http://localhost:9090}"
+      access: "proxy"
+      is_default: true
+
+# Prometheus Configuration
+prometheus:
+  url: "${PROMETHEUS_URL:-http://localhost:9090}"
+  rules_dir: "${PROMETHEUS_RULES_DIR:-./monitoring/rules}"
+  config_reload_url: "${PROMETHEUS_RELOAD_URL:-http://localhost:9090/-/reload}"
+  scrape_interval: "15s"
+  evaluation_interval: "30s"
+
+  # Alert manager configuration
+  alertmanager:
+    url: "${ALERTMANAGER_URL:-http://localhost:9093}"
+
+  # Scrape configurations
+  scrape_configs:
+    - job_name: "meatymusic-api"
+      static_configs:
+        - targets: ["localhost:8000"]
+      metrics_path: "/metrics"
+      scrape_interval: "15s"
+
+    - job_name: "meatymusic-web"
+      static_configs:
+        - targets: ["localhost:3000"]
+      metrics_path: "/api/metrics"
+      scrape_interval: "30s"
+
+# Metrics Configuration
+metrics:
+  namespace: "meatymusic"
+
+  # Application metric endpoints
+  endpoints:
+    - name: "api-service"
+      url: "http://localhost:8000/metrics"
+      timeout: 30
+      health_check: true
+
+    - name: "web-app"
+      url: "http://localhost:3000/api/metrics"
+      timeout: 30
+      health_check: false
+
+  # Security-specific metric configurations
+  security_metrics:
+    boundary_violations:
+      metric_name: "meatymusic_security_boundary_violations_total"
+      type: "counter"
+      description: "Total number of security boundary violations detected"
+      labels: ["violation_type", "table_name", "user_id", "instance"]
+      alert_threshold: 1.0
+
+    auth_failures:
+      metric_name: "meatymusic_auth_failures_total"
+      type: "counter"
+      description: "Total number of authentication failures"
+      labels: ["auth_method", "failure_reason", "instance"]
+      alert_threshold: 20.0
+
+    security_query_duration:
+      metric_name: "meatymusic_security_query_duration_seconds"
+      type: "histogram"
+      description: "Duration of security-related database queries"
+      labels: ["query_type", "table_name", "instance"]
+      buckets: [0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0]
+      alert_threshold: 2.0  # P95 threshold in seconds
+
+    rls_policy_applied:
+      metric_name: "meatymusic_rls_policy_applied_total"
+      type: "counter"
+      description: "Total number of RLS policies applied to queries"
+      labels: ["table_name", "policy_name", "instance"]
+
+    security_contexts:
+      metric_name: "meatymusic_security_contexts_active"
+      type: "gauge"
+      description: "Number of active security contexts"
+      labels: ["context_type", "instance"]
+
+# Alert Configuration
+alerts:
+  # Notification channels
+  webhook_url: "${ALERT_WEBHOOK_URL}"
+  slack_channel: "${ALERT_SLACK_CHANNEL:-#security-alerts}"
+  pager_duty_key: "${PAGERDUTY_INTEGRATION_KEY}"
+
+  # Alert routing rules
+  routing:
+    critical_alerts:
+      severity: "critical"
+      notify: ["pagerduty", "slack"]
+      repeat_interval: "5m"
+
+    warning_alerts:
+      severity: "warning"
+      notify: ["slack"]
+      repeat_interval: "30m"
+
+    info_alerts:
+      severity: "info"
+      notify: []
+      repeat_interval: "1h"
+
+  # Alert thresholds
+  thresholds:
+    boundary_violations:
+      warning: 0.1   # violations per second
+      critical: 1.0
+
+    auth_failures:
+      warning: 20    # failures per second
+      critical: 100
+
+    query_performance:
+      warning: 2.0   # seconds (P95)
+      critical: 5.0
+
+    rls_coverage:
+      warning: 95    # percentage
+      critical: 90
+
+# Environment-specific configurations
+environments:
+  development:
+    grafana:
+      url: "http://localhost:3000"
+    prometheus:
+      url: "http://localhost:9090"
+    alerts:
+      enabled: false
+
+  staging:
+    grafana:
+      url: "${STAGING_GRAFANA_URL}"
+    prometheus:
+      url: "${STAGING_PROMETHEUS_URL}"
+    alerts:
+      enabled: true
+      severity_filter: ["warning", "critical"]
+
+  production:
+    grafana:
+      url: "${PROD_GRAFANA_URL}"
+    prometheus:
+      url: "${PROD_PROMETHEUS_URL}"
+    alerts:
+      enabled: true
+      severity_filter: ["info", "warning", "critical"]
+
+    # Production-specific alert configurations
+    enhanced_monitoring:
+      enabled: true
+      retention_period: "30d"
+      high_availability: true
+
+# Health Check Configuration
+health_checks:
+  enabled: true
+  interval: "60s"
+  timeout: "10s"
+
+  checks:
+    - name: "grafana_api"
+      type: "http"
+      url: "${GRAFANA_URL:-http://localhost:3000}/api/health"
+      expected_status: 200
+
+    - name: "prometheus_api"
+      type: "http"
+      url: "${PROMETHEUS_URL:-http://localhost:9090}/-/healthy"
+      expected_status: 200
+
+    - name: "security_metrics_present"
+      type: "prometheus_query"
+      query: "up{job='meatymusic-api'}"
+      expected_result_count: "> 0"
+
+    - name: "alert_rules_loaded"
+      type: "prometheus_query"
+      query: "prometheus_rule_group_rules"
+      expected_result_count: "> 0"
+
+# Documentation Integration
+documentation:
+  auto_update: true
+  update_interval: "1h"
+
+  # Metric documentation generation
+  metrics_docs:
+    enabled: true
+    output_file: "docs/analytics/metrics-definitions.md"
+    template: "monitoring/templates/metrics-docs.md.j2"
+
+  # Dashboard documentation
+  dashboard_docs:
+    enabled: true
+    output_dir: "docs/monitoring/dashboards/"
+    include_screenshots: false
+
+  # Alert documentation
+  alert_docs:
+    enabled: true
+    output_file: "docs/monitoring/alert-runbooks.md"
+    include_runbook_links: true
+
+# Security Configuration
+security:
+  # API authentication
+  grafana_api_key: "${GRAFANA_API_KEY}"
+  prometheus_bearer_token: "${PROMETHEUS_BEARER_TOKEN}"
+
+  # TLS configuration
+  tls:
+    enabled: false  # Set to true in production
+    cert_file: "${TLS_CERT_FILE}"
+    key_file: "${TLS_KEY_FILE}"
+    ca_file: "${TLS_CA_FILE}"
+
+  # Access control
+  allowed_origins: ["localhost", "meatymusic.com"]
+  rate_limiting:
+    enabled: true
+    requests_per_minute: 60
+
+# Logging Configuration
+logging:
+  level: "${LOG_LEVEL:-INFO}"
+  format: "json"
+  output: ["console", "file"]
+
+  file_config:
+    path: "monitoring-setup.log"
+    max_size: "10MB"
+    max_age: "7d"
+    rotate: true
+
+  # Structured logging fields
+  fields:
+    service: "monitoring-setup"
+    version: "1.0.0"
+    environment: "${ENVIRONMENT:-development}"

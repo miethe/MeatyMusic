@@ -1,0 +1,68 @@
+{
+  "title": "Test Indie Chill",
+  "blueprint_ref": {
+    "genre": "Indie Alternative",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "Indie Alternative",
+      "subgenres": ["Bedroom Pop"],
+      "fusions": []
+    },
+    "tempo_bpm": 95,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "A major",
+      "modulations": []
+    },
+    "mood": ["dreamy", "nostalgic", "chill"],
+    "energy": "low",
+    "instrumentation": ["acoustic guitar", "synth pads", "lo-fi drums"],
+    "vocal_profile": "androgynous, intimate",
+    "tags": ["Era:2010s", "Mix:lo-fi", "Voice:whisper"],
+    "negative_tags": ["polished", "aggressive"]
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "present",
+    "themes": ["introspection", "youth", "longing"],
+    "rhyme_scheme": "free",
+    "meter": "irregular",
+    "syllables_per_line": 7,
+    "hook_strategy": "lyrical",
+    "repetition_policy": "sparse",
+    "section_order": ["Verse", "Verse", "Chorus", "Verse", "Chorus"],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 35,
+      "section_requirements": {
+        "Chorus": {
+          "min_lines": 3,
+          "max_lines": 6,
+          "must_end_with_hook": false
+        }
+      }
+    },
+    "source_citations": []
+  },
+  "producer_notes": {
+    "structure": "",
+    "hooks": 1,
+    "instrumentation": ["acoustic guitar", "lo-fi drums"],
+    "section_meta": {},
+    "mix": {
+      "lufs": -16.0,
+      "space": "intimate",
+      "stereo_width": "narrow"
+    }
+  },
+  "prompt_controls": {
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  }
+}

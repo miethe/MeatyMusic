@@ -1,0 +1,183 @@
+/* Container */
+.container {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Pill Group */
+.pillGroup {
+  display: flex;
+  gap: var(--mp-spacing-2, 0.5rem);
+  align-items: center;
+}
+
+/* Base Pill Styles */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mp-spacing-1, 0.25rem);
+  padding: var(--mp-spacing-1, 0.25rem) var(--mp-spacing-2, 0.5rem);
+  border-radius: var(--mp-radius-sm, 0.25rem);
+  background-color: var(--mp-color-surface-muted, rgba(0, 0, 0, 0.05));
+  border: 1px solid var(--mp-color-border, rgba(0, 0, 0, 0.1));
+  font-size: var(--mp-font-size-xs, 0.75rem);
+  font-weight: 500;
+  transition: all 150ms ease-out;
+  cursor: default;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Hover state for interactive tooltip */
+.pill:hover {
+  background-color: var(--mp-color-surface-hover, rgba(0, 0, 0, 0.08));
+  border-color: var(--mp-color-border-hover, rgba(0, 0, 0, 0.15));
+}
+
+/* Size Variants */
+.pill.compact {
+  padding: var(--mp-spacing-0-5, 0.125rem) var(--mp-spacing-1-5, 0.375rem);
+  font-size: var(--mp-font-size-2xs, 0.625rem);
+  gap: var(--mp-spacing-0-5, 0.125rem);
+}
+
+.pill.standard {
+  padding: var(--mp-spacing-1, 0.25rem) var(--mp-spacing-2, 0.5rem);
+  font-size: var(--mp-font-size-xs, 0.75rem);
+  gap: var(--mp-spacing-1, 0.25rem);
+}
+
+/* Icon Styling */
+.icon {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+/* Value Styling */
+.value {
+  line-height: 1;
+  color: var(--mp-color-text-strong, #000);
+}
+
+/* Cost Pill Specific */
+.costPill {
+  border-color: var(--mp-color-warning-border, rgba(255, 193, 7, 0.3));
+  background-color: var(--mp-color-warning-muted, rgba(255, 193, 7, 0.1));
+}
+
+.costPill .icon {
+  color: var(--mp-color-warning, #ffc107);
+}
+
+.costPill:hover {
+  background-color: var(--mp-color-warning-hover, rgba(255, 193, 7, 0.15));
+  border-color: var(--mp-color-warning-border-hover, rgba(255, 193, 7, 0.4));
+}
+
+/* Latency Pill Specific */
+.latencyPill {
+  border-color: var(--mp-color-info-border, rgba(0, 123, 255, 0.3));
+  background-color: var(--mp-color-info-muted, rgba(0, 123, 255, 0.1));
+}
+
+.latencyPill .icon {
+  color: var(--mp-color-info, #007bff);
+}
+
+.latencyPill:hover {
+  background-color: var(--mp-color-info-hover, rgba(0, 123, 255, 0.15));
+  border-color: var(--mp-color-info-border-hover, rgba(0, 123, 255, 0.4));
+}
+
+/* Tooltip Content Styling */
+.tooltipContent {
+  padding: var(--mp-spacing-2, 0.5rem);
+  min-width: 150px;
+}
+
+.tooltipHeader {
+  font-weight: 600;
+  font-size: var(--mp-font-size-xs, 0.75rem);
+  margin-bottom: var(--mp-spacing-2, 0.5rem);
+  color: var(--mp-color-text-strong, #000);
+  border-bottom: 1px solid var(--mp-color-border, rgba(0, 0, 0, 0.1));
+  padding-bottom: var(--mp-spacing-1, 0.25rem);
+}
+
+.tooltipRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--mp-font-size-xs, 0.75rem);
+  padding: var(--mp-spacing-1, 0.25rem) 0;
+  gap: var(--mp-spacing-4, 1rem);
+  color: var(--mp-color-text, #666);
+}
+
+.tooltipRow span:first-child {
+  opacity: 0.8;
+}
+
+.tooltipRow span:last-child {
+  font-weight: 500;
+  color: var(--mp-color-text-strong, #000);
+  font-variant-numeric: tabular-nums;
+}
+
+.tooltipSamples {
+  margin-top: var(--mp-spacing-2, 0.5rem);
+  padding-top: var(--mp-spacing-2, 0.5rem);
+  border-top: 1px solid var(--mp-color-border, rgba(0, 0, 0, 0.1));
+  font-size: var(--mp-font-size-2xs, 0.625rem);
+  color: var(--mp-color-text-muted, #999);
+  text-align: center;
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .pill {
+    border-width: 2px;
+  }
+
+  .costPill {
+    border-color: var(--mp-color-warning, #ffc107);
+  }
+
+  .latencyPill {
+    border-color: var(--mp-color-info, #007bff);
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .pill {
+    transition: none;
+  }
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  .pill {
+    background-color: var(--mp-color-surface-muted-dark, rgba(255, 255, 255, 0.05));
+    border-color: var(--mp-color-border-dark, rgba(255, 255, 255, 0.1));
+  }
+
+  .pill:hover {
+    background-color: var(--mp-color-surface-hover-dark, rgba(255, 255, 255, 0.08));
+    border-color: var(--mp-color-border-hover-dark, rgba(255, 255, 255, 0.15));
+  }
+
+  .value {
+    color: var(--mp-color-text-strong-dark, #fff);
+  }
+
+  .costPill {
+    border-color: var(--mp-color-warning-border-dark, rgba(255, 193, 7, 0.3));
+    background-color: var(--mp-color-warning-muted-dark, rgba(255, 193, 7, 0.15));
+  }
+
+  .latencyPill {
+    border-color: var(--mp-color-info-border-dark, rgba(100, 181, 255, 0.3));
+    background-color: var(--mp-color-info-muted-dark, rgba(100, 181, 255, 0.15));
+  }
+}

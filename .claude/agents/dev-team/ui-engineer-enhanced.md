@@ -126,7 +126,7 @@ Task("codebase-explorer", "Find existing page structures:
 # Follow loading/error patterns
 ```
 
-## Integration with MeatyPrompts Architecture
+## Integration with MeatyMusic Architecture
 
 ### Design System Compliance
 - **Always import from @meaty/ui**: Never direct Radix imports

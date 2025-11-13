@@ -9,15 +9,6 @@ description: Token-efficient codebase navigation through intelligent symbol load
 
 Enable token-efficient navigation through pre-generated symbol graphs chunked by domain and separated from test files. Query symbols by name, kind, path, layer tag, or architectural layer without loading entire files. Load only the context needed for the current task. Reduces token usage by 95-99% compared to loading full files.
 
-<!-- Template Variables:
-- {{PROJECT_NAME}} - Project or organization name
-- {{PROJECT_PATHS}} - Project directory structure
-- {{SYMBOL_FILES}} - Symbol file locations and domain mappings
-- {{PROJECT_ARCHITECTURE}} - System architecture description
-- {{LAYER_ARCHITECTURE}} - Detailed architectural layers breakdown
-- {{PROJECT_EXAMPLES}} - Real code examples from the project
--->
-
 **Key Benefits:**
 - 60-95% reduction in token usage vs loading full codebase
 - Progressive loading strategy (load only what's needed)
@@ -46,13 +37,13 @@ The **source of truth** for your project structure. Defines:
 - `extract_symbols_python.py` - Extracts Python symbols
 - Scripts READ the config to know WHAT to scan
 - You RUN scripts manually, passing directory paths as arguments
-- Example: `python extract_symbols_typescript.py {{PROJECT_PATHS.web}} --output={{SYMBOL_FILES.web}}`
+- Example: `python extract_symbols_typescript.py apps/web --output=ai/symbols-web.json`
 
 ### 3. Layer Tagging (add_layer_tags.py)
 Assigns architectural layer tags based on file path patterns:
-- File path patterns determine layer based on {{PROJECT_ARCHITECTURE}}
+- File path patterns determine layer (e.g., `app/api/*` → router layer)
 - Adds `layer` field to all symbols for precise filtering
-- Example layers vary by project (e.g., router, service, repository, component, hook, test)
+- Example layers: router, service, repository, component, hook, test
 
 ### 4. Chunking (split_api_by_layer.py) - OPTIONAL
 Splits large backend domains into layer-specific files for token efficiency:
@@ -144,11 +135,11 @@ Execute the Python function from `scripts/symbol_tools.py`:
 ```python
 from symbol_tools import query_symbols
 
-# Find all React components with "{{PROJECT_EXAMPLES.component}}" in the name
-results = query_symbols(name="{{PROJECT_EXAMPLES.component}}", kind="component", domain="ui", limit=10)
+# Find all React components with "Card" in the name
+results = query_symbols(name="Card", kind="component", domain="ui", limit=10)
 
 # Find authentication-related functions
-results = query_symbols(name="auth", kind="function", path="{{PROJECT_PATHS.api}}")
+results = query_symbols(name="auth", kind="function", path="services")
 
 # Get all custom hooks (summary only for quick scan)
 results = query_symbols(kind="hook", domain="ui", summary_only=True)
@@ -294,12 +285,12 @@ Get full context for a specific symbol including definition location and related
 from symbol_tools import get_symbol_context
 
 # Get full context for a component (includes props interface)
-context = get_symbol_context(name="{{PROJECT_EXAMPLES.component}}", include_related=True)
+context = get_symbol_context(name="Button", include_related=True)
 
 # Get service definition with related symbols
 service = get_symbol_context(
-    name="{{PROJECT_EXAMPLES.service}}",
-    file="{{PROJECT_PATHS.api}}/services/user_service.py",
+    name="UserService",
+    file="backend/services/user_service.py",
     include_related=True
 )
 ```
@@ -339,10 +330,10 @@ If manually updating symbols:
 
 ```bash
 # Extract TypeScript/React symbols
-python .claude/skills/symbols/scripts/extract_symbols_typescript.py {{PROJECT_PATHS.web}} --output={{SYMBOL_FILES.web}}
+python .claude/skills/symbols/scripts/extract_symbols_typescript.py apps/web --output=ai/symbols-web.json
 
 # Extract Python symbols
-python .claude/skills/symbols/scripts/extract_symbols_python.py {{PROJECT_PATHS.api}} --output={{SYMBOL_FILES.api}}
+python .claude/skills/symbols/scripts/extract_symbols_python.py services/api/app --output=ai/symbols-api.json
 
 # The scripts READ symbols.config.json to understand project structure
 # But you MUST specify input directory and output file as arguments
@@ -351,29 +342,29 @@ python .claude/skills/symbols/scripts/extract_symbols_python.py {{PROJECT_PATHS.
 3. **Add layer tags** (if needed):
 
 ```bash
-python .claude/skills/symbols/scripts/add_layer_tags.py {{SYMBOL_FILES.api}}
+python .claude/skills/symbols/scripts/add_layer_tags.py ai/symbols-api.json
 ```
 
 4. **Chunk by layer** (OPTIONAL, for backend token efficiency):
 
 ```bash
 # Split large API domain into layer-specific files
-python .claude/skills/symbols/scripts/split_api_by_layer.py {{SYMBOL_FILES.api}} --output-dir={{PROJECT_PATHS.symbolsDir}}/
+python .claude/skills/symbols/scripts/split_api_by_layer.py ai/symbols-api.json --output-dir=ai/
 ```
 
-Creates layer-specific files based on {{PROJECT_ARCHITECTURE}}:
-- `symbols-api-routers.json` - Router/controller layer only (or equivalent in your architecture)
-- `symbols-api-services.json` - Service layer only (or equivalent in your architecture)
-- `symbols-api-repositories.json` - Repository layer only (or equivalent in your architecture)
-- `symbols-api-schemas.json` - Schema/DTO layer only (or equivalent in your architecture)
-- `symbols-api-cores.json` - Core utilities and models (or equivalent in your architecture)
+Creates layer-specific files:
+- `symbols-api-routers.json` - Router/controller layer only
+- `symbols-api-services.json` - Service layer only
+- `symbols-api-repositories.json` - Repository layer only
+- `symbols-api-schemas.json` - Schema/DTO layer only
+- `symbols-api-cores.json` - Core utilities and models
 
 **Result**: 50-80% token reduction when loading backend symbols (load only the layer you need).
 
 **Extraction requirements**:
-- Scripts read `symbols.config.json` to understand {{PROJECT_NAME}} project structure
+- Scripts read `symbols.config.json` to understand project structure
 - You must specify input directory path and output file when running
-- Example: `python extract_symbols_typescript.py {{PROJECT_PATHS.web}} --output={{SYMBOL_FILES.web}}`
+- Example: `python extract_symbols_typescript.py <INPUT_DIR> --output=<OUTPUT_FILE>`
 - The config tells scripts WHICH directories to scan, but paths are passed as arguments
 
 **Alternative - Programmatic API**:
@@ -617,15 +608,15 @@ python .claude/skills/symbols/scripts/merge_symbols.py --domain=api --input=extr
 
 ```bash
 # 1. Extract Python symbols from API
-python scripts/extract_symbols_python.py {{PROJECT_PATHS.api}} --output={{SYMBOL_FILES.api}}
+python scripts/extract_symbols_python.py services/api/app --output=ai/symbols-api.json
 
 # 2. Add layer tags
-python scripts/add_layer_tags.py {{SYMBOL_FILES.api}}
+python scripts/add_layer_tags.py ai/symbols-api.json
 
 # 3. OPTIONAL: Chunk by layer for token efficiency
-python scripts/split_api_by_layer.py {{SYMBOL_FILES.api}} --output-dir={{PROJECT_PATHS.symbolsDir}}/
+python scripts/split_api_by_layer.py ai/symbols-api.json --output-dir=ai/
 
-# Result: 5 layer-specific files + original file (based on {{PROJECT_ARCHITECTURE}})
+# Result: 5 layer-specific files + original file
 # Load only the layer you need (80-90% token reduction vs full domain)
 ```
 
@@ -633,39 +624,37 @@ python scripts/split_api_by_layer.py {{SYMBOL_FILES.api}} --output-dir={{PROJECT
 
 ## Symbol Structure Reference
 
-Symbols are stored in domain-specific JSON files in the `{{PROJECT_PATHS.symbolsDir}}/` directory. All symbols include a `layer` field for architectural filtering based on {{PROJECT_ARCHITECTURE}}.
+Symbols are stored in domain-specific JSON files in the `ai/` directory. All symbols include a `layer` field for architectural filtering.
 
-**Symbol files are organized by domain as configured in `symbols.config.json`.**
+**Symbol files are organized by domain as configured in `symbols.config.json`. Common domains include:**
 
-**Domain Organization (configured per project):**
-- Domains are defined in `symbols.config.json` based on your project structure
-- Common patterns: UI components, Web/Mobile apps, Backend API, Shared utilities
-- {{PROJECT_NAME}} specific domains are configured in your `symbols.config.json`
+- **UI/Frontend Components** - UI primitives, design system components
+- **Web/Mobile Application** - Application-specific code (pages, routes, features)
+- **Backend API** - Backend code, optionally split by architectural layer
+- **Shared/Common** - Shared utilities, types, and helpers
 
 **Backend Layer Files** (when using layer-based split for token efficiency):
-- Layer organization matches {{PROJECT_ARCHITECTURE}}
-- Example layer files (adapt to your architecture):
-  - `symbols-{domain}-routers.json` - HTTP endpoints and route handlers (or equivalent)
-  - `symbols-{domain}-services.json` - Business logic layer (or equivalent)
-  - `symbols-{domain}-repositories.json` - Data access layer (or equivalent)
-  - `symbols-{domain}-schemas.json` - DTOs and request/response types (or equivalent)
-  - `symbols-{domain}-cores.json` - Domain models, core utilities (or equivalent)
+- `symbols-{domain}-routers.json` - HTTP endpoints and route handlers
+- `symbols-{domain}-services.json` - Business logic layer
+- `symbols-{domain}-repositories.json` - Data access layer
+- `symbols-{domain}-schemas.json` - DTOs and request/response types
+- `symbols-{domain}-cores.json` - Domain models, core utilities, database entities
 
 **Test symbol files** (loaded separately, on-demand for debugging):
 - `symbols-{domain}-tests.json` - Test helpers, fixtures, and test cases
 
-**Note**: Actual file names, symbol counts, and organization depend on your {{PROJECT_NAME}} configuration in `symbols.config.json`. See {{SYMBOL_FILES}} for your project's specific symbol file locations.
+**Note**: Actual file names, symbol counts, and organization depend on your project configuration in `symbols.config.json`.
 
 **Symbol structure example**:
 ```json
 {
-  "name": "{{PROJECT_EXAMPLES.component}}",
+  "name": "Button",
   "kind": "component",
-  "file": "{{PROJECT_PATHS.ui}}/components/{{PROJECT_EXAMPLES.component}}.tsx",
+  "file": "src/components/Button.tsx",
   "line": 15,
   "domain": "frontend",
   "layer": "component",
-  "summary": "Reusable component with variants (example from {{PROJECT_NAME}})"
+  "summary": "Reusable button component with variants"
 }
 ```
 
@@ -678,11 +667,10 @@ Symbols are stored in domain-specific JSON files in the `{{PROJECT_PATHS.symbols
 - `interface` - TypeScript interfaces
 - `type` - TypeScript type aliases
 
-**Layer tags** (all symbols include one, based on {{PROJECT_ARCHITECTURE}}):
-- Backend layers vary by architecture (examples: `router`, `service`, `repository`, `schema`, `model`, `core`)
-- Frontend layers vary by architecture (examples: `component`, `hook`, `page`, `util`)
+**Layer tags** (all symbols include one, configured per project):
+- Common backend layers: `router`, `service`, `repository`, `schema`, `model`, `core`, `auth`, `middleware`
+- Common frontend layers: `component`, `hook`, `page`, `util`
 - Test layer: `test`
-- Your project's specific layers are defined in `symbols.config.json` and match {{LAYER_ARCHITECTURE}}
 
 ## Resources
 
@@ -724,7 +712,7 @@ Read this reference for comprehensive examples of each workflow type.
 
 Deep dive into architecture integration:
 - Symbol structure specification
-- Layered architecture mapping based on {{PROJECT_ARCHITECTURE}}
+- Layered architecture mapping (e.g., Router → Service → Repository → DB)
 - Symbol relationship analysis
 - Development workflow integration
 - Regeneration and update strategies
@@ -732,7 +720,7 @@ Deep dive into architecture integration:
 - Agent integration patterns
 - Configuration reference
 
-Read this reference to understand how symbols map to {{PROJECT_NAME}}'s architectural patterns defined in {{LAYER_ARCHITECTURE}}.
+Read this reference to understand how symbols map to your project's architectural patterns.
 
 ## Project Integration
 
@@ -754,24 +742,20 @@ Common agent patterns that use symbols:
 
 ### Architecture Integration
 
-Symbols understand and validate {{PROJECT_NAME}}'s layered architecture as defined in {{PROJECT_ARCHITECTURE}}.
+Symbols understand and validate project-specific layered architectures. Common patterns include:
 
-**Architecture layers are configured per project** based on {{LAYER_ARCHITECTURE}}:
-
-**Example backend layers** (adapt to your architecture):
+**Backend layers:**
 - **Router/Controller layer** - HTTP endpoints, validation, request handling
 - **Service layer** - Business logic, orchestration, DTO mapping
 - **Repository layer** - Database operations, data access patterns
 - **Schema/DTO layer** - Request/response data structures
 - **Model layer** - Domain models and database entities
 
-**Example frontend layers** (adapt to your architecture):
+**Frontend layers:**
 - **Component layer** - UI components and design system primitives
 - **Hook layer** - React hooks, state management, data fetching
 - **Page layer** - Application pages, routes, views
 - **Util layer** - Shared utilities and helpers
-
-**Your project's specific layers** are defined in `symbols.config.json` and match your architecture.
 
 Use `search_patterns()` with `layer` parameter to filter by architectural layer.
 

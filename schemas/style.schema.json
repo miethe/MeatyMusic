@@ -1,0 +1,117 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "amcs://schemas/style-1.0.json",
+  "title": "Style Entity",
+  "description": "Musical identity specification including genre, tempo, key, mood, energy, and instrumentation",
+  "type": "object",
+  "required": ["genre_detail", "tempo_bpm", "key", "mood", "tags"],
+  "properties": {
+    "genre_detail": {
+      "type": "object",
+      "required": ["primary"],
+      "properties": {
+        "primary": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Primary genre (e.g., 'Pop', 'Hip-Hop', 'Jazz')"
+        },
+        "subgenres": {
+          "type": "array",
+          "items": {"type": "string"},
+          "default": [],
+          "description": "Sub-genres (e.g., 'Big Band Pop', 'Electro Swing')"
+        },
+        "fusions": {
+          "type": "array",
+          "items": {"type": "string"},
+          "default": [],
+          "description": "Genres to blend (e.g., 'Pop' + 'Reggaeton')"
+        }
+      },
+      "additionalProperties": false
+    },
+    "tempo_bpm": {
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 40,
+          "maximum": 220,
+          "description": "Single BPM value"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 40,
+            "maximum": 220
+          },
+          "minItems": 2,
+          "maxItems": 2,
+          "description": "BPM range [min, max]"
+        }
+      ],
+      "description": "Either a single BPM or range allowing variation"
+    },
+    "time_signature": {
+      "type": "string",
+      "default": "4/4",
+      "pattern": "^\\d+/\\d+$",
+      "description": "Time signature (e.g., '4/4', '6/8')"
+    },
+    "key": {
+      "type": "object",
+      "required": ["primary"],
+      "properties": {
+        "primary": {
+          "type": "string",
+          "pattern": "^[A-G](#|b)?\\s?(major|minor)$",
+          "description": "Musical key (e.g., 'C major', 'D# minor')"
+        },
+        "modulations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-G](#|b)?\\s?(major|minor)$"
+          },
+          "default": [],
+          "description": "Key changes or modulations"
+        }
+      },
+      "additionalProperties": false
+    },
+    "mood": {
+      "type": "array",
+      "items": {"type": "string"},
+      "minItems": 1,
+      "description": "Mood descriptors (e.g., 'upbeat', 'cheeky', 'melancholic')"
+    },
+    "energy": {
+      "type": "string",
+      "enum": ["low", "medium", "high", "anthemic"],
+      "description": "Overall intensity of the song"
+    },
+    "instrumentation": {
+      "type": "array",
+      "items": {"type": "string"},
+      "maxItems": 3,
+      "default": [],
+      "description": "Instruments to highlight (max 3 to avoid mix dilution)"
+    },
+    "vocal_profile": {
+      "type": "string",
+      "description": "Vocal performer or delivery style (e.g., 'female/male duet', 'crooner', 'rap')"
+    },
+    "tags": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Taxonomy tags (Era, Rhythm, Mix, Mood, etc.)"
+    },
+    "negative_tags": {
+      "type": "array",
+      "items": {"type": "string"},
+      "default": [],
+      "description": "Tags to exclude (e.g., 'muddy low-end', 'over-compressed')"
+    }
+  },
+  "additionalProperties": false
+}

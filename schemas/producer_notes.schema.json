@@ -1,0 +1,67 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "amcs://schemas/producer-notes-1.0.json",
+  "title": "Producer Notes Entity",
+  "description": "Structural and production-oriented aspects including arrangement, hooks, instrumentation, and mix targets",
+  "type": "object",
+  "required": ["structure", "hooks"],
+  "properties": {
+    "structure": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Arrangement of song sections (e.g., 'Intro–Verse–Pre-Chorus–Chorus–Verse–Chorus–Bridge–Chorus')"
+    },
+    "hooks": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of distinct hooks (memorable recurring phrases/melodies)"
+    },
+    "instrumentation": {
+      "type": "array",
+      "items": {"type": "string"},
+      "default": [],
+      "description": "Additional instrumentation notes beyond style spec"
+    },
+    "section_meta": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "tags": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "Section-specific tags (e.g., 'anthemic', 'stripped-down', 'build-up')"
+          },
+          "target_duration_sec": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Desired duration for this section in seconds"
+          }
+        },
+        "additionalProperties": false
+      },
+      "description": "Per-section metadata keyed by section name"
+    },
+    "mix": {
+      "type": "object",
+      "properties": {
+        "lufs": {
+          "type": "number",
+          "description": "Target loudness in LUFS (Loudness Units relative to Full Scale)"
+        },
+        "space": {
+          "type": "string",
+          "description": "Space/reverb description (e.g., 'dry', 'roomy', 'lush', 'vintage tape')"
+        },
+        "stereo_width": {
+          "type": "string",
+          "enum": ["narrow", "normal", "wide"],
+          "description": "Desired stereo spread"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Mix preferences and audio engineering parameters"
+    }
+  },
+  "additionalProperties": false
+}

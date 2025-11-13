@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "amcs://schemas/source-1.0.json",
+  "title": "Source Entity",
+  "description": "External data source configuration for retrieval-augmented generation with MCP integration",
+  "type": "object",
+  "required": ["name", "kind", "mcp_server_id"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "description": "Source identifier or display name"
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["file", "web", "api"],
+      "description": "Source type: file, web page, or API"
+    },
+    "config": {
+      "type": "object",
+      "default": {},
+      "description": "Source-specific configuration (e.g., file_path, base_url)"
+    },
+    "scopes": {
+      "type": "array",
+      "items": {"type": "string"},
+      "default": [],
+      "description": "Available scopes or topics from this source"
+    },
+    "weight": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "default": 0.5,
+      "description": "Retrieval weight (0-1) for RAG blending"
+    },
+    "allow": {
+      "type": "array",
+      "items": {"type": "string"},
+      "default": [],
+      "description": "Allowed terms or topics from this source"
+    },
+    "deny": {
+      "type": "array",
+      "items": {"type": "string"},
+      "default": [],
+      "description": "Denied terms or topics from this source"
+    },
+    "provenance": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether to track chunk hashes for citations"
+    },
+    "mcp_server_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "description": "MCP server identifier handling this source"
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,230 @@
+/**
+ * Collection Edge Accent Styles
+ *
+ * Renders a 4px vertical accent bar on the edge of the prompt card using
+ * collection colors from the design token system. Supports RTL layouts
+ * and different card sizes while maintaining accessibility standards.
+ */
+
+/* ============================================================================
+   BASE ACCENT STYLES
+   ============================================================================ */
+
+/**
+ * Base accent bar styling
+ * Positioned absolutely within the complications slot system
+ */
+.accent {
+  position: absolute;
+  width: 4px;
+  height: 100%;
+  background-color: var(--collection-accent-color, var(--mp-color-primary));
+  border-radius: var(--mp-radius-xs);
+
+  /* Smooth color transitions for theme changes */
+  transition: background-color var(--mp-motion-duration-ui) var(--mp-motion-easing-enter);
+
+  /* Ensure proper layer order */
+  z-index: 1;
+}
+
+/* ============================================================================
+   POSITION VARIANTS (LTR/RTL SUPPORT)
+   ============================================================================ */
+
+/**
+ * Left edge positioning (default for LTR)
+ * Anchored to the left edge of the complications slot
+ */
+.accent--left {
+  left: 0;
+  top: 0;
+}
+
+/**
+ * Right edge positioning (for RTL layouts)
+ * Anchored to the right edge of the complications slot
+ */
+.accent--right {
+  right: 0;
+  top: 0;
+}
+
+/* ============================================================================
+   CARD SIZE RESPONSIVE STYLING
+   ============================================================================ */
+
+/**
+ * Compact card adjustments
+ * Slightly narrower accent for space constraints
+ */
+.accent--compact {
+  width: 3px;
+  border-radius: calc(var(--mp-radius-xs) * 0.75);
+}
+
+/**
+ * Standard card sizing (default)
+ * Uses base 4px width
+ */
+.accent--standard {
+  /* Uses base styles */
+}
+
+/**
+ * XL card adjustments
+ * Slightly wider accent for better visibility on larger cards
+ */
+.accent--xl {
+  width: 5px;
+  border-radius: calc(var(--mp-radius-xs) * 1.25);
+}
+
+/* ============================================================================
+   ACCESSIBILITY ENHANCEMENTS
+   ============================================================================ */
+
+/**
+ * High contrast mode support
+ * Ensure accent remains visible with increased contrast
+ */
+@media (prefers-contrast: high) {
+  .accent {
+    /* Increase contrast in high contrast mode */
+    filter: contrast(1.2);
+    /* Add subtle border for better definition */
+    box-shadow: 0 0 0 1px var(--mp-color-border);
+  }
+}
+
+/**
+ * Reduced motion preference support
+ * Disable transitions for users who prefer reduced motion
+ */
+@media (prefers-reduced-motion: reduce) {
+  .accent {
+    transition: none;
+  }
+}
+
+/* ============================================================================
+   CARD STATE RESPONSIVE STYLING
+   ============================================================================ */
+
+/**
+ * These styles are applied automatically by the complications system
+ * based on the card's current state
+ */
+
+/**
+ * Running state - slightly reduced opacity to not distract
+ * Applied via parent selector from complications.module.css
+ */
+.running .accent {
+  opacity: 0.8;
+}
+
+/**
+ * Error state - reduce prominence to let error indicators shine
+ * Applied via parent selector from complications.module.css
+ */
+.error .accent {
+  opacity: 0.5;
+}
+
+/**
+ * Disabled state - significantly reduced visibility
+ * Applied via parent selector from complications.module.css
+ */
+.disabled .accent {
+  opacity: 0.3;
+}
+
+/**
+ * Selected state - enhance accent visibility
+ * Applied via parent selector from complications.module.css
+ */
+.selected .accent {
+  filter: brightness(1.1);
+  /* Slightly wider for selected state emphasis */
+  transform: scaleX(1.2);
+  transform-origin: left center;
+}
+
+.selected .accent--right {
+  transform-origin: right center;
+}
+
+/* ============================================================================
+   THEME INTEGRATION
+   ============================================================================ */
+
+/**
+ * Collection color CSS custom properties are defined in the token system:
+ * --mp-color-collection-primary
+ * --mp-color-collection-secondary
+ * --mp-color-collection-accent
+ * --mp-color-collection-purple
+ * --mp-color-collection-green
+ * --mp-color-collection-orange
+ * --mp-color-collection-blue
+ * --mp-color-collection-red
+ *
+ * These automatically adapt to the current theme (light/dark/high-contrast)
+ */
+
+/* ============================================================================
+   PERFORMANCE OPTIMIZATIONS
+   ============================================================================ */
+
+/**
+ * Optimize rendering performance for the accent bar
+ */
+.accent {
+  /* Create new stacking context for better compositing */
+  isolation: isolate;
+
+  /* Promote to new layer for smooth animations */
+  will-change: background-color, opacity, transform;
+
+  /* Optimize repaints */
+  backface-visibility: hidden;
+
+  /* Subpixel antialiasing */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Remove will-change when not transitioning */
+.accent:not(:hover):not(.selected) {
+  will-change: auto;
+}
+
+/* ============================================================================
+   DEBUG MODE STYLING
+   ============================================================================ */
+
+/**
+ * Development mode styling to help visualize the accent
+ * Only active when complications debug flag is enabled
+ */
+.debug .accent {
+  /* Add debug outline */
+  outline: 1px dashed var(--mp-color-warning);
+  outline-offset: 1px;
+}
+
+.debug .accent::before {
+  content: 'collection';
+  position: absolute;
+  top: -20px;
+  left: -10px;
+  font-size: 8px;
+  color: var(--mp-color-warning);
+  font-family: monospace;
+  white-space: nowrap;
+  pointer-events: none;
+  background: var(--mp-color-surface);
+  padding: 1px 2px;
+  border-radius: 2px;
+}

@@ -1,0 +1,176 @@
+import { Meta, ColorPalette, ColorItem } from '@storybook/addon-docs/blocks';
+
+<Meta title="Design Tokens/Overview" />
+
+# Design Tokens
+
+Design tokens are the atomic elements of our design system - the smallest pieces that make up the larger whole. They provide consistent, semantic values for colors, spacing, typography, and other design properties across all MeatyPrompts interfaces.
+
+## Token Categories
+
+### Colors
+Semantic color tokens that adapt across themes while maintaining WCAG AA contrast ratios.
+
+<ColorPalette>
+  <ColorItem
+    title="Primary Colors"
+    subtitle="Brand and interactive elements"
+    colors={{
+      'Primary': 'hsl(var(--mp-color-primary))',
+      'Primary Hover': 'hsl(var(--mp-color-primary-hover))',
+      'Primary Foreground': 'hsl(var(--mp-color-primary-foreground))',
+    }}
+  />
+  <ColorItem
+    title="Surface Colors"
+    subtitle="Backgrounds and containers"
+    colors={{
+      'Background': 'hsl(var(--mp-color-background))',
+      'Surface': 'hsl(var(--mp-color-surface))',
+      'Surface Secondary': 'hsl(var(--mp-color-surface-secondary))',
+    }}
+  />
+  <ColorItem
+    title="Text Colors"
+    subtitle="Content and labels"
+    colors={{
+      'Text': 'hsl(var(--mp-color-text))',
+      'Text Muted': 'hsl(var(--mp-color-text-muted))',
+      'Text Subtle': 'hsl(var(--mp-color-text-subtle))',
+    }}
+  />
+  <ColorItem
+    title="Semantic Colors"
+    subtitle="Status and feedback"
+    colors={{
+      'Success': 'hsl(var(--mp-color-success))',
+      'Warning': 'hsl(var(--mp-color-warning))',
+      'Danger': 'hsl(var(--mp-color-danger))',
+      'Info': 'hsl(var(--mp-color-info))',
+    }}
+  />
+</ColorPalette>
+
+### Spacing Scale
+
+Consistent spacing based on a 4px grid system:
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--mp-spacing-1` | `4px` | Tight layouts |
+| `--mp-spacing-2` | `8px` | Button groups |
+| `--mp-spacing-3` | `12px` | Form elements |
+| `--mp-spacing-4` | `16px` | Component padding |
+| `--mp-spacing-5` | `20px` | Component margins |
+| `--mp-spacing-6` | `24px` | Card padding |
+| `--mp-spacing-8` | `32px` | Section spacing |
+
+### Typography Scale
+
+Harmonious type scale with consistent sizing and spacing:
+
+| Token | Size | Usage |
+|-------|------|-------|
+| `--mp-font-size-xs` | `12px` | Captions, labels |
+| `--mp-font-size-sm` | `14px` | Secondary text |
+| `--mp-font-size-base` | `16px` | Body text |
+| `--mp-font-size-lg` | `18px` | Emphasized content |
+| `--mp-font-size-xl` | `20px` | Small headings |
+| `--mp-font-size-2xl` | `24px` | Section headers |
+| `--mp-font-size-3xl` | `30px` | Page headers |
+
+## Usage Examples
+
+### CSS Custom Properties
+```css
+.card {
+  background: hsl(var(--mp-color-surface));
+  border: 1px solid hsl(var(--mp-color-border));
+  border-radius: var(--mp-border-radius-lg);
+  padding: var(--mp-spacing-6);
+  box-shadow: var(--mp-shadow-sm);
+}
+
+.heading {
+  font-size: var(--mp-font-size-2xl);
+  font-weight: var(--mp-font-weight-semibold);
+  color: hsl(var(--mp-color-text));
+  margin-bottom: var(--mp-spacing-4);
+}
+```
+
+### Tailwind Classes
+```jsx
+<div className="bg-surface border border-border rounded-lg p-6 shadow-sm">
+  <h2 className="text-2xl font-semibold text-text mb-4">
+    Card Title
+  </h2>
+  <p className="text-base text-text-muted leading-relaxed">
+    Card content with consistent spacing and typography.
+  </p>
+</div>
+```
+
+### React Components
+```jsx
+import { tokens } from '@meaty/tokens';
+
+const StyledComponent = () => (
+  <div style={{
+    backgroundColor: `hsl(${tokens.color.surface})`,
+    padding: tokens.spacing[6],
+    fontSize: tokens.typography.size.base,
+    color: `hsl(${tokens.color.text})`
+  }}>
+    Token-styled component
+  </div>
+);
+```
+
+## Theme Variations
+
+All color tokens automatically adapt across our six theme variants:
+
+### Light Theme (Default)
+Clean, bright interface perfect for general daytime use.
+
+### Dark Theme
+Easy on the eyes for low-light environments and extended use.
+
+### Ocean Theme
+Professional blue-tinted theme for business applications.
+
+### Sand Theme
+Warm, comfortable theme ideal for reading and content consumption.
+
+### High Contrast Themes
+Enhanced contrast versions (light and dark) meeting WCAG AAA standards for improved accessibility.
+
+## Best Practices
+
+### Do's ✅
+- Use semantic tokens (`--mp-color-text`) over primitive values (`#000000`)
+- Combine tokens consistently for spacing (`var(--mp-spacing-4) var(--mp-spacing-6)`)
+- Test components across all theme variants
+- Reference tokens in component documentation
+
+### Don'ts ❌
+- Don't hardcode values that exist as tokens
+- Don't modify token values directly in components
+- Don't create one-off custom properties for existing tokens
+- Don't use tokens outside their intended semantic purpose
+
+## Token Generation
+
+Design tokens are automatically generated from source JSON files and compiled into:
+
+- **CSS Custom Properties** - For direct use in stylesheets
+- **JavaScript/TypeScript** - For programmatic access
+- **Tailwind Configuration** - For utility class integration
+- **Design Tool Formats** - For Figma, Sketch, and Adobe XD
+
+See our [Contributing Guide](/?path=/docs/contributing--docs) for information on adding new tokens to the system.
+
+---
+
+For complete token documentation with examples and usage guidelines, see the full [Token Reference](https://github.com/miethe/meatyprompts/blob/main/docs/design/tokens/reference.md).

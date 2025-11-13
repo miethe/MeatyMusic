@@ -1,0 +1,8 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+  # Exclude nested duplicate directories from Phase 1C cleanup
+  - "!packages/*/api"
+  - "!packages/*/ui"
+  - "!packages/*/tokens"
+  - "!packages/*/store"

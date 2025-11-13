@@ -1,0 +1,178 @@
+/**
+ * RunHistorySparkline Complication Styles - MP-PCARD-CPL-019
+ *
+ * Comprehensive styling for the 24-point stacked bar chart visualization
+ * with support for tooltips, accessibility, and responsive design.
+ */
+
+/* Container */
+.container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  outline: none;
+  transition: all 150ms ease-out;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.container:focus-visible {
+  outline: 2px solid var(--mp-color-primary);
+  outline-offset: 2px;
+}
+
+/* Chart SVG */
+.chart {
+  overflow: visible;
+  flex-shrink: 0;
+  animation: sparkline-enter 0.3s ease-out;
+}
+
+/* Card state variations */
+.container.running {
+  opacity: 0.7;
+}
+
+.container.error {
+  opacity: 0.5;
+}
+
+/* Tooltip styling */
+.tooltip {
+  background-color: var(--mp-color-bg-popover, var(--mp-color-background));
+  color: var(--mp-color-text);
+  padding: 12px;
+  border-radius: 6px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--mp-color-border);
+  max-width: 320px;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.tooltipContent {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tooltipHeader {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--mp-color-text);
+}
+
+.tooltipMessage {
+  font-size: 12px;
+  color: var(--mp-color-text-muted);
+}
+
+.tooltipStats {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.tooltipRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.tooltipRow.totalRow {
+  padding-top: 4px;
+  border-top: 1px solid var(--mp-color-border);
+  font-weight: 500;
+}
+
+.successColor {
+  color: var(--mp-color-success);
+  font-family: var(--mp-font-mono, monospace);
+}
+
+.failureColor {
+  color: var(--mp-color-danger);
+  font-family: var(--mp-font-mono, monospace);
+}
+
+/* Slot-specific adjustments */
+.container[data-slot="footer"] {
+  width: 100%;
+  justify-content: flex-start;
+  padding-left: 8px;
+}
+
+/* Animation keyframes */
+@keyframes sparkline-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .container,
+  .chart {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .tooltip {
+    border: 2px solid var(--mp-color-text);
+  }
+
+  .tooltipHeader {
+    font-weight: 700;
+  }
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+  .tooltip {
+    background-color: var(--mp-color-bg-popover-dark, var(--mp-color-background-dark));
+    color: var(--mp-color-text-dark);
+    border-color: var(--mp-color-border-dark);
+  }
+}
+
+/* Responsive design adjustments */
+@container (max-width: 320px) {
+  .container {
+    transform: scale(0.9);
+  }
+}
+
+/* Print styles */
+@media print {
+  .tooltip {
+    display: none !important;
+  }
+
+  .container {
+    opacity: 1 !important;
+  }
+}
+
+/* Screen reader only content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

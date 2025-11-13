@@ -1,0 +1,62 @@
+{
+  "title": "Test Folk Acoustic",
+  "blueprint_ref": {
+    "genre": "Folk",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "Folk",
+      "subgenres": ["Contemporary Folk"],
+      "fusions": []
+    },
+    "tempo_bpm": 85,
+    "time_signature": "3/4",
+    "key": {
+      "primary": "G major",
+      "modulations": []
+    },
+    "mood": ["reflective", "warm", "nostalgic"],
+    "energy": "low",
+    "instrumentation": ["acoustic guitar", "harmonica", "light percussion"],
+    "vocal_profile": "male lead, storytelling",
+    "tags": ["Era:1970s", "Voice:storytelling", "Mix:organic"],
+    "negative_tags": ["electronic", "modern"]
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "past",
+    "themes": ["journey", "home", "nature"],
+    "rhyme_scheme": "ABCB",
+    "meter": "3/4 waltz",
+    "syllables_per_line": 8,
+    "hook_strategy": "lyrical",
+    "repetition_policy": "sparse",
+    "section_order": ["Verse", "Verse", "Chorus", "Verse", "Chorus", "Verse", "Chorus"],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 55,
+      "section_requirements": {}
+    },
+    "source_citations": []
+  },
+  "producer_notes": {
+    "structure": "",
+    "hooks": 1,
+    "instrumentation": ["acoustic guitar", "harmonica"],
+    "section_meta": {},
+    "mix": {
+      "lufs": -16.0,
+      "space": "organic",
+      "stereo_width": "narrow"
+    }
+  },
+  "prompt_controls": {
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  }
+}

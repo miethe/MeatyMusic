@@ -1,0 +1,319 @@
+groups:
+  - name: meatymusic.security.boundary
+    interval: 30s
+    rules:
+      - alert: SecurityBoundaryViolationHigh
+        expr: |
+          sum(rate(meatymusic_security_boundary_violations_total[5m])) > 1
+        for: 2m
+        labels:
+          severity: critical
+          component: security
+          team: platform
+        annotations:
+          summary: "High rate of security boundary violations detected"
+          description: |
+            Security boundary violations are occurring at {{ $value | humanize }} violations/sec
+            over the last 5 minutes. This indicates potential security policy bypasses or
+            misconfigurations in the RLS system.
+          runbook_url: "https://docs.meatymusic.com/runbooks/security/boundary-violations"
+          dashboard_url: "https://grafana.meatymusic.com/d/security-overview"
+
+      - alert: SecurityBoundaryViolationCritical
+        expr: |
+          sum(rate(meatymusic_security_boundary_violations_total[1m])) > 10
+        for: 1m
+        labels:
+          severity: critical
+          component: security
+          team: platform
+          page: "true"
+        annotations:
+          summary: "Critical: Multiple security boundary violations detected"
+          description: |
+            CRITICAL: Security boundary violations are occurring at {{ $value | humanize }} violations/sec
+            over the last minute. Immediate investigation required.
+            Instance: {{ $labels.instance }}
+            Violation Type: {{ $labels.violation_type }}
+          runbook_url: "https://docs.meatymusic.com/runbooks/security/critical-violations"
+
+      - alert: SecurityBoundaryViolationsByType
+        expr: |
+          sum by (violation_type) (rate(meatymusic_security_boundary_violations_total[5m])) > 0.5
+        for: 3m
+        labels:
+          severity: warning
+          component: security
+          team: platform
+        annotations:
+          summary: "Security boundary violations detected for {{ $labels.violation_type }}"
+          description: |
+            Violation type "{{ $labels.violation_type }}" is occurring at {{ $value | humanize }} violations/sec.
+            This may indicate specific policy misconfiguration or targeted attack patterns.
+
+  - name: meatymusic.security.authentication
+    interval: 30s
+    rules:
+      - alert: HighAuthenticationFailureRate
+        expr: |
+          sum(rate(meatymusic_auth_failures_total[5m])) > 20
+        for: 2m
+        labels:
+          severity: warning
+          component: authentication
+          team: platform
+        annotations:
+          summary: "High authentication failure rate detected"
+          description: |
+            Authentication failures are occurring at {{ $value | humanize }} failures/sec
+            over the last 5 minutes. This may indicate credential stuffing or brute force attacks.
+          runbook_url: "https://docs.meatymusic.com/runbooks/security/auth-failures"
+
+      - alert: CriticalAuthenticationFailureRate
+        expr: |
+          sum(rate(meatymusic_auth_failures_total[2m])) > 100
+        for: 1m
+        labels:
+          severity: critical
+          component: authentication
+          team: platform
+          page: "true"
+        annotations:
+          summary: "CRITICAL: Extremely high authentication failure rate"
+          description: |
+            CRITICAL: Authentication failures are at {{ $value | humanize }} failures/sec.
+            This indicates a likely coordinated attack. Consider implementing rate limiting.
+            Auth Method: {{ $labels.auth_method }}
+            Instance: {{ $labels.instance }}
+
+      - alert: AuthMethodAnomalous
+        expr: |
+          sum by (auth_method) (rate(meatymusic_auth_attempts_total[5m]))
+          / ignoring(auth_method) group_left sum(rate(meatymusic_auth_attempts_total[5m])) > 0.8
+        for: 5m
+        labels:
+          severity: info
+          component: authentication
+          team: platform
+        annotations:
+          summary: "Unusual authentication method distribution"
+          description: |
+            Authentication method "{{ $labels.auth_method }}" represents {{ $value | humanizePercentage }}
+            of all authentication attempts, which is unusually high.
+
+  - name: meatymusic.security.performance
+    interval: 30s
+    rules:
+      - alert: SecurityPerformanceDegradation
+        expr: |
+          histogram_quantile(0.95, sum(rate(meatymusic_security_query_duration_seconds_bucket[5m])) by (le)) > 2.0
+        for: 5m
+        labels:
+          severity: warning
+          component: security-performance
+          team: platform
+        annotations:
+          summary: "Security query performance degradation detected"
+          description: |
+            95th percentile security query duration is {{ $value | humanizeDuration }},
+            exceeding the 2-second threshold. This may impact user experience.
+          runbook_url: "https://docs.meatymusic.com/runbooks/performance/security-queries"
+
+      - alert: SecurityPerformanceCritical
+        expr: |
+          histogram_quantile(0.95, sum(rate(meatymusic_security_query_duration_seconds_bucket[5m])) by (le)) > 5.0
+        for: 2m
+        labels:
+          severity: critical
+          component: security-performance
+          team: platform
+        annotations:
+          summary: "CRITICAL: Security query performance severely degraded"
+          description: |
+            95th percentile security query duration is {{ $value | humanizeDuration }},
+            which is critically high and likely causing timeouts.
+
+      - alert: RLSOverheadHigh
+        expr: |
+          histogram_quantile(0.95, sum(rate(meatymusic_rls_overhead_seconds_bucket[5m])) by (le, operation_type)) > 0.5
+        for: 3m
+        labels:
+          severity: warning
+          component: rls-performance
+          team: platform
+        annotations:
+          summary: "High RLS overhead detected for {{ $labels.operation_type }}"
+          description: |
+            RLS overhead for {{ $labels.operation_type }} operations is {{ $value | humanizeDuration }}
+            at the 95th percentile, which may indicate inefficient policies.
+
+  - name: meatymusic.security.context
+    interval: 30s
+    rules:
+      - alert: SecurityContextFailure
+        expr: |
+          sum(rate(meatymusic_security_context_validation_errors_total[5m])) > 5
+        for: 2m
+        labels:
+          severity: warning
+          component: security-context
+          team: platform
+        annotations:
+          summary: "High security context validation failure rate"
+          description: |
+            Security context validation failures are occurring at {{ $value | humanize }} failures/sec.
+            This may indicate issues with JWT validation or context creation logic.
+
+      - alert: SecurityContextCreationSlow
+        expr: |
+          histogram_quantile(0.95, sum(rate(meatymusic_security_context_creation_duration_seconds_bucket[5m])) by (le)) > 0.2
+        for: 3m
+        labels:
+          severity: warning
+          component: security-context
+          team: platform
+        annotations:
+          summary: "Slow security context creation detected"
+          description: |
+            Security context creation is taking {{ $value | humanizeDuration }} at the 95th percentile,
+            which may impact request latency.
+
+  - name: meatymusic.security.rls
+    interval: 30s
+    rules:
+      - alert: RLSPolicyFailure
+        expr: |
+          sum(rate(meatymusic_rls_policy_failures_total[5m])) > 1
+        for: 2m
+        labels:
+          severity: critical
+          component: rls-policy
+          team: platform
+        annotations:
+          summary: "RLS policy failures detected"
+          description: |
+            RLS policy failures are occurring at {{ $value | humanize }} failures/sec.
+            This indicates critical issues with row-level security enforcement.
+            Table: {{ $labels.table_name }}
+            Policy: {{ $labels.policy_name }}
+          runbook_url: "https://docs.meatymusic.com/runbooks/security/rls-failures"
+
+      - alert: RLSCoverageDropped
+        expr: |
+          (sum(meatymusic_rls_policy_applied_total) / sum(meatymusic_db_queries_total)) * 100 < 95
+        for: 5m
+        labels:
+          severity: critical
+          component: rls-coverage
+          team: platform
+          page: "true"
+        annotations:
+          summary: "CRITICAL: RLS policy coverage dropped below 95%"
+          description: |
+            RLS policy coverage is at {{ $value | humanizePercentage }}, below the critical 95% threshold.
+            This means some database queries are not being protected by row-level security.
+          runbook_url: "https://docs.meatymusic.com/runbooks/security/rls-coverage"
+
+      - alert: RLSPolicyCompilationSlow
+        expr: |
+          histogram_quantile(0.95, sum(rate(meatymusic_rls_policy_compilation_seconds_bucket[5m])) by (le)) > 1.0
+        for: 3m
+        labels:
+          severity: warning
+          component: rls-compilation
+          team: platform
+        annotations:
+          summary: "Slow RLS policy compilation detected"
+          description: |
+            RLS policy compilation is taking {{ $value | humanizeDuration }} at the 95th percentile.
+            This may indicate complex policies that need optimization.
+
+  - name: meatymusic.security.resources
+    interval: 60s
+    rules:
+      - alert: SecurityMemoryUsageHigh
+        expr: |
+          sum(meatymusic_security_memory_usage_bytes) / (1024^3) > 2.0
+        for: 5m
+        labels:
+          severity: warning
+          component: security-resources
+          team: platform
+        annotations:
+          summary: "High memory usage by security components"
+          description: |
+            Security components are using {{ $value | humanize }}GB of memory,
+            which may indicate memory leaks or inefficient caching.
+
+      - alert: SecurityCachePerformancePoor
+        expr: |
+          sum(rate(meatymusic_security_cache_hits_total[5m])) / sum(rate(meatymusic_security_cache_requests_total[5m])) * 100 < 70
+        for: 5m
+        labels:
+          severity: warning
+          component: security-cache
+          team: platform
+        annotations:
+          summary: "Poor security cache performance"
+          description: |
+            Security cache hit rate is {{ $value | humanizePercentage }}, below the 70% threshold.
+            This may cause increased database load and slower response times.
+
+  - name: meatymusic.security.database
+    interval: 30s
+    rules:
+      - alert: DatabaseSecurityFunctionSlow
+        expr: |
+          avg_over_time(meatymusic_db_security_function_duration_seconds[5m]) > 0.1
+        for: 3m
+        labels:
+          severity: warning
+          component: database-security
+          team: platform
+        annotations:
+          summary: "Slow database security function: {{ $labels.function_name }}"
+          description: |
+            Database security function "{{ $labels.function_name }}" is taking {{ $value | humanizeDuration }}
+            on average, which may impact query performance.
+
+      - alert: DatabaseConnectionPoolStrain
+        expr: |
+          (meatymusic_db_pool_connections_active / (meatymusic_db_pool_connections_active + meatymusic_db_pool_connections_idle)) > 0.9
+        for: 3m
+        labels:
+          severity: warning
+          component: database-pool
+          team: platform
+        annotations:
+          summary: "Database connection pool under strain"
+          description: |
+            {{ $value | humanizePercentage }} of database connections are active,
+            indicating high load that may affect security query performance.
+
+# Recording rules for derived metrics
+  - name: meatymusic.security.recording
+    interval: 30s
+    rules:
+      - record: meatymusic:security_boundary_violations:rate5m
+        expr: sum(rate(meatymusic_security_boundary_violations_total[5m]))
+
+      - record: meatymusic:auth_failure_rate:rate5m
+        expr: sum(rate(meatymusic_auth_failures_total[5m]))
+
+      - record: meatymusic:security_query_duration:p95_5m
+        expr: histogram_quantile(0.95, sum(rate(meatymusic_security_query_duration_seconds_bucket[5m])) by (le))
+
+      - record: meatymusic:security_query_duration:p50_5m
+        expr: histogram_quantile(0.50, sum(rate(meatymusic_security_query_duration_seconds_bucket[5m])) by (le))
+
+      - record: meatymusic:rls_coverage_percentage
+        expr: (sum(meatymusic_rls_policy_applied_total) / sum(meatymusic_db_queries_total)) * 100
+
+      - record: meatymusic:security_cache_hit_rate_percentage
+        expr: sum(rate(meatymusic_security_cache_hits_total[5m])) / sum(rate(meatymusic_security_cache_requests_total[5m])) * 100
+
+      - record: meatymusic:rls_overhead:p95_by_operation
+        expr: histogram_quantile(0.95, sum(rate(meatymusic_rls_overhead_seconds_bucket[5m])) by (le, operation_type))
+
+      - record: meatymusic:db_pool_utilization_percentage
+        expr: (meatymusic_db_pool_connections_active / (meatymusic_db_pool_connections_active + meatymusic_db_pool_connections_idle)) * 100

@@ -1,0 +1,136 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "amcs://schemas/lyrics-1.0.json",
+  "title": "Lyrics Entity",
+  "description": "Textual content with structural and stylistic constraints including sections, rhyme, meter, and citations",
+  "type": "object",
+  "required": ["language", "section_order", "constraints"],
+  "properties": {
+    "language": {
+      "type": "string",
+      "pattern": "^[a-z]{2}$",
+      "default": "en",
+      "description": "Language code (ISO 639-1)"
+    },
+    "pov": {
+      "type": "string",
+      "enum": ["1st", "2nd", "3rd"],
+      "description": "Point of view: 1st (I/we), 2nd (you), 3rd (he/she/they)"
+    },
+    "tense": {
+      "type": "string",
+      "enum": ["past", "present", "future", "mixed"],
+      "description": "Verb tense used in the song"
+    },
+    "themes": {
+      "type": "array",
+      "items": {"type": "string"},
+      "default": [],
+      "description": "Narrative themes (e.g., 'holiday hustle', 'family', 'heartbreak')"
+    },
+    "rhyme_scheme": {
+      "type": "string",
+      "description": "Structure of end rhymes (e.g., 'AABB', 'ABAB', 'AAA')"
+    },
+    "meter": {
+      "type": "string",
+      "description": "Meter or time feel (e.g., '4/4 pop', '6/8 ballad')"
+    },
+    "syllables_per_line": {
+      "type": "integer",
+      "minimum": 4,
+      "maximum": 16,
+      "description": "Target syllables per line for singability"
+    },
+    "hook_strategy": {
+      "type": "string",
+      "enum": ["melodic", "lyrical", "call-response", "chant"],
+      "description": "Approach to creating hooks"
+    },
+    "repetition_policy": {
+      "type": "string",
+      "enum": ["sparse", "moderate", "hook-heavy"],
+      "description": "How often phrases repeat"
+    },
+    "imagery_density": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Metaphorical/descriptive richness (0=literal, 1=highly poetic)"
+    },
+    "reading_level": {
+      "type": "string",
+      "description": "Reading difficulty (e.g., 'grade 4', 'college')"
+    },
+    "section_order": {
+      "type": "array",
+      "items": {"type": "string"},
+      "minItems": 1,
+      "description": "Ordered list of sections (e.g., ['Intro', 'Verse', 'Chorus'])"
+    },
+    "constraints": {
+      "type": "object",
+      "required": [],
+      "properties": {
+        "explicit": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether explicit content is allowed"
+        },
+        "max_lines": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum total lines across all sections"
+        },
+        "section_requirements": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "min_lines": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Minimum lines for this section"
+              },
+              "max_lines": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Maximum lines for this section"
+              },
+              "must_end_with_hook": {
+                "type": "boolean",
+                "description": "Whether section must end with hook"
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "Per-section line requirements"
+        }
+      },
+      "additionalProperties": false
+    },
+    "source_citations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source_id", "weight"],
+        "properties": {
+          "source_id": {
+            "type": "string",
+            "description": "UUID or identifier of external source"
+          },
+          "weight": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Contribution weight from this source"
+          }
+        },
+        "additionalProperties": false
+      },
+      "default": [],
+      "description": "External sources used for RAG lyrics generation"
+    }
+  },
+  "additionalProperties": false
+}

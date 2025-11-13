@@ -1,0 +1,144 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "amcs://schemas/blueprint-1.0.json",
+  "title": "Blueprint & Rubric Entity",
+  "description": "Algorithmic template for generating hit songs including genre rules and scoring rubric",
+  "type": "object",
+  "required": ["genre", "version", "rules", "eval_rubric"],
+  "properties": {
+    "genre": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "description": "Genre name (e.g., 'Christmas Pop', 'Hip-Hop')"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d{4}\\.\\d{1,2}$",
+      "description": "Blueprint version (e.g., '2025.11')"
+    },
+    "rules": {
+      "type": "object",
+      "required": [],
+      "properties": {
+        "tempo_bpm": {
+          "type": "array",
+          "items": {"type": "integer", "minimum": 40, "maximum": 220},
+          "minItems": 2,
+          "maxItems": 2,
+          "description": "Allowed BPM range [min, max]"
+        },
+        "required_sections": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Sections that must appear (e.g., ['Verse', 'Chorus'])"
+        },
+        "banned_terms": {
+          "type": "array",
+          "items": {"type": "string"},
+          "default": [],
+          "description": "Words or phrases forbidden in lyrics"
+        },
+        "lexicon_positive": {
+          "type": "array",
+          "items": {"type": "string"},
+          "default": [],
+          "description": "Terms that should appear to capture genre flavor"
+        },
+        "lexicon_negative": {
+          "type": "array",
+          "items": {"type": "string"},
+          "default": [],
+          "description": "Terms to avoid that clash with genre"
+        },
+        "section_lines": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "min": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Minimum lines for this section"
+              },
+              "max": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Maximum lines for this section"
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "Per-section line count guidance"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Genre-specific rules and constraints"
+    },
+    "eval_rubric": {
+      "type": "object",
+      "required": [],
+      "properties": {
+        "weights": {
+          "type": "object",
+          "properties": {
+            "hook_density": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Weight for hook density metric"
+            },
+            "singability": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Weight for singability metric"
+            },
+            "rhyme_tightness": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Weight for rhyme quality metric"
+            },
+            "section_completeness": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Weight for section structure metric"
+            },
+            "profanity_score": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Weight for profanity detection metric"
+            }
+          },
+          "additionalProperties": false,
+          "description": "Metric weights (should sum to 1.0)"
+        },
+        "thresholds": {
+          "type": "object",
+          "properties": {
+            "min_total": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Minimum passing score (triggers fixer if below)"
+            },
+            "max_profanity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Maximum allowed profanity score"
+            }
+          },
+          "additionalProperties": false,
+          "description": "Pass/fail thresholds"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Evaluation rubric with weights and thresholds"
+    }
+  },
+  "additionalProperties": false
+}

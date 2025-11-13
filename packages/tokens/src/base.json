@@ -1,0 +1,371 @@
+{
+  "color": {
+    "bg": {
+      "value": "#FBFCFE",
+      "type": "color",
+      "description": "Primary background color"
+    },
+    "surface": {
+      "value": "#FFFFFF",
+      "type": "color",
+      "description": "Surface color for cards and containers"
+    },
+    "panel": {
+      "value": "#F5F7FB",
+      "type": "color",
+      "description": "Panel background for sidebars and secondary surfaces"
+    },
+    "border": {
+      "value": "#E6EAF2",
+      "type": "color",
+      "description": "Border color for separators and outlines"
+    },
+    "ring": {
+      "value": "#7C3AED",
+      "type": "color",
+      "description": "Focus ring color"
+    },
+    "text": {
+      "strong": {
+        "value": "#0B1220",
+        "type": "color",
+        "description": "Strong text color for headings"
+      },
+      "base": {
+        "value": "#1F2937",
+        "type": "color",
+        "description": "Base text color for body text"
+      },
+      "muted": {
+        "value": "#6B7280",
+        "type": "color",
+        "description": "Muted text color for secondary text"
+      }
+    },
+    "primary": {
+      "value": "#6E56CF",
+      "type": "color",
+      "description": "Primary brand color"
+    },
+    "primaryForeground": {
+      "value": "#FFFFFF",
+      "type": "color",
+      "description": "Text color on primary background"
+    },
+    "secondary": {
+      "value": "#00B3A4",
+      "type": "color",
+      "description": "Secondary brand color"
+    },
+    "accent": {
+      "value": "#FFB224",
+      "type": "color",
+      "description": "Accent color for highlights"
+    },
+    "success": {
+      "value": "#2BA84A",
+      "type": "color",
+      "description": "Success state color"
+    },
+    "warning": {
+      "value": "#F59E0B",
+      "type": "color",
+      "description": "Warning state color"
+    },
+    "danger": {
+      "value": "#E5484D",
+      "type": "color",
+      "description": "Error/danger state color"
+    },
+    "info": {
+      "value": "#0091FF",
+      "type": "color",
+      "description": "Info state color"
+    }
+  },
+  "badge": {
+    "default": {
+      "border": {
+        "value": "#E6EAF2",
+        "type": "color",
+        "description": "Default badge border color"
+      },
+      "bg": {
+        "value": "#FFFFFF",
+        "type": "color",
+        "description": "Default badge background color"
+      },
+      "text": {
+        "value": "#1F2937",
+        "type": "color",
+        "description": "Default badge text color"
+      },
+      "hoverBg": {
+        "value": "#F5F7FB",
+        "type": "color",
+        "description": "Default badge hover background color"
+      },
+      "shadow": {
+        "value": "0 1px 2px rgba(8,15,30,.06)",
+        "type": "boxShadow",
+        "description": "Default badge shadow"
+      }
+    },
+    "secondary": {
+      "border": {
+        "value": "#E6EAF2",
+        "type": "color",
+        "description": "Secondary badge border color"
+      },
+      "bg": {
+        "value": "#F5F7FB",
+        "type": "color",
+        "description": "Secondary badge background color"
+      },
+      "text": {
+        "value": "#6E56CF",
+        "type": "color",
+        "description": "Secondary badge text color"
+      },
+      "hoverBg": {
+        "value": "#EEF2FF",
+        "type": "color",
+        "description": "Secondary badge hover background color"
+      },
+      "shadow": {
+        "value": "0 1px 2px rgba(110,86,207,.1)",
+        "type": "boxShadow",
+        "description": "Secondary badge shadow"
+      }
+    },
+    "outline": {
+      "border": {
+        "value": "#E6EAF2",
+        "type": "color",
+        "description": "Outline badge border color"
+      },
+      "bg": {
+        "value": "transparent",
+        "type": "color",
+        "description": "Outline badge background color"
+      },
+      "text": {
+        "value": "#1F2937",
+        "type": "color",
+        "description": "Outline badge text color"
+      },
+      "hoverBg": {
+        "value": "#F5F7FB",
+        "type": "color",
+        "description": "Outline badge hover background color"
+      },
+      "hoverBorder": {
+        "value": "#6E56CF",
+        "type": "color",
+        "description": "Outline badge hover border color"
+      },
+      "shadow": {
+        "value": "none",
+        "type": "boxShadow",
+        "description": "Outline badge shadow"
+      }
+    }
+  },
+  "spacing": {
+    "1": {
+      "value": "4px",
+      "type": "dimension",
+      "description": "Extra small spacing"
+    },
+    "2": {
+      "value": "8px",
+      "type": "dimension",
+      "description": "Small spacing"
+    },
+    "3": {
+      "value": "12px",
+      "type": "dimension",
+      "description": "Medium small spacing"
+    },
+    "4": {
+      "value": "16px",
+      "type": "dimension",
+      "description": "Medium spacing"
+    },
+    "5": {
+      "value": "24px",
+      "type": "dimension",
+      "description": "Medium large spacing"
+    },
+    "6": {
+      "value": "32px",
+      "type": "dimension",
+      "description": "Large spacing"
+    },
+    "7": {
+      "value": "40px",
+      "type": "dimension",
+      "description": "Extra large spacing"
+    },
+    "8": {
+      "value": "56px",
+      "type": "dimension",
+      "description": "2XL spacing"
+    }
+  },
+  "radius": {
+    "sm": {
+      "value": "8px",
+      "type": "borderRadius",
+      "description": "Small border radius for inputs"
+    },
+    "md": {
+      "value": "12px",
+      "type": "borderRadius",
+      "description": "Medium border radius for cards"
+    },
+    "lg": {
+      "value": "16px",
+      "type": "borderRadius",
+      "description": "Large border radius for modals"
+    },
+    "pill": {
+      "value": "999px",
+      "type": "borderRadius",
+      "description": "Pill border radius for buttons"
+    }
+  },
+  "elevation": {
+    "0": {
+      "value": "none",
+      "type": "boxShadow",
+      "description": "No elevation"
+    },
+    "1": {
+      "value": "0 1px 2px rgba(8,15,30,.06), 0 1px 1px rgba(8,15,30,.04)",
+      "type": "boxShadow",
+      "description": "Subtle elevation"
+    },
+    "2": {
+      "value": "0 4px 10px rgba(8,15,30,.08)",
+      "type": "boxShadow",
+      "description": "Low elevation"
+    },
+    "3": {
+      "value": "0 8px 24px rgba(8,15,30,.12)",
+      "type": "boxShadow",
+      "description": "Medium elevation"
+    },
+    "4": {
+      "value": "0 12px 32px rgba(8,15,30,.16)",
+      "type": "boxShadow",
+      "description": "High elevation"
+    }
+  },
+  "typography": {
+    "fontFamily": {
+      "ui": {
+        "value": ["Inter", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto"],
+        "type": "fontFamily",
+        "description": "Primary UI font family"
+      },
+      "mono": {
+        "value": ["JetBrains Mono", "ui-monospace", "SFMono-Regular", "Menlo", "Consolas"],
+        "type": "fontFamily",
+        "description": "Monospace font family"
+      },
+      "display": {
+        "value": ["Plus Jakarta Sans", "Inter", "ui-sans-serif", "system-ui"],
+        "type": "fontFamily",
+        "description": "Display font family for marketing"
+      }
+    },
+    "fontSize": {
+      "1": {
+        "value": "clamp(14px, 0.96vw + 10px, 16px)",
+        "type": "fontSize",
+        "description": "Body text size"
+      },
+      "2": {
+        "value": "clamp(16px, 1.1vw + 12px, 18px)",
+        "type": "fontSize",
+        "description": "Subheading size"
+      },
+      "3": {
+        "value": "clamp(18px, 1.2vw + 13px, 22px)",
+        "type": "fontSize",
+        "description": "H3 heading size"
+      },
+      "4": {
+        "value": "clamp(22px, 1.6vw + 14px, 28px)",
+        "type": "fontSize",
+        "description": "H2 heading size"
+      },
+      "5": {
+        "value": "clamp(28px, 2.2vw + 16px, 36px)",
+        "type": "fontSize",
+        "description": "H1 heading size"
+      }
+    },
+    "lineHeight": {
+      "body": {
+        "value": "1.5",
+        "type": "lineHeight",
+        "description": "Line height for body text"
+      },
+      "heading": {
+        "value": "1.35",
+        "type": "lineHeight",
+        "description": "Line height for headings"
+      }
+    },
+    "letterSpacing": {
+      "default": {
+        "value": "0",
+        "type": "letterSpacing",
+        "description": "Default letter spacing"
+      },
+      "tight": {
+        "value": "-0.01em",
+        "type": "letterSpacing",
+        "description": "Tight letter spacing for headings"
+      }
+    }
+  },
+  "motion": {
+    "duration": {
+      "micro": {
+        "value": "70ms",
+        "type": "duration",
+        "description": "Micro interactions"
+      },
+      "ui": {
+        "value": "150ms",
+        "type": "duration",
+        "description": "UI transitions"
+      },
+      "panel": {
+        "value": "250ms",
+        "type": "duration",
+        "description": "Panel animations"
+      },
+      "modal": {
+        "value": "400ms",
+        "type": "duration",
+        "description": "Modal animations"
+      }
+    },
+    "easing": {
+      "enter": {
+        "value": "cubic-bezier(.2,.8,.2,1)",
+        "type": "cubicBezier",
+        "description": "Entering easing"
+      },
+      "exit": {
+        "value": "cubic-bezier(.4,0,.2,1)",
+        "type": "cubicBezier",
+        "description": "Exiting easing"
+      }
+    }
+  }
+}

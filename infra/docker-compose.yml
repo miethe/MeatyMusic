@@ -1,0 +1,189 @@
+# Docker Compose for MeatyMusic Application Stack
+# This provides the complete application environment for development and production
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: meatymusic-postgres
+    restart: unless-stopped
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-meaty_music_dev}
+      POSTGRES_USER: ${POSTGRES_USER:-mm_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secure_dev_pw}
+      POSTGRES_INITDB_ARGS: "-E UTF8 --locale=en_US.UTF-8"
+      TZ: UTC
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../services/api/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    networks:
+      - meatymusic
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-mm_user} -d ${POSTGRES_DB:-meaty_music_dev}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Redis Cache
+  redis:
+    image: redis:7.2-alpine
+    container_name: meatymusic-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    networks:
+      - meatymusic
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    environment:
+      - TZ=UTC
+
+  # API Service (FastAPI)
+  api:
+    build:
+      context: ../services/api
+      dockerfile: Dockerfile
+    container_name: meatymusic-api
+    restart: unless-stopped
+    ports:
+      - "${API_PORT:-8000}:8000"
+    environment:
+      # Database
+      DATABASE_URL: postgresql://${POSTGRES_USER:-mm_user}:${POSTGRES_PASSWORD:-secure_dev_pw}@postgres:5432/${POSTGRES_DB:-meaty_music_dev}
+      DATABASE_URL_TEST: postgresql://${POSTGRES_USER:-mm_user}:${POSTGRES_PASSWORD:-secure_dev_pw}@postgres:5432/${POSTGRES_DB:-meaty_music_dev}_test
+
+      # Redis
+      REDIS_URL: redis://redis:6379/0
+      REDIS_MAX_CONNECTIONS: 50
+
+      # Clerk Authentication
+      CLERK_WEBHOOK_SECRET: ${CLERK_WEBHOOK_SECRET:-dev_webhook_secret}
+      CLERK_SECRET_KEY: ${CLERK_SECRET_KEY:-dev_secret_key}
+      CLERK_JWKS_URL: ${CLERK_JWKS_URL:-https://api.clerk.dev/.well-known/jwks.json}
+      CLERK_JWT_ISSUER: ${CLERK_JWT_ISSUER:-https://api.clerk.dev}
+
+      # Environment
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+
+      # Observability
+      OBS_TRACING_ENABLED: ${OBS_TRACING_ENABLED:-true}
+      OBS_TELEMETRY_ENABLED: ${OBS_TELEMETRY_ENABLED:-true}
+      OBS_LOG_JSON_FORMAT: ${OBS_LOG_JSON_FORMAT:-true}
+      OBS_LOG_LEVEL: ${OBS_LOG_LEVEL:-INFO}
+      OBS_OTEL_EXPORTER_TYPE: ${OBS_OTEL_EXPORTER_TYPE:-console}
+      OBS_OTEL_EXPORTER_OTLP_ENDPOINT: ${OBS_OTEL_EXPORTER_OTLP_ENDPOINT:-}
+
+      # Dev Auth Bypass (for MCP/testing)
+      DEV_AUTH_BYPASS_ENABLED: ${DEV_AUTH_BYPASS_ENABLED:-false}
+      DEV_AUTH_BYPASS_SECRET: ${DEV_AUTH_BYPASS_SECRET:-}
+      DEV_AUTH_BYPASS_USER_ID: ${DEV_AUTH_BYPASS_USER_ID:-user_test123}
+
+      TZ: UTC
+    volumes:
+      # Mount only source files for development, preserve .venv from image
+      - ../services/api/app:/app/app:cached
+      - ../services/api/alembic:/app/alembic:cached
+      - ../services/api/alembic.ini:/app/alembic.ini:cached
+      - ../services/api/main.py:/app/main.py:cached
+    networks:
+      - meatymusic
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Web App (Next.js)
+  web:
+    build:
+      context: ..
+      dockerfile: ./apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000}
+        NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+    container_name: meatymusic-web
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    environment:
+      # API Configuration
+      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://api:8000}
+
+      # Clerk Authentication
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+      CLERK_SECRET_KEY: ${CLERK_SECRET_KEY}
+
+      # Clerk Routes
+      NEXT_PUBLIC_CLERK_SIGN_IN_URL: /sign-in
+      NEXT_PUBLIC_CLERK_SIGN_UP_URL: /sign-up
+      NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: /dashboard
+      NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: /dashboard
+
+      # Environment
+      NODE_ENV: ${NODE_ENV:-production}
+
+      # OpenTelemetry (Optional)
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
+
+      TZ: UTC
+    networks:
+      - meatymusic
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Database Migration Runner (run once)
+  migrations:
+    build:
+      context: ../services/api
+      dockerfile: Dockerfile
+    container_name: meatymusic-migrations
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-mm_user}:${POSTGRES_PASSWORD:-secure_dev_pw}@postgres:5432/${POSTGRES_DB:-meaty_music_dev}
+      PYTHONPATH: /app
+    command: ["sh", "-c", "alembic upgrade head"]
+    networks:
+      - meatymusic
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+# Volumes
+volumes:
+  postgres_data:
+    driver: local
+    name: meatymusic-postgres-data
+  redis_data:
+    driver: local
+    name: meatymusic-redis-data
+
+# Networks
+networks:
+  meatymusic:
+    driver: bridge
+    name: meatymusic-app-network

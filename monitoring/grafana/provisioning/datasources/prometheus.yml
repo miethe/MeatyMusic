@@ -1,0 +1,72 @@
+# Grafana Data Source Provisioning Configuration
+
+apiVersion: 1
+
+datasources:
+  - name: MeatyMusic Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true
+
+    # JSON data for Prometheus-specific settings
+    jsonData:
+      httpMethod: POST
+      prometheusType: Prometheus
+      prometheusVersion: 2.47.0
+      cacheLevel: 'High'
+      disableMetricsLookup: false
+      customQueryParameters: ''
+      timeInterval: '15s'
+      queryTimeout: '60s'
+      defaultEditor: 'builder'
+
+      # Enable exemplars for trace correlation
+      exemplarTraceIdDestinations:
+        - name: 'Jaeger'
+          datasourceUid: 'jaeger-uid'
+          urlDisplayLabel: 'View Trace'
+
+    # HTTP settings
+    timeout: 60
+
+    # User and organization settings
+    orgId: 1
+    user: admin
+    database: ''
+    basicAuth: false
+    basicAuthUser: ''
+    withCredentials: false
+
+    # TLS settings
+    tlsAuth: false
+    tlsAuthWithCACert: false
+    tlsSkipVerify: true
+
+    # Secure JSON data (passwords, tokens, etc.)
+    secureJsonData:
+      httpHeaderValue1: ''
+
+    version: 1
+
+  - name: MeatyMusic Jaeger
+    type: jaeger
+    access: proxy
+    url: http://jaeger:16686
+    uid: jaeger-uid
+    editable: true
+
+    jsonData:
+      nodeGraph:
+        enabled: true
+      traceQuery:
+        timeShiftEnabled: true
+        spanStartTimeShift: '1h'
+        spanEndTimeShift: '-1h'
+      spanBar:
+        type: 'Tag'
+        tag: 'http.status_code'
+
+    orgId: 1
+    version: 1

@@ -1,0 +1,62 @@
+{
+  "title": "Test Singer-Songwriter",
+  "blueprint_ref": {
+    "genre": "Indie Alternative",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "Indie Alternative",
+      "subgenres": ["Singer-Songwriter"],
+      "fusions": []
+    },
+    "tempo_bpm": 78,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "C major",
+      "modulations": []
+    },
+    "mood": ["introspective", "vulnerable", "honest"],
+    "energy": "low",
+    "instrumentation": ["acoustic guitar", "piano"],
+    "vocal_profile": "androgynous, intimate",
+    "tags": ["Era:2010s", "Voice:intimate", "Mix:raw"],
+    "negative_tags": ["overproduced", "loud"]
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "present",
+    "themes": ["self-reflection", "relationships", "growth"],
+    "rhyme_scheme": "free",
+    "meter": "irregular",
+    "syllables_per_line": 8,
+    "hook_strategy": "lyrical",
+    "repetition_policy": "sparse",
+    "section_order": ["Verse", "Verse", "Chorus", "Verse", "Chorus", "Outro"],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 35,
+      "section_requirements": {}
+    },
+    "source_citations": []
+  },
+  "producer_notes": {
+    "structure": "",
+    "hooks": 1,
+    "instrumentation": ["acoustic guitar"],
+    "section_meta": {},
+    "mix": {
+      "lufs": -18.0,
+      "space": "intimate",
+      "stereo_width": "narrow"
+    }
+  },
+  "prompt_controls": {
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  }
+}
