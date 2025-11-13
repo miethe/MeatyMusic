@@ -1,10 +1,21 @@
 /**
- * API types
- * TODO: Populate with actual MeatyMusic API types in Phase 3
+ * MeatyMusic AMCS API Types
+ *
+ * This file re-exports all API types from the /api directory for convenience.
+ *
+ * Phase 5 Wave 1G: TypeScript type generation from backend schemas
+ * All types are manually generated from backend Pydantic schemas to ensure
+ * type safety across the frontend-backend boundary.
+ *
+ * For detailed documentation, see: /types/api/README.md
  */
 
+// Re-export all API types from the centralized location
+export * from './api';
+
 /**
- * User type
+ * Legacy User Type (from MeatyPrompts)
+ * TODO: Replace with AMCS-specific user/auth types in Phase 6
  */
 export interface User {
   id: string;
@@ -12,34 +23,4 @@ export interface User {
   name?: string;
   created_at: string;
   updated_at: string;
-}
-
-/**
- * Error response from API
- */
-export interface ErrorResponse {
-  error: {
-    code: string;
-    message: string;
-    details?: Record<string, unknown>;
-    request_id?: string;
-  };
-}
-
-/**
- * Pagination metadata
- */
-export interface PaginationMeta {
-  total: number;
-  page: number;
-  per_page: number;
-  total_pages: number;
-}
-
-/**
- * Paginated response
- */
-export interface PaginatedResponse<T> {
-  data: T[];
-  meta: PaginationMeta;
 }

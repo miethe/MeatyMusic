@@ -2,9 +2,17 @@
  * Error handler utilities
  */
 
-import type { ErrorResponse } from '@/types/api';
-
 import { ApplicationError, ERROR_CODES } from './types';
+
+/**
+ * Backend API error response structure
+ * Backend: app/schemas/common.py - ErrorResponse
+ */
+interface BackendErrorResponse {
+  error: string;
+  detail?: string;
+  field?: string;
+}
 
 /**
  * Parse API error response
@@ -19,15 +27,14 @@ export function parseApiError(error: unknown): ApplicationError {
     typeof error.response === 'object' &&
     'data' in error.response
   ) {
-    const response = error.response as { data: ErrorResponse; status: number };
-    const errorData = response.data?.error;
+    const response = error.response as { data: BackendErrorResponse; status: number };
+    const errorData = response.data;
 
     if (errorData) {
       return new ApplicationError({
-        code: errorData.code,
-        message: errorData.message,
-        details: errorData.details,
-        request_id: errorData.request_id,
+        code: errorData.error || 'UNKNOWN_ERROR',
+        message: errorData.detail || errorData.error || 'An error occurred',
+        details: errorData.field ? { field: errorData.field } : undefined,
         status: response.status,
       });
     }
