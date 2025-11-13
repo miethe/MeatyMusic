@@ -12,7 +12,7 @@
  */
 
 import { create } from 'zustand';
-import type { WorkflowRun, WorkflowNode, WorkflowRunStatus } from '@/types/api';
+import type { WorkflowNode, WorkflowRunStatus } from '@/types/api';
 import type { WorkflowEvent } from '@/types/api/events';
 
 /**
