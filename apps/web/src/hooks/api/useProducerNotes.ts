@@ -12,7 +12,7 @@ import type { ProducerNotesFilters } from '@/lib/api/producerNotes';
 
 export function useProducerNotesList(filters?: ProducerNotesFilters) {
   return useQuery({
-    queryKey: queryKeys.producerNotes.list(filters),
+    queryKey: queryKeys.producerNotes.list(filters as Record<string, unknown> | undefined),
     queryFn: () => producerNotesApi.list(filters),
     staleTime: getStaleTime('ENTITIES'),
   });
