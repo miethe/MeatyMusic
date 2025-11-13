@@ -11,6 +11,8 @@ from app.skills import (
     generate_lyrics,
     generate_producer_notes,
     compose_prompt,
+    evaluate_artifacts,
+    apply_fixes,
 )
 
 
@@ -27,8 +29,10 @@ def register_all_skills(orchestrator: WorkflowOrchestrator) -> None:
     orchestrator.register_skill("PRODUCER", generate_producer_notes)
     orchestrator.register_skill("COMPOSE", compose_prompt)
 
+    # Register validation and fix skills
+    orchestrator.register_skill("VALIDATE", evaluate_artifacts)
+    orchestrator.register_skill("FIX", apply_fixes)
+
     # TODO: Register additional skills when implemented:
-    # - VALIDATE: validation and scoring
-    # - FIX: targeted artifact fixes
     # - RENDER: submit to render engines
     # - REVIEW: finalize and emit events

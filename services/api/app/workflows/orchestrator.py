@@ -484,9 +484,62 @@ class WorkflowOrchestrator:
         Returns:
             Dictionary of inputs for this node
         """
+        node_id = node_spec["id"]
         node_inputs = {}
-        input_nodes = node_spec.get("inputs", [])
 
+        # Special handling for VALIDATE node
+        if node_id == "VALIDATE":
+            # Collect lyrics, style, producer_notes, blueprint, composed_prompt, sds
+            if "LYRICS" in outputs:
+                node_inputs["lyrics"] = outputs["LYRICS"].get("lyrics", "")
+            if "STYLE" in outputs:
+                node_inputs["style"] = outputs["STYLE"].get("style", {})
+            if "PRODUCER" in outputs:
+                node_inputs["producer_notes"] = outputs["PRODUCER"].get(
+                    "producer_notes", {}
+                )
+            if "COMPOSE" in outputs:
+                node_inputs["composed_prompt"] = outputs["COMPOSE"].get(
+                    "composed_prompt", {}
+                )
+            if "PLAN" in outputs:
+                # Get blueprint and sds from plan outputs if available
+                node_inputs["blueprint"] = outputs["PLAN"].get("blueprint", {})
+                node_inputs["sds"] = outputs["PLAN"].get("sds", {})
+            return node_inputs
+
+        # Special handling for FIX node
+        elif node_id == "FIX":
+            # Collect issues, scores, lyrics, style, producer_notes, blueprint
+            if "VALIDATE" in outputs:
+                node_inputs["issues"] = outputs["VALIDATE"].get("issues", [])
+                node_inputs["scores"] = outputs["VALIDATE"].get("scores", {})
+            if "LYRICS" in outputs:
+                node_inputs["lyrics"] = outputs["LYRICS"].get("lyrics", "")
+            if "STYLE" in outputs:
+                node_inputs["style"] = outputs["STYLE"].get("style", {})
+            if "PRODUCER" in outputs:
+                node_inputs["producer_notes"] = outputs["PRODUCER"].get(
+                    "producer_notes", {}
+                )
+            if "PLAN" in outputs:
+                node_inputs["blueprint"] = outputs["PLAN"].get("blueprint", {})
+                node_inputs["sds"] = outputs["PLAN"].get("sds", {})
+
+            # After FIX, update lyrics/style/producer with patched versions
+            if "FIX" in outputs:
+                fix_output = outputs["FIX"]
+                if "patched_lyrics" in fix_output:
+                    node_inputs["lyrics"] = fix_output["patched_lyrics"]
+                if "patched_style" in fix_output:
+                    node_inputs["style"] = fix_output["patched_style"]
+                if "patched_producer_notes" in fix_output:
+                    node_inputs["producer_notes"] = fix_output["patched_producer_notes"]
+
+            return node_inputs
+
+        # Default behavior: collect from input_nodes list
+        input_nodes = node_spec.get("inputs", [])
         for input_node in input_nodes:
             if input_node in outputs:
                 node_inputs[input_node] = outputs[input_node]
