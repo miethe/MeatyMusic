@@ -16,10 +16,10 @@ from app.core.async_database import get_async_db_session
 from app.core.security import SecurityContext, RepositoryFactory
 from app.core.security.exceptions import SecurityContextError
 from app.core.auth import JWTContextExtractor
-from auth.providers.base import AuthContext, AuthProvider
-from auth.deps import get_auth_provider
+from app.auth.providers.base import AuthContext, AuthProvider
+from app.auth.deps import get_auth_provider
 from app.models.user import UserORM
-from auth.jwks import verify_token
+from app.auth.jwks import verify_token
 
 logger = structlog.get_logger(__name__)
 security = HTTPBearer(auto_error=False)

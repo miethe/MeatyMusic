@@ -12,7 +12,7 @@ WORKDIR /app
 COPY pyproject.toml uv.lock ./
 
 # Install dependencies using uv
-RUN uv sync --frozen --no-dev
+RUN uv sync --frozen
 
 # Production stage
 FROM python:3.11-slim

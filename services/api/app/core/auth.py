@@ -17,7 +17,7 @@ from app.core.security import (
     create_tenant_context,
     create_dual_context
 )
-from auth.jwks import verify_token
+from app.auth.jwks import verify_token
 from app.models.user import UserORM
 
 logger = structlog.get_logger(__name__)

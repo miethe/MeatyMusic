@@ -244,8 +244,8 @@ class Settings(BaseSettings):
     AUTH_SIGNING_SECRET: str = "secret"
     PROMPT_ENGINE_ENABLED: bool = True
     MODEL_CONFIG_DIR: str = str(
-        (Path(__file__).resolve().parents[4] / "config/models").resolve()
-    )
+        Path(__file__).resolve().parents[2] / "config/models"
+    ) if (Path(__file__).resolve().parents[2] / "config/models").exists() else "/app/config/models"
 
     # Add ENVIRONMENT field to accept environment variable
     ENVIRONMENT: str = "development"

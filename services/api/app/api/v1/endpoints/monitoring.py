@@ -18,7 +18,8 @@ from prometheus_client import REGISTRY
 from prometheus_client.parser import text_string_to_metric_families
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user, get_db
+from app.core.dependencies import get_current_user_legacy as get_current_user
+from app.db.session import get_db
 from app.models.user import User
 from app.repositories.workflow_run_repo import WorkflowRunRepository
 from app.repositories.node_execution_repo import NodeExecutionRepository

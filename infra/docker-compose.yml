@@ -69,8 +69,10 @@ services:
       REDIS_MAX_CONNECTIONS: 50
 
       # Clerk Authentication
-      CLERK_WEBHOOK_SECRET: ${CLERK_WEBHOOK_SECRET}
-      CLERK_SECRET_KEY: ${CLERK_SECRET_KEY}
+      CLERK_WEBHOOK_SECRET: ${CLERK_WEBHOOK_SECRET:-dev_webhook_secret}
+      CLERK_SECRET_KEY: ${CLERK_SECRET_KEY:-dev_secret_key}
+      CLERK_JWKS_URL: ${CLERK_JWKS_URL:-https://api.clerk.dev/.well-known/jwks.json}
+      CLERK_JWT_ISSUER: ${CLERK_JWT_ISSUER:-https://api.clerk.dev}
 
       # Environment
       ENVIRONMENT: ${ENVIRONMENT:-development}
@@ -90,7 +92,11 @@ services:
 
       TZ: UTC
     volumes:
-      - ../services/api:/app:cached
+      # Mount only source files for development, preserve .venv from image
+      - ../services/api/app:/app/app:cached
+      - ../services/api/alembic:/app/alembic:cached
+      - ../services/api/alembic.ini:/app/alembic.ini:cached
+      - ../services/api/main.py:/app/main.py:cached
     networks:
       - meatymusic
     depends_on:
@@ -99,7 +105,7 @@ services:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000/healthz || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
