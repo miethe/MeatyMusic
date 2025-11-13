@@ -14,6 +14,7 @@ from app.models.producer_notes import ProducerNotes
 from app.models.song import Song, WorkflowRun
 from app.models.source import Source
 from app.models.style import Style
+from app.models.workflow import NodeExecution, WorkflowEvent
 
 __all__ = [
     "Base",
@@ -34,4 +35,7 @@ __all__ = [
     "WorkflowRun",
     "Source",
     "Style",
+    # Workflow execution models
+    "NodeExecution",
+    "WorkflowEvent",
 ]
