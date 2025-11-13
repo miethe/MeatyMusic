@@ -1,0 +1,73 @@
+{
+  "title": "Test Hip-Hop Energy",
+  "blueprint_ref": {
+    "genre": "Hip-Hop",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "Hip-Hop",
+      "subgenres": ["Trap"],
+      "fusions": []
+    },
+    "tempo_bpm": 140,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "A minor",
+      "modulations": []
+    },
+    "mood": ["aggressive", "confident"],
+    "energy": "very-high",
+    "instrumentation": ["808 bass", "hi-hats", "synth"],
+    "vocal_profile": "male rap, punchy delivery",
+    "tags": ["Era:2020s", "Rhythm:trap-hi-hats"],
+    "negative_tags": ["soft"]
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "present",
+    "themes": ["hustle", "success", "confidence"],
+    "rhyme_scheme": "AABB",
+    "meter": "16ths",
+    "syllables_per_line": 12,
+    "hook_strategy": "chant",
+    "repetition_policy": "hook-heavy",
+    "section_order": ["Intro", "Verse", "Hook", "Verse", "Hook", "Bridge", "Hook"],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 70,
+      "section_requirements": {
+        "Hook": {
+          "min_lines": 4,
+          "max_lines": 8,
+          "must_end_with_hook": true
+        }
+      }
+    },
+    "source_citations": []
+  },
+  "producer_notes": {
+    "structure": "",
+    "hooks": 2,
+    "instrumentation": ["808 bass", "hi-hats"],
+    "section_meta": {
+      "Hook": {
+        "tags": ["crowd-chant"],
+        "target_duration_sec": 20
+      }
+    },
+    "mix": {
+      "lufs": -10.0,
+      "space": "tight",
+      "stereo_width": "wide"
+    }
+  },
+  "prompt_controls": {
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  }
+}

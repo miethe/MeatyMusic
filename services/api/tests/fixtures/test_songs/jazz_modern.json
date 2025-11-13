@@ -1,0 +1,72 @@
+{
+  "title": "Test Jazz Modern",
+  "blueprint_ref": {
+    "genre": "Jazz",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "Jazz",
+      "subgenres": ["Contemporary Jazz"],
+      "fusions": ["Neo-Soul"]
+    },
+    "tempo_bpm": 110,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "Bb major",
+      "modulations": [
+        {
+          "at_section": "Bridge",
+          "to_key": "Eb major"
+        }
+      ]
+    },
+    "mood": ["sophisticated", "smooth", "elegant"],
+    "energy": "medium",
+    "instrumentation": ["piano", "upright bass", "brush drums"],
+    "vocal_profile": "female jazz vocal, sultry",
+    "tags": ["Era:2010s", "Voice:jazz-phrasing"],
+    "negative_tags": ["harsh", "digital"]
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "present",
+    "themes": ["love", "sophistication", "night"],
+    "rhyme_scheme": "ABCB",
+    "meter": "swing",
+    "syllables_per_line": 9,
+    "hook_strategy": "melodic",
+    "repetition_policy": "sparse",
+    "section_order": ["Intro", "Verse", "Chorus", "Verse", "Chorus", "Bridge", "Chorus"],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 50,
+      "section_requirements": {}
+    },
+    "source_citations": []
+  },
+  "producer_notes": {
+    "structure": "",
+    "hooks": 1,
+    "instrumentation": ["piano", "upright bass"],
+    "section_meta": {
+      "Bridge": {
+        "tags": ["piano-solo"],
+        "target_duration_sec": 20
+      }
+    },
+    "mix": {
+      "lufs": -18.0,
+      "space": "intimate",
+      "stereo_width": "normal"
+    }
+  },
+  "prompt_controls": {
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "title": "Test Metal Heavy",
+  "blueprint_ref": {
+    "genre": "Metal",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "Metal",
+      "subgenres": ["Thrash Metal"],
+      "fusions": []
+    },
+    "tempo_bpm": 200,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "E minor",
+      "modulations": []
+    },
+    "mood": ["aggressive", "intense", "dark"],
+    "energy": "extreme",
+    "instrumentation": ["distorted guitars", "double bass drums", "bass"],
+    "vocal_profile": "male growl/scream",
+    "tags": ["Era:1980s", "Voice:growl", "Mix:wall-of-sound"],
+    "negative_tags": ["soft", "clean"]
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "3rd",
+    "tense": "present",
+    "themes": ["war", "chaos", "destruction"],
+    "rhyme_scheme": "AABB",
+    "meter": "fast",
+    "syllables_per_line": 6,
+    "hook_strategy": "chant",
+    "repetition_policy": "moderate",
+    "section_order": ["Intro", "Verse", "Chorus", "Verse", "Chorus", "Guitar Solo", "Bridge", "Chorus"],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 60,
+      "section_requirements": {}
+    },
+    "source_citations": []
+  },
+  "producer_notes": {
+    "structure": "",
+    "hooks": 1,
+    "instrumentation": ["distorted guitars", "double bass drums"],
+    "section_meta": {
+      "Guitar Solo": {
+        "tags": ["shred", "fast"],
+        "target_duration_sec": 25
+      }
+    },
+    "mix": {
+      "lufs": -8.0,
+      "space": "wall-of-sound",
+      "stereo_width": "wide"
+    }
+  },
+  "prompt_controls": {
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  }
+}

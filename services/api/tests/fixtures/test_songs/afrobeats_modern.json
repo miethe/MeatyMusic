@@ -1,0 +1,62 @@
+{
+  "title": "Test Afrobeats Modern",
+  "blueprint_ref": {
+    "genre": "Afrobeats",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "Afrobeats",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 105,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "F# minor",
+      "modulations": []
+    },
+    "mood": ["groovy", "uplifting", "party"],
+    "energy": "high",
+    "instrumentation": ["log drums", "shakers", "bass"],
+    "vocal_profile": "male lead, smooth",
+    "tags": ["Era:2020s", "Rhythm:afrobeats-pattern"],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "present",
+    "themes": ["love", "celebration", "dance"],
+    "rhyme_scheme": "ABAB",
+    "meter": "syncopated",
+    "syllables_per_line": 9,
+    "hook_strategy": "melodic",
+    "repetition_policy": "moderate",
+    "section_order": ["Intro", "Verse", "Chorus", "Verse", "Chorus", "Bridge", "Chorus", "Outro"],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 65,
+      "section_requirements": {}
+    },
+    "source_citations": []
+  },
+  "producer_notes": {
+    "structure": "",
+    "hooks": 1,
+    "instrumentation": ["log drums", "shakers"],
+    "section_meta": {},
+    "mix": {
+      "lufs": -11.0,
+      "space": "normal",
+      "stereo_width": "wide"
+    }
+  },
+  "prompt_controls": {
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  }
+}

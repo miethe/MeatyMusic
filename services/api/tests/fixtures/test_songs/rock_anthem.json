@@ -1,0 +1,87 @@
+{
+  "title": "Test Rock Anthem",
+  "blueprint_ref": {
+    "genre": "Rock",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "Rock",
+      "subgenres": ["Arena Rock"],
+      "fusions": []
+    },
+    "tempo_bpm": 120,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "E major",
+      "modulations": [
+        {
+          "at_section": "Bridge",
+          "to_key": "F# major"
+        }
+      ]
+    },
+    "mood": ["powerful", "rebellious"],
+    "energy": "anthemic",
+    "instrumentation": ["electric guitar", "bass", "drums"],
+    "vocal_profile": "male lead, powerful belt",
+    "tags": ["Era:1980s", "Voice:anthemic", "Mix:stadium-reverb"],
+    "negative_tags": ["soft", "acoustic"]
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st-plural",
+    "tense": "present",
+    "themes": ["rebellion", "unity", "freedom"],
+    "rhyme_scheme": "ABAB",
+    "meter": "4/4",
+    "syllables_per_line": 8,
+    "hook_strategy": "melodic",
+    "repetition_policy": "hook-heavy",
+    "section_order": ["Intro", "Verse", "PreChorus", "Chorus", "Verse", "PreChorus", "Chorus", "Bridge", "Guitar Solo", "Chorus", "Outro"],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 80,
+      "section_requirements": {
+        "Chorus": {
+          "min_lines": 6,
+          "max_lines": 10,
+          "must_end_with_hook": true
+        },
+        "Bridge": {
+          "min_lines": 4,
+          "max_lines": 8,
+          "must_end_with_hook": false
+        }
+      }
+    },
+    "source_citations": []
+  },
+  "producer_notes": {
+    "structure": "",
+    "hooks": 2,
+    "instrumentation": ["electric guitar", "drums"],
+    "section_meta": {
+      "Guitar Solo": {
+        "tags": ["instrumental", "shred"],
+        "target_duration_sec": 20
+      },
+      "Bridge": {
+        "tags": ["breakdown", "quiet-to-loud"],
+        "target_duration_sec": 30
+      }
+    },
+    "mix": {
+      "lufs": -11.0,
+      "space": "stadium-reverb",
+      "stereo_width": "wide"
+    }
+  },
+  "prompt_controls": {
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "title": "Test Pop Upbeat",
+  "blueprint_ref": {
+    "genre": "Pop",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "Pop",
+      "subgenres": ["Dance Pop"],
+      "fusions": []
+    },
+    "tempo_bpm": 128,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "C major",
+      "modulations": []
+    },
+    "mood": ["happy", "energetic"],
+    "energy": "high",
+    "instrumentation": ["synth", "drums", "bass"],
+    "vocal_profile": "female lead, bright",
+    "tags": ["Era:2010s", "Mix:modern-bright"],
+    "negative_tags": ["muddy"]
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "present",
+    "themes": ["love", "joy", "celebration"],
+    "rhyme_scheme": "ABAB",
+    "meter": "4/4",
+    "syllables_per_line": 8,
+    "hook_strategy": "lyrical",
+    "repetition_policy": "hook-heavy",
+    "section_order": ["Verse", "Chorus", "Verse", "Chorus"],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 40,
+      "section_requirements": {
+        "Chorus": {
+          "min_lines": 6,
+          "max_lines": 10,
+          "must_end_with_hook": true
+        }
+      }
+    },
+    "source_citations": []
+  },
+  "producer_notes": {
+    "structure": "",
+    "hooks": 2,
+    "instrumentation": ["synth"],
+    "section_meta": {},
+    "mix": {
+      "lufs": -12.0,
+      "space": "normal",
+      "stereo_width": "wide"
+    }
+  },
+  "prompt_controls": {
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  }
+}

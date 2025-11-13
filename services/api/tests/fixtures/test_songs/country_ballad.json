@@ -1,0 +1,78 @@
+{
+  "title": "Test Country Ballad",
+  "blueprint_ref": {
+    "genre": "Country",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "Country",
+      "subgenres": ["Contemporary Country"],
+      "fusions": []
+    },
+    "tempo_bpm": 72,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "G major",
+      "modulations": []
+    },
+    "mood": ["melancholic", "nostalgic"],
+    "energy": "low",
+    "instrumentation": ["acoustic guitar", "steel guitar", "fiddle"],
+    "vocal_profile": "male lead, warm",
+    "tags": ["Era:2020s", "Voice:storytelling"],
+    "negative_tags": ["electronic"]
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "past",
+    "themes": ["heartbreak", "memories", "home"],
+    "rhyme_scheme": "AABB",
+    "meter": "4/4",
+    "syllables_per_line": 10,
+    "hook_strategy": "lyrical",
+    "repetition_policy": "moderate",
+    "section_order": ["Verse", "Chorus", "Verse", "Chorus", "Bridge", "Chorus"],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 60,
+      "section_requirements": {
+        "Chorus": {
+          "min_lines": 4,
+          "max_lines": 8,
+          "must_end_with_hook": true
+        },
+        "Bridge": {
+          "min_lines": 4,
+          "max_lines": 8,
+          "must_end_with_hook": false
+        }
+      }
+    },
+    "source_citations": []
+  },
+  "producer_notes": {
+    "structure": "",
+    "hooks": 1,
+    "instrumentation": ["steel guitar"],
+    "section_meta": {
+      "Bridge": {
+        "tags": ["instrumental-swell"],
+        "target_duration_sec": 30
+      }
+    },
+    "mix": {
+      "lufs": -14.0,
+      "space": "spacious",
+      "stereo_width": "normal"
+    }
+  },
+  "prompt_controls": {
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  }
+}

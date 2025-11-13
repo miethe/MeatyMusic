@@ -1,0 +1,73 @@
+{
+  "title": "Test Pop Punk Fast",
+  "blueprint_ref": {
+    "genre": "Pop Punk",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "Pop Punk",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 180,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "D major",
+      "modulations": []
+    },
+    "mood": ["energetic", "rebellious", "fun"],
+    "energy": "very-high",
+    "instrumentation": ["power chords", "fast drums", "bass"],
+    "vocal_profile": "male lead, shouty",
+    "tags": ["Era:2000s", "Voice:shouting", "Rhythm:double-time"],
+    "negative_tags": ["slow", "soft"]
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "present",
+    "themes": ["youth", "rebellion", "friendship"],
+    "rhyme_scheme": "AABB",
+    "meter": "fast-paced",
+    "syllables_per_line": 6,
+    "hook_strategy": "chant",
+    "repetition_policy": "hook-heavy",
+    "section_order": ["Intro", "Verse", "Chorus", "Verse", "Chorus", "Bridge", "Chorus"],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 50,
+      "section_requirements": {
+        "Chorus": {
+          "min_lines": 4,
+          "max_lines": 8,
+          "must_end_with_hook": true
+        }
+      }
+    },
+    "source_citations": []
+  },
+  "producer_notes": {
+    "structure": "",
+    "hooks": 2,
+    "instrumentation": ["power chords", "fast drums"],
+    "section_meta": {
+      "Bridge": {
+        "tags": ["breakdown", "half-time"],
+        "target_duration_sec": 15
+      }
+    },
+    "mix": {
+      "lufs": -10.0,
+      "space": "tight",
+      "stereo_width": "normal"
+    }
+  },
+  "prompt_controls": {
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  }
+}

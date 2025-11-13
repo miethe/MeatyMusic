@@ -1,0 +1,73 @@
+{
+  "title": "Test Christmas Pop",
+  "blueprint_ref": {
+    "genre": "Christmas Pop",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "Christmas Pop",
+      "subgenres": ["Big Band Pop"],
+      "fusions": ["Electro Swing"]
+    },
+    "tempo_bpm": 120,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "C major",
+      "modulations": []
+    },
+    "mood": ["upbeat", "festive", "warm"],
+    "energy": "anthemic",
+    "instrumentation": ["brass", "upright bass", "sleigh bells"],
+    "vocal_profile": "male/female duet",
+    "tags": ["Era:2010s", "Rhythm:four-on-the-floor", "Mix:modern-bright"],
+    "negative_tags": ["muddy"]
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "present",
+    "themes": ["holiday hustle", "family time", "Christmas joy"],
+    "rhyme_scheme": "AABB",
+    "meter": "4/4",
+    "syllables_per_line": 8,
+    "hook_strategy": "chant",
+    "repetition_policy": "hook-heavy",
+    "section_order": ["Intro", "Verse", "PreChorus", "Chorus", "Verse", "PreChorus", "Chorus", "Bridge", "Chorus"],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 80,
+      "section_requirements": {
+        "Chorus": {
+          "min_lines": 6,
+          "max_lines": 10,
+          "must_end_with_hook": true
+        }
+      }
+    },
+    "source_citations": []
+  },
+  "producer_notes": {
+    "structure": "",
+    "hooks": 2,
+    "instrumentation": ["sleigh bells", "brass"],
+    "section_meta": {
+      "Chorus": {
+        "tags": ["crowd-chant"],
+        "target_duration_sec": 25
+      }
+    },
+    "mix": {
+      "lufs": -12.0,
+      "space": "lush",
+      "stereo_width": "wide"
+    }
+  },
+  "prompt_controls": {
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  }
+}
