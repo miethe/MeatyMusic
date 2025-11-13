@@ -7,7 +7,7 @@
  */
 
 import type { ISODateTime, UUID } from './entities';
-import type { WorkflowNode } from './workflows';
+import { WorkflowNode } from './workflows';
 
 /**
  * Event Phase
