@@ -73,7 +73,7 @@ interface WorkflowActions {
   updateNodeStatus: (
     runId: string,
     nodeId: WorkflowNode,
-    status: Partial<WorkflowRunState['nodes'] extends Map<infer K, infer V> ? V : never>
+    status: Partial<WorkflowRunState['nodes'] extends Map<any, infer V> ? V : never>
   ) => void;
   addEvent: (runId: string, event: WorkflowEvent) => void;
   clearRun: (runId: string) => void;
@@ -141,7 +141,7 @@ export const useWorkflowStore = create<WorkflowState & WorkflowActions>((set, ge
         newNodes.set(nodeId, {
           ...existingNode,
           ...status,
-        } as WorkflowRunState['nodes'] extends Map<infer K, infer V> ? V : never);
+        } as WorkflowRunState['nodes'] extends Map<any, infer V> ? V : never);
         newRuns.set(runId, {
           ...run,
           nodes: newNodes,
