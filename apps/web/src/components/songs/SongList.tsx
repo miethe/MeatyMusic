@@ -10,6 +10,7 @@ import * as React from 'react';
 import { SongCard, type EntitySummary, type WorkflowState } from './SongCard';
 import { EmptyState } from '@meatymusic/ui';
 import { Skeleton } from '@meatymusic/ui';
+import { Search, Music2, AlertCircle } from 'lucide-react';
 import type { Song, SongStatus } from '@/types/api';
 
 export interface SongFilters {
@@ -99,7 +100,7 @@ const SongListEmptyState: React.FC<{ filters?: SongFilters }> = ({ filters }) =>
       <EmptyState
         title="No songs match your filters"
         description="Try adjusting your filters or clearing them to see more results"
-        icon="search"
+        icon={Search}
       />
     );
   }
@@ -108,7 +109,7 @@ const SongListEmptyState: React.FC<{ filters?: SongFilters }> = ({ filters }) =>
     <EmptyState
       title="No songs yet"
       description="Create your first song to get started with the Agentic Music Creation System"
-      icon="music"
+      icon={Music2}
       action={{
         label: 'Create Song',
         onClick: () => {
@@ -163,13 +164,13 @@ export const SongList: React.FC<SongListProps> = ({
     const target = observerTarget.current;
     if (target) {
       observer.observe(target);
+
+      return () => {
+        observer.unobserve(target);
+      };
     }
 
-    return () => {
-      if (target) {
-        observer.unobserve(target);
-      }
-    };
+    return undefined;
   }, [onLoadMore, hasMore, isLoading]);
 
   // Loading state
@@ -183,7 +184,7 @@ export const SongList: React.FC<SongListProps> = ({
       <EmptyState
         title="Error loading songs"
         description={error.message || 'An unexpected error occurred'}
-        icon="error"
+        icon={AlertCircle}
       />
     );
   }

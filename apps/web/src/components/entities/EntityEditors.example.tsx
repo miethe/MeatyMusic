@@ -21,6 +21,7 @@ import type {
   SongCreate,
   BlueprintCreate,
 } from '@/types/api/entities';
+import { POV, PersonaKind, SongStatus } from '@/types/api/entities';
 
 // Example 1: StyleEditor - Creating a new pop style
 function StyleEditorExample() {
@@ -69,7 +70,7 @@ function LyricsEditorExample() {
       songId={songId}
       initialValue={{
         rhyme_scheme: 'ABAB',
-        pov: 'first-person',
+        pov: POV.FIRST_PERSON,
         themes: ['love', 'hope'],
       }}
       onSave={handleSave}
@@ -94,7 +95,7 @@ function PersonaEditorExample() {
     <PersonaEditor
       initialValue={{
         name: 'Soulful Storyteller',
-        kind: 'artist',
+        kind: PersonaKind.ARTIST,
         vocal_range: 'tenor',
         delivery: ['smooth', 'melodic'],
       }}
@@ -151,7 +152,7 @@ function SongEditorExample() {
     <SongEditor
       initialValue={{
         title: 'Holiday Hustle',
-        status: 'draft',
+        status: SongStatus.DRAFT,
         global_seed: 42,
       }}
       onSave={handleSave}
@@ -299,12 +300,13 @@ import {
   SectionEditor,
   RhymeSchemeInput,
   EntityPreviewPanel,
+  type Section,
 } from './index';
 
 function CommonComponentsExample() {
   const [moods, setMoods] = useState<string[]>(['upbeat', 'energetic']);
   const [tempo, setTempo] = useState<[number, number]>([120, 140]);
-  const [sections, setSections] = useState([
+  const [sections, setSections] = useState<Section[]>([
     { id: '1', type: 'verse', duration: 30 },
     { id: '2', type: 'chorus', duration: 25 },
   ]);

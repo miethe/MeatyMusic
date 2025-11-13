@@ -275,7 +275,7 @@ const SongCardActions: React.FC<{
   onEdit?: () => void;
   onClone?: () => void;
   onDelete?: () => void;
-}> = ({ onViewWorkflow, onEdit, onClone, onDelete }) => {
+}> = ({ onViewWorkflow, onEdit, onClone, onDelete: _onDelete }) => {
   return (
     <div className="flex items-center gap-2 pt-3 border-t border-border/10">
       {onViewWorkflow && (
@@ -361,12 +361,11 @@ export const SongCard = React.forwardRef<HTMLDivElement, SongCardProps>(
     const derivedState = state || (workflowStatus ? workflowStatus.toLowerCase() as any : 'default');
 
     return (
-      <Card
-        ref={ref}
-        className={cn(songCardVariants({ size, state: derivedState }), className)}
-        onClick={handleCardClick}
-        {...props}
-      >
+      <div ref={ref} {...props}>
+        <Card
+          className={cn(songCardVariants({ size, state: derivedState }), className)}
+          onClick={handleCardClick}
+        >
         <SongCardHeader
           title={song.title}
           genre={genre}
@@ -391,6 +390,7 @@ export const SongCard = React.forwardRef<HTMLDivElement, SongCardProps>(
           onDelete={onDelete}
         />
       </Card>
+      </div>
     );
   }
 );

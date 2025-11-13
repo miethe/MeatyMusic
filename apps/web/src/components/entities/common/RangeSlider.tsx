@@ -89,6 +89,7 @@ export function RangeSlider({
         document.removeEventListener('mouseup', handleMouseUp);
       };
     }
+    return undefined;
   }, [isDragging, value]);
 
   const toggleRangeMode = () => {

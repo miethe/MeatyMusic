@@ -185,12 +185,13 @@ function NavItem({ item, pathname }: NavItemProps) {
   }
 
   const Icon = getIcon(item.icon);
-  const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+  const href = 'href' in item ? item.href : '#';
+  const isActive = 'href' in item && (pathname === item.href || pathname.startsWith(`${item.href}/`));
 
   return (
     <li>
       <Link
-        href={item.href}
+        href={href}
         className={cn(
           'flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors',
           isActive

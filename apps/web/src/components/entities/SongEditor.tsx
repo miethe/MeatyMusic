@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { SongBase, SongCreate, SongStatus } from '@/types/api/entities';
-import { ChipSelector } from './common/ChipSelector';
 import { EntityPreviewPanel, ValidationError } from './common/EntityPreviewPanel';
 import { Save, X } from 'lucide-react';
 

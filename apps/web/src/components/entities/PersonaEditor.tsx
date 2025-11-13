@@ -252,8 +252,8 @@ export function PersonaEditor({
                 checked={formData.policy?.public_release || false}
                 onChange={(e) =>
                   updateField('policy', {
-                    ...formData.policy,
                     public_release: e.target.checked,
+                    disallow_named_style_of: formData.policy?.disallow_named_style_of ?? true,
                   })
                 }
                 className="w-4 h-4 rounded border-border-secondary text-accent-primary focus:ring-2 focus:ring-border-focus"
@@ -273,7 +273,7 @@ export function PersonaEditor({
                 checked={formData.policy?.disallow_named_style_of ?? true}
                 onChange={(e) =>
                   updateField('policy', {
-                    ...formData.policy,
+                    public_release: formData.policy?.public_release ?? false,
                     disallow_named_style_of: e.target.checked,
                   })
                 }

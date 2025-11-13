@@ -9,15 +9,14 @@ import * as React from 'react';
 import Link from 'next/link';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@meatymusic/ui';
-import { SongList } from '@/components/songs/SongList';
+import { SongList, type SongFilters } from '@/components/songs/SongList';
 import { Plus, Filter } from 'lucide-react';
 import { ROUTES } from '@/config/routes';
 
 export default function SongsPage() {
-  const [filters, setFilters] = React.useState({
-    search: '',
-    status: '',
-    genre: '',
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const [filters, setFilters] = React.useState<SongFilters>({
+    q: '',
   });
 
   return (
@@ -43,8 +42,11 @@ export default function SongsPage() {
               type="search"
               placeholder="Search songs..."
               className="w-full px-4 py-2 rounded-lg border bg-background"
-              value={filters.search}
-              onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setFilters({ ...filters, q: e.target.value });
+              }}
             />
           </div>
           <Button variant="outline">
@@ -54,7 +56,7 @@ export default function SongsPage() {
         </div>
 
         {/* Song List */}
-        <SongList filters={filters} />
+        <SongList songs={[]} filters={filters} />
       </div>
     </div>
   );

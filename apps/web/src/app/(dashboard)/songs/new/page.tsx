@@ -125,7 +125,7 @@ export default function NewSongPage() {
 
         {/* Step Content */}
         <Card className="p-8 mb-6">
-          <h2 className="text-2xl font-semibold mb-6">{currentStepConfig.label}</h2>
+          <h2 className="text-2xl font-semibold mb-6">{currentStepConfig?.label}</h2>
 
           {currentStep === 0 && (
             <SongInfoStep formData={formData} setFormData={setFormData} />

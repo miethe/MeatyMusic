@@ -79,9 +79,10 @@ export function SectionEditor({
 
     const reordered = [...sections];
     const [removed] = reordered.splice(draggedIndex, 1);
-    reordered.splice(dropIndex, 0, removed);
-
-    onChange(reordered);
+    if (removed) {
+      reordered.splice(dropIndex, 0, removed);
+      onChange(reordered);
+    }
     setDraggedIndex(null);
     setDragOverIndex(null);
   };

@@ -49,7 +49,7 @@ export default function SongWorkflowPage() {
             status="running"
             currentNode="LYRICS"
             progress={33}
-            startedAt={new Date(Date.now() - 60000)}
+            durationMs={60000}
           />
         </div>
 

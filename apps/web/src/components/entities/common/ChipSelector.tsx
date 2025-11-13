@@ -73,11 +73,14 @@ export function ChipSelector({
       e.preventDefault();
       addChip(inputValue);
     } else if (e.key === 'Backspace' && !inputValue && value.length > 0) {
-      removeChip(value[value.length - 1]);
+      const lastChip = value[value.length - 1];
+      if (lastChip) {
+        removeChip(lastChip);
+      }
     }
   };
 
-  const showMaxChipWarning = maxChips && value.length >= maxChips;
+  const showMaxChipWarning = Boolean(maxChips && value.length >= maxChips);
   const statusColor = error
     ? 'border-accent-error'
     : warning || showMaxChipWarning

@@ -10,7 +10,6 @@ import Link from 'next/link';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@meatymusic/ui';
 import { Card } from '@meatymusic/ui';
-import { Badge } from '@meatymusic/ui';
 import {
   Music2,
   Plus,

@@ -55,7 +55,7 @@ export function RhymeSchemeInput({
   const getColorForLetter = (letter: string, letters: string[]): string => {
     const uniqueLetters = Array.from(new Set(letters));
     const index = uniqueLetters.indexOf(letter);
-    return RHYME_COLORS[index % RHYME_COLORS.length];
+    return RHYME_COLORS[index % RHYME_COLORS.length] || RHYME_COLORS[0] || '';
   };
 
   const visualizeScheme = (scheme: string): JSX.Element[] => {
@@ -74,8 +74,9 @@ export function RhymeSchemeInput({
 
     letters.forEach((letter, index) => {
       const color = getColorForLetter(letter, letters);
+      const letterGroup = lineGroups[letter];
       const isLastInGroup =
-        lineGroups[letter][lineGroups[letter].length - 1] === index;
+        letterGroup && letterGroup[letterGroup.length - 1] === index;
 
       elements.push(
         <div
@@ -88,7 +89,7 @@ export function RhymeSchemeInput({
             {letter}
           </span>
           <span className="text-sm text-text-secondary">Line {index + 1}</span>
-          {lineGroups[letter].length > 1 && !isLastInGroup && (
+          {letterGroup && letterGroup.length > 1 && !isLastInGroup && (
             <svg
               width="2"
               height="32"
@@ -102,7 +103,7 @@ export function RhymeSchemeInput({
                 y2="32"
                 stroke="currentColor"
                 strokeWidth="2"
-                className={color.split(' ')[1].replace('border-', 'text-')}
+                className={color.split(' ')[1]?.replace('border-', 'text-') || ''}
               />
             </svg>
           )}

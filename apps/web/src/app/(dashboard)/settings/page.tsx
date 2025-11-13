@@ -9,7 +9,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { Card } from '@meatymusic/ui';
 import { Button } from '@meatymusic/ui';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@meatymusic/ui';
-import { User, Bell, Key, Shield } from 'lucide-react';
+import { User } from 'lucide-react';
 
 export default function SettingsPage() {
   return (

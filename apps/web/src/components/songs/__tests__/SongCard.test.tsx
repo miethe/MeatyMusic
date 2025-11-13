@@ -3,8 +3,8 @@
  * Basic rendering tests for SongCard component
  */
 
-import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { SongCard } from '../SongCard';
 import type { Song } from '@/types/api';
 import { SongStatus } from '@/types/api';
