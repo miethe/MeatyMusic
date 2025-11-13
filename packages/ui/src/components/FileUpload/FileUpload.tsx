@@ -174,7 +174,7 @@ const FileUpload = React.forwardRef<HTMLDivElement, FileUploadProps>(
         if (multiple) {
           onFilesSelected([...value, ...validFiles].slice(0, maxFiles));
         } else {
-          onFilesSelected([validFiles[0]]);
+          onFilesSelected([validFiles[0]!]);
         }
       }
     };

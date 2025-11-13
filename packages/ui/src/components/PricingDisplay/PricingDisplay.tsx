@@ -199,7 +199,7 @@ export const PricingDisplay = React.forwardRef<
 
     // Calculate price difference if comparison provided
     const priceDifference =
-      comparisonPricing?.cost_per_token && primaryTier.cost_per_token
+      comparisonPricing?.cost_per_token && primaryTier?.cost_per_token
         ? ((primaryTier.cost_per_token - comparisonPricing.cost_per_token) /
             comparisonPricing.cost_per_token) *
           100
@@ -212,11 +212,11 @@ export const PricingDisplay = React.forwardRef<
         {...props}
       >
         {tiersToDisplay.map((tier, index) => (
-          <Card key={tier.id} className="p-4 space-y-3">
+          <Card key={tier?.id} className="p-4 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
-                <span className="font-semibold">{tier.pricing_tier}</span>
+                <span className="font-semibold">{tier?.pricing_tier}</span>
               </div>
               {index === 0 && pricing.length > 1 && (
                 <Badge variant="outline" className="text-xs">
@@ -229,16 +229,16 @@ export const PricingDisplay = React.forwardRef<
               <div>
                 <span className="text-muted-foreground">Per 1K tokens:</span>
                 <p className="font-medium">
-                  {tier.currency}
-                  {formatCostPer1K(tier.cost_per_token)}
+                  {tier?.currency}
+                  {formatCostPer1K(tier?.cost_per_token)}
                 </p>
               </div>
-              {tier.cost_per_request != null && (
+              {tier?.cost_per_request != null && (
                 <div>
                   <span className="text-muted-foreground">Per request:</span>
                   <p className="font-medium">
-                    {tier.currency}
-                    {tier.cost_per_request.toFixed(4)}
+                    {tier?.currency}
+                    {tier?.cost_per_request.toFixed(4)}
                   </p>
                 </div>
               )}
@@ -251,7 +251,7 @@ export const PricingDisplay = React.forwardRef<
                     <TrendingUp className="h-3 w-3 text-danger" />
                     <span className="text-danger">
                       {priceDifference.toFixed(1)}% more than{' '}
-                      {comparisonPricing.label || 'comparison'}
+                      {comparisonPricing?.label || 'comparison'}
                     </span>
                   </>
                 ) : (
@@ -259,14 +259,14 @@ export const PricingDisplay = React.forwardRef<
                     <TrendingDown className="h-3 w-3 text-success" />
                     <span className="text-success">
                       {Math.abs(priceDifference).toFixed(1)}% less than{' '}
-                      {comparisonPricing.label || 'comparison'}
+                      {comparisonPricing?.label || 'comparison'}
                     </span>
                   </>
                 )}
               </div>
             )}
 
-            {tier.effective_date && (
+            {tier?.effective_date && (
               <p className="text-xs text-muted-foreground">
                 Effective: {new Date(tier.effective_date).toLocaleDateString()}
               </p>
@@ -282,8 +282,8 @@ export const PricingDisplay = React.forwardRef<
 
         {showCalculator && (
           <CostCalculator
-            costPerToken={primaryTier.cost_per_token}
-            currency={primaryTier.currency}
+            costPerToken={primaryTier?.cost_per_token}
+            currency={primaryTier?.currency ?? 'USD'}
           />
         )}
       </div>

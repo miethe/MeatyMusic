@@ -73,7 +73,7 @@ export const Slider: React.FC<SliderProps> = ({
       onChange={handleSingleChange}
       className={`w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer ${className}`}
       style={{
-        background: `linear-gradient(to right, #3B82F6 0%, #3B82F6 ${((normalizedValue[0] - min) / (max - min)) * 100}%, #E5E7EB ${((normalizedValue[0] - min) / (max - min)) * 100}%, #E5E7EB 100%)`
+        background: `linear-gradient(to right, #3B82F6 0%, #3B82F6 ${(((normalizedValue[0] ?? min) - min) / (max - min)) * 100}%, #E5E7EB ${(((normalizedValue[0] ?? min) - min) / (max - min)) * 100}%, #E5E7EB 100%)`
       }}
     />
   );

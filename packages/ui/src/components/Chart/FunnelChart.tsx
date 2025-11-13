@@ -146,7 +146,7 @@ const FunnelChart = React.forwardRef<HTMLDivElement, FunnelChartProps>(
                 </span>
                 <span className="font-medium">
                   {data.length > 0 && (
-                    `${((data[data.length - 1].count / data[0].count) * 100).toFixed(2)}%`
+                    `${(((data[data.length - 1]?.count ?? 0) / (data[0]?.count ?? 1)) * 100).toFixed(2)}%`
                   )}
                 </span>
               </div>

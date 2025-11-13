@@ -103,6 +103,7 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(
         }, transitionDuration);
         return () => clearTimeout(timer);
       }
+      return undefined;
     }, [isTransitioning, transitionDuration]);
 
     const handleToggle = () => {

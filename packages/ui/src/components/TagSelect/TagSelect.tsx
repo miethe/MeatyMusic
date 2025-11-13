@@ -106,13 +106,16 @@ const TagSelect = React.forwardRef<HTMLDivElement, TagSelectProps>(
       if (e.key === "Enter") {
         e.preventDefault();
 
-        if (filteredOptions.length > 0) {
+        if (filteredOptions.length > 0 && filteredOptions[0]) {
           handleAddTag(filteredOptions[0]);
         } else if (canAddNewTag) {
           handleCreateTag();
         }
       } else if (e.key === "Backspace" && !inputValue && value.length > 0) {
-        handleRemoveTag(value[value.length - 1]);
+        const lastTag = value[value.length - 1];
+        if (lastTag) {
+          handleRemoveTag(lastTag);
+        }
       } else if (e.key === "Escape") {
         setIsOpen(false);
         inputRef.current?.blur();
