@@ -14,6 +14,8 @@ from app.skills import (
     evaluate_artifacts,
     apply_fixes,
 )
+from app.skills.render import submit_render
+from app.skills.review import finalize_run
 
 
 def register_all_skills(orchestrator: WorkflowOrchestrator) -> None:
@@ -33,6 +35,6 @@ def register_all_skills(orchestrator: WorkflowOrchestrator) -> None:
     orchestrator.register_skill("VALIDATE", evaluate_artifacts)
     orchestrator.register_skill("FIX", apply_fixes)
 
-    # TODO: Register additional skills when implemented:
-    # - RENDER: submit to render engines
-    # - REVIEW: finalize and emit events
+    # Register render and review skills
+    orchestrator.register_skill("RENDER", submit_render)
+    orchestrator.register_skill("REVIEW", finalize_run)
