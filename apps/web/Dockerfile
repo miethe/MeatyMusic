@@ -49,7 +49,14 @@ ENV NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
-# Build the application
+# Build workspace packages first (ui, tokens, etc.)
+# Must build in order due to dependencies: tokens -> ui, store, api
+RUN pnpm --filter "@meatymusic/tokens" build && \
+    pnpm --filter "@meatymusic/ui" build && \
+    pnpm --filter "@meatymusic/store" build && \
+    pnpm --filter "@meatymusic/api" build
+
+# Build the Next.js application
 WORKDIR /app/apps/web
 RUN pnpm build
 
