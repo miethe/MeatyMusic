@@ -206,8 +206,13 @@ export const WorkflowGraph: React.FC<WorkflowGraphProps> = ({
 
   // Determine connection line status
   const getConnectionStatus = (fromIndex: number): 'pending' | 'active' | 'complete' => {
-    const fromNode = getNodeState(WORKFLOW_NODES[fromIndex]);
-    const toNode = getNodeState(WORKFLOW_NODES[fromIndex + 1]);
+    const fromNodeId = WORKFLOW_NODES[fromIndex];
+    const toNodeId = WORKFLOW_NODES[fromIndex + 1];
+
+    if (!fromNodeId || !toNodeId) return 'pending';
+
+    const fromNode = getNodeState(fromNodeId);
+    const toNode = getNodeState(toNodeId);
 
     if (fromNode.status === 'success') {
       if (toNode.status === 'running') return 'active';
