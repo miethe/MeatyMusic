@@ -12,7 +12,7 @@ import type { LyricsFilters } from '@/lib/api/lyrics';
 
 export function useLyricsList(filters?: LyricsFilters) {
   return useQuery({
-    queryKey: queryKeys.lyrics.list(filters),
+    queryKey: queryKeys.lyrics.list(filters as Record<string, unknown> | undefined),
     queryFn: () => lyricsApi.list(filters),
     staleTime: getStaleTime('ENTITIES'),
   });

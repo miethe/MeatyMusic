@@ -18,7 +18,7 @@ import type { WorkflowRunFilters } from '@/lib/api/workflows';
  */
 export function useWorkflowRuns(filters?: WorkflowRunFilters) {
   return useQuery({
-    queryKey: queryKeys.workflows.list(filters),
+    queryKey: queryKeys.workflows.list(filters as Record<string, unknown> | undefined),
     queryFn: () => workflowsApi.list(filters),
     staleTime: getStaleTime('WORKFLOWS_INACTIVE'),
   });

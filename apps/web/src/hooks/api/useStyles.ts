@@ -12,7 +12,7 @@ import type { StyleFilters } from '@/lib/api/styles';
 
 export function useStyles(filters?: StyleFilters) {
   return useQuery({
-    queryKey: queryKeys.styles.list(filters),
+    queryKey: queryKeys.styles.list(filters as Record<string, unknown> | undefined),
     queryFn: () => stylesApi.list(filters),
     staleTime: getStaleTime('ENTITIES'),
   });

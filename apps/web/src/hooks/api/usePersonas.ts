@@ -12,7 +12,7 @@ import type { PersonaFilters } from '@/lib/api/personas';
 
 export function usePersonas(filters?: PersonaFilters) {
   return useQuery({
-    queryKey: queryKeys.personas.list(filters),
+    queryKey: queryKeys.personas.list(filters as Record<string, unknown> | undefined),
     queryFn: () => personasApi.list(filters),
     staleTime: getStaleTime('ENTITIES'),
   });

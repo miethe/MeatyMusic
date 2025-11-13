@@ -17,7 +17,7 @@ import type { SongFilters } from '@/lib/api/songs';
  */
 export function useSongs(filters?: SongFilters) {
   return useQuery({
-    queryKey: queryKeys.songs.list(filters),
+    queryKey: queryKeys.songs.list(filters as Record<string, unknown> | undefined),
     queryFn: () => songsApi.list(filters),
     staleTime: getStaleTime('SONGS'),
   });
