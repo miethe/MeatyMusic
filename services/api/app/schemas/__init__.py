@@ -71,6 +71,9 @@ from app.schemas.song import (
 
 # Source schemas
 from app.schemas.source import (
+    Chunk,
+    ChunkWithHash,
+    MCPServerInfo,
     SourceBase,
     SourceCreate,
     SourceKind,
@@ -136,6 +139,9 @@ __all__ = [
     "WorkflowRunStatus",
     "WorkflowRunUpdate",
     # Source
+    "Chunk",
+    "ChunkWithHash",
+    "MCPServerInfo",
     "SourceBase",
     "SourceCreate",
     "SourceKind",
