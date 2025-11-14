@@ -22,7 +22,7 @@ from app.repositories.node_execution_repo import NodeExecutionRepository
 from app.repositories.workflow_event_repo import WorkflowEventRepository
 from app.repositories.workflow_run_repo import WorkflowRunRepository
 from app.schemas import ErrorResponse
-from app.services.workflow_service import WorkflowService
+from app.services import WorkflowService
 from app.workflows.events import get_event_publisher
 from sqlalchemy.orm import Session
 
