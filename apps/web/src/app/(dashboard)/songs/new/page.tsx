@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Card } from '@meatymusic/ui';
 import { Button } from '@meatymusic/ui';
+import { StyleEditor } from '@/components/entities/StyleEditor';
 import { ROUTES } from '@/config/routes';
 import { useCreateSong } from '@/hooks/api/useSongs';
 import { SongCreate, StyleCreate, LyricsCreate, PersonaCreate, ProducerNotesCreate } from '@/types/api/entities';
@@ -58,6 +59,8 @@ export default function NewSongPage() {
   const router = useRouter();
   const createSong = useCreateSong();
   const [currentStep, setCurrentStep] = React.useState(0);
+  const [completedSteps, setCompletedSteps] = React.useState<Set<number>>(new Set([0])); // Step 0 is always completed
+  const [skippedSteps, setSkippedSteps] = React.useState<Set<number>>(new Set());
   const [formData, setFormData] = React.useState<WizardFormData>({
     song: {
       title: '',
@@ -125,6 +128,30 @@ export default function NewSongPage() {
   }, []);
 
   /**
+   * Helper function to mark a step as completed
+   */
+  const markStepCompleted = React.useCallback((stepIndex: number) => {
+    setCompletedSteps((prev) => new Set([...prev, stepIndex]));
+    setSkippedSteps((prev) => {
+      const next = new Set(prev);
+      next.delete(stepIndex);
+      return next;
+    });
+  }, []);
+
+  /**
+   * Helper function to mark a step as skipped
+   */
+  const markStepSkipped = React.useCallback((stepIndex: number) => {
+    setSkippedSteps((prev) => new Set([...prev, stepIndex]));
+    setCompletedSteps((prev) => {
+      const next = new Set(prev);
+      next.delete(stepIndex);
+      return next;
+    });
+  }, []);
+
+  /**
    * Validation logic to determine if user can progress to next step
    * Step 0: Require title
    * Steps 1-4: Optional (always allow progression)
@@ -140,6 +167,7 @@ export default function NewSongPage() {
   }, [currentStep, formData.song.title]);
 
   const handleNext = () => {
+    markStepCompleted(currentStep);
     if (currentStep < WIZARD_STEPS.length - 1) {
       setCurrentStep(currentStep + 1);
     }
@@ -148,6 +176,28 @@ export default function NewSongPage() {
   const handlePrevious = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
+    }
+  };
+
+  /**
+   * Handler for StyleEditor save
+   */
+  const handleStyleSave = (style: StyleCreate) => {
+    updateStyleData(style);
+    markStepCompleted(currentStep);
+    if (currentStep < WIZARD_STEPS.length - 1) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  /**
+   * Handler for StyleEditor cancel/skip
+   */
+  const handleStyleCancel = () => {
+    updateStyleData(null);
+    markStepSkipped(currentStep);
+    if (currentStep < WIZARD_STEPS.length - 1) {
+      setCurrentStep(currentStep + 1);
     }
   };
 
@@ -192,7 +242,10 @@ export default function NewSongPage() {
             {WIZARD_STEPS.map((step, index) => {
               const Icon = step.icon;
               const isActive = index === currentStep;
-              const isComplete = index < currentStep;
+              const isCompleted = completedSteps.has(index);
+              const isSkipped = skippedSteps.has(index);
+              const isOptional = index > 0; // Steps 1-5 are optional
+              const isPending = !isActive && !isCompleted && !isSkipped;
 
               return (
                 <React.Fragment key={step.id}>
@@ -201,31 +254,47 @@ export default function NewSongPage() {
                       className={`w-14 h-14 rounded-full flex items-center justify-center mb-3 transition-all duration-ui ${
                         isActive
                           ? 'bg-primary shadow-lg text-primaryForeground scale-110'
-                          : isComplete
+                          : isCompleted
                             ? 'bg-success text-white'
-                            : 'bg-panel border-2 border-border text-text-muted'
+                            : isSkipped
+                              ? 'bg-warning/20 border-2 border-warning text-warning'
+                              : 'bg-panel border-2 border-border text-text-muted'
                       }`}
                     >
-                      {isComplete ? (
+                      {isCompleted ? (
                         <Check className="w-6 h-6" />
+                      ) : isSkipped ? (
+                        <span className="text-sm font-bold">⊘</span>
                       ) : (
                         <Icon className="w-6 h-6" />
                       )}
                     </div>
-                    <span
-                      className={`text-sm font-medium transition-colors duration-ui ${
-                        isActive
-                          ? 'text-text-strong'
-                          : 'text-text-muted'
-                      }`}
-                    >
-                      {step.label}
-                    </span>
+                    <div className="flex flex-col items-center gap-1">
+                      <span
+                        className={`text-sm font-medium transition-colors duration-ui ${
+                          isActive
+                            ? 'text-text-strong'
+                            : 'text-text-muted'
+                        }`}
+                      >
+                        {step.label}
+                      </span>
+                      {isOptional && !isCompleted && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-info/10 text-info font-medium">
+                          Optional
+                        </span>
+                      )}
+                      {isSkipped && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-warning/10 text-warning font-medium">
+                          Skipped
+                        </span>
+                      )}
+                    </div>
                   </div>
                   {index < WIZARD_STEPS.length - 1 && (
                     <div
                       className={`flex-1 h-1 mx-4 rounded transition-colors duration-ui ${
-                        isComplete ? 'bg-success' : 'bg-border'
+                        isCompleted ? 'bg-success' : isPending || isSkipped ? 'bg-border' : 'bg-border'
                       }`}
                     />
                   )}
@@ -236,63 +305,73 @@ export default function NewSongPage() {
         </div>
 
         {/* Step Content */}
-        <Card className="bg-surface border-border shadow-elev1 p-10 mb-6 animate-slide-up">
-          <h2 className="text-2xl font-semibold text-text-strong mb-8">{currentStepConfig?.label}</h2>
+        {currentStep === 1 ? (
+          <StyleEditor
+            initialValue={formData.style || undefined}
+            onSave={handleStyleSave}
+            onCancel={handleStyleCancel}
+            className="rounded-lg border border-border shadow-elev1 bg-surface"
+          />
+        ) : (
+          <Card className="bg-surface border-border shadow-elev1 p-10 mb-6 animate-slide-up">
+            <h2 className="text-2xl font-semibold text-text-strong mb-8">{currentStepConfig?.label}</h2>
 
-          {currentStep === 0 && (
-            <SongInfoStep formData={formData} updateSongData={updateSongData} />
-          )}
-          {currentStep === 1 && <div className="py-16 text-center text-text-muted">Style editor coming soon</div>}
-          {currentStep === 2 && <div className="py-16 text-center text-text-muted">Lyrics editor coming soon</div>}
-          {currentStep === 3 && <div className="py-16 text-center text-text-muted">Persona selector coming soon</div>}
-          {currentStep === 4 && <div className="py-16 text-center text-text-muted">Producer notes editor coming soon</div>}
-          {currentStep === 5 && <ReviewStep formData={formData} />}
-        </Card>
+            {currentStep === 0 && (
+              <SongInfoStep formData={formData} updateSongData={updateSongData} />
+            )}
+            {currentStep === 2 && <div className="py-16 text-center text-text-muted">Lyrics editor coming soon</div>}
+            {currentStep === 3 && <div className="py-16 text-center text-text-muted">Persona selector coming soon</div>}
+            {currentStep === 4 && <div className="py-16 text-center text-text-muted">Producer notes editor coming soon</div>}
+            {currentStep === 5 && <ReviewStep formData={formData} />}
+          </Card>
+        )}
 
         {/* Navigation */}
-        <div className="flex items-center justify-between">
-          <Button variant="outline" onClick={handleCancel} className="px-6 py-3">
-            Cancel
-          </Button>
+        {currentStep !== 1 && (
+          <div className="flex items-center justify-between">
+            <Button variant="outline" onClick={handleCancel} className="px-6 py-3">
+              Cancel
+            </Button>
 
-          <div className="flex items-center gap-3">
-            {currentStep > 0 && (
-              <Button variant="outline" onClick={handlePrevious} className="px-6 py-3">
-                <ChevronLeft className="w-4 h-4 mr-2" />
-                Previous
-              </Button>
-            )}
+            <div className="flex items-center gap-3">
+              {currentStep > 0 && (
+                <Button variant="outline" onClick={handlePrevious} className="px-6 py-3">
+                  <ChevronLeft className="w-4 h-4 mr-2" />
+                  Previous
+                </Button>
+              )}
 
-            {currentStep < WIZARD_STEPS.length - 1 ? (
-              <Button
-                onClick={handleNext}
-                disabled={!canProgress}
-                className="bg-primary text-primaryForeground hover:opacity-90 transition-all duration-ui px-6 py-3"
-              >
-                Next
-                <ChevronRight className="w-4 h-4 ml-2" />
-              </Button>
-            ) : (
-              <Button
-                onClick={handleSubmit}
-                disabled={!formData.song.title || createSong.isPending}
-                className="bg-primary text-primaryForeground hover:opacity-90 transition-all duration-ui px-6 py-3"
-              >
-                {createSong.isPending ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Creating...
-                  </>
-                ) : (
-                  <>
-                    <Check className="w-4 h-4 mr-2" />
-                    Create Song
-                  </>
-                )}
-              </Button>
-            )}
+              {currentStep < WIZARD_STEPS.length - 1 ? (
+                <Button
+                  onClick={handleNext}
+                  disabled={!canProgress}
+                  className="bg-primary text-primaryForeground hover:opacity-90 transition-all duration-ui px-6 py-3"
+                >
+                  Next
+                  <ChevronRight className="w-4 h-4 ml-2" />
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleSubmit}
+                  disabled={!formData.song.title || createSong.isPending}
+                  className="bg-primary text-primaryForeground hover:opacity-90 transition-all duration-ui px-6 py-3"
+                >
+                  {createSong.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Creating...
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-4 h-4 mr-2" />
+                      Create Song
+                    </>
+                  )}
+                </Button>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
