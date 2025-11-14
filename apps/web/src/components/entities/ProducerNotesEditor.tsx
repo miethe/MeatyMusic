@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ProducerNotesBase, ProducerNotesCreate, MixConfig } from '@/types/api/entities';
+import { ProducerNotesBase, ProducerNotesCreate, MixConfig, ProducerNotes } from '@/types/api/entities';
 import { ChipSelector } from './common/ChipSelector';
 import { SectionEditor, Section } from './common/SectionEditor';
 import { EntityPreviewPanel, ValidationError } from './common/EntityPreviewPanel';
+import { LibrarySelector } from './common/LibrarySelector';
 import { Save, X } from 'lucide-react';
+import { useProducerNotesList } from '@/hooks/api/useProducerNotes';
 
 export interface ProducerNotesEditorProps {
   songId: string;
@@ -13,6 +15,7 @@ export interface ProducerNotesEditorProps {
   onSave: (notes: ProducerNotesCreate) => void;
   onCancel: () => void;
   className?: string;
+  showLibrarySelector?: boolean;
 }
 
 const STRUCTURE_TYPES = [
@@ -42,6 +45,7 @@ export function ProducerNotesEditor({
   onSave,
   onCancel,
   className = '',
+  showLibrarySelector = false,
 }: ProducerNotesEditorProps) {
   const [formData, setFormData] = useState<Partial<ProducerNotesBase>>({
     song_id: songId,
@@ -60,6 +64,9 @@ export function ProducerNotesEditor({
   const [sections, setSections] = useState<Section[]>([]);
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
   const [showPreview, setShowPreview] = useState(true);
+
+  // Fetch library producer notes for selection
+  const { data: producerNotesData } = useProducerNotesList();
 
   useEffect(() => {
     if (initialValue.structure) {
@@ -132,6 +139,23 @@ export function ProducerNotesEditor({
     }));
   };
 
+  const handleLibrarySelect = (notes: ProducerNotes) => {
+    // Remove id, timestamps, and song_id from library item (will use current songId)
+    const { id, created_at, updated_at, song_id, ...notesData } = notes;
+    setFormData({ ...notesData, song_id: songId });
+
+    // Convert structure to sections
+    if (notes.structure) {
+      const sectionNames = notes.structure.split('-');
+      const convertedSections = sectionNames.map((name, i) => ({
+        id: `section-${i}`,
+        type: name.toLowerCase(),
+        duration: 0,
+      }));
+      setSections(convertedSections);
+    }
+  };
+
   return (
     <div className={`flex flex-col h-full ${className}`}>
       <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-border-secondary bg-background-secondary">
@@ -167,6 +191,37 @@ export function ProducerNotesEditor({
 
       <div className="flex-1 flex overflow-hidden">
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          {showLibrarySelector && (
+            <>
+              <LibrarySelector
+                items={producerNotesData?.items || []}
+                onSelect={handleLibrarySelect}
+                renderItem={(notes) => (
+                  <div>
+                    <div className="font-semibold text-text-primary">
+                      {notes.structure || 'No structure'} • {notes.hooks} hooks
+                    </div>
+                    <div className="text-xs text-text-tertiary mt-1">
+                      {notes.mix?.lufs && `LUFS: ${notes.mix.lufs}`}
+                      {notes.mix?.space && ` • ${notes.mix.space}`}
+                      {notes.instrumentation && notes.instrumentation.length > 0 && ` • ${notes.instrumentation.slice(0, 2).join(', ')}`}
+                    </div>
+                  </div>
+                )}
+                getItemKey={(notes) => notes.id}
+                getItemSearchText={(notes) => `${notes.structure} ${notes.instrumentation?.join(' ')}`}
+                emptyMessage="No producer notes in library. Create your first producer notes below."
+                label="Add from Library"
+              />
+
+              <div className="flex items-center gap-4 text-sm text-text-tertiary">
+                <div className="flex-1 h-px bg-border-secondary" />
+                <span>Or create new:</span>
+                <div className="flex-1 h-px bg-border-secondary" />
+              </div>
+            </>
+          )}
+
           <SectionEditor
             label="Arrangement Structure"
             sections={sections}
@@ -186,7 +241,7 @@ export function ProducerNotesEditor({
               max="10"
               value={formData.hooks || 0}
               onChange={(e) => updateField('hooks', parseInt(e.target.value) || 0)}
-              className="w-full px-4 py-2 rounded-lg bg-background-tertiary border border-border-secondary text-text-primary focus:outline-none focus:border-border-focus focus:ring-2 focus:ring-border-focus/20 transition-colors"
+              className="w-full px-4 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"
             />
             <p className="text-xs text-text-tertiary mt-1">
               Recommended: 2-4 for commercial songs
@@ -220,7 +275,7 @@ export function ProducerNotesEditor({
                 onChange={(e) =>
                   updateMix('lufs', parseFloat(e.target.value) || -12)
                 }
-                className="w-full px-4 py-2 rounded-lg bg-background-primary border border-border-secondary text-text-primary focus:outline-none focus:border-border-focus focus:ring-2 focus:ring-border-focus/20 transition-colors"
+                className="w-full px-4 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"
               />
               <p className="text-xs text-text-tertiary mt-1">
                 Typical range: -12 to -6 LUFS
@@ -234,7 +289,7 @@ export function ProducerNotesEditor({
               <select
                 value={formData.mix?.space || 'normal'}
                 onChange={(e) => updateMix('space', e.target.value)}
-                className="w-full px-4 py-2 rounded-lg bg-background-primary border border-border-secondary text-text-primary focus:outline-none focus:border-border-focus focus:ring-2 focus:ring-border-focus/20 transition-colors"
+                className="w-full px-4 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"
               >
                 <option value="dry">Dry</option>
                 <option value="normal">Normal</option>

@@ -107,7 +107,7 @@ export function SongEditor({
               value={formData.title || ''}
               onChange={(e) => updateField('title', e.target.value)}
               placeholder="e.g., Holiday Hustle"
-              className="w-full px-4 py-2 rounded-lg bg-background-tertiary border border-border-secondary text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-border-focus focus:ring-2 focus:ring-border-focus/20 transition-colors"
+              className="w-full px-4 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary placeholder:text-text-muted focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"
             />
           </div>
 
@@ -186,7 +186,7 @@ export function SongEditor({
                   value={formData.style_id || ''}
                   onChange={(e) => updateField('style_id', e.target.value)}
                   placeholder="UUID"
-                  className="w-full px-3 py-2 rounded-lg bg-background-primary border border-border-secondary text-text-primary text-xs font-mono focus:outline-none focus:border-border-focus focus:ring-2 focus:ring-border-focus/20 transition-colors"
+                  className="w-full px-3 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary text-xs font-mono focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"
                 />
               </div>
 
@@ -199,7 +199,7 @@ export function SongEditor({
                   value={formData.persona_id || ''}
                   onChange={(e) => updateField('persona_id', e.target.value)}
                   placeholder="UUID"
-                  className="w-full px-3 py-2 rounded-lg bg-background-primary border border-border-secondary text-text-primary text-xs font-mono focus:outline-none focus:border-border-focus focus:ring-2 focus:ring-border-focus/20 transition-colors"
+                  className="w-full px-3 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary text-xs font-mono focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"
                 />
               </div>
 
@@ -212,7 +212,7 @@ export function SongEditor({
                   value={formData.blueprint_id || ''}
                   onChange={(e) => updateField('blueprint_id', e.target.value)}
                   placeholder="UUID"
-                  className="w-full px-3 py-2 rounded-lg bg-background-primary border border-border-secondary text-text-primary text-xs font-mono focus:outline-none focus:border-border-focus focus:ring-2 focus:ring-border-focus/20 transition-colors"
+                  className="w-full px-3 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary text-xs font-mono focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"
                 />
               </div>
             </div>

@@ -175,7 +175,7 @@ export function BlueprintEditor({
               <select
                 value={formData.genre || ''}
                 onChange={(e) => updateField('genre', e.target.value)}
-                className="w-full px-4 py-2 rounded-lg bg-background-tertiary border border-border-secondary text-text-primary focus:outline-none focus:border-border-focus focus:ring-2 focus:ring-border-focus/20 transition-colors"
+                className="w-full px-4 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"
               >
                 <option value="">Select genre...</option>
                 {GENRE_OPTIONS.map((genre) => (
@@ -194,7 +194,7 @@ export function BlueprintEditor({
                 type="text"
                 value={formData.version || '1.0'}
                 onChange={(e) => updateField('version', e.target.value)}
-                className="w-full px-4 py-2 rounded-lg bg-background-tertiary border border-border-secondary text-text-primary focus:outline-none focus:border-border-focus focus:ring-2 focus:ring-border-focus/20 transition-colors"
+                className="w-full px-4 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"
               />
             </div>
           </div>
@@ -267,7 +267,7 @@ export function BlueprintEditor({
                   onChange={(e) =>
                     updateWeight(key, parseFloat(e.target.value) || 0)
                   }
-                  className="w-full px-3 py-2 rounded-lg bg-background-primary border border-border-secondary text-text-primary focus:outline-none focus:border-border-focus focus:ring-2 focus:ring-border-focus/20 transition-colors"
+                  className="w-full px-3 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"
                 />
               </div>
             ))}
@@ -291,7 +291,7 @@ export function BlueprintEditor({
                 onChange={(e) =>
                   updateThreshold('min_total', parseFloat(e.target.value) || 7.0)
                 }
-                className="w-full px-3 py-2 rounded-lg bg-background-primary border border-border-secondary text-text-primary focus:outline-none focus:border-border-focus focus:ring-2 focus:ring-border-focus/20 transition-colors"
+                className="w-full px-3 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"
               />
             </div>
 
@@ -311,7 +311,7 @@ export function BlueprintEditor({
                     parseFloat(e.target.value) || 2.0
                   )
                 }
-                className="w-full px-3 py-2 rounded-lg bg-background-primary border border-border-secondary text-text-primary focus:outline-none focus:border-border-focus focus:ring-2 focus:ring-border-focus/20 transition-colors"
+                className="w-full px-3 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"
               />
             </div>
           </div>

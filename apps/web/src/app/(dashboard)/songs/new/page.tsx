@@ -713,6 +713,7 @@ export default function NewSongPage() {
             initialValue={formData.style || undefined}
             onSave={handleStyleSave}
             onCancel={handleStyleCancel}
+            showLibrarySelector={true}
             className="rounded-lg border border-border shadow-elev1 bg-surface"
           />
         ) : currentStep === 2 ? (
@@ -721,6 +722,7 @@ export default function NewSongPage() {
             initialValue={formData.lyrics || undefined}
             onSave={handleLyricsSave}
             onCancel={handleLyricsCancel}
+            showLibrarySelector={true}
             className="rounded-lg border border-border shadow-elev1 bg-surface"
           />
         ) : currentStep === 3 ? (
@@ -728,6 +730,7 @@ export default function NewSongPage() {
             initialValue={formData.persona || undefined}
             onSave={handlePersonaSave}
             onCancel={handlePersonaCancel}
+            showLibrarySelector={true}
             className="rounded-lg border border-border shadow-elev1 bg-surface"
           />
         ) : currentStep === 4 ? (
@@ -736,6 +739,7 @@ export default function NewSongPage() {
             initialValue={formData.producerNotes || undefined}
             onSave={handleProducerNotesSave}
             onCancel={handleProducerNotesCancel}
+            showLibrarySelector={true}
             className="rounded-lg border border-border shadow-elev1 bg-surface"
           />
         ) : (

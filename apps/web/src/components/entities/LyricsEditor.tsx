@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { LyricsBase, LyricsCreate, POV, Tense, HookStrategy } from '@/types/api/entities';
+import { LyricsBase, LyricsCreate, POV, Tense, HookStrategy, Lyrics } from '@/types/api/entities';
 import { ChipSelector } from './common/ChipSelector';
 import { SectionEditor, Section } from './common/SectionEditor';
 import { RhymeSchemeInput } from './common/RhymeSchemeInput';
 import { EntityPreviewPanel, ValidationError } from './common/EntityPreviewPanel';
+import { LibrarySelector } from './common/LibrarySelector';
 import { Save, X } from 'lucide-react';
+import { useLyricsList } from '@/hooks/api/useLyrics';
 
 export interface LyricsEditorProps {
   songId: string;
@@ -14,6 +16,7 @@ export interface LyricsEditorProps {
   onSave: (lyrics: LyricsCreate) => void;
   onCancel: () => void;
   className?: string;
+  showLibrarySelector?: boolean;
 }
 
 const SECTION_TYPES = [
@@ -44,6 +47,7 @@ export function LyricsEditor({
   onSave,
   onCancel,
   className = '',
+  showLibrarySelector = false,
 }: LyricsEditorProps) {
   const [formData, setFormData] = useState<Partial<LyricsBase>>({
     song_id: songId,
@@ -66,6 +70,9 @@ export function LyricsEditor({
   const [sections, setSections] = useState<Section[]>([]);
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
   const [showPreview, setShowPreview] = useState(true);
+
+  // Fetch library lyrics for selection
+  const { data: lyricsData } = useLyricsList();
 
   useEffect(() => {
     if (initialValue.sections) {
@@ -143,6 +150,23 @@ export function LyricsEditor({
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const handleLibrarySelect = (lyrics: Lyrics) => {
+    // Remove id, timestamps, and song_id from library item (will use current songId)
+    const { id, created_at, updated_at, song_id, ...lyricsData } = lyrics;
+    setFormData({ ...lyricsData, song_id: songId });
+
+    // Convert sections to editor format
+    if (lyrics.sections) {
+      const convertedSections = (lyrics.sections as any[]).map((s, i) => ({
+        id: `section-${i}`,
+        type: s.type || 'verse',
+        lines: s.lines || 4,
+        metadata: s,
+      }));
+      setSections(convertedSections);
+    }
+  };
+
   return (
     <div className={`flex flex-col h-full ${className}`}>
       <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-border-secondary bg-background-secondary">
@@ -176,6 +200,37 @@ export function LyricsEditor({
 
       <div className="flex-1 flex overflow-hidden">
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          {showLibrarySelector && (
+            <>
+              <LibrarySelector
+                items={lyricsData?.items || []}
+                onSelect={handleLibrarySelect}
+                renderItem={(lyrics) => (
+                  <div>
+                    <div className="font-semibold text-text-primary">
+                      {lyrics.sections?.length || 0} sections • {lyrics.pov || 'N/A'} POV
+                    </div>
+                    <div className="text-xs text-text-tertiary mt-1">
+                      {lyrics.language || 'English'}
+                      {lyrics.rhyme_scheme && ` • ${lyrics.rhyme_scheme}`}
+                      {lyrics.themes && lyrics.themes.length > 0 && ` • ${lyrics.themes.slice(0, 2).join(', ')}`}
+                    </div>
+                  </div>
+                )}
+                getItemKey={(lyrics) => lyrics.id}
+                getItemSearchText={(lyrics) => `${lyrics.language} ${lyrics.pov} ${lyrics.themes?.join(' ')}`}
+                emptyMessage="No lyrics in library. Create your first lyrics below."
+                label="Add from Library"
+              />
+
+              <div className="flex items-center gap-4 text-sm text-text-tertiary">
+                <div className="flex-1 h-px bg-border-secondary" />
+                <span>Or create new:</span>
+                <div className="flex-1 h-px bg-border-secondary" />
+              </div>
+            </>
+          )}
+
           <SectionEditor
             label="Section Structure"
             sections={sections}
@@ -195,7 +250,7 @@ export function LyricsEditor({
                 type="text"
                 value={formData.language || 'English'}
                 onChange={(e) => updateField('language', e.target.value)}
-                className="w-full px-4 py-2 rounded-lg bg-background-tertiary border border-border-secondary text-text-primary focus:outline-none focus:border-border-focus focus:ring-2 focus:ring-border-focus/20 transition-colors"
+                className="w-full px-4 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"
               />
             </div>
 
@@ -206,7 +261,7 @@ export function LyricsEditor({
               <select
                 value={formData.meter || '4/4'}
                 onChange={(e) => updateField('meter', e.target.value)}
-                className="w-full px-4 py-2 rounded-lg bg-background-tertiary border border-border-secondary text-text-primary focus:outline-none focus:border-border-focus focus:ring-2 focus:ring-border-focus/20 transition-colors"
+                className="w-full px-4 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"
               >
                 <option value="4/4">4/4</option>
                 <option value="3/4">3/4</option>
@@ -232,7 +287,7 @@ export function LyricsEditor({
               <select
                 value={formData.pov || POV.FIRST_PERSON}
                 onChange={(e) => updateField('pov', e.target.value as POV)}
-                className="w-full px-4 py-2 rounded-lg bg-background-tertiary border border-border-secondary text-text-primary focus:outline-none focus:border-border-focus focus:ring-2 focus:ring-border-focus/20 transition-colors"
+                className="w-full px-4 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"
               >
                 <option value={POV.FIRST_PERSON}>First Person (I, We)</option>
                 <option value={POV.SECOND_PERSON}>Second Person (You)</option>
@@ -247,7 +302,7 @@ export function LyricsEditor({
               <select
                 value={formData.tense || Tense.PRESENT}
                 onChange={(e) => updateField('tense', e.target.value as Tense)}
-                className="w-full px-4 py-2 rounded-lg bg-background-tertiary border border-border-secondary text-text-primary focus:outline-none focus:border-border-focus focus:ring-2 focus:ring-border-focus/20 transition-colors"
+                className="w-full px-4 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"
               >
                 <option value={Tense.PAST}>Past</option>
                 <option value={Tense.PRESENT}>Present</option>
@@ -269,7 +324,7 @@ export function LyricsEditor({
               onChange={(e) =>
                 updateField('syllables_per_line', parseInt(e.target.value) || 8)
               }
-              className="w-full px-4 py-2 rounded-lg bg-background-tertiary border border-border-secondary text-text-primary focus:outline-none focus:border-border-focus focus:ring-2 focus:ring-border-focus/20 transition-colors"
+              className="w-full px-4 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"
             />
             <p className="text-xs text-text-tertiary mt-1">
               Recommended range: 4-16 syllables
@@ -285,7 +340,7 @@ export function LyricsEditor({
               onChange={(e) =>
                 updateField('hook_strategy', e.target.value as HookStrategy)
               }
-              className="w-full px-4 py-2 rounded-lg bg-background-tertiary border border-border-secondary text-text-primary focus:outline-none focus:border-border-focus focus:ring-2 focus:ring-border-focus/20 transition-colors"
+              className="w-full px-4 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"
             >
               <option value={HookStrategy.MELODIC}>Melodic</option>
               <option value={HookStrategy.LYRICAL}>Lyrical</option>

@@ -1,16 +1,19 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { PersonaBase, PersonaCreate, PersonaKind } from '@/types/api/entities';
+import { PersonaBase, PersonaCreate, PersonaKind, Persona } from '@/types/api/entities';
 import { ChipSelector } from './common/ChipSelector';
 import { EntityPreviewPanel, ValidationError } from './common/EntityPreviewPanel';
+import { LibrarySelector } from './common/LibrarySelector';
 import { Save, X } from 'lucide-react';
+import { usePersonas } from '@/hooks/api/usePersonas';
 
 export interface PersonaEditorProps {
   initialValue?: Partial<PersonaBase>;
   onSave: (persona: PersonaCreate) => void;
   onCancel: () => void;
   className?: string;
+  showLibrarySelector?: boolean;
 }
 
 const VOCAL_RANGE_OPTIONS = [
@@ -40,6 +43,7 @@ export function PersonaEditor({
   onSave,
   onCancel,
   className = '',
+  showLibrarySelector = false,
 }: PersonaEditorProps) {
   const [formData, setFormData] = useState<Partial<PersonaBase>>({
     name: '',
@@ -58,6 +62,9 @@ export function PersonaEditor({
 
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
   const [showPreview, setShowPreview] = useState(true);
+
+  // Fetch library personas for selection
+  const { data: personasData } = usePersonas();
 
   useEffect(() => {
     validateForm();
@@ -101,6 +108,12 @@ export function PersonaEditor({
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const handleLibrarySelect = (persona: Persona) => {
+    // Remove id and timestamps from library item
+    const { id, created_at, updated_at, ...personaData } = persona;
+    setFormData(personaData);
+  };
+
   return (
     <div className={`flex flex-col h-full ${className}`}>
       <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-border-secondary bg-background-secondary">
@@ -134,6 +147,35 @@ export function PersonaEditor({
 
       <div className="flex-1 flex overflow-hidden">
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          {showLibrarySelector && (
+            <>
+              <LibrarySelector
+                items={personasData?.items || []}
+                onSelect={handleLibrarySelect}
+                renderItem={(persona) => (
+                  <div>
+                    <div className="font-semibold text-text-primary">{persona.name}</div>
+                    <div className="text-xs text-text-tertiary mt-1">
+                      {persona.kind === PersonaKind.ARTIST ? 'Artist' : 'Band'}
+                      {persona.vocal_range && ` • ${persona.vocal_range}`}
+                      {persona.delivery && persona.delivery.length > 0 && ` • ${persona.delivery.slice(0, 2).join(', ')}`}
+                    </div>
+                  </div>
+                )}
+                getItemKey={(persona) => persona.id}
+                getItemSearchText={(persona) => `${persona.name} ${persona.vocal_range} ${persona.delivery?.join(' ')}`}
+                emptyMessage="No personas in library. Create your first persona below."
+                label="Add from Library"
+              />
+
+              <div className="flex items-center gap-4 text-sm text-text-tertiary">
+                <div className="flex-1 h-px bg-border-secondary" />
+                <span>Or create new:</span>
+                <div className="flex-1 h-px bg-border-secondary" />
+              </div>
+            </>
+          )}
+
           <div>
             <label className="block text-sm font-medium text-text-primary mb-2">
               Persona Name <span className="text-accent-error">*</span>
@@ -143,7 +185,7 @@ export function PersonaEditor({
               value={formData.name || ''}
               onChange={(e) => updateField('name', e.target.value)}
               placeholder="e.g., Soulful Storyteller"
-              className="w-full px-4 py-2 rounded-lg bg-background-tertiary border border-border-secondary text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-border-focus focus:ring-2 focus:ring-border-focus/20 transition-colors"
+              className="w-full px-4 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary placeholder:text-text-muted focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"
             />
           </div>
 
@@ -184,7 +226,7 @@ export function PersonaEditor({
               onChange={(e) => updateField('bio', e.target.value)}
               placeholder="Brief description of the persona..."
               rows={3}
-              className="w-full px-4 py-2 rounded-lg bg-background-tertiary border border-border-secondary text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-border-focus focus:ring-2 focus:ring-border-focus/20 transition-colors resize-none"
+              className="w-full px-4 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary placeholder:text-text-muted focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors resize-none"
             />
           </div>
 
@@ -197,7 +239,7 @@ export function PersonaEditor({
               value={formData.voice || ''}
               onChange={(e) => updateField('voice', e.target.value)}
               placeholder="e.g., Warm and rich with subtle vibrato"
-              className="w-full px-4 py-2 rounded-lg bg-background-tertiary border border-border-secondary text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-border-focus focus:ring-2 focus:ring-border-focus/20 transition-colors"
+              className="w-full px-4 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary placeholder:text-text-muted focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"
             />
           </div>
 

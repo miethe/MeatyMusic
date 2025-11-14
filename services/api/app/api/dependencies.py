@@ -6,12 +6,14 @@ and handling authentication/authorization.
 
 from __future__ import annotations
 
-from typing import AsyncGenerator
-
 from fastapi import Depends
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 
 from app.db.session import get_db
+
+# Alias for backward compatibility
+get_db_session = get_db
+
 from app.repositories import (
     BlueprintRepository,
     ComposedPromptRepository,
@@ -39,72 +41,65 @@ from app.services import (
 )
 
 
-# Database session dependency (reuse from db.session)
-async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
-    """Get database session for dependency injection."""
-    async for session in get_db():
-        yield session
-
-
 # Repository dependencies
 def get_blueprint_repository(
-    db: AsyncSession = Depends(get_db_session),
+    db: Session = Depends(get_db),
 ) -> BlueprintRepository:
     """Get BlueprintRepository instance."""
     return BlueprintRepository(db)
 
 
 def get_persona_repository(
-    db: AsyncSession = Depends(get_db_session),
+    db: Session = Depends(get_db),
 ) -> PersonaRepository:
     """Get PersonaRepository instance."""
     return PersonaRepository(db)
 
 
 def get_source_repository(
-    db: AsyncSession = Depends(get_db_session),
+    db: Session = Depends(get_db),
 ) -> SourceRepository:
     """Get SourceRepository instance."""
     return SourceRepository(db)
 
 
 def get_style_repository(
-    db: AsyncSession = Depends(get_db_session),
+    db: Session = Depends(get_db),
 ) -> StyleRepository:
     """Get StyleRepository instance."""
     return StyleRepository(db)
 
 
 def get_song_repository(
-    db: AsyncSession = Depends(get_db_session),
+    db: Session = Depends(get_db),
 ) -> SongRepository:
     """Get SongRepository instance."""
     return SongRepository(db)
 
 
 def get_lyrics_repository(
-    db: AsyncSession = Depends(get_db_session),
+    db: Session = Depends(get_db),
 ) -> LyricsRepository:
     """Get LyricsRepository instance."""
     return LyricsRepository(db)
 
 
 def get_producer_notes_repository(
-    db: AsyncSession = Depends(get_db_session),
+    db: Session = Depends(get_db),
 ) -> ProducerNotesRepository:
     """Get ProducerNotesRepository instance."""
     return ProducerNotesRepository(db)
 
 
 def get_workflow_run_repository(
-    db: AsyncSession = Depends(get_db_session),
+    db: Session = Depends(get_db),
 ) -> WorkflowRunRepository:
     """Get WorkflowRunRepository instance."""
     return WorkflowRunRepository(db)
 
 
 def get_composed_prompt_repository(
-    db: AsyncSession = Depends(get_db_session),
+    db: Session = Depends(get_db),
 ) -> ComposedPromptRepository:
     """Get ComposedPromptRepository instance."""
     return ComposedPromptRepository(db)
@@ -196,7 +191,7 @@ def get_cross_entity_validator() -> CrossEntityValidator:
 
 
 def get_persona_service(
-    db: AsyncSession = Depends(get_db_session),
+    db: Session = Depends(get_db),
     repo: PersonaRepository = Depends(get_persona_repository),
 ) -> PersonaService:
     """Get PersonaService instance with all dependencies."""
@@ -204,7 +199,7 @@ def get_persona_service(
 
 
 def get_source_service(
-    db: AsyncSession = Depends(get_db_session),
+    db: Session = Depends(get_db),
     repo: SourceRepository = Depends(get_source_repository),
 ) -> SourceService:
     """Get SourceService instance with all dependencies."""
@@ -212,7 +207,7 @@ def get_source_service(
 
 
 def get_lyrics_service(
-    db: AsyncSession = Depends(get_db_session),
+    db: Session = Depends(get_db),
     repo: LyricsRepository = Depends(get_lyrics_repository),
 ) -> LyricsService:
     """Get LyricsService instance with all dependencies."""
@@ -220,7 +215,7 @@ def get_lyrics_service(
 
 
 def get_producer_notes_service(
-    db: AsyncSession = Depends(get_db_session),
+    db: Session = Depends(get_db),
     repo: ProducerNotesRepository = Depends(get_producer_notes_repository),
     blueprint_repo: BlueprintRepository = Depends(get_blueprint_repository),
     lyrics_repo: LyricsRepository = Depends(get_lyrics_repository),
@@ -235,6 +230,7 @@ def get_producer_notes_service(
 
 
 __all__ = [
+    "get_db",
     "get_db_session",
     "get_blueprint_repository",
     "get_persona_repository",

@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.core.database import get_db_session
-from app.core.async_database import get_async_db_session
+# from app.core.async_database import get_async_db_session  # Not used - commented to avoid asyncpg dependency
 from app.core.security import SecurityContext, RepositoryFactory
 from app.core.security.exceptions import SecurityContextError
 from app.core.auth import JWTContextExtractor
@@ -340,18 +340,19 @@ async def get_repository_factory(
     return RepositoryFactory(db=db)
 
 
-async def get_async_repository_factory(
-    db: Annotated[AsyncSession, Depends(get_async_db_session)]
-) -> RepositoryFactory:
-    """FastAPI dependency providing async repository factory.
-
-    Args:
-        db: Async database session
-
-    Returns:
-        RepositoryFactory instance with async session
-    """
-    return RepositoryFactory(db=db)
+# Commented out - async repository factory not currently used, avoids asyncpg dependency
+# async def get_async_repository_factory(
+#     db: Annotated[AsyncSession, Depends(get_async_db_session)]
+# ) -> RepositoryFactory:
+#     """FastAPI dependency providing async repository factory.
+#
+#     Args:
+#         db: Async database session
+#
+#     Returns:
+#         RepositoryFactory instance with async session
+#     """
+#     return RepositoryFactory(db=db)
 
 
 async def get_current_user_with_context_async(

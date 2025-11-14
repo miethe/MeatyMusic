@@ -1,17 +1,20 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { StyleBase, StyleCreate } from '@/types/api/entities';
+import { StyleBase, StyleCreate, Style } from '@/types/api/entities';
 import { ChipSelector } from './common/ChipSelector';
 import { RangeSlider } from './common/RangeSlider';
 import { EntityPreviewPanel, ValidationError } from './common/EntityPreviewPanel';
+import { LibrarySelector } from './common/LibrarySelector';
 import { Save, X } from 'lucide-react';
+import { useStyles } from '@/hooks/api/useStyles';
 
 export interface StyleEditorProps {
   initialValue?: Partial<StyleBase>;
   onSave: (style: StyleCreate) => void;
   onCancel: () => void;
   className?: string;
+  showLibrarySelector?: boolean;
 }
 
 const GENRE_OPTIONS = [
@@ -87,6 +90,7 @@ export function StyleEditor({
   onSave,
   onCancel,
   className = '',
+  showLibrarySelector = false,
 }: StyleEditorProps) {
   const [formData, setFormData] = useState<Partial<StyleBase>>({
     name: '',
@@ -106,6 +110,9 @@ export function StyleEditor({
 
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
   const [showPreview, setShowPreview] = useState(true);
+
+  // Fetch library styles for selection
+  const { data: stylesData } = useStyles();
 
   useEffect(() => {
     validateForm();
@@ -165,6 +172,12 @@ export function StyleEditor({
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const handleLibrarySelect = (style: Style) => {
+    // Remove id and timestamps from library item
+    const { id, created_at, updated_at, ...styleData } = style;
+    setFormData(styleData);
+  };
+
   return (
     <div className={`flex flex-col h-full ${className}`}>
       <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-border-secondary bg-background-secondary">
@@ -198,6 +211,34 @@ export function StyleEditor({
 
       <div className="flex-1 flex overflow-hidden">
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          {showLibrarySelector && (
+            <>
+              <LibrarySelector
+                items={stylesData?.items || []}
+                onSelect={handleLibrarySelect}
+                renderItem={(style) => (
+                  <div>
+                    <div className="font-semibold text-text-primary">{style.name}</div>
+                    <div className="text-xs text-text-tertiary mt-1">
+                      {style.genre} • {style.bpm_min}-{style.bpm_max} BPM
+                      {style.mood && style.mood.length > 0 && ` • ${style.mood.slice(0, 2).join(', ')}`}
+                    </div>
+                  </div>
+                )}
+                getItemKey={(style) => style.id}
+                getItemSearchText={(style) => `${style.name} ${style.genre} ${style.mood?.join(' ')}`}
+                emptyMessage="No styles in library. Create your first style below."
+                label="Add from Library"
+              />
+
+              <div className="flex items-center gap-4 text-sm text-text-tertiary">
+                <div className="flex-1 h-px bg-border-secondary" />
+                <span>Or create new:</span>
+                <div className="flex-1 h-px bg-border-secondary" />
+              </div>
+            </>
+          )}
+
           <div>
             <label className="block text-sm font-medium text-text-primary mb-2">
               Style Name <span className="text-accent-error">*</span>
@@ -207,7 +248,7 @@ export function StyleEditor({
               value={formData.name || ''}
               onChange={(e) => updateField('name', e.target.value)}
               placeholder="e.g., Modern Pop Ballad"
-              className="w-full px-4 py-2 rounded-lg bg-background-tertiary border border-border-secondary text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-border-focus focus:ring-2 focus:ring-border-focus/20 transition-colors"
+              className="w-full px-4 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary placeholder:text-text-muted focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"
             />
           </div>
 
@@ -219,11 +260,11 @@ export function StyleEditor({
               <select
                 value={formData.genre || ''}
                 onChange={(e) => updateField('genre', e.target.value)}
-                className="w-full px-4 py-2 rounded-lg bg-background-tertiary border border-border-secondary text-text-primary focus:outline-none focus:border-border-focus focus:ring-2 focus:ring-border-focus/20 transition-colors"
+                className="w-full px-4 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"
               >
-                <option value="">Select genre...</option>
+                <option value="" className="bg-bg-base text-text-primary">Select genre...</option>
                 {GENRE_OPTIONS.map((genre) => (
-                  <option key={genre} value={genre.toLowerCase()}>
+                  <option key={genre} value={genre.toLowerCase()} className="bg-bg-base text-text-primary">
                     {genre}
                   </option>
                 ))}
@@ -237,11 +278,11 @@ export function StyleEditor({
               <select
                 value={formData.key || ''}
                 onChange={(e) => updateField('key', e.target.value)}
-                className="w-full px-4 py-2 rounded-lg bg-background-tertiary border border-border-secondary text-text-primary focus:outline-none focus:border-border-focus focus:ring-2 focus:ring-border-focus/20 transition-colors"
+                className="w-full px-4 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"
               >
-                <option value="">Select key...</option>
+                <option value="" className="bg-bg-base text-text-primary">Select key...</option>
                 {KEY_OPTIONS.map((key) => (
-                  <option key={key} value={key}>
+                  <option key={key} value={key} className="bg-bg-base text-text-primary">
                     {key}
                   </option>
                 ))}
@@ -275,30 +316,15 @@ export function StyleEditor({
             helpText="Select a single value or range for tempo flexibility"
           />
 
-          <div>
-            <label className="block text-sm font-medium text-text-primary mb-2">
-              Energy Level
-            </label>
-            <div className="flex items-center gap-4">
-              <input
-                type="range"
-                min="1"
-                max="10"
-                value={formData.energy_level || 5}
-                onChange={(e) =>
-                  updateField('energy_level', parseInt(e.target.value))
-                }
-                className="flex-1"
-              />
-              <span className="text-sm font-semibold text-text-primary w-8 text-right">
-                {formData.energy_level || 5}
-              </span>
-            </div>
-            <div className="flex justify-between text-xs text-text-tertiary mt-1">
-              <span>Low</span>
-              <span>Anthemic</span>
-            </div>
-          </div>
+          <RangeSlider
+            label="Energy Level"
+            min={1}
+            max={10}
+            value={formData.energy_level || 5}
+            onChange={(value) => updateField('energy_level', typeof value === 'number' ? value : value[0])}
+            allowRange={false}
+            helpText="1 = Low, 10 = Anthemic"
+          />
 
           <ChipSelector
             label="Mood"
