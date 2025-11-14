@@ -10,151 +10,194 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-inter)', 'Inter', 'sans-serif'],
+        sans: ['var(--font-inter)', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace'],
+      },
+      fontSize: {
+        'xs': ['12px', { lineHeight: '18px', letterSpacing: '0.01em' }],
+        'sm': ['14px', { lineHeight: '21px', letterSpacing: '0' }],
+        'base': ['16px', { lineHeight: '24px', letterSpacing: '0' }],
+        'lg': ['18px', { lineHeight: '28px', letterSpacing: '0' }],
+        'xl': ['20px', { lineHeight: '28px', letterSpacing: '0' }],
+        '2xl': ['24px', { lineHeight: '32px', letterSpacing: '0' }],
+        '3xl': ['30px', { lineHeight: '39px', letterSpacing: '-0.01em' }],
+        '4xl': ['36px', { lineHeight: '44px', letterSpacing: '-0.01em' }],
+        '5xl': ['48px', { lineHeight: '56px', letterSpacing: '-0.02em' }],
       },
       borderRadius: {
-        lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
-        // MeatyMusic radius tokens
-        'mm-sm': 'var(--mm-radius-sm)',
-        'mm-md': 'var(--mm-radius-md)',
-        'mm-lg': 'var(--mm-radius-lg)',
-        'mm-pill': 'var(--mm-radius-pill)',
+        lg: '12px',
+        md: '8px',
+        sm: '6px',
+        xs: '4px',
+        pill: '9999px',
       },
       boxShadow: {
-        'elev0': 'var(--mm-elevation-0)',
-        'elev1': 'var(--mm-elevation-1)',
-        'elev2': 'var(--mm-elevation-2)',
-        'elev3': 'var(--mm-elevation-3)',
-        'elev4': 'var(--mm-elevation-4)',
+        'elevation-1': '0 2px 8px rgba(0, 0, 0, 0.15)',
+        'elevation-2': '0 4px 16px rgba(0, 0, 0, 0.2)',
+        'elevation-3': '0 8px 24px rgba(0, 0, 0, 0.25)',
+        'elevation-4': '0 16px 32px rgba(0, 0, 0, 0.3)',
+        'elevation-5': '0 24px 48px rgba(0, 0, 0, 0.35)',
+        'accent-glow': '0 0 20px rgba(91, 76, 250, 0.4)',
+        'accent-glow-lg': '0 0 32px rgba(91, 76, 250, 0.5)',
       },
       animation: {
-        shimmer: 'shimmer 2s ease-in-out infinite',
+        'shimmer': 'shimmer 2s ease-in-out infinite',
+        'fade-in': 'fadeIn 0.2s ease-out',
+        'slide-up': 'slideUp 0.3s ease-out',
+        'scale-in': 'scaleIn 0.2s ease-out',
       },
       keyframes: {
         shimmer: {
           '0%': { backgroundPosition: '-200% 0' },
           '100%': { backgroundPosition: '200% 0' },
         },
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        slideUp: {
+          '0%': { transform: 'translateY(10px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        scaleIn: {
+          '0%': { transform: 'scale(0.95)', opacity: '0' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
       },
       transitionDuration: {
-        '70': '70ms',
-        '250': '250ms',
-        // MeatyMusic motion duration tokens
-        'micro': 'var(--mm-motion-duration-micro)',
-        'ui': 'var(--mm-motion-duration-ui)',
-        'panel': 'var(--mm-motion-duration-panel)',
-        'modal': 'var(--mm-motion-duration-modal)',
+        'micro': '70ms',
+        'ui': '150ms',
+        'panel': '250ms',
+        'modal': '300ms',
       },
       transitionTimingFunction: {
-        // MeatyMusic motion easing tokens
-        'enter': 'var(--mm-motion-easing-enter)',
-        'exit': 'var(--mm-motion-easing-exit)',
+        'enter': 'cubic-bezier(0, 0, 0.2, 1)',
+        'exit': 'cubic-bezier(0.4, 0, 1, 1)',
+      },
+      animationDelay: {
+        '100': '100ms',
+        '200': '200ms',
+        '300': '300ms',
+        '400': '400ms',
+        '500': '500ms',
+      },
+      backgroundImage: {
+        'gradient-primary': 'linear-gradient(135deg, #5b4cfa 0%, #6366f1 100%)',
+        'gradient-mesh': `radial-gradient(at 0% 0%, rgba(91, 76, 250, 0.15) 0px, transparent 50%),
+                          radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+                          radial-gradient(at 100% 100%, rgba(124, 58, 237, 0.1) 0px, transparent 50%),
+                          radial-gradient(at 0% 100%, rgba(99, 102, 241, 0.08) 0px, transparent 50%)`,
       },
       colors: {
-        // HSL-based variables (shadcn/ui compatibility)
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
+        // MeatyMusic Dark Mode Design System
+        // Background layers
+        'bg-base': '#0f0f1c',
+        'bg-surface': '#1a1625',
+        'bg-elevated': '#252137',
+        'bg-overlay': '#2d2742',
+        'bg-muted': '#1a1625',
+
+        // Text colors
+        'text-primary': '#f8f9fc',
+        'text-secondary': '#b8bcc8',
+        'text-muted': '#7c7f8c',
+        'text-inverse': '#0f0f1c',
+        'text-accent': '#8b87ff',
+
+        // Border colors
+        'border-default': '#2d2742',
+        'border-strong': '#3f3a56',
+        'border-subtle': '#1f1b2e',
+        'border-accent': '#5b4cfa',
+
+        // Primary accent (purple-blue)
+        primary: {
+          900: '#3730a3',
+          700: '#5b4cfa',
+          500: '#6366f1',
+          300: '#a5b4fc',
+          100: '#e0e7ff',
+          DEFAULT: '#6366f1',
+          foreground: '#f8f9fc',
+        },
+
+        // Secondary accent (purple)
+        secondary: {
+          700: '#7c3aed',
+          500: '#a78bfa',
+          300: '#c4b5fd',
+          DEFAULT: '#a78bfa',
+          foreground: '#f8f9fc',
+        },
+
+        // Semantic colors
+        success: {
+          700: '#15803d',
+          500: '#22c55e',
+          300: '#86efac',
+          bg: 'rgba(34, 197, 94, 0.1)',
+          DEFAULT: '#22c55e',
+        },
+        warning: {
+          700: '#c2410c',
+          500: '#f97316',
+          300: '#fdba74',
+          bg: 'rgba(249, 115, 22, 0.1)',
+          DEFAULT: '#f97316',
+        },
+        error: {
+          700: '#b91c1c',
+          500: '#ef4444',
+          300: '#fca5a5',
+          bg: 'rgba(239, 68, 68, 0.1)',
+          DEFAULT: '#ef4444',
+        },
+        info: {
+          700: '#0369a1',
+          500: '#3b82f6',
+          300: '#93c5fd',
+          bg: 'rgba(59, 130, 246, 0.1)',
+          DEFAULT: '#3b82f6',
+        },
+
+        // Shadcn compatibility
+        background: '#0f0f1c',
+        foreground: '#f8f9fc',
         card: {
-          DEFAULT: 'hsl(var(--card))',
-          foreground: 'hsl(var(--card-foreground))'
+          DEFAULT: '#1a1625',
+          foreground: '#f8f9fc'
         },
         popover: {
-          DEFAULT: 'hsl(var(--popover))',
-          foreground: 'hsl(var(--popover-foreground))'
-        },
-        primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))'
-        },
-        secondary: {
-          DEFAULT: 'hsl(var(--secondary))',
-          foreground: 'hsl(var(--secondary-foreground))'
+          DEFAULT: '#252137',
+          foreground: '#f8f9fc'
         },
         muted: {
-          DEFAULT: 'hsl(var(--muted))',
-          foreground: 'hsl(var(--muted-foreground))'
+          DEFAULT: '#2d2742',
+          foreground: '#b8bcc8'
         },
         accent: {
-          DEFAULT: 'hsl(var(--accent))',
-          foreground: 'hsl(var(--accent-foreground))'
+          DEFAULT: '#6366f1',
+          foreground: '#f8f9fc'
         },
         destructive: {
-          DEFAULT: 'hsl(var(--destructive))',
-          foreground: 'hsl(var(--destructive-foreground))'
+          DEFAULT: '#ef4444',
+          foreground: '#f8f9fc'
         },
-        border: 'hsl(var(--border))',
-        input: 'hsl(var(--input))',
-        ring: 'hsl(var(--ring))',
-        'sidebar-background': 'hsl(var(--sidebar-background))',
-
-        // MeatyMusic color tokens - Base colors
-        'mm-bg': 'var(--mm-color-bg)',
-        'mm-surface': 'var(--mm-color-surface)',
-        'mm-panel': 'var(--mm-color-panel)',
-        'mm-border': 'var(--mm-color-border)',
-        'mm-ring': 'var(--mm-color-ring)',
-
-        // MeatyMusic color tokens - Text colors
-        'mm-text-strong': 'var(--mm-color-text-strong)',
-        'mm-text-base': 'var(--mm-color-text-base)',
-        'mm-text-muted': 'var(--mm-color-text-muted)',
-
-        // MeatyMusic color tokens - Semantic colors
-        'mm-primary': 'var(--mm-color-primary)',
-        'mm-primary-foreground': 'var(--mm-color-primaryForeground)',
-        'mm-secondary': 'var(--mm-color-secondary)',
-        'mm-accent': 'var(--mm-color-accent)',
-        'mm-success': 'var(--mm-color-success)',
-        'mm-warning': 'var(--mm-color-warning)',
-        'mm-danger': 'var(--mm-color-danger)',
-        'mm-info': 'var(--mm-color-info)',
-
-        // MeatyMusic color tokens - Collection colors
-        'mm-collection-primary': 'var(--mm-color-collection-primary)',
-        'mm-collection-secondary': 'var(--mm-color-collection-secondary)',
-        'mm-collection-accent': 'var(--mm-color-collection-accent)',
-        'mm-collection-purple': 'var(--mm-color-collection-purple)',
-        'mm-collection-green': 'var(--mm-color-collection-green)',
-        'mm-collection-orange': 'var(--mm-color-collection-orange)',
-        'mm-collection-blue': 'var(--mm-color-collection-blue)',
-        'mm-collection-red': 'var(--mm-color-collection-red)',
-
-        // MeatyMusic Badge tokens - Light/Dark mode aware colors
-        'mm-badge-outline': {
-          bg: 'var(--mm-badge-outline-bg)',
-          border: 'var(--mm-badge-outline-border)',
-          text: 'var(--mm-badge-outline-text)',
-          'hover-bg': 'var(--mm-badge-outline-hover-bg)',
-          'hover-border': 'var(--mm-badge-outline-hover-border)',
-        },
-        'mm-badge-default': {
-          bg: 'var(--mm-badge-default-bg)',
-          border: 'var(--mm-badge-default-border)',
-          text: 'var(--mm-badge-default-text)',
-          'hover-bg': 'var(--mm-badge-default-hover-bg)',
-        },
-        'mm-badge-secondary': {
-          bg: 'var(--mm-badge-secondary-bg)',
-          border: 'var(--mm-badge-secondary-border)',
-          text: 'var(--mm-badge-secondary-text)',
-          'hover-bg': 'var(--mm-badge-secondary-hover-bg)',
-        },
-
-        // MeatyMusic Complication tokens
-        'mm-complication-prompt-type': {
-          bg: 'var(--mm-complication-prompt-type-bg)',
-          border: 'var(--mm-complication-prompt-type-border)',
-          text: 'var(--mm-complication-prompt-type-text)',
-        },
-        'mm-complication-permission': {
-          bg: 'var(--mm-complication-permission-bg)',
-          border: 'var(--mm-complication-permission-border)',
-          text: 'var(--mm-complication-permission-text)',
-        },
+        border: '#2d2742',
+        input: '#2d2742',
+        ring: '#5b4cfa',
       },
     }
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    function({ addUtilities, theme }) {
+      const animationDelays = theme('animationDelay');
+      const utilities = Object.entries(animationDelays).reduce((acc, [key, value]) => {
+        acc[`.animation-delay-${key}`] = { animationDelay: value };
+        return acc;
+      }, {});
+      addUtilities(utilities);
+    },
+  ],
 }

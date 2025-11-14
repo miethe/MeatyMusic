@@ -73,7 +73,7 @@ export default function NewSongPage() {
         description="Follow the steps to design your song"
       />
 
-      <div className="container mx-auto px-4 py-8 max-w-5xl">
+      <div className="container mx-auto px-4 py-8 max-w-5xl animate-fade-in">
         {/* Stepper */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
@@ -86,12 +86,12 @@ export default function NewSongPage() {
                 <React.Fragment key={step.id}>
                   <div className="flex flex-col items-center">
                     <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 transition-colors ${
+                      className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 transition-all duration-ui ${
                         isActive
-                          ? 'bg-primary text-primary-foreground'
+                          ? 'bg-gradient-primary shadow-accent-glow text-white scale-110'
                           : isComplete
-                            ? 'bg-green-500 text-white'
-                            : 'bg-muted text-muted-foreground'
+                            ? 'bg-success-500 text-white'
+                            : 'bg-bg-elevated border border-border-default text-text-muted'
                       }`}
                     >
                       {isComplete ? (
@@ -101,10 +101,10 @@ export default function NewSongPage() {
                       )}
                     </div>
                     <span
-                      className={`text-sm font-medium ${
+                      className={`text-sm font-medium transition-colors duration-ui ${
                         isActive
-                          ? 'text-foreground'
-                          : 'text-muted-foreground'
+                          ? 'text-text-primary'
+                          : 'text-text-muted'
                       }`}
                     >
                       {step.label}
@@ -112,8 +112,8 @@ export default function NewSongPage() {
                   </div>
                   {index < WIZARD_STEPS.length - 1 && (
                     <div
-                      className={`flex-1 h-0.5 mx-4 ${
-                        isComplete ? 'bg-green-500' : 'bg-muted'
+                      className={`flex-1 h-0.5 mx-4 transition-colors duration-ui ${
+                        isComplete ? 'bg-success-500' : 'bg-border-default'
                       }`}
                     />
                   )}
@@ -124,16 +124,16 @@ export default function NewSongPage() {
         </div>
 
         {/* Step Content */}
-        <Card className="p-8 mb-6">
-          <h2 className="text-2xl font-semibold mb-6">{currentStepConfig?.label}</h2>
+        <Card className="bg-bg-surface border-border-default shadow-elevation-1 p-8 mb-6 animate-slide-up">
+          <h2 className="text-2xl font-semibold text-text-primary mb-6">{currentStepConfig?.label}</h2>
 
           {currentStep === 0 && (
             <SongInfoStep formData={formData} setFormData={setFormData} />
           )}
-          {currentStep === 1 && <div className="py-12 text-center text-muted-foreground">Style editor coming soon</div>}
-          {currentStep === 2 && <div className="py-12 text-center text-muted-foreground">Lyrics editor coming soon</div>}
-          {currentStep === 3 && <div className="py-12 text-center text-muted-foreground">Persona selector coming soon</div>}
-          {currentStep === 4 && <div className="py-12 text-center text-muted-foreground">Producer notes editor coming soon</div>}
+          {currentStep === 1 && <div className="py-12 text-center text-text-muted">Style editor coming soon</div>}
+          {currentStep === 2 && <div className="py-12 text-center text-text-muted">Lyrics editor coming soon</div>}
+          {currentStep === 3 && <div className="py-12 text-center text-text-muted">Persona selector coming soon</div>}
+          {currentStep === 4 && <div className="py-12 text-center text-text-muted">Producer notes editor coming soon</div>}
           {currentStep === 5 && <ReviewStep formData={formData} />}
         </Card>
 
@@ -152,12 +152,18 @@ export default function NewSongPage() {
             )}
 
             {currentStep < WIZARD_STEPS.length - 1 ? (
-              <Button onClick={handleNext}>
+              <Button
+                onClick={handleNext}
+                className="bg-gradient-primary shadow-accent-glow hover:shadow-accent-glow-lg transition-all duration-ui"
+              >
                 Next
                 <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
             ) : (
-              <Button onClick={handleSubmit}>
+              <Button
+                onClick={handleSubmit}
+                className="bg-gradient-primary shadow-accent-glow hover:shadow-accent-glow-lg transition-all duration-ui"
+              >
                 <Check className="w-4 h-4 mr-2" />
                 Create Song
               </Button>
@@ -179,10 +185,10 @@ function SongInfoStep({
   return (
     <div className="space-y-6">
       <div>
-        <label className="block text-sm font-medium mb-2">Song Title *</label>
+        <label className="block text-sm font-medium text-text-primary mb-2">Song Title *</label>
         <input
           type="text"
-          className="w-full px-4 py-2 rounded-lg border bg-background"
+          className="w-full px-4 py-2 rounded-lg border border-border-default bg-bg-elevated text-text-primary placeholder:text-text-muted focus:border-border-accent focus:ring-2 focus:ring-primary-500/20 transition-all duration-ui"
           placeholder="Enter song title..."
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -190,9 +196,9 @@ function SongInfoStep({
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-2">Description</label>
+        <label className="block text-sm font-medium text-text-primary mb-2">Description</label>
         <textarea
-          className="w-full px-4 py-2 rounded-lg border bg-background"
+          className="w-full px-4 py-2 rounded-lg border border-border-default bg-bg-elevated text-text-primary placeholder:text-text-muted focus:border-border-accent focus:ring-2 focus:ring-primary-500/20 transition-all duration-ui resize-none"
           rows={4}
           placeholder="Describe your song concept..."
           value={formData.description}
@@ -202,9 +208,9 @@ function SongInfoStep({
 
       <div className="grid md:grid-cols-2 gap-6">
         <div>
-          <label className="block text-sm font-medium mb-2">Genre *</label>
+          <label className="block text-sm font-medium text-text-primary mb-2">Genre *</label>
           <select
-            className="w-full px-4 py-2 rounded-lg border bg-background"
+            className="w-full px-4 py-2 rounded-lg border border-border-default bg-bg-elevated text-text-primary focus:border-border-accent focus:ring-2 focus:ring-primary-500/20 transition-all duration-ui"
             value={formData.genre}
             onChange={(e) => setFormData({ ...formData, genre: e.target.value })}
           >
@@ -219,10 +225,10 @@ function SongInfoStep({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Mood</label>
+          <label className="block text-sm font-medium text-text-primary mb-2">Mood</label>
           <input
             type="text"
-            className="w-full px-4 py-2 rounded-lg border bg-background"
+            className="w-full px-4 py-2 rounded-lg border border-border-default bg-bg-elevated text-text-primary placeholder:text-text-muted focus:border-border-accent focus:ring-2 focus:ring-primary-500/20 transition-all duration-ui"
             placeholder="e.g., upbeat, melancholic..."
           />
         </div>
@@ -234,26 +240,26 @@ function SongInfoStep({
 function ReviewStep({ formData }: { formData: any }) {
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold mb-4">Song Information</h3>
+      <div className="bg-bg-elevated border border-border-default rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-text-primary mb-4">Song Information</h3>
         <dl className="grid grid-cols-2 gap-4">
           <div>
-            <dt className="text-sm text-muted-foreground">Title</dt>
-            <dd className="font-medium">{formData.name || 'Not set'}</dd>
+            <dt className="text-sm text-text-muted mb-1">Title</dt>
+            <dd className="font-medium text-text-primary">{formData.name || 'Not set'}</dd>
           </div>
           <div>
-            <dt className="text-sm text-muted-foreground">Genre</dt>
-            <dd className="font-medium">{formData.genre || 'Not set'}</dd>
+            <dt className="text-sm text-text-muted mb-1">Genre</dt>
+            <dd className="font-medium text-text-primary">{formData.genre || 'Not set'}</dd>
           </div>
           <div className="col-span-2">
-            <dt className="text-sm text-muted-foreground">Description</dt>
-            <dd className="font-medium">{formData.description || 'Not set'}</dd>
+            <dt className="text-sm text-text-muted mb-1">Description</dt>
+            <dd className="font-medium text-text-primary">{formData.description || 'Not set'}</dd>
           </div>
         </dl>
       </div>
 
-      <div className="bg-muted/50 rounded-lg p-4">
-        <p className="text-sm text-muted-foreground">
+      <div className="bg-info-bg border border-info-500/30 rounded-lg p-4">
+        <p className="text-sm text-text-secondary">
           Note: Style, Lyrics, Persona, and Producer Notes editors are coming soon.
           You'll be able to define these entities in future steps.
         </p>

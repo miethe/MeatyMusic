@@ -20,9 +20,9 @@ export default function NewPersonaPage() {
         description="Define a new artist persona"
       />
 
-      <div className="container mx-auto px-4 py-8 max-w-3xl">
-        <Card className="p-12 text-center">
-          <p className="text-muted-foreground mb-6">
+      <div className="container mx-auto px-4 py-8 max-w-3xl animate-fade-in">
+        <Card className="bg-bg-surface border-border-default shadow-elevation-1 p-12 text-center">
+          <p className="text-text-secondary mb-6">
             Persona editor coming soon. This will include vocal range, delivery style, and influences.
           </p>
           <Button variant="outline" onClick={() => router.push(ROUTES.ENTITIES.PERSONAS)}>

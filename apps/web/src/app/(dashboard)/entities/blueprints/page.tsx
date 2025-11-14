@@ -28,15 +28,15 @@ export default function BlueprintsPage() {
       />
 
       <div className="container mx-auto px-4 py-8">
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
           {blueprints.map((blueprint) => (
-            <Card key={blueprint.id} className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
+            <Card key={blueprint.id} className="bg-bg-surface border-border-default shadow-elevation-1 hover:shadow-elevation-2 hover:border-border-accent p-6 transition-all duration-ui cursor-pointer">
               <div className="flex items-center gap-3 mb-3">
-                <BookOpen className="w-5 h-5 text-primary" />
-                <h3 className="text-lg font-semibold">{blueprint.name}</h3>
+                <BookOpen className="w-5 h-5 text-primary-500" />
+                <h3 className="text-lg font-semibold text-text-primary">{blueprint.name}</h3>
               </div>
               <Badge variant="secondary" className="mb-3">{blueprint.genre}</Badge>
-              <p className="text-sm text-muted-foreground">{blueprint.description}</p>
+              <p className="text-sm text-text-secondary">{blueprint.description}</p>
             </Card>
           ))}
         </div>

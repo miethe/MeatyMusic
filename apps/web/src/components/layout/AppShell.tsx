@@ -31,11 +31,11 @@ export function AppShell({ children }: AppShellProps) {
   const pathname = usePathname();
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-bg-base">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -43,15 +43,17 @@ export function AppShell({ children }: AppShellProps) {
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 w-64 bg-card border-r transform transition-transform duration-200 lg:translate-x-0',
+          'fixed inset-y-0 left-0 z-50 w-64 bg-bg-surface border-r border-border-default shadow-elevation-2 transform transition-transform duration-200 lg:translate-x-0',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="flex items-center gap-3 px-6 py-4 border-b">
-            <Music2 className="w-8 h-8 text-primary" />
-            <span className="text-xl font-bold">MeatyMusic</span>
+          <div className="flex items-center gap-3 px-6 py-4 border-b border-border-default">
+            <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
+              <Music2 className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-xl font-bold text-text-primary">MeatyMusic</span>
             <Button
               variant="ghost"
               size="sm"
@@ -72,14 +74,14 @@ export function AppShell({ children }: AppShellProps) {
           </nav>
 
           {/* User Section */}
-          <div className="border-t px-4 py-4">
+          <div className="border-t border-border-default px-4 py-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <span className="text-sm font-semibold text-primary">U</span>
+              <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center">
+                <span className="text-sm font-semibold text-white">U</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">User</p>
-                <p className="text-xs text-muted-foreground truncate">user@example.com</p>
+                <p className="text-sm font-medium text-text-primary truncate">User</p>
+                <p className="text-xs text-text-muted truncate">user@example.com</p>
               </div>
             </div>
           </div>
@@ -89,7 +91,7 @@ export function AppShell({ children }: AppShellProps) {
       {/* Main content */}
       <div className="lg:pl-64">
         {/* Header */}
-        <header className="sticky top-0 z-30 bg-card border-b">
+        <header className="sticky top-0 z-30 bg-bg-surface/80 backdrop-blur-lg border-b border-border-default">
           <div className="flex items-center gap-4 px-4 py-3">
             <Button
               variant="ghost"
@@ -144,9 +146,9 @@ function NavItem({ item, pathname }: NavItemProps) {
         <button
           onClick={() => setExpanded(!expanded)}
           className={cn(
-            'w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors',
-            'hover:bg-accent/50',
-            expanded ? 'text-foreground' : 'text-muted-foreground'
+            'w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-ui',
+            'hover:bg-bg-overlay',
+            expanded ? 'text-text-primary' : 'text-text-secondary'
           )}
         >
           {Icon && <Icon className="w-5 h-5 flex-shrink-0" />}
@@ -167,10 +169,10 @@ function NavItem({ item, pathname }: NavItemProps) {
                   <Link
                     href={child.href}
                     className={cn(
-                      'block px-3 py-2 text-sm rounded-lg transition-colors',
+                      'block px-3 py-2 text-sm rounded-lg transition-all duration-ui',
                       isActive
-                        ? 'bg-primary/10 text-primary font-medium'
-                        : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground'
+                        ? 'bg-primary-700/20 text-primary-300 font-medium'
+                        : 'text-text-secondary hover:bg-bg-overlay hover:text-text-primary'
                     )}
                   >
                     {child.name}
@@ -193,10 +195,10 @@ function NavItem({ item, pathname }: NavItemProps) {
       <Link
         href={href}
         className={cn(
-          'flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors',
+          'flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-ui',
           isActive
-            ? 'bg-primary/10 text-primary'
-            : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground'
+            ? 'bg-primary-700/20 text-primary-300'
+            : 'text-text-secondary hover:bg-bg-overlay hover:text-text-primary'
         )}
       >
         {Icon && <Icon className="w-5 h-5 flex-shrink-0" />}

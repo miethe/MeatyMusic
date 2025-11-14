@@ -20,9 +20,9 @@ export default function NewSourcePage() {
         description="Register a new external knowledge source"
       />
 
-      <div className="container mx-auto px-4 py-8 max-w-3xl">
-        <Card className="p-12 text-center">
-          <p className="text-muted-foreground mb-6">
+      <div className="container mx-auto px-4 py-8 max-w-3xl animate-fade-in">
+        <Card className="bg-bg-surface border-border-default shadow-elevation-1 p-12 text-center">
+          <p className="text-text-secondary mb-6">
             Source management coming soon. This will support files, APIs, and database connections.
           </p>
           <Button variant="outline" onClick={() => router.push(ROUTES.ENTITIES.SOURCES)}>

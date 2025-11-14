@@ -36,29 +36,29 @@ export function PageHeader({
   const breadcrumbs = customBreadcrumbs || getBreadcrumbs(pathname);
 
   return (
-    <div className={cn('border-b bg-card', className)}>
+    <div className={cn('border-b border-border-default bg-bg-surface', className)}>
       <div className="container mx-auto px-4 py-6">
         {/* Breadcrumbs */}
         {breadcrumbs.length > 0 && (
           <nav className="flex items-center gap-2 mb-4 text-sm">
             <Link
               href="/dashboard"
-              className="text-muted-foreground hover:text-foreground transition-colors"
+              className="text-text-secondary hover:text-text-primary transition-colors duration-ui"
             >
               Home
             </Link>
             {breadcrumbs.map((crumb, index) => (
               <React.Fragment key={index}>
-                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                <ChevronRight className="w-4 h-4 text-text-muted" />
                 {crumb.href ? (
                   <Link
                     href={crumb.href}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
+                    className="text-text-secondary hover:text-text-primary transition-colors duration-ui"
                   >
                     {crumb.label}
                   </Link>
                 ) : (
-                  <span className="text-foreground font-medium">{crumb.label}</span>
+                  <span className="text-text-primary font-medium">{crumb.label}</span>
                 )}
               </React.Fragment>
             ))}
@@ -68,9 +68,9 @@ export function PageHeader({
         {/* Title & Actions */}
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
-            <h1 className="text-3xl font-bold mb-2">{title}</h1>
+            <h1 className="text-3xl font-bold text-text-primary mb-2">{title}</h1>
             {description && (
-              <p className="text-muted-foreground">{description}</p>
+              <p className="text-text-secondary">{description}</p>
             )}
           </div>
 

@@ -20,9 +20,9 @@ export default function NewProducerNotesPage() {
         description="Define production arrangement and mix specifications"
       />
 
-      <div className="container mx-auto px-4 py-8 max-w-3xl">
-        <Card className="p-12 text-center">
-          <p className="text-muted-foreground mb-6">
+      <div className="container mx-auto px-4 py-8 max-w-3xl animate-fade-in">
+        <Card className="bg-bg-surface border-border-default shadow-elevation-1 p-12 text-center">
+          <p className="text-text-secondary mb-6">
             Producer notes editor coming soon. This will include structure, hooks, and mix parameters.
           </p>
           <Button variant="outline" onClick={() => router.push(ROUTES.ENTITIES.PRODUCER_NOTES)}>
