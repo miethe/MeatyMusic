@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import '@meatymusic/tokens/css/tokens.css';
 
 @tailwind base;
 @tailwind components;
@@ -23,7 +24,7 @@
   }
 
   a {
-    @apply text-text-accent transition-colors hover:text-primary-300;
+    @apply text-text-accent transition-colors hover:text-primary;
   }
 
   /* Scrollbar styling */
@@ -46,7 +47,7 @@
 
   /* Selection */
   ::selection {
-    @apply bg-primary-700/30 text-text-primary;
+    @apply bg-primary/30 text-text-primary;
   }
 
   /* Focus visible */
@@ -91,7 +92,7 @@
   /* Input base styles */
   .input {
     @apply bg-bg-elevated border border-border-default text-text-primary px-3 py-2 rounded-lg;
-    @apply focus:border-border-accent focus:ring-2 focus:ring-primary-700/20;
+    @apply focus:border-border-accent focus:ring-2 focus:ring-primary/20;
     @apply transition-all duration-ui;
     @apply placeholder:text-text-muted;
   }

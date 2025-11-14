@@ -44,7 +44,7 @@ export default function NewStylePage() {
                 <label className="block text-sm font-medium text-text-primary mb-2">Name *</label>
                 <input
                   type="text"
-                  className="w-full px-4 py-2 rounded-lg border border-border-default bg-bg-elevated text-text-primary placeholder:text-text-muted focus:border-border-accent focus:ring-2 focus:ring-primary-500/20 transition-all duration-ui"
+                  className="w-full px-4 py-2 rounded-lg border border-border-default bg-bg-elevated text-text-primary placeholder:text-text-muted focus:border-border-accent focus:ring-2 focus:ring-primary/20 transition-all duration-ui"
                   placeholder="e.g., Upbeat Pop"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}

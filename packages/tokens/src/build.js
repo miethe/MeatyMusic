@@ -162,7 +162,7 @@ function generateTailwindPreset() {
   colorPaths.forEach(path => {
     const cssVar = tokenToCSSVar(`color.${path}`);
     const tailwindKey = path.replace('.', '-');
-    preset.theme.extend.colors[tailwindKey] = `hsl(var(${cssVar}))`;
+    preset.theme.extend.colors[tailwindKey] = `var(${cssVar})`;
   });
 
   // Spacing

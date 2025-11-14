@@ -10,11 +10,11 @@ export const Card: React.FC<CardProps> & {
   Content: React.FC<CardProps>;
   Footer: React.FC<CardProps>;
 } = ({ children, className = '', ...props }) => (
-  <div className={`bg-white rounded-md shadow ${className}`} {...props}>{children}</div>
+  <div className={`bg-bg-surface border border-border-default rounded-lg shadow-elevation-1 ${className}`} {...props}>{children}</div>
 );
 
 Card.Header = ({ children, className = '', ...props }) => (
-  <div className={`border-b px-4 py-2 ${className}`} {...props}>{children}</div>
+  <div className={`border-b border-border-default px-4 py-2 ${className}`} {...props}>{children}</div>
 );
 
 Card.Content = ({ children, className = '', ...props }) => (
@@ -22,7 +22,7 @@ Card.Content = ({ children, className = '', ...props }) => (
 );
 
 Card.Footer = ({ children, className = '', ...props }) => (
-  <div className={`border-t px-4 py-2 ${className}`} {...props}>{children}</div>
+  <div className={`border-t border-border-default px-4 py-2 ${className}`} {...props}>{children}</div>
 );
 
 export default Card;

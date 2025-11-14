@@ -73,9 +73,9 @@ export default function DashboardPage() {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Recent Songs */}
           <div className="lg:col-span-2 animate-slide-up">
-            <Card className="p-6 bg-bg-surface border-border-default shadow-elevation-1">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-text-primary">Recent Songs</h2>
+            <Card className="p-8 bg-surface border-border shadow-elev1">
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-xl font-semibold text-text-strong">Recent Songs</h2>
                 <Link href={ROUTES.SONGS}>
                   <Button variant="ghost" size="sm">
                     View All
@@ -83,16 +83,16 @@ export default function DashboardPage() {
                 </Link>
               </div>
 
-              <div className="text-center py-12">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-lg bg-bg-elevated flex items-center justify-center">
+              <div className="text-center py-16">
+                <div className="w-20 h-20 mx-auto mb-6 rounded-xl bg-panel flex items-center justify-center">
                   <Music2 className="w-10 h-10 text-text-muted" />
                 </div>
-                <h3 className="text-lg font-medium text-text-primary mb-2">No songs yet</h3>
-                <p className="text-text-secondary mb-6">
+                <h3 className="text-lg font-medium text-text-strong mb-3">No songs yet</h3>
+                <p className="text-text-muted mb-8 max-w-md mx-auto">
                   Create your first song to get started with MeatyMusic AMCS
                 </p>
                 <Link href={ROUTES.SONG_NEW}>
-                  <Button className="bg-gradient-primary text-white shadow-accent-glow hover:shadow-accent-glow-lg hover:scale-105 transition-all duration-ui">
+                  <Button className="bg-primary text-primaryForeground hover:opacity-90 transition-all duration-ui px-6 py-3">
                     <Plus className="w-4 h-4 mr-2" />
                     Create Your First Song
                   </Button>
@@ -103,32 +103,32 @@ export default function DashboardPage() {
 
           {/* Quick Actions */}
           <div className="space-y-6 animate-slide-up animation-delay-100">
-            <Card className="p-6 bg-bg-surface border-border-default shadow-elevation-1">
-              <h2 className="text-xl font-semibold text-text-primary mb-6">Quick Actions</h2>
+            <Card className="p-8 bg-surface border-border shadow-elev1">
+              <h2 className="text-xl font-semibold text-text-strong mb-6">Quick Actions</h2>
               <div className="space-y-3">
                 <Link href={ROUTES.SONG_NEW} className="block">
-                  <Button variant="outline" className="w-full justify-start bg-bg-elevated hover:bg-bg-overlay border-border-default hover:border-border-accent text-text-primary transition-all duration-ui">
-                    <Plus className="w-4 h-4 mr-2" />
+                  <Button variant="outline" className="w-full justify-start px-4 py-3 bg-panel hover:bg-primary/10 border-border hover:border-primary text-text-base transition-all duration-ui">
+                    <Plus className="w-4 h-4 mr-3" />
                     New Song
                   </Button>
                 </Link>
                 <Link href={ROUTES.ENTITIES.STYLES} className="block">
-                  <Button variant="outline" className="w-full justify-start bg-bg-elevated hover:bg-bg-overlay border-border-default hover:border-border-accent text-text-primary transition-all duration-ui">
+                  <Button variant="outline" className="w-full justify-start px-4 py-3 bg-panel hover:bg-primary/10 border-border hover:border-primary text-text-base transition-all duration-ui">
                     Browse Styles
                   </Button>
                 </Link>
                 <Link href={ROUTES.ENTITIES.LYRICS} className="block">
-                  <Button variant="outline" className="w-full justify-start bg-bg-elevated hover:bg-bg-overlay border-border-default hover:border-border-accent text-text-primary transition-all duration-ui">
+                  <Button variant="outline" className="w-full justify-start px-4 py-3 bg-panel hover:bg-primary/10 border-border hover:border-primary text-text-base transition-all duration-ui">
                     Browse Lyrics
                   </Button>
                 </Link>
                 <Link href={ROUTES.ENTITIES.PERSONAS} className="block">
-                  <Button variant="outline" className="w-full justify-start bg-bg-elevated hover:bg-bg-overlay border-border-default hover:border-border-accent text-text-primary transition-all duration-ui">
+                  <Button variant="outline" className="w-full justify-start px-4 py-3 bg-panel hover:bg-primary/10 border-border hover:border-primary text-text-base transition-all duration-ui">
                     Browse Personas
                   </Button>
                 </Link>
                 <Link href={ROUTES.ENTITIES.BLUEPRINTS} className="block">
-                  <Button variant="outline" className="w-full justify-start bg-bg-elevated hover:bg-bg-overlay border-border-default hover:border-border-accent text-text-primary transition-all duration-ui">
+                  <Button variant="outline" className="w-full justify-start px-4 py-3 bg-panel hover:bg-primary/10 border-border hover:border-primary text-text-base transition-all duration-ui">
                     View Blueprints
                   </Button>
                 </Link>
@@ -136,9 +136,9 @@ export default function DashboardPage() {
             </Card>
 
             {/* System Status */}
-            <Card className="p-6 bg-bg-surface border-border-default shadow-elevation-1">
-              <h2 className="text-xl font-semibold text-text-primary mb-4">System Status</h2>
-              <div className="space-y-3">
+            <Card className="p-8 bg-surface border-border shadow-elev1">
+              <h2 className="text-xl font-semibold text-text-strong mb-6">System Status</h2>
+              <div className="space-y-4">
                 <StatusItem label="API" status="operational" />
                 <StatusItem label="Workflow Engine" status="operational" />
                 <StatusItem label="Database" status="operational" />
@@ -148,9 +148,9 @@ export default function DashboardPage() {
         </div>
 
         {/* Getting Started */}
-        <Card className="p-6 mt-8 bg-bg-surface border-border-default shadow-elevation-1 animate-fade-in animation-delay-200">
-          <h2 className="text-xl font-semibold text-text-primary mb-4">Getting Started</h2>
-          <div className="grid md:grid-cols-3 gap-6">
+        <Card className="p-8 mt-8 bg-surface border-border shadow-elev1 animate-fade-in animation-delay-200">
+          <h2 className="text-xl font-semibold text-text-strong mb-6">Getting Started</h2>
+          <div className="grid md:grid-cols-3 gap-8">
             <StepCard
               number={1}
               title="Create a Song"
@@ -187,17 +187,17 @@ function MetricCard({
   trendDirection: 'up' | 'down' | 'neutral';
 }) {
   return (
-    <Card className="p-6 bg-bg-surface border-border-default shadow-elevation-1 hover:shadow-elevation-2 transition-all duration-ui animate-fade-in">
-      <div className="flex items-center justify-between mb-4">
-        <span className="text-sm font-medium text-text-secondary">{title}</span>
-        <div className="w-10 h-10 rounded-lg bg-gradient-primary flex items-center justify-center">
-          <div className="text-white">{icon}</div>
+    <Card className="p-8 bg-surface border-border shadow-elev1 hover:shadow-elev2 transition-all duration-ui animate-fade-in">
+      <div className="flex items-center justify-between mb-6">
+        <span className="text-sm font-medium text-text-base">{title}</span>
+        <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center shadow-md">
+          <div className="text-primaryForeground">{icon}</div>
         </div>
       </div>
-      <div className="text-3xl font-bold text-text-primary mb-2">{value}</div>
+      <div className="text-3xl font-bold text-text-strong mb-3">{value}</div>
       <div className="flex items-center gap-2">
-        {trendDirection === 'up' && <TrendingUp className="w-4 h-4 text-success-500" />}
-        <span className="text-sm text-text-secondary">{trend}</span>
+        {trendDirection === 'up' && <TrendingUp className="w-4 h-4 text-success" />}
+        <span className="text-sm text-text-muted">{trend}</span>
       </div>
     </Card>
   );
@@ -205,19 +205,19 @@ function MetricCard({
 
 function StatusItem({ label, status }: { label: string; status: 'operational' | 'degraded' | 'down' }) {
   const statusConfig = {
-    operational: { color: 'bg-success-500', text: 'Operational', textColor: 'text-success-300' },
-    degraded: { color: 'bg-warning-500', text: 'Degraded', textColor: 'text-warning-300' },
-    down: { color: 'bg-error-500', text: 'Down', textColor: 'text-error-300' },
+    operational: { color: 'bg-success', text: 'Operational', textColor: 'text-success' },
+    degraded: { color: 'bg-warning', text: 'Degraded', textColor: 'text-warning' },
+    down: { color: 'bg-danger', text: 'Down', textColor: 'text-danger' },
   };
 
   const config = statusConfig[status];
 
   return (
-    <div className="flex items-center justify-between">
-      <span className="text-sm text-text-primary">{label}</span>
+    <div className="flex items-center justify-between py-2">
+      <span className="text-sm font-medium text-text-base">{label}</span>
       <div className="flex items-center gap-2">
-        <div className={`w-2 h-2 rounded-full ${config.color}`} />
-        <span className={`text-sm ${config.textColor}`}>{config.text}</span>
+        <div className={`w-2.5 h-2.5 rounded-full ${config.color}`} />
+        <span className={`text-sm font-medium ${config.textColor}`}>{config.text}</span>
       </div>
     </div>
   );
@@ -234,12 +234,12 @@ function StepCard({
 }) {
   return (
     <div className="flex gap-4">
-      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary-700/20 text-primary-300 flex items-center justify-center font-semibold text-lg">
+      <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-primary/20 text-primary flex items-center justify-center font-semibold text-lg">
         {number}
       </div>
       <div>
-        <h3 className="font-semibold text-text-primary mb-2">{title}</h3>
-        <p className="text-sm text-text-secondary">{description}</p>
+        <h3 className="font-semibold text-text-strong mb-2">{title}</h3>
+        <p className="text-sm text-text-muted leading-relaxed">{description}</p>
       </div>
     </div>
   );

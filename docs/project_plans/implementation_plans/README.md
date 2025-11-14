@@ -4,7 +4,108 @@ This directory contains comprehensive, detailed implementation plans for MeatyMu
 
 ## Current Plans
 
-### 1. Claude Code Workflow Skills Implementation Plan (WP-N1)
+### 1. SDS Aggregation & Song Creation Backend (CRITICAL - Phase 3 Blocker)
+
+**Status**: READY FOR IMPLEMENTATION
+**Created**: 2025-11-14
+**Complexity**: Medium (M) - Standard Track
+**Priority**: CRITICAL (Blocks Phase 3 Orchestration)
+**Duration**: 1 week (5-7 business days)
+**Effort**: 26-30 story points
+
+#### Plan Document
+- **File**: `sds-aggregation-implementation-v1.md`
+- **Purpose**: Complete song creation backend flow with SDS compilation and validation
+- **Length**: ~2100 lines (single comprehensive document)
+- **Key Sections**:
+  - Executive Summary (current state: Phase 2 80% complete)
+  - Implementation Strategy (layered architecture)
+  - 5 Phase Breakdown (Repository → Services → API → Testing → Docs)
+  - 12 Detailed Tasks (SDS-001 through SDS-012)
+  - Risk Mitigation & Success Metrics
+
+#### What This Plan Delivers
+
+**Core Components**:
+1. **SDS Compiler Service**: Aggregates entity references into validated SDS JSON
+2. **Blueprint Validator Service**: Enforces genre-specific constraints (BPM, sections, lexicon)
+3. **Tag Conflict Resolver**: Applies conflict matrix to resolve tag contradictions
+4. **Cross-Entity Validator**: Ensures consistency between style, lyrics, producer notes
+5. **Enhanced Song API**: Integrated song creation with full validation pipeline
+
+**Key Features**:
+- Deterministic SDS compilation (SHA-256 hashing)
+- Source weight normalization (sum to 1.0)
+- Blueprint constraint enforcement
+- Tag conflict resolution via conflict matrix
+- Cross-entity consistency validation
+- Comprehensive error messages
+
+**Dependencies Resolved**:
+- Builds on Phase 1 (Entity Services) - Complete
+- Completes Phase 2 (Aggregation) - Currently 80%
+- Unblocks Phase 3 (Orchestration) - Waiting on this
+- Uses existing infrastructure (DB models, repositories, validation service)
+
+#### Phase Structure
+
+**Phase 1**: Repository Extensions (0.5 days, 3 pts)
+- Add batch entity fetching for SDS compilation
+- Optimize queries with eager loading
+
+**Phase 2A**: SDS Compiler Service (2 days, 8 pts)
+- Core compiler logic
+- Entity-to-SDS transformation
+- Weight normalization
+- Deterministic hashing
+
+**Phase 2B**: Validation Services (1.5 days, 6 pts)
+- Blueprint constraint validator
+- Tag conflict resolver
+- Cross-entity validator
+
+**Phase 2C**: Utility Services (1 day, 4 pts)
+- Source weight normalizer
+- SDS hash calculator
+- Genre consistency checker
+
+**Phase 3**: API Enhancement (1 day, 4 pts)
+- Enhanced POST /songs with SDS compilation
+- New GET /songs/{id}/sds endpoint
+- Error handling and rollback logic
+
+**Phase 4**: Testing Suite (1.5 days, 5 pts)
+- Unit tests (95%+ coverage)
+- Integration tests (end-to-end flow)
+- Determinism tests (hash reproducibility)
+
+**Phase 5**: Documentation (0.5 days, 2 pts)
+- API documentation
+- Algorithm descriptions
+
+#### Quick Start for Developers
+
+1. **Review Plan**: Read `sds-aggregation-implementation-v1.md`
+2. **Check Prerequisites**: Verify Phase 1-2 infrastructure exists
+3. **Create Branch**: `feature/sds-aggregation-v1`
+4. **Follow Phases**: Implement in order (1 → 2A-C → 3 → 4 → 5)
+5. **Use File Paths**: All file paths are absolute and production-ready
+6. **Check Acceptance Criteria**: Each task has clear completion criteria
+
+#### Success Criteria Summary
+
+- Song creation flow fully operational
+- SDS compilation from entity references works
+- All validation rules enforced
+- Tag conflicts resolved deterministically
+- Source weights normalized to 1.0
+- API returns clear error messages
+- 95%+ test coverage
+- Phase 3 (Orchestration) unblocked
+
+---
+
+### 2. Claude Code Workflow Skills Implementation Plan (WP-N1)
 
 **Status**: READY FOR IMPLEMENTATION
 **Created**: 2025-11-14

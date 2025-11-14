@@ -42,7 +42,7 @@ export default function StylesPage() {
             <input
               type="search"
               placeholder="Search styles..."
-              className="w-full px-4 py-2 rounded-lg border border-border-default bg-bg-elevated text-text-primary placeholder:text-text-muted focus:border-border-accent focus:ring-2 focus:ring-primary-500/20 transition-all duration-ui"
+              className="w-full px-4 py-2 rounded-lg border border-border-default bg-bg-elevated text-text-primary placeholder:text-text-muted focus:border-border-accent focus:ring-2 focus:ring-primary/20 transition-all duration-ui"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
