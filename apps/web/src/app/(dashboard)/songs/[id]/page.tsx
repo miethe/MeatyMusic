@@ -131,13 +131,13 @@ export default function SongDetailPage() {
           <Card className="p-4">
             <div className="text-sm text-muted-foreground mb-1">Created</div>
             <div className="font-semibold">
-              {new Date(song.createdAt).toLocaleDateString()}
+              {new Date(song.created_at).toLocaleDateString()}
             </div>
           </Card>
           <Card className="p-4">
             <div className="text-sm text-muted-foreground mb-1">Updated</div>
             <div className="font-semibold">
-              {new Date(song.updatedAt).toLocaleDateString()}
+              {new Date(song.updated_at).toLocaleDateString()}
             </div>
           </Card>
         </div>
