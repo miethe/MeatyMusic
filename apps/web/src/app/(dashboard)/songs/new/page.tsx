@@ -28,6 +28,7 @@ import {
   Settings,
   Eye,
   Loader2,
+  Edit,
 } from 'lucide-react';
 
 const WIZARD_STEPS = [
@@ -278,6 +279,13 @@ export default function NewSongPage() {
     router.push(ROUTES.SONGS);
   };
 
+  /**
+   * Navigate back to a specific step for editing
+   */
+  const handleEditStep = (stepIndex: number) => {
+    setCurrentStep(stepIndex);
+  };
+
   const handleSubmit = async () => {
     try {
       const songData = {
@@ -415,7 +423,7 @@ export default function NewSongPage() {
             {currentStep === 0 && (
               <SongInfoStep formData={formData} updateSongData={updateSongData} />
             )}
-            {currentStep === 5 && <ReviewStep formData={formData} />}
+            {currentStep === 5 && <ReviewStep formData={formData} onEditStep={handleEditStep} />}
           </Card>
         )}
 
@@ -541,36 +549,270 @@ function SongInfoStep({ formData, updateSongData }: SongInfoStepProps) {
   );
 }
 
-interface ReviewStepProps {
-  formData: WizardFormData;
+/**
+ * Props for EntityReviewSection component
+ */
+interface EntityReviewSectionProps {
+  title: string;
+  data: any | null;
+  stepIndex: number;
+  onEdit: (stepIndex: number) => void;
+  isRequired?: boolean;
 }
 
-function ReviewStep({ formData }: ReviewStepProps) {
+/**
+ * Reusable component for displaying entity data in review step
+ * Shows key fields if data is present, or "Not provided" message if null
+ */
+function EntityReviewSection({
+  title,
+  data,
+  stepIndex,
+  onEdit,
+  isRequired = false,
+}: EntityReviewSectionProps) {
+  const isEmpty = data === null || data === undefined;
+
   return (
-    <div className="space-y-8">
-      <div className="bg-panel border-2 border-border rounded-xl p-8">
-        <h3 className="text-lg font-semibold text-text-strong mb-6">Song Information</h3>
-        <dl className="grid grid-cols-2 gap-6">
-          <div>
-            <dt className="text-sm font-medium text-text-muted mb-2">Title</dt>
-            <dd className="font-medium text-text-base text-lg">{formData.song.title || 'Not set'}</dd>
-          </div>
-          <div>
-            <dt className="text-sm font-medium text-text-muted mb-2">Genre</dt>
-            <dd className="font-medium text-text-base text-lg">{formData.song.genre || 'Not set'}</dd>
-          </div>
-          <div className="col-span-2">
-            <dt className="text-sm font-medium text-text-muted mb-2">Description</dt>
-            <dd className="font-medium text-text-base">{formData.song.description || 'Not set'}</dd>
-          </div>
-        </dl>
+    <div className={`bg-panel border-2 rounded-xl p-8 transition-all duration-ui ${
+      isEmpty ? 'border-border' : 'border-border hover:border-primary/30'
+    }`}>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-lg font-semibold text-text-strong">{title}</h3>
+        <Button
+          variant="outline"
+          onClick={() => onEdit(stepIndex)}
+          className="gap-2 px-4 py-2 text-sm"
+        >
+          <Edit className="w-4 h-4" />
+          Edit
+        </Button>
       </div>
 
+      {isEmpty ? (
+        <div className="text-text-muted italic py-4">
+          No {title.toLowerCase()} provided{!isRequired && ' (optional)'}
+        </div>
+      ) : (
+        <dl className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {title === 'Song Information' && (
+            <>
+              <div>
+                <dt className="text-sm font-medium text-text-muted mb-2">Title</dt>
+                <dd className="font-medium text-text-base text-lg">{data.title || 'Not set'}</dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-text-muted mb-2">Genre</dt>
+                <dd className="font-medium text-text-base text-lg">{data.genre || 'Not set'}</dd>
+              </div>
+              {data.mood && data.mood.length > 0 && (
+                <div className="md:col-span-2">
+                  <dt className="text-sm font-medium text-text-muted mb-2">Moods</dt>
+                  <dd className="font-medium text-text-base">{data.mood.join(', ')}</dd>
+                </div>
+              )}
+              {data.description && (
+                <div className="md:col-span-2">
+                  <dt className="text-sm font-medium text-text-muted mb-2">Description</dt>
+                  <dd className="font-medium text-text-base line-clamp-2">{data.description}</dd>
+                </div>
+              )}
+              <div className="md:col-span-2">
+                <dt className="text-sm font-medium text-text-muted mb-2">Global Seed</dt>
+                <dd className="font-medium text-text-base font-mono text-xs bg-panel p-3 rounded border border-border">{data.global_seed}</dd>
+              </div>
+            </>
+          )}
+
+          {title === 'Style' && (
+            <>
+              {data.genre && (
+                <div>
+                  <dt className="text-sm font-medium text-text-muted mb-2">Genre</dt>
+                  <dd className="font-medium text-text-base">{data.genre}</dd>
+                </div>
+              )}
+              {(data.bpm_min || data.bpm_max) && (
+                <div>
+                  <dt className="text-sm font-medium text-text-muted mb-2">BPM Range</dt>
+                  <dd className="font-medium text-text-base">{data.bpm_min || 0} - {data.bpm_max || 0}</dd>
+                </div>
+              )}
+              {data.key && (
+                <div>
+                  <dt className="text-sm font-medium text-text-muted mb-2">Key</dt>
+                  <dd className="font-medium text-text-base">{data.key}</dd>
+                </div>
+              )}
+              {data.energy_level !== undefined && (
+                <div>
+                  <dt className="text-sm font-medium text-text-muted mb-2">Energy Level</dt>
+                  <dd className="font-medium text-text-base">{data.energy_level}/10</dd>
+                </div>
+              )}
+              {data.mood && data.mood.length > 0 && (
+                <div className="md:col-span-2">
+                  <dt className="text-sm font-medium text-text-muted mb-2">Moods</dt>
+                  <dd className="font-medium text-text-base">{data.mood.slice(0, 3).join(', ')}</dd>
+                </div>
+              )}
+              {data.instrumentation && data.instrumentation.length > 0 && (
+                <div className="md:col-span-2">
+                  <dt className="text-sm font-medium text-text-muted mb-2">Instrumentation</dt>
+                  <dd className="font-medium text-text-base">{data.instrumentation.slice(0, 3).join(', ')}</dd>
+                </div>
+              )}
+            </>
+          )}
+
+          {title === 'Lyrics' && (
+            <>
+              {data.sections && (
+                <div>
+                  <dt className="text-sm font-medium text-text-muted mb-2">Sections</dt>
+                  <dd className="font-medium text-text-base">{Array.isArray(data.sections) ? data.sections.length : 0}</dd>
+                </div>
+              )}
+              {data.pov && (
+                <div>
+                  <dt className="text-sm font-medium text-text-muted mb-2">Point of View</dt>
+                  <dd className="font-medium text-text-base capitalize">{data.pov.replace('-', ' ')}</dd>
+                </div>
+              )}
+              {data.rhyme_scheme && (
+                <div>
+                  <dt className="text-sm font-medium text-text-muted mb-2">Rhyme Scheme</dt>
+                  <dd className="font-medium text-text-base">{data.rhyme_scheme}</dd>
+                </div>
+              )}
+              {data.themes && data.themes.length > 0 && (
+                <div className="md:col-span-2">
+                  <dt className="text-sm font-medium text-text-muted mb-2">Themes</dt>
+                  <dd className="font-medium text-text-base">{data.themes.join(', ')}</dd>
+                </div>
+              )}
+            </>
+          )}
+
+          {title === 'Persona' && (
+            <>
+              {data.name && (
+                <div>
+                  <dt className="text-sm font-medium text-text-muted mb-2">Name</dt>
+                  <dd className="font-medium text-text-base">{data.name}</dd>
+                </div>
+              )}
+              {data.vocal_range && (
+                <div>
+                  <dt className="text-sm font-medium text-text-muted mb-2">Vocal Range</dt>
+                  <dd className="font-medium text-text-base">{data.vocal_range}</dd>
+                </div>
+              )}
+              {data.influences && data.influences.length > 0 && (
+                <div className="md:col-span-2">
+                  <dt className="text-sm font-medium text-text-muted mb-2">Influences</dt>
+                  <dd className="font-medium text-text-base">{data.influences.slice(0, 3).join(', ')}</dd>
+                </div>
+              )}
+            </>
+          )}
+
+          {title === 'Producer Notes' && (
+            <>
+              {data.structure && (
+                <div>
+                  <dt className="text-sm font-medium text-text-muted mb-2">Structure</dt>
+                  <dd className="font-medium text-text-base line-clamp-1">{data.structure}</dd>
+                </div>
+              )}
+              {data.hooks !== undefined && (
+                <div>
+                  <dt className="text-sm font-medium text-text-muted mb-2">Target Hook Count</dt>
+                  <dd className="font-medium text-text-base">{data.hooks}</dd>
+                </div>
+              )}
+              {data.instrumentation && data.instrumentation.length > 0 && (
+                <div className="md:col-span-2">
+                  <dt className="text-sm font-medium text-text-muted mb-2">Instrumentation</dt>
+                  <dd className="font-medium text-text-base">{data.instrumentation.slice(0, 3).join(', ')}</dd>
+                </div>
+              )}
+            </>
+          )}
+        </dl>
+      )}
+    </div>
+  );
+}
+
+interface ReviewStepProps {
+  formData: WizardFormData;
+  onEditStep: (stepIndex: number) => void;
+}
+
+function ReviewStep({ formData, onEditStep }: ReviewStepProps) {
+  // Count provided optional entities
+  const providedCount = [
+    formData.style,
+    formData.lyrics,
+    formData.persona,
+    formData.producerNotes,
+  ].filter(item => item !== null).length;
+
+  const totalOptional = 4;
+
+  return (
+    <div className="space-y-8">
+      {/* Required Song Information */}
+      <EntityReviewSection
+        title="Song Information"
+        data={formData.song}
+        stepIndex={0}
+        onEdit={onEditStep}
+        isRequired={true}
+      />
+
+      {/* Optional Entities */}
+      <EntityReviewSection
+        title="Style"
+        data={formData.style}
+        stepIndex={1}
+        onEdit={onEditStep}
+      />
+
+      <EntityReviewSection
+        title="Lyrics"
+        data={formData.lyrics}
+        stepIndex={2}
+        onEdit={onEditStep}
+      />
+
+      <EntityReviewSection
+        title="Persona"
+        data={formData.persona}
+        stepIndex={3}
+        onEdit={onEditStep}
+      />
+
+      <EntityReviewSection
+        title="Producer Notes"
+        data={formData.producerNotes}
+        stepIndex={4}
+        onEdit={onEditStep}
+      />
+
+      {/* Validation Summary */}
       <div className="bg-info/10 border-2 border-info/30 rounded-xl p-6">
-        <p className="text-sm text-text-base leading-relaxed">
-          Note: The song will be created as a draft. You can add Style, Lyrics, Persona, and Producer Notes
-          after creation by editing the song. Full entity editors will be integrated into this wizard in a future update.
-        </p>
+        <h4 className="font-semibold text-info mb-3">Review Summary</h4>
+        <div className="space-y-2 text-sm text-text-base">
+          <p>
+            You have completed <strong>{providedCount}</strong> of <strong>{totalOptional}</strong> optional entities.
+          </p>
+          <p className="text-text-muted">
+            All optional entities can be edited or added later from the song detail page.
+            Click <strong>Edit</strong> on any section above to make changes.
+          </p>
+        </div>
       </div>
     </div>
   );

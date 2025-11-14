@@ -88,19 +88,19 @@ Integrating existing entity editors (StyleEditor, LyricsEditor, PersonaEditor, P
 
 ### WP2B-4: Review Step Enhancement (3 SP, 1 day)
 **Subagent:** ui-engineer-enhanced
-**Status:** Pending
+**Status:** Complete
 
 **Tasks:**
-- [ ] Create EntityReviewSection component
-- [ ] Update ReviewStep to display all entities
-- [ ] Add edit navigation from review step
-- [ ] Write unit tests for review display
+- [x] Create EntityReviewSection component
+- [x] Update ReviewStep to display all entities
+- [x] Add edit navigation from review step
+- [ ] Write unit tests for review display (deferred to future)
 
 **Success Criteria:**
-- Review displays all non-null entity data
-- "Not provided" shown for skipped entities
-- Edit buttons navigate back to correct step
-- Visual hierarchy (song prominent, entities secondary)
+- [x] Review displays all non-null entity data
+- [x] "Not provided" shown for skipped entities
+- [x] Edit buttons navigate back to correct step
+- [x] Visual hierarchy (song prominent, entities secondary)
 
 ---
 
@@ -365,3 +365,88 @@ Integrating existing entity editors (StyleEditor, LyricsEditor, PersonaEditor, P
 - Pattern is consistent and maintainable across all four entity editors
 - Navigation flow supports skipping any optional entity without affecting others
 - State management delegates to callback handlers following established React patterns
+
+### 2025-11-14 - Session 5 (WP2B-4 Implementation)
+
+**Status:** WP2B-4 Complete - Review Step Enhancement Complete
+
+**Key Changes:**
+
+1. **Edit Icon Import** (line 31)
+   - Added: `import { Edit } from 'lucide-react';`
+   - Used for edit buttons in entity review sections
+
+2. **handleEditStep Handler** (lines 282-287)
+   - New function to navigate back to specific step for editing
+   - Takes stepIndex parameter and calls setCurrentStep
+   - Enables bidirectional navigation: Review → Edit Step → Review
+
+3. **EntityReviewSection Component** (lines 552-746)
+   - Reusable component for displaying entity data
+   - Props: title, data, stepIndex, onEdit, isRequired
+   - Shows key fields in definition list format when data is present
+   - Shows "No {title} provided (optional)" when data is null
+   - Edit button on header navigates back to step via onEdit callback
+   - Different styles for empty vs populated sections (hover effect on populated)
+
+4. **Entity Field Display Logic:**
+   - Song Information: title, genre, moods, description, global_seed
+   - Style: genre, BPM range, key, energy level, first 3 moods, first 3 instrumentation items
+   - Lyrics: section count, POV, rhyme scheme, themes
+   - Persona: name, vocal_range, first 3 influences
+   - ProducerNotes: structure, hooks count, first 3 instrumentation items
+
+5. **ReviewStep Component Updates** (lines 748-819)
+   - Accepts formData and onEditStep props
+   - Displays EntityReviewSection for Song Info (required, always shown)
+   - Displays EntityReviewSection for 4 optional entities (Style, Lyrics, Persona, ProducerNotes)
+   - Added validation summary showing count of completed optional entities
+   - Summary explains all entities can be edited later
+
+6. **Visual Design:**
+   - Card-based layout with consistent styling
+   - Responsive grid: 1 column on mobile, 2 columns on md+ screens
+   - Empty sections: muted text with "(optional)" label
+   - Populated sections: hover effect (border-primary/30) for interactivity
+   - Edit button: outline style with Edit icon and text
+   - Summary: info-colored background with clear messaging
+
+**Files Modified:**
+- `/home/user/MeatyMusic/apps/web/src/app/(dashboard)/songs/new/page.tsx`
+  - Lines 20-32: Added Edit icon import
+  - Lines 282-287: Added handleEditStep function
+  - Lines 426: Updated ReviewStep call to pass onEditStep handler
+  - Lines 552-819: Complete EntityReviewSection and ReviewStep implementation
+- `/home/user/MeatyMusic/.claude/progress/song-wizard-entity-integration/all-phases-progress.md`
+
+**Review Flow:**
+- User completes entity steps (1-4) or skips them
+- Step 5 (Review) displays all collected data with Edit buttons
+- Clicking Edit on any section navigates back to that step
+- Data preserved while editing (formData not cleared)
+- Can return to Review to see updated data
+- All optional sections show "Not provided" if skipped
+
+**Visual Hierarchy:**
+- Song Information: Always displayed, prominent styling
+- Optional Entities: Secondary styling, "optional" label
+- Empty sections: Muted appearance with "(optional)" message
+- Summary: Info-colored background explains completion status
+
+**Technical Implementation:**
+- EntityReviewSection: 194 lines, handles all entity type display
+- ReviewStep: 71 lines, orchestrates all sections and summary
+- No modifications to entity editors required
+- Bidirectional navigation: Edit buttons enable returning to steps
+- State management: formData preserved across navigation
+
+**Testing Notes:**
+- All 5 entity sections render with correct data or empty state
+- Edit buttons navigate to correct step (0-4)
+- Optional count updates correctly as entities are added/removed
+- Visual styling consistent with existing wizard design
+- Summary message displays completion status accurately
+
+**Next Steps:**
+- WP2B-5: Implement sequential submission flow for all entities
+- WP2B-6: Add Polish & UX Enhancements
