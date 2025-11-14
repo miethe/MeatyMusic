@@ -28,3 +28,24 @@
 | Fix | Removed conditional check for song.workflow, always show empty state |
 | File | apps/web/src/app/(dashboard)/songs/[id]/page.tsx:232 |
 | Commit | d848e14 |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | Entity creation failures - async/sync session mismatch |
+| Fix | Fixed sync/async session mismatch, added get_db_session alias, commented out unused async dependencies |
+| File | services/api/app/api/dependencies.py, services/api/app/core/dependencies.py |
+| Commit | b3fb1c1 |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | White text on white backgrounds in entity editors |
+| Fix | Updated background/text colors for proper contrast, fixed slider visibility |
+| Files | StyleEditor, SongEditor, PersonaEditor, LyricsEditor, ProducerNotesEditor, BlueprintEditor |
+| Commit | b3fb1c1 |
+
+| Aspect | Value |
+|--------|-------|
+| Enhancement | Missing library selection in song creation flow |
+| Fix | Added LibrarySelector component and integrated across all entity editors |
+| File | apps/web/src/components/entities/common/LibrarySelector.tsx |
+| Commit | b3fb1c1 |
