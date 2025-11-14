@@ -3,18 +3,19 @@
 This module provides the foundation for service layer implementation with
 transaction management, error handling, and DTO conversion utilities.
 
-The BaseService supports async operations and integrates with SQLAlchemy
-async sessions for database transactions with proper commit/rollback handling.
+The BaseService integrates with SQLAlchemy synchronous sessions for database
+transactions with proper commit/rollback handling. Service methods remain async
+for FastAPI compatibility while calling synchronous repository operations.
 """
 
 from __future__ import annotations
 
 from typing import Generic, TypeVar, Optional, List, Any, Dict, Type
-from contextlib import asynccontextmanager
+from contextlib import contextmanager
 from uuid import UUID
 import structlog
 
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from pydantic import BaseModel
 
@@ -33,7 +34,7 @@ class BaseService(Generic[T, R, C, U]):
     """Abstract base class for all entity services.
 
     Provides:
-    - Async transaction context management with automatic commit/rollback
+    - Synchronous transaction context management with automatic commit/rollback
     - Structured error handling with logging
     - DTO conversion utilities (Model → Response DTO)
     - Repository dependency injection patterns
@@ -48,18 +49,20 @@ class BaseService(Generic[T, R, C, U]):
     Usage:
         ```python
         class LyricsService(BaseService[Lyrics, LyricsResponse, LyricsCreate, LyricsUpdate]):
-            def __init__(self, session: AsyncSession, repo: LyricsRepository):
+            def __init__(self, session: Session, repo: LyricsRepository):
                 super().__init__(session, LyricsResponse)
                 self.repo = repo
 
             async def create_lyrics(self, data: LyricsCreate) -> Lyrics:
-                async with self.transaction():
-                    entity = await self.repo.create(data)
+                # Async method calling sync transaction and repo
+                with self.transaction():
+                    entity = self.repo.create(data)  # NO await - repo is sync
                     logger.info("lyrics.created", id=str(entity.id))
                     return entity
 
             async def get_lyrics(self, lyrics_id: UUID) -> LyricsResponse:
-                lyrics = await self.repo.get_by_id(lyrics_id)
+                # Read operations don't need transactions
+                lyrics = self.repo.get_by_id(lyrics_id)  # NO await
                 if not lyrics:
                     raise NotFoundError(f"Lyrics {lyrics_id} not found")
                 return self.to_response(lyrics)
@@ -71,6 +74,7 @@ class BaseService(Generic[T, R, C, U]):
         - Automatic rollback on exception
         - Structured logging of transaction lifecycle
         - Proper error propagation with context
+        - Synchronous operations (use `with`, not `async with`)
 
     Error Handling:
         All errors are logged with structured context including:
@@ -86,28 +90,28 @@ class BaseService(Generic[T, R, C, U]):
         - Handles None values gracefully
     """
 
-    def __init__(self, session: AsyncSession, response_model: Type[R]):
+    def __init__(self, session: Session, response_model: Type[R]):
         """Initialize base service.
 
         Args:
-            session: SQLAlchemy async session for database operations
+            session: SQLAlchemy synchronous session for database operations
             response_model: Pydantic model class for response DTOs
         """
         self._session = session
         self._response_model = response_model
 
     @property
-    def session(self) -> AsyncSession:
+    def session(self) -> Session:
         """Get the current database session.
 
         Returns:
-            AsyncSession: The SQLAlchemy async session
+            Session: The SQLAlchemy synchronous session
         """
         return self._session
 
-    @asynccontextmanager
-    async def transaction(self):
-        """Async transaction context manager for atomic operations.
+    @contextmanager
+    def transaction(self):
+        """Synchronous transaction context manager for atomic operations.
 
         Provides automatic commit/rollback handling with structured logging.
         The transaction is automatically committed when the context exits
@@ -115,10 +119,10 @@ class BaseService(Generic[T, R, C, U]):
 
         Usage:
             ```python
-            async with self.transaction():
+            with self.transaction():  # NOT async with
                 # Do database operations
-                entity = await self.repo.create(data)
-                await self.repo.update(entity.id, updates)
+                entity = self.repo.create(data)  # NO await
+                self.repo.update(entity.id, updates)  # NO await
                 # Auto-commit on success, auto-rollback on error
             ```
 
@@ -132,13 +136,13 @@ class BaseService(Generic[T, R, C, U]):
         Examples:
             ```python
             # Simple transaction
-            async with self.transaction():
-                style = await self.style_repo.create(style_data)
+            with self.transaction():
+                style = self.style_repo.create(style_data)
 
             # Nested operations (same transaction)
-            async with self.transaction():
-                lyrics = await self.lyrics_repo.create(lyrics_data)
-                await self.song_repo.update(song_id, {"lyrics_id": lyrics.id})
+            with self.transaction():
+                lyrics = self.lyrics_repo.create(lyrics_data)
+                self.song_repo.update(song_id, {"lyrics_id": lyrics.id})
             ```
         """
         logger.debug("transaction.start", session_id=id(self._session))
@@ -148,12 +152,12 @@ class BaseService(Generic[T, R, C, U]):
             yield
 
             # Commit the transaction on success
-            await self._session.commit()
+            self._session.commit()
             logger.debug("transaction.commit", session_id=id(self._session))
 
         except SQLAlchemyError as e:
             # Database error - rollback and log with context
-            await self._session.rollback()
+            self._session.rollback()
             logger.error(
                 "transaction.rollback.database_error",
                 session_id=id(self._session),
@@ -165,7 +169,7 @@ class BaseService(Generic[T, R, C, U]):
 
         except Exception as e:
             # Non-database error - still rollback to maintain consistency
-            await self._session.rollback()
+            self._session.rollback()
             logger.error(
                 "transaction.rollback.error",
                 session_id=id(self._session),
@@ -193,12 +197,12 @@ class BaseService(Generic[T, R, C, U]):
         Examples:
             ```python
             # Convert single entity
-            style = await self.repo.get_by_id(style_id)
+            style = self.repo.get_by_id(style_id)  # NO await - repo is sync
             response = self.to_response(style)
             # Returns: StyleResponse with all fields populated
 
             # Handle None safely
-            style = await self.repo.get_by_id(nonexistent_id)
+            style = self.repo.get_by_id(nonexistent_id)
             response = self.to_response(style)  # Returns None
             ```
         """
@@ -239,12 +243,12 @@ class BaseService(Generic[T, R, C, U]):
         Examples:
             ```python
             # Convert multiple entities
-            styles = await self.repo.get_by_genre("pop")
+            styles = self.repo.get_by_genre("pop")  # NO await
             responses = self.to_response_list(styles)
             # Returns: List[StyleResponse]
 
             # Empty list handling
-            styles = await self.repo.get_by_genre("nonexistent")
+            styles = self.repo.get_by_genre("nonexistent")
             responses = self.to_response_list(styles)
             # Returns: [] (empty list)
             ```
@@ -273,7 +277,7 @@ class BaseService(Generic[T, R, C, U]):
         Examples:
             ```python
             try:
-                entity = await self.repo.create(data)
+                entity = self.repo.create(data)  # NO await - repo is sync
             except Exception as e:
                 raise await self._handle_error(e, "create_lyrics", {
                     "song_id": str(song_id),

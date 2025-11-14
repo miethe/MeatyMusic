@@ -9,7 +9,7 @@ from typing import Optional, Dict, List, Any
 from uuid import UUID
 import structlog
 
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 
 from app.repositories.producer_notes_repo import ProducerNotesRepository
 from app.repositories.blueprint_repo import BlueprintRepository
@@ -50,7 +50,7 @@ class ProducerNotesService(BaseService[
 
     def __init__(
         self,
-        session: AsyncSession,
+        session: Session,
         repo: ProducerNotesRepository,
         blueprint_repo: Optional[BlueprintRepository] = None,
         lyrics_repo: Optional[LyricsRepository] = None,
@@ -58,7 +58,7 @@ class ProducerNotesService(BaseService[
         """Initialize the producer notes service.
 
         Args:
-            session: SQLAlchemy async session for database operations
+            session: SQLAlchemy synchronous session for database operations
             repo: Repository for producer notes data access
             blueprint_repo: Optional repository for blueprint validation
             lyrics_repo: Optional repository for lyrics section validation
@@ -112,10 +112,9 @@ class ProducerNotesService(BaseService[
             )
 
         # Create via repository
-        async with self.transaction():
+        with self.transaction():
             # Convert Pydantic model to dict for repository
-            entity_data = data.model_dump(exclude_unset=True)
-            entity = self.repo.create(ProducerNotes, entity_data)
+            entity = self.repo.create(data)
 
             logger.info(
                 "producer_notes.created",
@@ -138,7 +137,7 @@ class ProducerNotesService(BaseService[
         Returns:
             Producer notes response DTO, or None if not found
         """
-        entity = self.repo.get_by_id(ProducerNotes, notes_id)
+        entity = self.repo.get_by_id(notes_id)
 
         if entity:
             logger.debug("producer_notes.retrieved", notes_id=str(notes_id))
@@ -162,7 +161,7 @@ class ProducerNotesService(BaseService[
             NotFoundError: If producer notes not found
         """
         # Get existing entity
-        existing = self.repo.get_by_id(ProducerNotes, notes_id)
+        existing = self.repo.get_by_id(notes_id)
         if not existing:
             from app.errors import NotFoundError
             raise NotFoundError(
@@ -184,15 +183,14 @@ class ProducerNotesService(BaseService[
             )
 
         # Update via repository
-        async with self.transaction():
-            # Convert Pydantic model to dict, excluding unset fields
-            update_data = data.model_dump(exclude_unset=True)
-            entity = self.repo.update(ProducerNotes, notes_id, update_data)
+        with self.transaction():
+            # Update via repository (pass Pydantic model directly)
+            entity = self.repo.update(notes_id, data)
 
             logger.info(
                 "producer_notes.updated",
                 notes_id=str(notes_id),
-                updated_fields=list(update_data.keys())
+                updated_fields=list(data.model_dump(exclude_unset=True).keys())
             )
 
             return self.to_response(entity)
@@ -206,7 +204,7 @@ class ProducerNotesService(BaseService[
         Returns:
             True if deleted, False if not found
         """
-        success = self.repo.delete(ProducerNotes, notes_id)
+        success = self.repo.delete(notes_id)
 
         if success:
             logger.info("producer_notes.deleted", notes_id=str(notes_id))
@@ -392,7 +390,7 @@ class ProducerNotesService(BaseService[
         violations = []
 
         # Get producer notes
-        entity = self.repo.get_by_id(ProducerNotes, notes_id)
+        entity = self.repo.get_by_id(notes_id)
         if not entity:
             return False, ["ProducerNotes not found"]
 
@@ -453,7 +451,7 @@ class ProducerNotesService(BaseService[
             Tuple of (is_within_tolerance, difference_in_seconds)
         """
         # Get producer notes
-        entity = self.repo.get_by_id(ProducerNotes, notes_id)
+        entity = self.repo.get_by_id(notes_id)
         if not entity:
             raise ValueError(f"ProducerNotes {notes_id} not found")
 

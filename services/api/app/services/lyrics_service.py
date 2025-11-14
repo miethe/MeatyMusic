@@ -22,7 +22,7 @@ from typing import Optional, List, Dict, Any
 from uuid import UUID
 import structlog
 
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 
 from app.services.base_service import BaseService
 from app.repositories.lyrics_repo import LyricsRepository
@@ -57,11 +57,11 @@ class LyricsService(BaseService[Lyrics, LyricsResponse, LyricsCreate, LyricsUpda
     # Valid reading levels (case-insensitive)
     VALID_READING_LEVELS = ["elementary", "middle", "high_school", "college"]
 
-    def __init__(self, session: AsyncSession, repo: LyricsRepository):
+    def __init__(self, session: Session, repo: LyricsRepository):
         """Initialize the lyrics service.
 
         Args:
-            session: SQLAlchemy async session for database operations
+            session: SQLAlchemy synchronous session for database operations
             repo: LyricsRepository for data access
         """
         super().__init__(session, LyricsResponse)
@@ -173,10 +173,10 @@ class LyricsService(BaseService[Lyrics, LyricsResponse, LyricsCreate, LyricsUpda
             )
 
         # 6. Create in transaction
-        async with self.transaction():
+        with self.transaction():
             # Convert processed_data back to LyricsCreate for type safety
             # (we've modified source_citations with hashes)
-            entity = await self.repo.create(LyricsCreate(**processed_data))
+            entity = self.repo.create(LyricsCreate(**processed_data))
 
             logger.info(
                 "lyrics.created",
@@ -204,7 +204,7 @@ class LyricsService(BaseService[Lyrics, LyricsResponse, LyricsCreate, LyricsUpda
             ... else:
             ...     print("Not found")
         """
-        lyrics = await self.repo.get_by_id(lyrics_id)
+        lyrics = self.repo.get_by_id(lyrics_id)
         return self.to_response(lyrics)
 
     async def update_lyrics(
@@ -297,9 +297,9 @@ class LyricsService(BaseService[Lyrics, LyricsResponse, LyricsCreate, LyricsUpda
             processed_data["source_citations"] = citations_with_hashes
 
         # 6. Update in transaction
-        async with self.transaction():
+        with self.transaction():
             # Convert processed_data back to LyricsUpdate
-            entity = await self.repo.update(lyrics_id, LyricsUpdate(**processed_data))
+            entity = self.repo.update(lyrics_id, LyricsUpdate(**processed_data))
 
             if not entity:
                 logger.debug("lyrics.update_not_found", lyrics_id=str(lyrics_id))
@@ -322,8 +322,8 @@ class LyricsService(BaseService[Lyrics, LyricsResponse, LyricsCreate, LyricsUpda
             >>> if success:
             ...     print("Deleted successfully")
         """
-        async with self.transaction():
-            success = await self.repo.delete(lyrics_id)
+        with self.transaction():
+            success = self.repo.delete(lyrics_id)
 
             if success:
                 logger.info("lyrics.deleted", lyrics_id=str(lyrics_id))
@@ -346,7 +346,7 @@ class LyricsService(BaseService[Lyrics, LyricsResponse, LyricsCreate, LyricsUpda
             >>> for lyrics in lyrics_versions:
             ...     print(f"Version: {lyrics.created_at}")
         """
-        lyrics_list = await self.repo.get_by_song_id(song_id)
+        lyrics_list = self.repo.get_by_song_id(song_id)
         return self.to_response_list(lyrics_list)
 
     # =========================================================================

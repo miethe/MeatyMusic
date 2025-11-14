@@ -9,7 +9,7 @@ from typing import List, Optional, Tuple
 from uuid import UUID
 import structlog
 
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 
 from app.repositories.persona_repo import PersonaRepository
 from app.schemas.persona import PersonaCreate, PersonaUpdate, PersonaResponse
@@ -68,11 +68,11 @@ class PersonaService(BaseService[Persona, PersonaResponse, PersonaCreate, Person
         "harry styles", "olivia rodrigo", "bublé", "michael bublé"
     }
 
-    def __init__(self, session: AsyncSession, repo: PersonaRepository):
+    def __init__(self, session: Session, repo: PersonaRepository):
         """Initialize persona service.
 
         Args:
-            session: SQLAlchemy async session for database operations
+            session: SQLAlchemy synchronous session for database operations
             repo: PersonaRepository for data access
         """
         super().__init__(session, PersonaResponse)
@@ -131,8 +131,8 @@ class PersonaService(BaseService[Persona, PersonaResponse, PersonaCreate, Person
                 )
 
         # Create via repository with transaction
-        async with self.transaction():
-            entity = await self.repo.create(data)
+        with self.transaction():
+            entity = self.repo.create(data)
             logger.info(
                 "persona.created",
                 persona_id=str(entity.id),
@@ -152,7 +152,7 @@ class PersonaService(BaseService[Persona, PersonaResponse, PersonaCreate, Person
         Returns:
             PersonaResponse if found, None otherwise
         """
-        entity = await self.repo.get_by_id(persona_id)
+        entity = self.repo.get_by_id(persona_id)
         return self.to_response(entity)
 
     async def update_persona(
@@ -174,7 +174,7 @@ class PersonaService(BaseService[Persona, PersonaResponse, PersonaCreate, Person
             BadRequestError: If validation fails
         """
         # Get existing persona
-        existing = await self.repo.get_by_id(persona_id)
+        existing = self.repo.get_by_id(persona_id)
         if not existing:
             raise NotFoundError(f"Persona {persona_id} not found")
 
@@ -213,8 +213,8 @@ class PersonaService(BaseService[Persona, PersonaResponse, PersonaCreate, Person
                     )
 
         # Update via repository with transaction
-        async with self.transaction():
-            entity = await self.repo.update(persona_id, data)
+        with self.transaction():
+            entity = self.repo.update(persona_id, data)
             if entity:
                 logger.info(
                     "persona.updated",
@@ -236,8 +236,8 @@ class PersonaService(BaseService[Persona, PersonaResponse, PersonaCreate, Person
         Returns:
             True if deleted, False if not found
         """
-        async with self.transaction():
-            success = await self.repo.delete(persona_id)
+        with self.transaction():
+            success = self.repo.delete(persona_id)
             if success:
                 logger.info("persona.deleted", persona_id=str(persona_id))
 
@@ -256,7 +256,7 @@ class PersonaService(BaseService[Persona, PersonaResponse, PersonaCreate, Person
         # Otherwise use base repository filter
         # For now, using base get_all and filter in memory
         # TODO: Add get_by_kind method to repository
-        all_personas = await self.repo.get_all()
+        all_personas = self.repo.get_all()
         filtered = [p for p in all_personas if p.kind == persona_type]
 
         logger.debug(
@@ -429,7 +429,7 @@ class PersonaService(BaseService[Persona, PersonaResponse, PersonaCreate, Person
         Returns:
             PersonaResponse if found, None otherwise
         """
-        entity = await self.repo.get_by_name(name)
+        entity = self.repo.get_by_name(name)
         return self.to_response(entity)
 
     async def search_by_influences(
@@ -446,7 +446,7 @@ class PersonaService(BaseService[Persona, PersonaResponse, PersonaCreate, Person
         Returns:
             List of personas with any of the specified influences
         """
-        entities = await self.repo.search_by_influences(influences)
+        entities = self.repo.search_by_influences(influences)
 
         logger.debug(
             "persona.search_by_influences",
@@ -470,7 +470,7 @@ class PersonaService(BaseService[Persona, PersonaResponse, PersonaCreate, Person
         Returns:
             List of personas within the specified vocal range
         """
-        entities = await self.repo.get_by_vocal_range(min_range, max_range)
+        entities = self.repo.get_by_vocal_range(min_range, max_range)
 
         logger.debug(
             "persona.get_by_vocal_range",

@@ -20,7 +20,7 @@ from uuid import UUID
 import random
 import structlog
 
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 
 from app.repositories.source_repo import SourceRepository
 from app.schemas.source import (
@@ -70,11 +70,11 @@ class SourceService(BaseService[Source, SourceResponse, SourceCreate, SourceUpda
         >>> chunk = await service.retrieve_by_hash(source.id, chunk_hash)
     """
 
-    def __init__(self, session: AsyncSession, repo: SourceRepository):
+    def __init__(self, session: Session, repo: SourceRepository):
         """Initialize SourceService.
 
         Args:
-            session: SQLAlchemy async session
+            session: SQLAlchemy synchronous session
             repo: SourceRepository instance
         """
         super().__init__(session, SourceResponse)
@@ -300,7 +300,7 @@ class SourceService(BaseService[Source, SourceResponse, SourceCreate, SourceUpda
             ...     print(f"Text: {chunk.text[:50]}...")
         """
         # Get source
-        source = await self.repo.get(source_id)
+        source = self.repo.get(source_id)
         if not source:
             raise NotFoundError(f"Source not found: {source_id}")
 
@@ -658,7 +658,7 @@ class SourceService(BaseService[Source, SourceResponse, SourceCreate, SourceUpda
         Raises:
             BadRequestError: If validation fails
         """
-        async with self.transaction():
+        with self.transaction():
             # Validate MCP server scopes
             if data.scopes:
                 is_valid, error = await self.validate_mcp_scopes(
@@ -668,14 +668,8 @@ class SourceService(BaseService[Source, SourceResponse, SourceCreate, SourceUpda
                 if not is_valid:
                     raise BadRequestError(error)
 
-            # Create source entity
-            source = Source(
-                **data.model_dump(),
-                owner_id=owner_id,
-                tenant_id=tenant_id
-            )
-
-            created = await self.repo.create(source)
+            # Create source entity (pass Pydantic model with extra fields)
+            created = self.repo.create(data)
 
             logger.info(
                 "source.created",
@@ -699,7 +693,7 @@ class SourceService(BaseService[Source, SourceResponse, SourceCreate, SourceUpda
         Raises:
             NotFoundError: If source doesn't exist
         """
-        source = await self.repo.get(source_id)
+        source = self.repo.get(source_id)
         if not source:
             raise NotFoundError(f"Source not found: {source_id}")
 
@@ -711,5 +705,5 @@ class SourceService(BaseService[Source, SourceResponse, SourceCreate, SourceUpda
         Returns:
             List of active sources as SourceResponse DTOs
         """
-        sources = await self.repo.get_active_sources()
+        sources = self.repo.get_active_sources()
         return self.to_response_list(sources)
