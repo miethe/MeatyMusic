@@ -371,6 +371,82 @@ export default function NewSongPage() {
   }, []);
 
   /**
+   * Effect: Prevent browser navigation during submission
+   * Warns user if they try to close tab, navigate, or reload while creating entities
+   */
+  React.useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (wizardIsSubmitting) {
+        e.preventDefault();
+        e.returnValue = ''; // Chrome requires returnValue
+        return '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [wizardIsSubmitting]);
+
+  /**
+   * Effect: Save draft to localStorage on form data changes
+   * Persists wizard state so user can resume later
+   */
+  React.useEffect(() => {
+    if (formData.song.title || formData.song.description || formData.style || formData.lyrics || formData.persona || formData.producerNotes) {
+      // Convert Sets to arrays for JSON serialization
+      const draftData = {
+        formData,
+        currentStep,
+        completedSteps: Array.from(completedSteps),
+        skippedSteps: Array.from(skippedSteps),
+        timestamp: new Date().toISOString(),
+      };
+      try {
+        localStorage.setItem('song-wizard-draft', JSON.stringify(draftData));
+      } catch (error) {
+        // Silently fail if localStorage is full or unavailable
+        console.warn('Failed to save draft to localStorage:', error);
+      }
+    }
+  }, [formData, currentStep, completedSteps, skippedSteps]);
+
+  /**
+   * Effect: Restore draft from localStorage on component mount
+   * Shows confirmation dialog if draft exists
+   */
+  React.useEffect(() => {
+    const draft = localStorage.getItem('song-wizard-draft');
+    if (draft) {
+      try {
+        const parsed = JSON.parse(draft);
+        const draftDate = new Date(parsed.timestamp);
+        const formattedDate = draftDate.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+
+        if (confirm(`Resume draft from ${formattedDate}?`)) {
+          // Restore form data and step tracking
+          setFormData(parsed.formData);
+          setCurrentStep(parsed.currentStep || 0);
+          // Convert arrays back to Sets
+          setCompletedSteps(new Set(parsed.completedSteps || []));
+          setSkippedSteps(new Set(parsed.skippedSteps || []));
+        } else {
+          localStorage.removeItem('song-wizard-draft');
+        }
+      } catch (error) {
+        // Silently fail if draft is corrupted
+        console.warn('Failed to restore draft from localStorage:', error);
+        localStorage.removeItem('song-wizard-draft');
+      }
+    }
+  }, []); // Run only on mount
+
+  /**
    * Validation logic to determine if user can progress to next step
    * Step 0: Require title
    * Steps 1-4: Optional (always allow progression)
@@ -490,8 +566,28 @@ export default function NewSongPage() {
     }
   };
 
+  /**
+   * Handler for cancel button with confirmation dialog
+   * Detects if user has entered any data and prompts before navigating away
+   */
   const handleCancel = () => {
-    router.push(ROUTES.SONGS);
+    const hasData = formData.song.title ||
+                    formData.song.description ||
+                    formData.song.genre ||
+                    formData.song.mood.length > 0 ||
+                    formData.style ||
+                    formData.lyrics ||
+                    formData.persona ||
+                    formData.producerNotes;
+
+    if (hasData) {
+      if (confirm('Are you sure? All progress will be lost. You can save drafts to resume later.')) {
+        localStorage.removeItem('song-wizard-draft');
+        router.push(ROUTES.SONGS);
+      }
+    } else {
+      router.push(ROUTES.SONGS);
+    }
   };
 
   /**
@@ -503,11 +599,13 @@ export default function NewSongPage() {
 
   /**
    * Handle final submission - orchestrate multi-entity creation
-   * On success, navigates to the created song's detail page
+   * On success, clears draft and navigates to the created song's detail page
    */
   const handleSubmit = async () => {
     try {
       const songId = await submitWizard(formData);
+      // Clear draft on successful submission
+      localStorage.removeItem('song-wizard-draft');
       // Navigate to the created song's detail page
       router.push(ROUTES.SONG_DETAIL(songId));
     } catch (error) {
@@ -964,7 +1062,28 @@ interface ReviewStepProps {
 }
 
 function ReviewStep({ formData, onEditStep }: ReviewStepProps) {
-  // Count provided optional entities
+  /**
+   * Generate validation summary with required and optional fields
+   */
+  const getValidationSummary = (): { required: string[]; optional: string[] } => {
+    const required: string[] = [];
+    const optional: string[] = [];
+
+    // Check required fields
+    if (!formData.song.title || formData.song.title.trim().length === 0) {
+      required.push('Song title');
+    }
+
+    // Check optional fields
+    if (!formData.style) optional.push('Style');
+    if (!formData.lyrics) optional.push('Lyrics');
+    if (!formData.persona) optional.push('Persona');
+    if (!formData.producerNotes) optional.push('Producer Notes');
+
+    return { required, optional };
+  };
+
+  const summary = getValidationSummary();
   const providedCount = [
     formData.style,
     formData.lyrics,
@@ -976,6 +1095,41 @@ function ReviewStep({ formData, onEditStep }: ReviewStepProps) {
 
   return (
     <div className="space-y-8">
+      {/* Validation Summary - Show before content */}
+      {summary.required.length > 0 && (
+        <div className="bg-destructive/10 border-2 border-destructive/30 rounded-xl p-6">
+          <h4 className="font-semibold text-destructive mb-3">Required items missing:</h4>
+          <ul className="list-disc list-inside text-sm text-text-base space-y-1">
+            {summary.required.map(item => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {summary.optional.length > 0 && (
+        <div className="bg-warning/10 border-2 border-warning/30 rounded-xl p-6">
+          <h4 className="font-semibold text-warning mb-3">Optional items not provided:</h4>
+          <ul className="list-disc list-inside text-sm text-text-base space-y-1">
+            {summary.optional.map(item => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+          <p className="text-xs text-text-muted mt-3">
+            You can add these later from the song detail page after creation.
+          </p>
+        </div>
+      )}
+
+      {summary.required.length === 0 && summary.optional.length === 0 && (
+        <div className="bg-success/10 border-2 border-success/30 rounded-xl p-6">
+          <h4 className="font-semibold text-success mb-3">All items provided:</h4>
+          <p className="text-sm text-text-base">
+            You have filled in all available fields. Your song is ready to create!
+          </p>
+        </div>
+      )}
+
       {/* Required Song Information */}
       <EntityReviewSection
         title="Song Information"
@@ -1014,16 +1168,16 @@ function ReviewStep({ formData, onEditStep }: ReviewStepProps) {
         onEdit={onEditStep}
       />
 
-      {/* Validation Summary */}
+      {/* Completion Summary */}
       <div className="bg-info/10 border-2 border-info/30 rounded-xl p-6">
-        <h4 className="font-semibold text-info mb-3">Review Summary</h4>
+        <h4 className="font-semibold text-info mb-3">Completion Status</h4>
         <div className="space-y-2 text-sm text-text-base">
           <p>
-            You have completed <strong>{providedCount}</strong> of <strong>{totalOptional}</strong> optional entities.
+            <strong>{providedCount}</strong> of <strong>{totalOptional}</strong> optional entities completed.
           </p>
           <p className="text-text-muted">
             All optional entities can be edited or added later from the song detail page.
-            Click <strong>Edit</strong> on any section above to make changes.
+            Click <strong>Edit</strong> on any section above to make changes before creating.
           </p>
         </div>
       </div>
