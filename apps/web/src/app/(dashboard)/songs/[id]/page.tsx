@@ -229,23 +229,17 @@ export default function SongDetailPage() {
           </TabsContent>
 
           <TabsContent value="workflow" className="mt-6">
-            {song.workflow ? (
-              <Card className="p-6">
-                <p>Workflow visualization coming soon</p>
-              </Card>
-            ) : (
-              <Card className="p-6 text-center">
-                <Music2 className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-medium mb-2">No workflow yet</h3>
-                <p className="text-muted-foreground mb-6">
-                  Start a workflow to generate musical artifacts
-                </p>
-                <Button onClick={handleStartWorkflow}>
-                  <Play className="w-4 h-4 mr-2" />
-                  Start Workflow
-                </Button>
-              </Card>
-            )}
+            <Card className="p-6 text-center">
+              <Music2 className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-medium mb-2">No workflow yet</h3>
+              <p className="text-muted-foreground mb-6">
+                Start a workflow to generate musical artifacts
+              </p>
+              <Button onClick={handleStartWorkflow}>
+                <Play className="w-4 h-4 mr-2" />
+                Start Workflow
+              </Button>
+            </Card>
           </TabsContent>
 
           <TabsContent value="history" className="mt-6">
