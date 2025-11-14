@@ -301,7 +301,7 @@ class SDSCompilerService:
         elif producer_notes.structure:
             # Convert array to string
             if isinstance(producer_notes.structure, list):
-                structure = "-".join(producer_notes.structure)
+                structure = "–".join(producer_notes.structure)
             else:
                 structure = str(producer_notes.structure)
         else:
