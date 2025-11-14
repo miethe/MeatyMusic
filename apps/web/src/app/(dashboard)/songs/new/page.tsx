@@ -11,6 +11,9 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { Card } from '@meatymusic/ui';
 import { Button } from '@meatymusic/ui';
 import { StyleEditor } from '@/components/entities/StyleEditor';
+import { LyricsEditor } from '@/components/entities/LyricsEditor';
+import { PersonaEditor } from '@/components/entities/PersonaEditor';
+import { ProducerNotesEditor } from '@/components/entities/ProducerNotesEditor';
 import { ROUTES } from '@/config/routes';
 import { useCreateSong } from '@/hooks/api/useSongs';
 import { SongCreate, StyleCreate, LyricsCreate, PersonaCreate, ProducerNotesCreate } from '@/types/api/entities';
@@ -201,6 +204,76 @@ export default function NewSongPage() {
     }
   };
 
+  /**
+   * Handler for LyricsEditor save
+   */
+  const handleLyricsSave = (lyrics: LyricsCreate) => {
+    // Remove temporary song_id before storing
+    const { song_id, ...lyricsData } = lyrics;
+    updateLyricsData(lyricsData as Partial<LyricsCreate>);
+    markStepCompleted(currentStep);
+    if (currentStep < WIZARD_STEPS.length - 1) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  /**
+   * Handler for LyricsEditor cancel/skip
+   */
+  const handleLyricsCancel = () => {
+    updateLyricsData(null);
+    markStepSkipped(currentStep);
+    if (currentStep < WIZARD_STEPS.length - 1) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  /**
+   * Handler for PersonaEditor save
+   */
+  const handlePersonaSave = (persona: PersonaCreate) => {
+    updatePersonaData(persona);
+    markStepCompleted(currentStep);
+    if (currentStep < WIZARD_STEPS.length - 1) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  /**
+   * Handler for PersonaEditor cancel/skip
+   */
+  const handlePersonaCancel = () => {
+    updatePersonaData(null);
+    markStepSkipped(currentStep);
+    if (currentStep < WIZARD_STEPS.length - 1) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  /**
+   * Handler for ProducerNotesEditor save
+   */
+  const handleProducerNotesSave = (notes: ProducerNotesCreate) => {
+    // Remove temporary song_id before storing
+    const { song_id, ...notesData } = notes;
+    updateProducerNotesData(notesData as Partial<ProducerNotesCreate>);
+    markStepCompleted(currentStep);
+    if (currentStep < WIZARD_STEPS.length - 1) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  /**
+   * Handler for ProducerNotesEditor cancel/skip
+   */
+  const handleProducerNotesCancel = () => {
+    updateProducerNotesData(null);
+    markStepSkipped(currentStep);
+    if (currentStep < WIZARD_STEPS.length - 1) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
   const handleCancel = () => {
     router.push(ROUTES.SONGS);
   };
@@ -312,6 +385,29 @@ export default function NewSongPage() {
             onCancel={handleStyleCancel}
             className="rounded-lg border border-border shadow-elev1 bg-surface"
           />
+        ) : currentStep === 2 ? (
+          <LyricsEditor
+            songId="wizard-temp-id"
+            initialValue={formData.lyrics || undefined}
+            onSave={handleLyricsSave}
+            onCancel={handleLyricsCancel}
+            className="rounded-lg border border-border shadow-elev1 bg-surface"
+          />
+        ) : currentStep === 3 ? (
+          <PersonaEditor
+            initialValue={formData.persona || undefined}
+            onSave={handlePersonaSave}
+            onCancel={handlePersonaCancel}
+            className="rounded-lg border border-border shadow-elev1 bg-surface"
+          />
+        ) : currentStep === 4 ? (
+          <ProducerNotesEditor
+            songId="wizard-temp-id"
+            initialValue={formData.producerNotes || undefined}
+            onSave={handleProducerNotesSave}
+            onCancel={handleProducerNotesCancel}
+            className="rounded-lg border border-border shadow-elev1 bg-surface"
+          />
         ) : (
           <Card className="bg-surface border-border shadow-elev1 p-10 mb-6 animate-slide-up">
             <h2 className="text-2xl font-semibold text-text-strong mb-8">{currentStepConfig?.label}</h2>
@@ -319,15 +415,12 @@ export default function NewSongPage() {
             {currentStep === 0 && (
               <SongInfoStep formData={formData} updateSongData={updateSongData} />
             )}
-            {currentStep === 2 && <div className="py-16 text-center text-text-muted">Lyrics editor coming soon</div>}
-            {currentStep === 3 && <div className="py-16 text-center text-text-muted">Persona selector coming soon</div>}
-            {currentStep === 4 && <div className="py-16 text-center text-text-muted">Producer notes editor coming soon</div>}
             {currentStep === 5 && <ReviewStep formData={formData} />}
           </Card>
         )}
 
         {/* Navigation */}
-        {currentStep !== 1 && (
+        {![1, 2, 3, 4].includes(currentStep) && (
           <div className="flex items-center justify-between">
             <Button variant="outline" onClick={handleCancel} className="px-6 py-3">
               Cancel
@@ -370,6 +463,16 @@ export default function NewSongPage() {
                 </Button>
               )}
             </div>
+          </div>
+        )}
+
+        {/* Previous Button for Editor Steps */}
+        {[1, 2, 3, 4].includes(currentStep) && currentStep > 0 && (
+          <div className="flex justify-start">
+            <Button variant="outline" onClick={handlePrevious} className="px-6 py-3">
+              <ChevronLeft className="w-4 h-4 mr-2" />
+              Previous
+            </Button>
           </div>
         )}
       </div>
