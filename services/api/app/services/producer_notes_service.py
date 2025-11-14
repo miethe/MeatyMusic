@@ -71,19 +71,34 @@ class ProducerNotesService(BaseService[
     async def create_producer_notes(
         self, data: ProducerNotesCreate
     ) -> ProducerNotesResponse:
-        """Create producer notes with validation.
+        """Create producer notes with comprehensive validation.
 
-        Validates mix settings, hook count, and calculates total duration
-        before creating the entity.
+        Creates producer notes including arrangement guidance, mix targets, and
+        structural information. Validates all mix settings and warns on potential
+        quality issues (e.g., zero hook count).
+
+        Validation Pipeline:
+        1. Validate mix_targets (LUFS range, stereo width)
+        2. Check hook_count >= 1 (warn if zero)
+        3. Calculate total duration from section_durations
+        4. Persist within transaction with logging
 
         Args:
-            data: Producer notes creation data
+            data: Producer notes creation data including structure, mix_targets,
+                  hook_count, and section_durations
 
         Returns:
-            Created producer notes response DTO
+            Created producer notes response DTO with all fields populated
 
         Raises:
-            ValueError: If validation fails (invalid mix settings, duration mismatch)
+            ValueError: If mix settings are invalid (LUFS outside [-20, -5],
+                       stereo_width not in valid set, etc.)
+
+        Note:
+            Mix Settings Constraints (per blueprint and audio standards):
+            - loudness_lufs: [-20.0, -5.0] dB (broadcast standard)
+            - stereo_width: "narrow", "normal", or "wide"
+            - Zero hooks triggers quality warning but doesn't block creation
         """
         # Validate mix settings if provided
         if data.mix_targets:
@@ -305,21 +320,35 @@ class ProducerNotesService(BaseService[
     ) -> tuple[bool, Optional[str]]:
         """Validate mix settings ranges.
 
-        Checks that LUFS is within acceptable range and stereo width
-        is a valid value.
+        Ensures mix target specifications conform to audio production standards
+        and MeatyMusic constraints. LUFS (Loudness Units relative to Full Scale)
+        follows broadcast standards for streaming platforms.
+
+        Validation Rules:
+        - loudness_lufs: Must be in [-20.0, -5.0] dB range
+          * -20 dB: Quieter, more dynamic content (acoustic, spoken word)
+          * -5 dB: Louder, compressed content (pop, electronic)
+        - stereo_width: One of "narrow" (mono-ish), "normal", or "wide"
 
         Args:
-            mix_targets: Mix specifications dictionary
+            mix_targets: Mix specifications dictionary with optional keys:
+                        - loudness_lufs: int/float in [-20, -5]
+                        - stereo_width: str in ["narrow", "normal", "wide"]
 
         Returns:
             Tuple of (is_valid, error_message)
+            - is_valid: True if all checks pass
+            - error_message: None if valid, error string if invalid
         """
-        # Validate LUFS (loudness_lufs)
+        # Validate LUFS (Loudness Units relative to Full Scale)
         lufs = mix_targets.get("loudness_lufs")
         if lufs is not None:
+            # Type check: LUFS must be numeric
             if not isinstance(lufs, (int, float)):
                 return False, "loudness_lufs must be a number"
 
+            # Range check: LUFS must be within broadcast standards
+            # [-20, -5] dB is standard for streaming (Spotify, Apple Music, etc.)
             if not (self.LUFS_MIN <= lufs <= self.LUFS_MAX):
                 return (
                     False,
@@ -327,9 +356,10 @@ class ProducerNotesService(BaseService[
                     f"[{self.LUFS_MIN}, {self.LUFS_MAX}] dB"
                 )
 
-        # Validate stereo width
+        # Validate stereo width (spatial characteristics)
         stereo_width = mix_targets.get("stereo_width")
         if stereo_width is not None:
+            # Must be one of the predefined width categories
             if stereo_width not in self.VALID_STEREO_WIDTHS:
                 return (
                     False,
@@ -337,6 +367,7 @@ class ProducerNotesService(BaseService[
                     f"Must be one of: {', '.join(self.VALID_STEREO_WIDTHS)}"
                 )
 
+        # Log validation success
         logger.debug(
             "producer_notes.mix_settings_validated",
             lufs=lufs,
@@ -350,18 +381,33 @@ class ProducerNotesService(BaseService[
     ) -> int:
         """Calculate total duration from section durations.
 
+        Sums durations across all sections (Verse, Chorus, Bridge, etc.)
+        to calculate the total song length. Only positive integer durations
+        are included to ensure accurate calculations.
+
         Args:
             section_durations: Dictionary mapping section names to durations in seconds
+                              Example: {"Verse": 30, "Chorus": 20, "Bridge": 15}
 
         Returns:
-            Total duration in seconds
+            Total duration in seconds (sum of all positive section durations)
+
+        Example:
+            >>> durations = {"Verse": 30, "Chorus": 20, "Bridge": 15}
+            >>> total = service.calculate_total_duration(durations)
+            >>> assert total == 65  # 30 + 20 + 15
         """
+        # Sum only valid durations:
+        # - Must be int type (reject float/string)
+        # - Must be positive (> 0 seconds)
+        # Invalid entries are silently skipped
         total = sum(
             duration
             for duration in section_durations.values()
             if isinstance(duration, int) and duration > 0
         )
 
+        # Log the calculation for debugging and traceability
         logger.debug(
             "producer_notes.total_duration_calculated",
             total_duration=total,
@@ -377,15 +423,36 @@ class ProducerNotesService(BaseService[
     ) -> tuple[bool, List[str]]:
         """Validate producer notes against blueprint constraints.
 
-        Checks hook count minimums and instrumentation alignment with
-        genre-specific blueprint rules.
+        Ensures that producer notes comply with genre-specific blueprint rules,
+        particularly hook count minimums. This validation is critical for hit song
+        blueprint compliance per MeatyMusic AMCS architecture.
+
+        Validation Checks:
+        1. Producer notes must exist
+        2. Blueprint must exist
+        3. Hook count must meet genre minimum (per blueprint rules)
+        4. Instrumentation aligns with allowed instruments for genre
 
         Args:
-            notes_id: Producer notes identifier
-            blueprint_id: Blueprint identifier
+            notes_id: Producer notes identifier (UUID)
+            blueprint_id: Blueprint identifier (UUID)
 
         Returns:
             Tuple of (is_valid, list_of_violations)
+            - is_valid: True if all blueprint constraints pass
+            - list_of_violations: Empty list if valid, or list of constraint violations
+
+        Raises:
+            No exceptions raised; returns violations in tuple instead
+
+        Example:
+            >>> is_valid, violations = await service.validate_against_blueprint(
+            ...     notes_id=notes.id,
+            ...     blueprint_id=pop_blueprint.id
+            ... )
+            >>> if not is_valid:
+            ...     for violation in violations:
+            ...         print(f"Constraint failed: {violation}")
         """
         violations = []
 

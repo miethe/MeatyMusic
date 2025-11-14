@@ -81,20 +81,26 @@ class PersonaService(BaseService[Persona, PersonaResponse, PersonaCreate, Person
     async def create_persona(self, data: PersonaCreate) -> PersonaResponse:
         """Create new persona with validation and normalization.
 
-        Performs:
-        - Influence normalization if public_release=True
-        - Vocal range validation
-        - Delivery style conflict detection
-        - Policy enforcement
+        Creates a new artist or band persona with comprehensive validation
+        including influence normalization for public releases, vocal range
+        verification, and delivery style conflict detection per MeatyMusic
+        AMCS policy constraints.
+
+        Validation Pipeline:
+        1. Validate vocal_range against VALID_VOCAL_RANGES
+        2. Check delivery styles for conflicts (e.g., whisper + belting)
+        3. Normalize influences if public_release + disallow_named_style_of
+        4. Persist to database within transaction
 
         Args:
-            data: Persona creation data
+            data: Persona creation data including name, kind, vocal_range,
+                  delivery styles, influences, and policy settings
 
         Returns:
-            PersonaResponse: Created persona with all fields
+            PersonaResponse: Created persona with all fields populated
 
         Raises:
-            BadRequestError: If validation fails
+            BadRequestError: If vocal_range is invalid or policy enforcement fails
         """
         # Validate vocal range if provided
         if data.vocal_range and not self.validate_vocal_range(data.vocal_range):
@@ -275,36 +281,52 @@ class PersonaService(BaseService[Persona, PersonaResponse, PersonaCreate, Person
         """Normalize artist influences for public release.
 
         Converts specific living artist references to generic descriptions
-        to avoid copyright and likeness issues.
+        to avoid copyright and likeness issues during public music releases.
+        This is part of MeatyMusic policy enforcement (disallow_named_style_of).
 
-        Transformations:
+        Normalization Strategy:
+        - Detects "style of <artist>" patterns
+        - Checks against LIVING_ARTISTS registry
+        - Converts to generic genre/vocal descriptions
+        - Preserves historical artists and genre references
+
+        Example Transformations:
         - "Beyoncé" → "contemporary R&B diva-inspired sound"
         - "style of Drake" → "modern hip-hop influenced"
         - "Taylor Swift" → "pop storyteller-inspired"
+        - "1970s soul" → unchanged (historical reference)
 
         Args:
-            influences: List of influence strings
-            public_release: Whether to apply normalization
+            influences: List of influence strings (artist names, genres, etc.)
+            public_release: Whether to apply normalization (boolean flag)
 
         Returns:
-            Normalized list of influences
+            Normalized list of influences (unchanged if public_release=False)
+
+        Note:
+            Policy enforcement: Per MeatyMusic CLAUDE.md policy,
+            public releases must not reference living artists by name
+            to avoid likeness and copyright issues.
         """
         if not public_release:
             return influences
 
         normalized = []
 
+        # Process each influence string
         for influence in influences:
             influence_lower = influence.lower().strip()
 
-            # Remove "style of" prefix
+            # Pattern 1: "style of <artist>" prefix
             if "style of" in influence_lower:
-                # Extract artist name
+                # Extract artist name by removing prefix
                 artist = influence_lower.replace("style of", "").strip()
 
-                # Check if living artist
+                # Check if the extracted artist is in LIVING_ARTISTS registry
+                # Using "in" check to match partial names (e.g., "drake" in "style of drake")
                 if any(living in artist for living in self.LIVING_ARTISTS):
-                    # Convert to generic description
+                    # Living artist detected - convert to generic description
+                    # This prevents direct attribution that could cause likeness issues
                     normalized.append(self._genericize_artist(artist))
                     logger.debug(
                         "persona.influence_normalized",
@@ -312,11 +334,13 @@ class PersonaService(BaseService[Persona, PersonaResponse, PersonaCreate, Person
                         normalized=normalized[-1]
                     )
                 else:
-                    # Keep but remove "style of"
+                    # Not a living artist (likely historical) - keep but remove "style of"
                     normalized.append(f"{artist}-inspired sound")
             else:
-                # Check if direct living artist reference
+                # Pattern 2: Direct artist name reference (no "style of" prefix)
+                # Check if this is a living artist
                 if any(living in influence_lower for living in self.LIVING_ARTISTS):
+                    # Living artist detected directly - genericize it
                     normalized.append(self._genericize_artist(influence_lower))
                     logger.debug(
                         "persona.influence_normalized",
@@ -324,7 +348,8 @@ class PersonaService(BaseService[Persona, PersonaResponse, PersonaCreate, Person
                         normalized=normalized[-1]
                     )
                 else:
-                    # Keep as-is (genre, era, or historical artist)
+                    # Not a living artist - keep as-is (genre, era, historical artist, etc.)
+                    # Examples: "1970s soul", "rock legend", "classical composer", etc.
                     normalized.append(influence)
 
         return normalized

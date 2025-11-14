@@ -1,8 +1,8 @@
 # MeatyMusic Service Layer Documentation
 
-**Primary Reference for Service Development in Phase 2+**
+**Comprehensive Reference for Service Layer Implementation**
 
-This comprehensive guide documents the MeatyMusic service layer patterns, contracts, and best practices. Use this as your primary reference when implementing the 5 entity services in Phase 2 (LyricsService, PersonaService, ProducerNotesService, BlueprintService, SourceService).
+This guide documents the MeatyMusic service layer patterns, contracts, and best practices for all 9 services. It includes detailed documentation of the 5 new entity services implemented in Phase 2 (LyricsService, PersonaService, ProducerNotesService, BlueprintService, SourceService), plus the 4 existing services (StyleService, SongService, ValidationService, WorkflowService).
 
 ---
 
@@ -11,13 +11,15 @@ This comprehensive guide documents the MeatyMusic service layer patterns, contra
 1. [Service Layer Overview](#1-service-layer-overview)
 2. [BaseService Contract](#2-baseservice-contract)
 3. [Service Implementation Pattern](#3-service-implementation-pattern)
-4. [Shared Utilities](#4-shared-utilities)
-5. [Error Handling](#5-error-handling-patterns)
-6. [Testing Patterns](#6-testing-patterns)
-7. [Dependency Injection](#7-dependency-injection)
-8. [Service Contracts](#8-service-contract-interfaces)
-9. [API Integration](#9-api-integration)
-10. [Troubleshooting](#10-troubleshooting)
+4. [Service Catalog](#4-service-catalog)
+5. [Shared Utilities](#5-shared-utilities)
+6. [Error Handling](#6-error-handling-patterns)
+7. [Testing Patterns](#7-testing-patterns)
+8. [Dependency Injection](#8-dependency-injection)
+9. [Service Contracts](#9-service-contract-interfaces)
+10. [API Integration](#10-api-integration)
+11. [Troubleshooting](#11-troubleshooting)
+12. [Architecture Compliance](#12-architecture-compliance)
 
 ---
 
@@ -600,7 +602,526 @@ class SongService(BaseService[Song, SongResponse, SongCreate, SongUpdate]):
 
 ---
 
-## 4. Shared Utilities
+## 4. Service Catalog
+
+This section documents the 5 new entity services implemented in Phase 2, along with their specific patterns, validations, and responsibilities.
+
+### 4.1. LyricsService
+
+**File:** `/services/api/app/services/lyrics_service.py`
+
+**Purpose:** Business logic for lyrics entities with citation management, section validation, and rhyme scheme enforcement.
+
+**Responsibilities:**
+- CRUD operations for lyrics entities
+- Section structure validation (must contain at least one Chorus)
+- Rhyme scheme format validation (uppercase letters only)
+- Explicit content filtering with profanity detection
+- Reading level validation
+- Citation management with deterministic hash computation
+- Source weight normalization for retrieval
+
+**Key Methods:**
+
+```python
+async def create_lyrics(self, data: LyricsCreate) -> LyricsResponse:
+    """Create lyrics with comprehensive validation."""
+    # Validates section order contains "Chorus"
+    # Validates rhyme scheme format
+    # Checks explicit content if explicit_allowed=False
+    # Validates reading level (elementary, middle, high_school, college)
+
+async def validate_citations(self, citations: List[Dict]) -> bool:
+    """Validate citations for deterministic hashing."""
+    # Each citation must have source_id, chunk_text, weight
+    # Weights normalized via normalize_weights()
+    # Hashes computed deterministically
+
+async def parse_citations_with_hashes(
+    self,
+    citations: List[Dict]
+) -> List[Dict]:
+    """Parse citations and compute SHA-256 hashes."""
+    # Uses compute_citation_hash() from common.py
+    # Same inputs always produce same hash (99%+ reproducibility)
+```
+
+**Validation Rules:**
+- Section order must contain at least one "Chorus" (case-insensitive)
+- Rhyme scheme: uppercase letters only (AABB, ABAB, ABCB, etc.)
+- Explicit content: checked if `explicit_allowed=False`
+- Reading level: one of ["elementary", "middle", "high_school", "college"]
+- Citations: each must have source_id, chunk_text, weight > 0
+
+**Example Usage:**
+
+```python
+from app.services.lyrics_service import LyricsService
+from app.schemas.lyrics import LyricsCreate
+
+service = LyricsService(session=db_session, repo=lyrics_repo)
+
+# Create lyrics with validation
+lyrics_data = LyricsCreate(
+    song_id=song_id,
+    section_order=["Verse", "Chorus", "Verse", "Chorus"],
+    text="[Verse]\nLime and rhyme...\n[Chorus]\nHook line",
+    rhyme_scheme="AABB",
+    explicit_allowed=False,
+    reading_level="high_school",
+    citations=[
+        {"source_id": src1, "chunk_text": "inspiration text", "weight": 0.7},
+        {"source_id": src2, "chunk_text": "another text", "weight": 0.3}
+    ]
+)
+
+response = await service.create_lyrics(lyrics_data)
+# Returns: LyricsResponse with validated data and citation hashes
+
+# Get lyrics by song
+lyrics_list = await service.get_by_song_id(song_id)
+
+# Validate structure
+is_valid = await service.validate_citations(lyrics_data.citations)
+```
+
+**Dependencies:**
+- **Repository:** LyricsRepository
+- **Utilities:** common.py (validate_section_order, validate_rhyme_scheme, check_explicit_content, compute_citation_hash, normalize_weights)
+
+**Reference:** See `/docs/project_plans/PRDs/lyrics.prd.md` for detailed lyrics specification
+
+---
+
+### 4.2. PersonaService
+
+**File:** `/services/api/app/services/persona_service.py`
+
+**Purpose:** Business logic for artist personas with influence normalization and vocal range validation.
+
+**Responsibilities:**
+- CRUD operations for persona entities
+- Influence normalization (living artist policies for public releases)
+- Vocal range validation (soprano, tenor, alto, bass, countertenor, mezzo-soprano)
+- Delivery style validation with conflict detection
+- Search and filtering operations
+
+**Key Methods:**
+
+```python
+async def create_persona(self, data: PersonaCreate) -> PersonaResponse:
+    """Create persona with validation."""
+    # Validates vocal range is supported
+    # Validates delivery styles for conflicts
+    # Normalizes influences based on public_release flag
+
+async def normalize_influences(
+    self,
+    influences: List[str],
+    public_release: bool = False
+) -> List[str]:
+    """Normalize influence strings for policy compliance."""
+    # For public releases: removes "style of <living artist>" references
+    # Converts to generic influence language
+    # Maintains reproducibility
+
+async def validate_delivery_styles(
+    self,
+    delivery: List[str]
+) -> Tuple[bool, List[Tuple[str, str]]]:
+    """Validate delivery styles for conflicts."""
+    # Checks for conflicting styles (e.g., "whisper" + "belting")
+    # Returns conflicts found
+```
+
+**Validation Rules:**
+- Vocal range: must be one of canonical set
+- Delivery styles: checked for conflicts via conflict matrix
+- Living artist influences: normalized for public releases (policy enforcement)
+- Influences: generic terms (e.g., "melancholic" instead of "like Taylor Swift")
+
+**Example Usage:**
+
+```python
+from app.services.persona_service import PersonaService
+from app.schemas.persona import PersonaCreate
+
+service = PersonaService(session=db_session, repo=persona_repo)
+
+# Create persona
+persona_data = PersonaCreate(
+    name="Ethereal Vocalist",
+    persona_type="artist",
+    vocal_range="soprano",
+    influences=["ethereal vocals", "ambient music", "indie folk"],
+    delivery_styles=["legato", "sustain"],
+    bio="A delicate, atmospheric vocalist"
+)
+
+response = await service.create_persona(persona_data)
+
+# Normalize influences for public release
+normalized = await service.normalize_influences(
+    influences=["style of Adele", "powerful vocals"],
+    public_release=True
+)
+# Returns: ["powerful vocals", "influenced by theatrical delivery"]
+
+# Validate delivery styles
+is_valid, conflicts = await service.validate_delivery_styles(
+    delivery=["whisper", "belting"]  # Conflicting!
+)
+# Returns: (False, [("whisper", "belting")])
+```
+
+**Dependencies:**
+- **Repository:** PersonaRepository
+- **Utilities:** None (self-contained validation)
+
+**Reference:** See `/docs/project_plans/PRDs/persona.prd.md` for persona specification
+
+---
+
+### 4.3. ProducerNotesService
+
+**File:** `/services/api/app/services/producer_notes_service.py`
+
+**Purpose:** Business logic for producer notes with mix settings validation and blueprint alignment.
+
+**Responsibilities:**
+- CRUD operations for producer notes
+- Mix settings validation (LUFS, stereo width, reverb, etc.)
+- Duration calculation and validation
+- Structure alignment with lyrics sections
+- Blueprint compliance validation
+- Hook count and arrangement guidance
+
+**Key Methods:**
+
+```python
+async def create_producer_notes(
+    self,
+    data: ProducerNotesCreate
+) -> ProducerNotesResponse:
+    """Create producer notes with validation."""
+    # Validates mix targets (LUFS -20 to -5 dB)
+    # Validates structure matches section order
+    # Calculates total duration
+
+async def validate_mix_settings(
+    self,
+    mix_targets: Dict[str, Any]
+) -> Tuple[bool, Optional[str]]:
+    """Validate mix settings against constraints."""
+    # LUFS: -20.0 to -5.0 dB
+    # Stereo width: "narrow", "normal", "wide"
+    # Check coherence (energy/tempo matching)
+
+async def validate_against_blueprint(
+    self,
+    notes_id: UUID,
+    blueprint_id: UUID
+) -> Tuple[bool, List[str]]:
+    """Validate notes align with blueprint."""
+    # Checks section structure against blueprint requirements
+    # Validates tempo range
+    # Checks required elements
+
+async def validate_duration_against_target(
+    self,
+    notes_id: UUID,
+    target_duration: int
+) -> Tuple[bool, int]:
+    """Validate duration within tolerance."""
+    # Duration tolerance: ±30 seconds
+    # Returns if valid and actual duration
+```
+
+**Validation Rules:**
+- LUFS: -20.0 to -5.0 dB
+- Stereo width: "narrow", "normal", or "wide"
+- Structure: must match section order
+- Duration: ±30 seconds from target
+- Hook count: warning if zero
+- Energy/Tempo coherence: high energy (8-10) ≠ slow tempo (< 90 BPM)
+
+**Example Usage:**
+
+```python
+from app.services.producer_notes_service import ProducerNotesService
+from app.schemas.producer_notes import ProducerNotesCreate
+
+service = ProducerNotesService(
+    session=db_session,
+    repo=producer_notes_repo,
+    blueprint_repo=blueprint_repo,  # Optional for validation
+    lyrics_repo=lyrics_repo  # Optional for section validation
+)
+
+# Create producer notes
+notes_data = ProducerNotesCreate(
+    song_id=song_id,
+    structure=["Intro", "Verse", "Chorus", "Verse", "Chorus", "Bridge", "Chorus", "Outro"],
+    section_durations={
+        "Intro": 8,
+        "Verse": 16,
+        "Chorus": 16,
+        "Bridge": 8,
+        "Outro": 4
+    },
+    mix_targets={
+        "lufs": -6.0,
+        "stereo_width": "normal",
+        "reverb_amount": 0.3,
+        "compression_ratio": 4.0
+    },
+    hook_lines=["This is the hook line"],
+    target_duration=180  # 3 minutes
+)
+
+response = await service.create_producer_notes(notes_data)
+
+# Validate against blueprint
+is_valid, issues = await service.validate_against_blueprint(
+    notes_id=response.id,
+    blueprint_id=blueprint_id
+)
+
+# Check duration
+is_valid, actual_duration = await service.validate_duration_against_target(
+    notes_id=response.id,
+    target_duration=180
+)
+```
+
+**Dependencies:**
+- **Repository:** ProducerNotesRepository, BlueprintRepository (optional), LyricsRepository (optional)
+- **Utilities:** None (self-contained validation)
+
+**Reference:** See `/docs/project_plans/PRDs/producer_notes.prd.md` for details
+
+---
+
+### 4.4. BlueprintService
+
+**File:** `/services/api/app/services/blueprint_service.py`
+
+**Purpose:** Business logic for genre blueprints with markdown loading, caching, and tag conflict detection.
+
+**Responsibilities:**
+- Load blueprints from markdown files in `/docs/hit_song_blueprint/AI/`
+- Cache blueprints in memory for performance
+- Validate rubric weights (must sum to 1.0)
+- Load and apply tag conflict matrix
+- Validate tempo ranges and required sections
+- Provide blueprint data to other services
+
+**Key Methods:**
+
+```python
+def get_or_load_blueprint(
+    self,
+    genre: str,
+    version: str = "latest"
+) -> Blueprint:
+    """Get blueprint from cache or load from file."""
+    # Checks in-memory cache first
+    # Loads from markdown if not cached
+    # Returns parsed blueprint with metadata
+
+def load_conflict_matrix(self) -> Dict[str, List[str]]:
+    """Load tag conflict matrix from JSON."""
+    # Loads from /taxonomies/conflict_matrix.json
+    # Cached in memory
+    # Used for tag validation
+
+def get_tag_conflicts(
+    self,
+    tags: List[str]
+) -> List[Tuple[str, str]]:
+    """Get conflicting tags."""
+    # Returns list of (tag1, tag2) conflicts
+    # Validates against conflict matrix
+
+def validate_rubric_weights(
+    self,
+    weights: Dict[str, float]
+) -> Tuple[bool, Optional[str]]:
+    """Validate rubric weights sum to 1.0."""
+    # All weights must be positive
+    # Sum must be 1.0 ± 0.01 tolerance
+```
+
+**Validation Rules:**
+- Rubric weights sum to 1.0 (±0.01 tolerance)
+- All weights positive
+- Tempo range: min ≤ max
+- Required sections present
+- Tags don't have conflicts
+
+**Example Usage:**
+
+```python
+from app.services.blueprint_service import BlueprintService
+
+service = BlueprintService(blueprint_repo=blueprint_repo)
+
+# Get blueprint from cache or load
+blueprint = service.get_or_load_blueprint(genre="pop")
+# Loads from /docs/hit_song_blueprint/AI/pop_blueprint.md if needed
+
+# Check tag conflicts
+conflicts = service.get_tag_conflicts(["whisper", "anthemic"])
+# Returns: [("whisper", "anthemic")] - conflict detected
+
+# Validate weights
+is_valid, error = service.validate_rubric_weights({
+    "hook_density": 0.25,
+    "singability": 0.25,
+    "rhyme_tightness": 0.25,
+    "section_completeness": 0.25
+})
+# Returns: (True, None)
+
+# Load conflict matrix
+conflicts_matrix = service.load_conflict_matrix()
+```
+
+**Cache Management:**
+- In-memory cache of blueprints for performance
+- Invalidate cache with `invalidate_cache(genre)` or `invalidate_cache()` for all
+- Returns count of invalidated entries
+
+**Dependencies:**
+- **Repository:** BlueprintRepository
+- **Utilities:** common.py (normalize_weights)
+- **File System:** `/docs/hit_song_blueprint/AI/*.md`, `/taxonomies/conflict_matrix.json`
+
+**Reference:** See `/docs/hit_song_blueprint/` for blueprint files
+
+---
+
+### 4.5. SourceService
+
+**File:** `/services/api/app/services/source_service.py`
+
+**Purpose:** Business logic for external data sources with MCP integration and deterministic retrieval.
+
+**Responsibilities:**
+- Manage external data sources (files, APIs, MCP servers)
+- MCP server discovery and validation
+- Deterministic chunk retrieval with content hashing
+- Citation management with SHA-256 hashing
+- Weight normalization for retrieval weighting
+- Allow/deny list validation for source access
+
+**Key Methods:**
+
+```python
+def retrieve_chunks(
+    self,
+    source_id: UUID,
+    query: str,
+    top_k: int = 5,
+    seed: Optional[int] = None
+) -> List[ChunkWithHash]:
+    """Retrieve chunks deterministically."""
+    # Same query + seed = same chunks (99%+ reproducibility)
+    # Uses fixed top-k with lexicographic tie-breaking
+    # Includes SHA-256 content hashes
+
+def retrieve_by_hash(
+    self,
+    source_id: UUID,
+    chunk_hash: str
+) -> Optional[Chunk]:
+    """Retrieve chunk by content hash."""
+    # Enables pinned retrieval for determinism
+    # Returns chunk if hash matches
+
+def normalize_source_weights(
+    self,
+    sources: List[Source]
+) -> Dict[UUID, float]:
+    """Normalize retrieval source weights."""
+    # Weights sum to 1.0 maximum
+    # Preserves relative proportions
+    # Used for multi-source RAG
+
+def discover_mcp_servers(self) -> List[MCPServerInfo]:
+    """Discover available MCP servers."""
+    # Lists configured MCP servers
+    # Returns server info with capabilities and scopes
+
+def validate_mcp_scopes(
+    self,
+    scopes: List[str],
+    server_id: str
+) -> Tuple[bool, Optional[str]]:
+    """Validate MCP scopes for server."""
+    # Checks if scopes are allowed for server
+    # Enforces security policy
+```
+
+**Determinism Features:**
+- Content hashing: SHA-256 for deterministic citation
+- Pinned retrieval: same hash always retrieves same chunk
+- Fixed seed: same seed + query = same results
+- Lexicographic tie-breaking: resolves ambiguities consistently
+
+**Example Usage:**
+
+```python
+from app.services.source_service import SourceService
+from uuid import UUID
+
+service = SourceService(source_repo=source_repo)
+
+# Retrieve chunks deterministically
+chunks = service.retrieve_chunks(
+    source_id=source_uuid,
+    query="inspiration for lyrics",
+    top_k=5,
+    seed=42  # Fixed seed for reproducibility
+)
+# Same inputs always return same chunks (99%+ reproducibility)
+
+# Get chunk by hash (pinned retrieval)
+chunk = service.retrieve_by_hash(
+    source_id=source_uuid,
+    chunk_hash="abc123def456..."  # SHA-256 hash
+)
+
+# Normalize weights for multi-source retrieval
+sources = [
+    {"id": src1, "weight": 0.7},
+    {"id": src2, "weight": 0.5}
+]
+normalized = service.normalize_source_weights(sources)
+# Returns: {src1: 0.583, src2: 0.417}
+
+# Check MCP server capabilities
+servers = service.discover_mcp_servers()
+for server in servers:
+    print(f"{server.id}: {server.capabilities}")
+
+# Validate access scopes
+is_valid, error = service.validate_mcp_scopes(
+    scopes=["read:lyrics", "read:sources"],
+    server_id="mcp_knowledge_base"
+)
+```
+
+**Dependencies:**
+- **Repository:** SourceRepository
+- **Utilities:** common.py (compute_citation_hash, normalize_weights)
+- **External:** MCP servers for source access
+
+**Reference:** See `/docs/project_plans/PRDs/sources.prd.md` for source specification
+
+---
+
+## 5. Shared Utilities
 
 The `common.py` module provides deterministic validation utilities used across ALL entity services.
 
@@ -994,7 +1515,7 @@ class LyricsService(BaseService[...]):
 
 ---
 
-## 5. Error Handling Patterns
+## 6. Error Handling Patterns
 
 ### Transaction Error Handling
 
@@ -1144,7 +1665,7 @@ logger.error(
 
 ---
 
-## 6. Testing Patterns
+## 7. Testing Patterns
 
 ### Unit Test Structure
 
@@ -1457,7 +1978,7 @@ class TestCommonUtilities:
 
 ---
 
-## 7. Dependency Injection
+## 8. Dependency Injection
 
 ### Constructor Injection Pattern
 
@@ -1631,7 +2152,7 @@ async def get_caching_lyrics_service(
 
 ---
 
-## 8. Service Contract Interfaces
+## 9. Service Contract Interfaces
 
 ### Standard Service Contract
 
@@ -1769,7 +2290,7 @@ All responses must follow standard format:
 
 ---
 
-## 9. API Integration
+## 10. API Integration
 
 ### Endpoint Structure
 
@@ -1925,7 +2446,7 @@ async def create_lyrics(
 
 ---
 
-## 10. Troubleshooting
+## 11. Troubleshooting
 
 ### Transaction Errors
 
@@ -2196,13 +2717,224 @@ Review these resources before asking:
 
 ---
 
+## 12. Architecture Compliance
+
+This section documents how the service layer implementation maintains MeatyMusic's architectural standards and validation requirements.
+
+### Dependency Graph Validation
+
+**Status:** ✓ **PASSED** - No circular dependencies detected
+
+The service layer forms a Directed Acyclic Graph (DAG) with clear dependency levels:
+
+```
+Level 0 (No Service Dependencies):
+  - PersonaService
+  - ValidationService
+
+Level 1 (Uses Common Utilities):
+  - LyricsService
+  - BlueprintService
+  - SourceService
+  - StyleService
+
+Level 2 (Aggregators):
+  - SongService (uses ValidationService)
+  - WorkflowService (uses WorkflowOrchestrator, EventPublisher)
+```
+
+**Verification:** See `/services/api/app/services/DEPENDENCIES.md` for detailed dependency matrix.
+
+### Transaction Management
+
+All services use synchronous transaction management via `BaseService.transaction()`:
+
+- **Atomic Operations:** Multiple repository operations within single transaction
+- **Automatic Commit/Rollback:** Context manager handles success/error paths
+- **Error Logging:** Structured logging with trace context
+- **Determinism:** Session state isolated per request
+
+**Pattern:**
+```python
+with self.transaction():
+    entity = self.repo.create(data)
+    # Auto-commit on success, auto-rollback on error
+```
+
+### Error Handling Consistency
+
+All services follow consistent error handling patterns:
+
+| Error Type | HTTP Status | Usage |
+|---|---|---|
+| `BadRequestError` | 400 | Validation failures, bad input |
+| `NotFoundError` | 404 | Entity not found by ID |
+| `ConflictError` | 409 | Duplicate, constraint violation |
+| `InternalServerError` | 500 | Unexpected errors |
+
+**Pattern:**
+```python
+async def _handle_error(error, operation, context) -> AppError:
+    # Converts exceptions to appropriate AppError types
+    # Logs with structured context
+    # Returns or raises AppError
+```
+
+### Determinism Requirements
+
+Services maintain determinism for reproducibility:
+
+**LyricsService:**
+- Citation hashing via `compute_citation_hash()` (SHA-256)
+- Same inputs always produce same hash
+- 99%+ reproducibility across runs
+
+**SourceService:**
+- Deterministic chunk retrieval with seed
+- SHA-256 content hashing for pinned retrieval
+- Lexicographic tie-breaking for deterministic ordering
+
+**Pattern:**
+```python
+# Same seed + query = same chunks (99%+ reproducibility)
+chunks = service.retrieve_chunks(
+    source_id=uuid,
+    query="search text",
+    seed=42  # Fixed seed
+)
+```
+
+### Validation Strategy
+
+Each service implements three levels of validation:
+
+**1. Schema Validation (Pydantic)**
+- Input DTOs validated before entering service
+- Type coercion and basic constraints
+
+**2. Business Logic Validation (Service)**
+- Domain-specific rules (section order, rhyme scheme, mix settings)
+- Cross-entity constraints (duration tolerance, blueprint alignment)
+- Policy enforcement (profanity, living artist influences)
+
+**3. Optional Detailed Validation (Repository)**
+- Database constraints (unique keys, foreign keys)
+- Actual data persistence checks
+
+**Example (LyricsService):**
+```python
+# 1. Pydantic validates LyricsCreate schema
+async def create_lyrics(self, data: LyricsCreate) -> LyricsResponse:
+    # 2. Service validates business logic
+    await self._validate_required_fields(data, ["text", "section_order"], ...)
+    is_valid, error = validate_section_order(data.section_order)
+    if not is_valid:
+        raise BadRequestError(error)
+
+    # 3. Repository persists with constraints
+    with self.transaction():
+        lyrics = await self.repo.create(data)
+```
+
+### Testing Requirements
+
+Each service must meet coverage targets:
+
+- **Unit Tests:** 90% coverage per service
+- **Integration Tests:** Create, read, update, delete, list operations
+- **Error Tests:** All error paths and rollback scenarios
+- **Determinism Tests:** Same inputs produce same outputs (for LyricsService, SourceService)
+
+**Reference:** See section 7 (Testing Patterns) for complete testing guide.
+
+### Performance Constraints
+
+All services respect MeatyMusic performance targets:
+
+- **P95 Latency:** ≤ 60s for end-to-end plan→prompt flow (excluding render)
+- **Database Queries:** Minimize N+1 patterns via eager loading
+- **Caching:** In-memory caching for blueprints (via BlueprintService)
+- **Weight Operations:** Use efficient normalize_weights() implementation
+
+**Service-Specific Performance:**
+- LyricsService: O(n) for citation hashing where n = citation count
+- BlueprintService: O(1) for cached blueprint retrieval
+- SourceService: O(log k) for top-k retrieval with seed
+
+### Observability & Logging
+
+All services emit structured logs for observability:
+
+**Standard Log Fields:**
+- `operation`: Method name (e.g., "create_lyrics")
+- `entity_type`: Entity being operated on
+- `entity_id`: Primary key if available
+- `duration_ms`: Operation duration
+- `error_type`: Exception type if failed
+- `trace_id`: OpenTelemetry trace ID (automatic)
+
+**Pattern:**
+```python
+logger.info(
+    "lyrics.created",
+    lyrics_id=str(lyrics.id),
+    song_id=str(lyrics.song_id),
+    section_count=len(lyrics.sections)
+)
+
+logger.error(
+    "lyrics.creation_failed",
+    operation="create_lyrics",
+    error_type=type(e).__name__,
+    error_message=str(e),
+    exc_info=True
+)
+```
+
+### Related Documentation
+
+For detailed architecture information, see:
+
+1. **Dependency Analysis:** `/services/api/app/services/DEPENDENCIES.md`
+   - Complete dependency matrix
+   - Circular dependency validation
+   - Service-to-repository mappings
+
+2. **Architecture Validation:** `/services/api/app/services/ARCHITECTURE_VALIDATION.md`
+   - Layer separation verification
+   - Transaction pattern compliance
+   - Error handling consistency
+
+3. **Base Service Usage:** `/services/api/app/services/BASE_SERVICE_USAGE.md`
+   - Transaction management details
+   - DTO conversion patterns
+   - Error handling examples
+
+4. **Implementation Summary:** `/services/api/app/services/IMPLEMENTATION_SUMMARY.md`
+   - Phase completion status
+   - Service implementation checklist
+   - Deliverables summary
+
+5. **Project PRDs:** `/docs/project_plans/PRDs/`
+   - Entity-specific requirements
+   - Business logic specifications
+   - Validation rules and constraints
+
+---
+
 ## Summary
 
-This documentation provides everything needed to implement MeatyMusic entity services:
+This documentation provides everything needed to implement and maintain MeatyMusic service layer:
 
 ✅ **Service Layer Overview** - Understand purpose and position
 ✅ **BaseService Contract** - Use the abstract base class
 ✅ **Implementation Pattern** - Follow standard structure
+✅ **Service Catalog** - Learn the 5 new entity services
+  - LyricsService: Citations, sections, rhyme schemes
+  - PersonaService: Influences, vocal range, delivery styles
+  - ProducerNotesService: Mix settings, duration, blueprint alignment
+  - BlueprintService: Genre blueprints, tag conflicts, caching
+  - SourceService: MCP integration, deterministic retrieval
 ✅ **Shared Utilities** - Use common validation functions
 ✅ **Error Handling** - Handle errors consistently
 ✅ **Testing** - Write comprehensive tests
@@ -2210,6 +2942,7 @@ This documentation provides everything needed to implement MeatyMusic entity ser
 ✅ **Service Contracts** - Implement standard operations
 ✅ **API Integration** - Connect to endpoints
 ✅ **Troubleshooting** - Fix common issues
+✅ **Architecture Compliance** - Meet MeatyMusic standards
 
 ---
 
@@ -2220,5 +2953,7 @@ This documentation provides everything needed to implement MeatyMusic entity ser
 - Add troubleshooting entries as issues arise
 
 **Last Updated:** 2025-11-14
-**Phase:** Phase 2 - Entity Service Implementation
-**Status:** Ready for service developers
+**Phase:** Phase 2 - Entity Service Implementation (Complete)
+**Status:** ✓ All 5 entity services documented and implemented
+**Services Documented:** 9 total (5 new + 4 existing)
+**Coverage:** 100% of Phase 2 deliverables

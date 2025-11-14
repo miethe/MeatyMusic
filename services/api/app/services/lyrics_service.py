@@ -566,11 +566,16 @@ class LyricsService(BaseService[Lyrics, LyricsResponse, LyricsCreate, LyricsUpda
     def _extract_text_from_sections(self, sections: List[Dict[str, Any]]) -> str:
         """Extract full text from sections for profanity checking.
 
+        Combines all lines from all sections into a single text block
+        for efficient profanity analysis. This allows checking the entire
+        lyrical content at once against policy constraints.
+
         Args:
-            sections: List of section dicts with 'lines' field
+            sections: List of section dicts with 'lines' field containing
+                     lyrical content for each section
 
         Returns:
-            Combined text from all sections
+            Combined text from all sections separated by newlines
 
         Example:
             >>> sections = [
@@ -579,12 +584,20 @@ class LyricsService(BaseService[Lyrics, LyricsResponse, LyricsCreate, LyricsUpda
             ... ]
             >>> text = service._extract_text_from_sections(sections)
             >>> # Returns: "Line 1\\nLine 2\\nHook line"
+
+        Note:
+            This is a helper method used internally during validation.
+            The combined text is passed to check_explicit_content() for
+            policy compliance checking.
         """
         all_lines = []
 
+        # Iterate through sections and extract lines from each
         for section in sections:
             lines = section.get("lines", [])
             if isinstance(lines, list):
+                # Extend with all lines from this section
                 all_lines.extend(lines)
 
+        # Join all lines with newlines for readability
         return "\n".join(all_lines)

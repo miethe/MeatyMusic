@@ -263,32 +263,50 @@ class SourceService(BaseService[Source, SourceResponse, SourceCreate, SourceUpda
         top_k: int = 5,
         seed: Optional[int] = None
     ) -> List[ChunkWithHash]:
-        """Retrieve chunks with deterministic hashing.
+        """Retrieve chunks with deterministic hashing and policy enforcement.
 
-        Queries MCP server for relevant chunks and computes SHA-256 hashes for
-        each chunk to enable pinned retrieval and provenance tracking.
+        Core retrieval method for retrieval-augmented generation (RAG). Queries
+        MCP servers for relevant chunks, applies allow/deny filters, and computes
+        SHA-256 hashes for deterministic provenance tracking.
 
-        DETERMINISM GUARANTEE:
+        DETERMINISM GUARANTEE (99%+ reproducibility):
         - Same source_id + query + top_k + seed → same chunks
-        - Same chunk content → same hash
-        - Fixed top-k retrieval
-        - Lexicographic sorting for tie-breaking
-        - 99%+ reproducibility
+        - Same chunk content → identical hash (SHA-256)
+        - Fixed top-k retrieval with lexicographic tie-breaking
+        - Pinned retrieval possible via content_hash
+        - Seed propagation ensures RNG reproducibility
+
+        Retrieval Pipeline:
+        1. Validate source exists and is active
+        2. Validate MCP scopes against server capabilities
+        3. Query MCP server (with seed for determinism)
+        4. Apply allow/deny list filters (security policy)
+        5. Limit to top_k results after filtering
+        6. Compute SHA-256 hash for each chunk (provenance)
+        7. Cache chunks locally for hash-based retrieval
+        8. Return chunks with hashes
 
         Args:
-            source_id: Source UUID
-            query: Search query string
-            top_k: Number of chunks to retrieve (default: 5)
-            seed: Random seed for determinism (default: None)
+            source_id: Source UUID to query
+            query: Search query string (e.g., "chord progressions in pop")
+            top_k: Maximum number of chunks to retrieve (default: 5)
+            seed: Random seed for determinism (default: None = not deterministic)
 
         Returns:
-            List of ChunkWithHash with content hashes for provenance
+            List of ChunkWithHash objects with:
+            - text: Chunk content
+            - score: Relevance score (0.0-1.0)
+            - metadata: Associated metadata
+            - timestamp: Creation/update timestamp if available
+            - content_hash: SHA-256 hash (64 hex chars) for provenance
+            - source_id: Source UUID for validation
 
         Raises:
-            NotFoundError: If source doesn't exist
-            BadRequestError: If source is inactive or invalid
+            NotFoundError: If source doesn't exist in database
+            BadRequestError: If source is inactive or scopes invalid
 
         Example:
+            >>> # Deterministic retrieval with seed
             >>> chunks = await service.retrieve_chunks(
             ...     source_id=source.id,
             ...     query="chord progressions in pop music",
@@ -296,19 +314,27 @@ class SourceService(BaseService[Source, SourceResponse, SourceCreate, SourceUpda
             ...     seed=42  # Deterministic!
             ... )
             >>> for chunk in chunks:
-            ...     print(f"Hash: {chunk.content_hash[:8]}...")
+            ...     print(f"Hash: {chunk.content_hash[:8]}...")  # First 8 chars
+            ...     print(f"Score: {chunk.score:.2f}")
             ...     print(f"Text: {chunk.text[:50]}...")
         """
+        # =====================================================================
+        # Step 1: Validate Source
+        # =====================================================================
         # Get source
         source = self.repo.get(source_id)
         if not source:
             raise NotFoundError(f"Source not found: {source_id}")
 
-        # Validate source is active
+        # Validate source is active (inactive sources are excluded from retrieval)
         if not source.is_active:
             raise BadRequestError(f"Source is inactive: {source.name}")
 
-        # Validate scopes
+        # =====================================================================
+        # Step 2: Validate MCP Server Scopes
+        # =====================================================================
+        # Validate that all requested scopes are available on the MCP server
+        # Scopes are permissions (e.g., 'music', 'lyrics', 'public')
         if source.scopes:
             is_valid, error = await self.validate_mcp_scopes(
                 source.scopes,
@@ -317,7 +343,11 @@ class SourceService(BaseService[Source, SourceResponse, SourceCreate, SourceUpda
             if not is_valid:
                 raise BadRequestError(error)
 
-        # Query MCP server (mock for now)
+        # =====================================================================
+        # Step 3: Query MCP Server
+        # =====================================================================
+        # Execute query with seed for determinism
+        # Seed ensures same query = same chunks (reproducibility)
         raw_chunks = await self._query_mcp_server(
             server_id=source.mcp_server_id,
             query=query,
@@ -326,7 +356,12 @@ class SourceService(BaseService[Source, SourceResponse, SourceCreate, SourceUpda
             config=source.config
         )
 
-        # Apply allow/deny lists
+        # =====================================================================
+        # Step 4: Apply Allow/Deny List Filters (Policy Enforcement)
+        # =====================================================================
+        # Filter chunks based on source's allow/deny lists
+        # Deny list: Block chunks containing denied terms
+        # Allow list: Only keep chunks containing allowed terms
         filtered_chunks = []
         for chunk in raw_chunks:
             is_allowed, reason = self.validate_allow_deny_lists(
@@ -338,6 +373,7 @@ class SourceService(BaseService[Source, SourceResponse, SourceCreate, SourceUpda
             if is_allowed:
                 filtered_chunks.append(chunk)
             else:
+                # Chunk was filtered out due to policy
                 logger.debug(
                     "chunk.filtered",
                     source_id=str(source_id),
@@ -345,30 +381,46 @@ class SourceService(BaseService[Source, SourceResponse, SourceCreate, SourceUpda
                     text_preview=chunk["text"][:50]
                 )
 
-        # Limit to top_k after filtering
+        # =====================================================================
+        # Step 5: Limit to top_k After Filtering
+        # =====================================================================
+        # Ensure final result doesn't exceed top_k
+        # (filtering may reduce count below top_k)
         filtered_chunks = filtered_chunks[:top_k]
 
-        # Compute hashes for each chunk
+        # =====================================================================
+        # Step 6: Compute SHA-256 Hashes for Deterministic Provenance
+        # =====================================================================
+        # Each chunk gets a deterministic hash based on:
+        # - source_id (which source it came from)
+        # - chunk_text (the exact content)
+        # - timestamp (when it was created/updated)
         chunks_with_hash = []
         for chunk in filtered_chunks:
+            # Compute deterministic SHA-256 hash (64 hex chars)
             chunk_hash = compute_citation_hash(
                 source_id=source_id,
                 chunk_text=chunk["text"],
                 timestamp=chunk.get("timestamp")
             )
 
+            # Build response object with hash
             chunk_with_hash = ChunkWithHash(
                 text=chunk["text"],
                 score=chunk["score"],
                 metadata=chunk.get("metadata", {}),
                 timestamp=chunk.get("timestamp"),
-                content_hash=chunk_hash,
+                content_hash=chunk_hash,  # 64-char hex SHA-256 hash
                 source_id=source_id
             )
 
             chunks_with_hash.append(chunk_with_hash)
 
-            # Cache for hash-based retrieval
+            # ===================================================================
+            # Step 7: Cache Chunks Locally for Hash-Based Retrieval
+            # ===================================================================
+            # Store chunk in local cache keyed by hash
+            # Later calls to retrieve_by_hash() will check this cache first
             self._chunk_cache[chunk_hash] = Chunk(
                 text=chunk["text"],
                 score=chunk["score"],
@@ -376,6 +428,7 @@ class SourceService(BaseService[Source, SourceResponse, SourceCreate, SourceUpda
                 timestamp=chunk.get("timestamp")
             )
 
+        # Log retrieval metrics for observability
         logger.info(
             "chunks.retrieved",
             source_id=str(source_id),
@@ -455,26 +508,33 @@ class SourceService(BaseService[Source, SourceResponse, SourceCreate, SourceUpda
         allow: Optional[List[str]] = None,
         deny: Optional[List[str]] = None
     ) -> Tuple[bool, Optional[str]]:
-        """Validate text against allow/deny lists.
+        """Validate text against allow/deny lists for policy enforcement.
 
         Enforces source-level filtering policies to ensure only appropriate
-        content is retrieved. Deny list takes precedence over allow list.
+        content is retrieved. This is part of MeatyMusic safety guardrails.
 
-        Validation Rules:
-        1. If deny list exists, text must NOT contain any denied terms
-        2. If allow list exists, text MUST contain at least one allowed term
-        3. If both exist, both rules must pass
-        4. If neither exist, all text is allowed
+        Validation Logic (DENY takes precedence):
+        1. Deny list: If ANY denied term found in text → REJECT (return False)
+        2. Allow list: If allow list exists, REQUIRE at least ONE allowed term
+        3. Both lists: Both must pass (deny fails = reject; allow fails = reject)
+        4. No lists: ACCEPT (no filtering applied)
+
+        This enables granular content filtering:
+        - Deny: ["profanity", "explicit"] → filters out inappropriate content
+        - Allow: ["music", "theory"] → only retrieves musicology content
+        - Both: Ensures content is relevant AND appropriate
 
         Args:
-            text: Text content to validate
-            allow: Optional list of allowed terms (case-insensitive)
-            deny: Optional list of denied terms (case-insensitive)
+            text: Text content to validate against filters
+            allow: Optional list of allowed/required terms (case-insensitive)
+                   If provided, text MUST contain at least one of these
+            deny: Optional list of denied/forbidden terms (case-insensitive)
+                   If provided, text MUST NOT contain any of these
 
         Returns:
             Tuple of (is_valid, reason)
-            - is_valid: True if text passes filters
-            - reason: None if valid, error string if invalid
+            - is_valid: True if text passes all filters
+            - reason: None if valid, error string describing why invalid
 
         Example:
             >>> # Deny list check
@@ -483,19 +543,34 @@ class SourceService(BaseService[Source, SourceResponse, SourceCreate, SourceUpda
             ...     deny=["profanity", "explicit"]
             ... )
             >>> print(is_valid)  # False
+            >>> print(reason)  # "Denied term found: profanity"
             >>>
-            >>> # Allow list check
+            >>> # Allow list check (only music-related content)
             >>> is_valid, reason = service.validate_allow_deny_lists(
             ...     text="Music theory concepts",
             ...     allow=["music", "theory", "composition"]
             ... )
-            >>> print(is_valid)  # True
+            >>> print(is_valid)  # True (contains "music" and "theory")
+            >>>
+            >>> # Both lists
+            >>> is_valid, reason = service.validate_allow_deny_lists(
+            ...     text="Music with explicit lyrics",
+            ...     allow=["music"],
+            ...     deny=["explicit", "profanity"]
+            ... )
+            >>> print(is_valid)  # False (contains denied term "explicit")
         """
+        # Convert to lowercase for case-insensitive matching
         text_lower = text.lower()
 
-        # Check deny list first (highest priority)
+        # =====================================================================
+        # Check 1: Deny List (HIGHEST PRIORITY)
+        # =====================================================================
+        # If deny list exists, block ANY text containing denied terms
+        # This is a blocklist - immediate rejection if match found
         if deny:
             for term in deny:
+                # Substring match (case-insensitive)
                 if term.lower() in text_lower:
                     reason = f"Denied term found: {term}"
                     logger.debug(
@@ -505,14 +580,20 @@ class SourceService(BaseService[Source, SourceResponse, SourceCreate, SourceUpda
                     )
                     return False, reason
 
-        # Check allow list (must match at least one if provided)
+        # =====================================================================
+        # Check 2: Allow List (if provided, must match at least one term)
+        # =====================================================================
+        # If allow list exists, require at least ONE allowed term present
+        # This is an allowlist/whitelist - must match to pass
         if allow:
             found = False
             for term in allow:
+                # Substring match (case-insensitive)
                 if term.lower() in text_lower:
                     found = True
                     break
 
+            # If allow list was provided but no term matched, reject
             if not found:
                 reason = "No allowed terms found"
                 logger.debug(
@@ -522,7 +603,9 @@ class SourceService(BaseService[Source, SourceResponse, SourceCreate, SourceUpda
                 )
                 return False, reason
 
-        # Passed all checks
+        # =====================================================================
+        # Passed all checks - text is valid
+        # =====================================================================
         logger.debug(
             "allow_deny.passed",
             has_allow=bool(allow),
@@ -535,35 +618,51 @@ class SourceService(BaseService[Source, SourceResponse, SourceCreate, SourceUpda
         self,
         sources: List[Source]
     ) -> Dict[UUID, float]:
-        """Normalize source weights to sum to ≤1.0.
+        """Normalize source weights to sum to ≤1.0 for multi-source retrieval.
 
-        Ensures multi-source retrieval weights comply with constraints while
-        preserving relative proportions. Uses shared normalize_weights utility.
+        Scales multiple source weights proportionally so they sum to ≤1.0,
+        ensuring compliance with retrieval constraints. This is used when
+        retrieving chunks from multiple sources simultaneously.
+
+        Weight Normalization Strategy:
+        - If sum(weights) ≤ 1.0 → no scaling needed (return as-is)
+        - If sum(weights) > 1.0 → scale all weights proportionally
+        - Maintains relative proportions between sources
+        - Examples:
+          * [0.5, 0.5] → [0.5, 0.5] (already valid)
+          * [0.8, 0.6] → [0.571, 0.429] (scaled by 1.0/1.4)
+          * [2.0, 3.0] → [0.4, 0.6] (scaled by 1.0/5.0)
 
         Args:
-            sources: List of Source entities
+            sources: List of Source entities with weight properties
 
         Returns:
-            Dict mapping source_id to normalized weight
+            Dict mapping source_id (UUID) to normalized weight (float)
+            All values sum to ≤ 1.0
 
         Example:
-            >>> sources = await repo.get_active_sources()
+            >>> # Multiple sources with different weights
+            >>> sources = [
+            ...     Source(id=uuid1, weight=0.8),
+            ...     Source(id=uuid2, weight=0.6),  # Total = 1.4 (over limit)
+            ... ]
             >>> normalized = service.normalize_source_weights(sources)
-            >>> total = sum(normalized.values())
-            >>> assert total <= 1.0  # Compliant!
+            >>> # Normalized to: {uuid1: 0.571, uuid2: 0.429}
+            >>> assert sum(normalized.values()) <= 1.0  # Compliant!
         """
         if not sources:
             return {}
 
-        # Build weight dict
+        # Build weight dict from source entities
         weights = {
             source.id: float(source.weight)
             for source in sources
         }
 
-        # Normalize using common utility
+        # Normalize weights using shared utility (ensures sum ≤ 1.0)
         normalized = normalize_weights(weights, max_sum=1.0)
 
+        # Log for debugging/observability
         logger.info(
             "source_weights.normalized",
             source_count=len(sources),

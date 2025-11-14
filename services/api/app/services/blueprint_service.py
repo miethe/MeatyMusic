@@ -209,29 +209,42 @@ class BlueprintService:
     ) -> Dict:
         """Parse blueprint markdown content into structured data.
 
-        Extracts tempo ranges, required sections, and other constraints
-        from the markdown structure.
+        Extracts tempo ranges, required sections, length constraints, and
+        evaluation rubric from the markdown blueprint file. Uses regex patterns
+        to identify key sections and constraints.
+
+        This is the core parsing logic that transforms human-readable markdown
+        blueprints into machine-readable data structures for validation and scoring.
 
         Args:
-            content: Raw markdown content
-            genre: Genre name
+            content: Raw markdown content from blueprint file
+            genre: Genre name (used to initialize structure)
 
         Returns:
-            Dict with structured blueprint data
+            Dict with structured blueprint data including:
+            - genre: Genre name
+            - version: Blueprint version (default: 'latest')
+            - rules: Dict with tempo_bpm, required_sections, length_minutes
+            - eval_rubric: Scoring weights and thresholds
+            - conflict_matrix: Tag conflicts for this genre
+            - tag_categories: Categorized style tags
+            - extra_metadata: Additional metadata (source file, has examples, etc.)
         """
-        # Initialize default structure
+        # Initialize default structure with empty containers
         data = {
             'genre': genre,
             'version': 'latest',  # Could parse from content if version is specified
-            'rules': {},
-            'eval_rubric': {},
-            'conflict_matrix': {},
-            'tag_categories': {},
-            'extra_metadata': {}
+            'rules': {},                # Tempo, sections, length constraints
+            'eval_rubric': {},          # Scoring weights and thresholds
+            'conflict_matrix': {},      # Tag conflicts for this genre
+            'tag_categories': {},       # Categorized style tags
+            'extra_metadata': {}        # Source file, parse info, etc.
         }
 
-        # Extract tempo range from "Tempo:" lines
-        # Pattern: **Tempo:** Most pop hits fall between **95–130 BPM**
+        # =====================================================================
+        # 1. Extract Tempo Range
+        # =====================================================================
+        # Regex pattern: Matches "**Tempo:** Most pop hits fall between **95–130 BPM**"
         tempo_match = re.search(
             r'\*\*Tempo:\*\*[^\d]*(\d+)[–-](\d+)\s*BPM',
             content,
@@ -248,8 +261,8 @@ class BlueprintService:
                 bpm_max=bpm_max
             )
         else:
-            # Try alternative pattern with "or" for ballads
-            # Pattern: **95–130 BPM** for dance‑oriented tracks or **70–90 BPM** for ballads
+            # Fallback: Try simpler pattern for alternative markdown formats
+            # Pattern: "**95–130 BPM** for dance‑oriented tracks or **70–90 BPM** for ballads"
             tempo_alt_match = re.search(
                 r'(\d+)[–-](\d+)\s*BPM',
                 content
@@ -259,8 +272,10 @@ class BlueprintService:
                 bpm_max = int(tempo_alt_match.group(2))
                 data['rules']['tempo_bpm'] = [bpm_min, bpm_max]
 
-        # Extract required sections from "Form:" or "Structure:" lines
-        # Common patterns: Verse → Chorus, Verse → Pre-Chorus → Chorus
+        # =====================================================================
+        # 2. Extract Required Sections (Song Structure)
+        # =====================================================================
+        # Looks for "**Form:** Verse → Chorus → Verse → Chorus → Bridge → Chorus"
         sections = []
         form_match = re.search(
             r'\*\*Form:\*\*[^\n]*?\*\*([^*]+)\*\*',
@@ -269,19 +284,24 @@ class BlueprintService:
         )
         if form_match:
             form_text = form_match.group(1)
-            # Extract section names (Verse, Chorus, Bridge, Pre-Chorus, etc.)
+            # Extract standard section names (case-insensitive)
+            # Pattern handles Pre-Chorus with both hyphen and en-dash
             section_pattern = r'(Verse|Chorus|Bridge|Pre[‑-]?Chorus|Intro|Outro|Hook)'
             found_sections = re.findall(section_pattern, form_text, re.IGNORECASE)
-            sections = list(dict.fromkeys(found_sections))  # Remove duplicates, preserve order
+            # Remove duplicates while preserving order (unique while maintaining sequence)
+            sections = list(dict.fromkeys(found_sections))
 
         if not sections:
-            # Default required sections
+            # Default required sections (Verse + Chorus minimum)
             sections = ["Verse", "Chorus"]
 
         data['rules']['required_sections'] = sections
 
-        # Extract length constraints
-        # Pattern: Most hits run **2.5–3.5 minutes**
+        # =====================================================================
+        # 3. Extract Length Constraints (Song Duration)
+        # =====================================================================
+        # Pattern: "Most hits run **2.5–3.5 minutes**"
+        # Matches decimal numbers with em-dash or hyphen
         length_match = re.search(
             r'(\d+\.?\d*)[–-](\d+\.?\d*)\s*minutes',
             content,
@@ -292,25 +312,31 @@ class BlueprintService:
             max_length = float(length_match.group(2))
             data['rules']['length_minutes'] = [min_length, max_length]
 
-        # Initialize default rubric (can be overridden by external config)
+        # =====================================================================
+        # 4. Initialize Default Evaluation Rubric
+        # =====================================================================
+        # Per MeatyMusic AMCS blueprint requirements - these are the base weights
+        # used to score generated lyrics and producer notes against quality metrics
         data['eval_rubric'] = {
             'weights': {
-                'hook_density': 0.25,
-                'singability': 0.20,
-                'rhyme_tightness': 0.15,
-                'section_completeness': 0.20,
-                'profanity_score': 0.20
+                'hook_density': 0.25,           # How many catchy hooks (chorus-quality lines)
+                'singability': 0.20,            # How easy to sing/remember
+                'rhyme_tightness': 0.15,        # Quality and consistency of rhyme scheme
+                'section_completeness': 0.20,   # All required sections present
+                'profanity_score': 0.20         # Adherence to explicit policy
             },
             'thresholds': {
-                'min_total': 0.75,
-                'max_profanity': 0.1
+                'min_total': 0.75,              # Minimum total score to pass validation
+                'max_profanity': 0.1            # Maximum profanity allowed (0.0 = none)
             }
         }
 
-        # Store raw markdown in metadata for reference
+        # =====================================================================
+        # 5. Store Metadata for Reference
+        # =====================================================================
         data['extra_metadata'] = {
             'source_file': f"{genre}_blueprint.md",
-            'parsed_at': None,  # Could add timestamp
+            'parsed_at': None,  # Could add timestamp if needed
             'has_examples': bool(re.search(r'## Examples', content, re.IGNORECASE))
         }
 
