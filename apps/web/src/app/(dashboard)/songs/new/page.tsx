@@ -86,12 +86,12 @@ export default function NewSongPage() {
                 <React.Fragment key={step.id}>
                   <div className="flex flex-col items-center">
                     <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 transition-all duration-ui ${
+                      className={`w-14 h-14 rounded-full flex items-center justify-center mb-3 transition-all duration-ui ${
                         isActive
-                          ? 'bg-gradient-primary shadow-accent-glow text-white scale-110'
+                          ? 'bg-primary shadow-lg text-primaryForeground scale-110'
                           : isComplete
-                            ? 'bg-success-500 text-white'
-                            : 'bg-bg-elevated border border-border-default text-text-muted'
+                            ? 'bg-success text-white'
+                            : 'bg-panel border-2 border-border text-text-muted'
                       }`}
                     >
                       {isComplete ? (
@@ -103,7 +103,7 @@ export default function NewSongPage() {
                     <span
                       className={`text-sm font-medium transition-colors duration-ui ${
                         isActive
-                          ? 'text-text-primary'
+                          ? 'text-text-strong'
                           : 'text-text-muted'
                       }`}
                     >
@@ -112,8 +112,8 @@ export default function NewSongPage() {
                   </div>
                   {index < WIZARD_STEPS.length - 1 && (
                     <div
-                      className={`flex-1 h-0.5 mx-4 transition-colors duration-ui ${
-                        isComplete ? 'bg-success-500' : 'bg-border-default'
+                      className={`flex-1 h-1 mx-4 rounded transition-colors duration-ui ${
+                        isComplete ? 'bg-success' : 'bg-border'
                       }`}
                     />
                   )}
@@ -124,28 +124,28 @@ export default function NewSongPage() {
         </div>
 
         {/* Step Content */}
-        <Card className="bg-bg-surface border-border-default shadow-elevation-1 p-8 mb-6 animate-slide-up">
-          <h2 className="text-2xl font-semibold text-text-primary mb-6">{currentStepConfig?.label}</h2>
+        <Card className="bg-surface border-border shadow-elev1 p-10 mb-6 animate-slide-up">
+          <h2 className="text-2xl font-semibold text-text-strong mb-8">{currentStepConfig?.label}</h2>
 
           {currentStep === 0 && (
             <SongInfoStep formData={formData} setFormData={setFormData} />
           )}
-          {currentStep === 1 && <div className="py-12 text-center text-text-muted">Style editor coming soon</div>}
-          {currentStep === 2 && <div className="py-12 text-center text-text-muted">Lyrics editor coming soon</div>}
-          {currentStep === 3 && <div className="py-12 text-center text-text-muted">Persona selector coming soon</div>}
-          {currentStep === 4 && <div className="py-12 text-center text-text-muted">Producer notes editor coming soon</div>}
+          {currentStep === 1 && <div className="py-16 text-center text-text-muted">Style editor coming soon</div>}
+          {currentStep === 2 && <div className="py-16 text-center text-text-muted">Lyrics editor coming soon</div>}
+          {currentStep === 3 && <div className="py-16 text-center text-text-muted">Persona selector coming soon</div>}
+          {currentStep === 4 && <div className="py-16 text-center text-text-muted">Producer notes editor coming soon</div>}
           {currentStep === 5 && <ReviewStep formData={formData} />}
         </Card>
 
         {/* Navigation */}
         <div className="flex items-center justify-between">
-          <Button variant="outline" onClick={handleCancel}>
+          <Button variant="outline" onClick={handleCancel} className="px-6 py-3">
             Cancel
           </Button>
 
           <div className="flex items-center gap-3">
             {currentStep > 0 && (
-              <Button variant="outline" onClick={handlePrevious}>
+              <Button variant="outline" onClick={handlePrevious} className="px-6 py-3">
                 <ChevronLeft className="w-4 h-4 mr-2" />
                 Previous
               </Button>
@@ -154,7 +154,7 @@ export default function NewSongPage() {
             {currentStep < WIZARD_STEPS.length - 1 ? (
               <Button
                 onClick={handleNext}
-                className="bg-gradient-primary shadow-accent-glow hover:shadow-accent-glow-lg transition-all duration-ui"
+                className="bg-primary text-primaryForeground hover:opacity-90 transition-all duration-ui px-6 py-3"
               >
                 Next
                 <ChevronRight className="w-4 h-4 ml-2" />
@@ -162,7 +162,7 @@ export default function NewSongPage() {
             ) : (
               <Button
                 onClick={handleSubmit}
-                className="bg-gradient-primary shadow-accent-glow hover:shadow-accent-glow-lg transition-all duration-ui"
+                className="bg-primary text-primaryForeground hover:opacity-90 transition-all duration-ui px-6 py-3"
               >
                 <Check className="w-4 h-4 mr-2" />
                 Create Song
@@ -183,12 +183,12 @@ function SongInfoStep({
   setFormData: (data: any) => void;
 }) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <label className="block text-sm font-medium text-text-primary mb-2">Song Title *</label>
+        <label className="block text-sm font-medium text-text-strong mb-3">Song Title *</label>
         <input
           type="text"
-          className="w-full px-4 py-2 rounded-lg border border-border-default bg-bg-elevated text-text-primary placeholder:text-text-muted focus:border-border-accent focus:ring-2 focus:ring-primary-500/20 transition-all duration-ui"
+          className="w-full px-5 py-3.5 rounded-lg border-2 border-border bg-panel text-text-base placeholder:text-text-muted focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-ui"
           placeholder="Enter song title..."
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -196,10 +196,10 @@ function SongInfoStep({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-text-primary mb-2">Description</label>
+        <label className="block text-sm font-medium text-text-strong mb-3">Description</label>
         <textarea
-          className="w-full px-4 py-2 rounded-lg border border-border-default bg-bg-elevated text-text-primary placeholder:text-text-muted focus:border-border-accent focus:ring-2 focus:ring-primary-500/20 transition-all duration-ui resize-none"
-          rows={4}
+          className="w-full px-5 py-3.5 rounded-lg border-2 border-border bg-panel text-text-base placeholder:text-text-muted focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-ui resize-none"
+          rows={5}
           placeholder="Describe your song concept..."
           value={formData.description}
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -208,9 +208,9 @@ function SongInfoStep({
 
       <div className="grid md:grid-cols-2 gap-6">
         <div>
-          <label className="block text-sm font-medium text-text-primary mb-2">Genre *</label>
+          <label className="block text-sm font-medium text-text-strong mb-3">Genre *</label>
           <select
-            className="w-full px-4 py-2 rounded-lg border border-border-default bg-bg-elevated text-text-primary focus:border-border-accent focus:ring-2 focus:ring-primary-500/20 transition-all duration-ui"
+            className="w-full px-5 py-3.5 rounded-lg border-2 border-border bg-panel text-text-base focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-ui"
             value={formData.genre}
             onChange={(e) => setFormData({ ...formData, genre: e.target.value })}
           >
@@ -225,10 +225,10 @@ function SongInfoStep({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-text-primary mb-2">Mood</label>
+          <label className="block text-sm font-medium text-text-strong mb-3">Mood</label>
           <input
             type="text"
-            className="w-full px-4 py-2 rounded-lg border border-border-default bg-bg-elevated text-text-primary placeholder:text-text-muted focus:border-border-accent focus:ring-2 focus:ring-primary-500/20 transition-all duration-ui"
+            className="w-full px-5 py-3.5 rounded-lg border-2 border-border bg-panel text-text-base placeholder:text-text-muted focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-ui"
             placeholder="e.g., upbeat, melancholic..."
           />
         </div>
@@ -239,27 +239,27 @@ function SongInfoStep({
 
 function ReviewStep({ formData }: { formData: any }) {
   return (
-    <div className="space-y-6">
-      <div className="bg-bg-elevated border border-border-default rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-text-primary mb-4">Song Information</h3>
-        <dl className="grid grid-cols-2 gap-4">
+    <div className="space-y-8">
+      <div className="bg-panel border-2 border-border rounded-xl p-8">
+        <h3 className="text-lg font-semibold text-text-strong mb-6">Song Information</h3>
+        <dl className="grid grid-cols-2 gap-6">
           <div>
-            <dt className="text-sm text-text-muted mb-1">Title</dt>
-            <dd className="font-medium text-text-primary">{formData.name || 'Not set'}</dd>
+            <dt className="text-sm font-medium text-text-muted mb-2">Title</dt>
+            <dd className="font-medium text-text-base text-lg">{formData.name || 'Not set'}</dd>
           </div>
           <div>
-            <dt className="text-sm text-text-muted mb-1">Genre</dt>
-            <dd className="font-medium text-text-primary">{formData.genre || 'Not set'}</dd>
+            <dt className="text-sm font-medium text-text-muted mb-2">Genre</dt>
+            <dd className="font-medium text-text-base text-lg">{formData.genre || 'Not set'}</dd>
           </div>
           <div className="col-span-2">
-            <dt className="text-sm text-text-muted mb-1">Description</dt>
-            <dd className="font-medium text-text-primary">{formData.description || 'Not set'}</dd>
+            <dt className="text-sm font-medium text-text-muted mb-2">Description</dt>
+            <dd className="font-medium text-text-base">{formData.description || 'Not set'}</dd>
           </div>
         </dl>
       </div>
 
-      <div className="bg-info-bg border border-info-500/30 rounded-lg p-4">
-        <p className="text-sm text-text-secondary">
+      <div className="bg-info/10 border-2 border-info/30 rounded-xl p-6">
+        <p className="text-sm text-text-base leading-relaxed">
           Note: Style, Lyrics, Persona, and Producer Notes editors are coming soon.
           You'll be able to define these entities in future steps.
         </p>
