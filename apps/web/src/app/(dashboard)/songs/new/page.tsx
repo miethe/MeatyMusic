@@ -238,15 +238,25 @@ function SubmissionProgressModal({
 
   return (
     <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-50">
-      <Card className="p-8 max-w-md w-full mx-4 shadow-xl">
+      <Card
+        className="p-8 max-w-md w-full mx-4 shadow-xl"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="progress-title"
+      >
         <div className="flex flex-col items-center">
           <div className="mb-6">
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
-          <h3 className="font-semibold text-lg text-text-strong mb-4 text-center">Creating Song...</h3>
+          <h3
+            id="progress-title"
+            className="font-semibold text-lg text-text-strong mb-4 text-center"
+          >
+            Creating Song...
+          </h3>
           <div className="w-full space-y-4">
             {/* Progress Bar */}
-            <div className="space-y-2">
+            <div className="space-y-2" aria-live="polite">
               <div className="h-2 bg-muted rounded-full overflow-hidden">
                 <div
                   className="h-full bg-primary transition-all duration-300 ease-out"
