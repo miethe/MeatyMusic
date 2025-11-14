@@ -6,23 +6,11 @@
 'use client';
 
 import * as React from 'react';
+
 import { useRouter } from 'next/navigation';
-import { PageHeader } from '@/components/layout/PageHeader';
+
 import { Card } from '@meatymusic/ui';
 import { Button } from '@meatymusic/ui';
-import { StyleEditor } from '@/components/entities/StyleEditor';
-import { LyricsEditor } from '@/components/entities/LyricsEditor';
-import { PersonaEditor } from '@/components/entities/PersonaEditor';
-import { ProducerNotesEditor } from '@/components/entities/ProducerNotesEditor';
-import { ROUTES } from '@/config/routes';
-import { useCreateSong } from '@/hooks/api/useSongs';
-import { useCreateStyle } from '@/hooks/api/useStyles';
-import { useCreateLyrics } from '@/hooks/api/useLyrics';
-import { useCreatePersona } from '@/hooks/api/usePersonas';
-import { useCreateProducerNotes } from '@/hooks/api/useProducerNotes';
-import { useUIStore } from '@/stores';
-import { songsApi } from '@/lib/api';
-import { SongCreate, StyleCreate, LyricsCreate, PersonaCreate, ProducerNotesCreate, UUID } from '@/types/api/entities';
 import {
   ChevronLeft,
   ChevronRight,
@@ -36,6 +24,22 @@ import {
   Loader2,
   Edit,
 } from 'lucide-react';
+
+import { LyricsEditor } from '@/components/entities/LyricsEditor';
+import { PersonaEditor } from '@/components/entities/PersonaEditor';
+import { ProducerNotesEditor } from '@/components/entities/ProducerNotesEditor';
+import { StyleEditor } from '@/components/entities/StyleEditor';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { ROUTES } from '@/config/routes';
+import { useCreateLyrics } from '@/hooks/api/useLyrics';
+import { useCreatePersona } from '@/hooks/api/usePersonas';
+import { useCreateProducerNotes } from '@/hooks/api/useProducerNotes';
+import { useCreateSong } from '@/hooks/api/useSongs';
+import { useCreateStyle } from '@/hooks/api/useStyles';
+import { songsApi } from '@/lib/api';
+import { useUIStore } from '@/stores';
+import { SongCreate, StyleCreate, LyricsCreate, PersonaCreate, ProducerNotesCreate, UUID } from '@/types/api/entities';
+
 
 const WIZARD_STEPS = [
   { id: 'info', label: 'Song Info', icon: Music2 },
@@ -512,7 +516,7 @@ export default function NewSongPage() {
    */
   const handleLyricsSave = (lyrics: LyricsCreate) => {
     // Remove temporary song_id before storing
-    const { song_id, ...lyricsData } = lyrics;
+    const { song_id: _song_id, ...lyricsData } = lyrics;
     updateLyricsData(lyricsData as Partial<LyricsCreate>);
     markStepCompleted(currentStep);
     if (currentStep < WIZARD_STEPS.length - 1) {
@@ -558,7 +562,7 @@ export default function NewSongPage() {
    */
   const handleProducerNotesSave = (notes: ProducerNotesCreate) => {
     // Remove temporary song_id before storing
-    const { song_id, ...notesData } = notes;
+    const { song_id: _song_id, ...notesData } = notes;
     updateProducerNotesData(notesData as Partial<ProducerNotesCreate>);
     markStepCompleted(currentStep);
     if (currentStep < WIZARD_STEPS.length - 1) {
@@ -645,7 +649,6 @@ export default function NewSongPage() {
               const isCompleted = completedSteps.has(index);
               const isSkipped = skippedSteps.has(index);
               const isOptional = index > 0; // Steps 1-5 are optional
-              const isPending = !isActive && !isCompleted && !isSkipped;
 
               return (
                 <React.Fragment key={step.id}>
@@ -876,7 +879,7 @@ function SongInfoStep({ formData, updateSongData }: SongInfoStepProps) {
  */
 interface EntityReviewSectionProps {
   title: string;
-  data: any | null;
+  data: Record<string, unknown> | null;
   stepIndex: number;
   onEdit: (stepIndex: number) => void;
   isRequired?: boolean;
@@ -921,13 +924,13 @@ function EntityReviewSection({
             <>
               <div>
                 <dt className="text-sm font-medium text-text-muted mb-2">Title</dt>
-                <dd className="font-medium text-text-base text-lg">{data.title || 'Not set'}</dd>
+                <dd className="font-medium text-text-base text-lg">{(data.title as string) || 'Not set'}</dd>
               </div>
               <div>
                 <dt className="text-sm font-medium text-text-muted mb-2">Genre</dt>
-                <dd className="font-medium text-text-base text-lg">{data.genre || 'Not set'}</dd>
+                <dd className="font-medium text-text-base text-lg">{(data.genre as string) || 'Not set'}</dd>
               </div>
-              {data.mood && data.mood.length > 0 && (
+              {data.mood && Array.isArray(data.mood) && data.mood.length > 0 && (
                 <div className="md:col-span-2">
                   <dt className="text-sm font-medium text-text-muted mb-2">Moods</dt>
                   <dd className="font-medium text-text-base">{data.mood.join(', ')}</dd>
@@ -936,12 +939,12 @@ function EntityReviewSection({
               {data.description && (
                 <div className="md:col-span-2">
                   <dt className="text-sm font-medium text-text-muted mb-2">Description</dt>
-                  <dd className="font-medium text-text-base line-clamp-2">{data.description}</dd>
+                  <dd className="font-medium text-text-base line-clamp-2">{data.description as string}</dd>
                 </div>
               )}
               <div className="md:col-span-2">
                 <dt className="text-sm font-medium text-text-muted mb-2">Global Seed</dt>
-                <dd className="font-medium text-text-base font-mono text-xs bg-panel p-3 rounded border border-border">{data.global_seed}</dd>
+                <dd className="font-medium text-text-base font-mono text-xs bg-panel p-3 rounded border border-border">{data.global_seed as number}</dd>
               </div>
             </>
           )}
@@ -951,34 +954,34 @@ function EntityReviewSection({
               {data.genre && (
                 <div>
                   <dt className="text-sm font-medium text-text-muted mb-2">Genre</dt>
-                  <dd className="font-medium text-text-base">{data.genre}</dd>
+                  <dd className="font-medium text-text-base">{data.genre as string}</dd>
                 </div>
               )}
               {(data.bpm_min || data.bpm_max) && (
                 <div>
                   <dt className="text-sm font-medium text-text-muted mb-2">BPM Range</dt>
-                  <dd className="font-medium text-text-base">{data.bpm_min || 0} - {data.bpm_max || 0}</dd>
+                  <dd className="font-medium text-text-base">{(data.bpm_min as number) || 0} - {(data.bpm_max as number) || 0}</dd>
                 </div>
               )}
               {data.key && (
                 <div>
                   <dt className="text-sm font-medium text-text-muted mb-2">Key</dt>
-                  <dd className="font-medium text-text-base">{data.key}</dd>
+                  <dd className="font-medium text-text-base">{data.key as string}</dd>
                 </div>
               )}
               {data.energy_level !== undefined && (
                 <div>
                   <dt className="text-sm font-medium text-text-muted mb-2">Energy Level</dt>
-                  <dd className="font-medium text-text-base">{data.energy_level}/10</dd>
+                  <dd className="font-medium text-text-base">{data.energy_level as number}/10</dd>
                 </div>
               )}
-              {data.mood && data.mood.length > 0 && (
+              {data.mood && Array.isArray(data.mood) && data.mood.length > 0 && (
                 <div className="md:col-span-2">
                   <dt className="text-sm font-medium text-text-muted mb-2">Moods</dt>
                   <dd className="font-medium text-text-base">{data.mood.slice(0, 3).join(', ')}</dd>
                 </div>
               )}
-              {data.instrumentation && data.instrumentation.length > 0 && (
+              {data.instrumentation && Array.isArray(data.instrumentation) && data.instrumentation.length > 0 && (
                 <div className="md:col-span-2">
                   <dt className="text-sm font-medium text-text-muted mb-2">Instrumentation</dt>
                   <dd className="font-medium text-text-base">{data.instrumentation.slice(0, 3).join(', ')}</dd>
@@ -998,16 +1001,16 @@ function EntityReviewSection({
               {data.pov && (
                 <div>
                   <dt className="text-sm font-medium text-text-muted mb-2">Point of View</dt>
-                  <dd className="font-medium text-text-base capitalize">{data.pov.replace('-', ' ')}</dd>
+                  <dd className="font-medium text-text-base capitalize">{(data.pov as string).replace('-', ' ')}</dd>
                 </div>
               )}
               {data.rhyme_scheme && (
                 <div>
                   <dt className="text-sm font-medium text-text-muted mb-2">Rhyme Scheme</dt>
-                  <dd className="font-medium text-text-base">{data.rhyme_scheme}</dd>
+                  <dd className="font-medium text-text-base">{data.rhyme_scheme as string}</dd>
                 </div>
               )}
-              {data.themes && data.themes.length > 0 && (
+              {data.themes && Array.isArray(data.themes) && data.themes.length > 0 && (
                 <div className="md:col-span-2">
                   <dt className="text-sm font-medium text-text-muted mb-2">Themes</dt>
                   <dd className="font-medium text-text-base">{data.themes.join(', ')}</dd>
@@ -1021,16 +1024,16 @@ function EntityReviewSection({
               {data.name && (
                 <div>
                   <dt className="text-sm font-medium text-text-muted mb-2">Name</dt>
-                  <dd className="font-medium text-text-base">{data.name}</dd>
+                  <dd className="font-medium text-text-base">{data.name as string}</dd>
                 </div>
               )}
               {data.vocal_range && (
                 <div>
                   <dt className="text-sm font-medium text-text-muted mb-2">Vocal Range</dt>
-                  <dd className="font-medium text-text-base">{data.vocal_range}</dd>
+                  <dd className="font-medium text-text-base">{data.vocal_range as string}</dd>
                 </div>
               )}
-              {data.influences && data.influences.length > 0 && (
+              {data.influences && Array.isArray(data.influences) && data.influences.length > 0 && (
                 <div className="md:col-span-2">
                   <dt className="text-sm font-medium text-text-muted mb-2">Influences</dt>
                   <dd className="font-medium text-text-base">{data.influences.slice(0, 3).join(', ')}</dd>
@@ -1044,16 +1047,16 @@ function EntityReviewSection({
               {data.structure && (
                 <div>
                   <dt className="text-sm font-medium text-text-muted mb-2">Structure</dt>
-                  <dd className="font-medium text-text-base line-clamp-1">{data.structure}</dd>
+                  <dd className="font-medium text-text-base line-clamp-1">{data.structure as string}</dd>
                 </div>
               )}
               {data.hooks !== undefined && (
                 <div>
                   <dt className="text-sm font-medium text-text-muted mb-2">Target Hook Count</dt>
-                  <dd className="font-medium text-text-base">{data.hooks}</dd>
+                  <dd className="font-medium text-text-base">{data.hooks as number}</dd>
                 </div>
               )}
-              {data.instrumentation && data.instrumentation.length > 0 && (
+              {data.instrumentation && Array.isArray(data.instrumentation) && data.instrumentation.length > 0 && (
                 <div className="md:col-span-2">
                   <dt className="text-sm font-medium text-text-muted mb-2">Instrumentation</dt>
                   <dd className="font-medium text-text-base">{data.instrumentation.slice(0, 3).join(', ')}</dd>
@@ -1144,7 +1147,7 @@ function ReviewStep({ formData, onEditStep }: ReviewStepProps) {
       {/* Required Song Information */}
       <EntityReviewSection
         title="Song Information"
-        data={formData.song}
+        data={formData.song as Record<string, unknown>}
         stepIndex={0}
         onEdit={onEditStep}
         isRequired={true}
@@ -1153,28 +1156,28 @@ function ReviewStep({ formData, onEditStep }: ReviewStepProps) {
       {/* Optional Entities */}
       <EntityReviewSection
         title="Style"
-        data={formData.style}
+        data={formData.style as Record<string, unknown> | null}
         stepIndex={1}
         onEdit={onEditStep}
       />
 
       <EntityReviewSection
         title="Lyrics"
-        data={formData.lyrics}
+        data={formData.lyrics as Record<string, unknown> | null}
         stepIndex={2}
         onEdit={onEditStep}
       />
 
       <EntityReviewSection
         title="Persona"
-        data={formData.persona}
+        data={formData.persona as Record<string, unknown> | null}
         stepIndex={3}
         onEdit={onEditStep}
       />
 
       <EntityReviewSection
         title="Producer Notes"
-        data={formData.producerNotes}
+        data={formData.producerNotes as Record<string, unknown> | null}
         stepIndex={4}
         onEdit={onEditStep}
       />
