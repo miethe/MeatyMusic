@@ -6,14 +6,26 @@ and producer notes into a complete Song Design Spec (SDS).
 
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 from uuid import UUID
+import structlog
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
-from app.api.dependencies import get_song_repository, get_song_service
+from app.api.dependencies import (
+    get_song_repository,
+    get_song_service,
+    get_sds_compiler_service,
+    get_blueprint_validator_service,
+    get_cross_entity_validator,
+)
 from app.repositories import SongRepository
-from app.services import SongService
+from app.services import (
+    SongService,
+    SDSCompilerService,
+    BlueprintValidatorService,
+    CrossEntityValidator,
+)
 from app.schemas import (
     ErrorResponse,
     PageInfo,
@@ -25,6 +37,8 @@ from app.schemas import (
     StatusUpdateRequest,
 )
 
+logger = structlog.get_logger(__name__)
+
 router = APIRouter(prefix="/songs", tags=["Songs"])
 
 
@@ -33,49 +47,146 @@ router = APIRouter(prefix="/songs", tags=["Songs"])
     response_model=SongResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Create a new song",
-    description="Create a new song with SDS validation",
+    description="Create a new song with automatic SDS compilation and validation",
     responses={
-        201: {"description": "Song created successfully"},
+        201: {"description": "Song created successfully with compiled SDS"},
         400: {"model": ErrorResponse, "description": "Invalid song data or SDS validation failed"},
+        404: {"model": ErrorResponse, "description": "Referenced entity not found"},
     },
 )
 async def create_song(
     song_data: SongCreate,
-    service: SongService = Depends(get_song_service),
     repo: SongRepository = Depends(get_song_repository),
+    sds_compiler: SDSCompilerService = Depends(get_sds_compiler_service),
+    blueprint_validator: BlueprintValidatorService = Depends(get_blueprint_validator_service),
+    cross_entity_validator: CrossEntityValidator = Depends(get_cross_entity_validator),
 ) -> SongResponse:
-    """Create a new song with SDS validation.
+    """Create a new song with automatic SDS compilation and validation.
+
+    This endpoint creates a song record and immediately compiles the Song Design Spec (SDS)
+    from the referenced entities (style, lyrics, producer notes, blueprint). The compiled SDS
+    is validated against blueprint constraints and cross-entity consistency rules before
+    being stored in the song's extra_metadata field.
+
+    If any validation fails, the song creation is rolled back and an error is returned.
 
     Args:
-        song_data: Song creation data
-        service: Song service instance (for validation)
+        song_data: Song creation data with entity references
         repo: Song repository instance
+        sds_compiler: SDS compiler service for aggregation
+        blueprint_validator: Blueprint validator for genre constraints
+        cross_entity_validator: Cross-entity consistency validator
 
     Returns:
-        Created song
+        Created song with compiled SDS in extra_metadata
 
     Raises:
-        HTTPException: If song creation or SDS validation fails
+        HTTPException:
+            - 400: If SDS compilation or validation fails
+            - 404: If referenced entities (style, lyrics, etc.) not found
     """
     song_dict = song_data.model_dump()
-
-    # Validate SDS if provided
-    if "sds" in song_dict and song_dict["sds"]:
-        try:
-            await service.validate_sds(song_dict["sds"])
-        except ValueError as e:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"SDS validation failed: {str(e)}",
-            )
+    song = None
 
     try:
+        # Step 1: Create song record
+        logger.info(
+            "song.create_start",
+            title=song_dict.get("title"),
+            style_id=song_dict.get("style_id"),
+            blueprint_id=song_dict.get("blueprint_id"),
+        )
         song = await repo.create(song_dict)
+
+        # Step 2: Compile SDS from entity references
+        logger.info("sds.compile_start", song_id=str(song.id))
+        try:
+            sds = sds_compiler.compile_sds(song.id, validate=True)
+        except ValueError as e:
+            logger.warning(
+                "sds.compile_failed",
+                song_id=str(song.id),
+                error=str(e),
+            )
+            # Rollback song creation
+            await repo.delete(song.id)
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"SDS compilation failed: {str(e)}",
+            )
+
+        # Step 3: Validate against blueprint constraints
+        logger.info("sds.blueprint_validation_start", song_id=str(song.id))
+        is_valid, errors = await blueprint_validator.validate_sds_against_blueprint(
+            sds, str(song.blueprint_id)
+        )
+        if not is_valid:
+            logger.warning(
+                "sds.blueprint_validation_failed",
+                song_id=str(song.id),
+                errors=errors,
+            )
+            # Rollback song creation
+            await repo.delete(song.id)
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Blueprint validation failed: {'; '.join(errors)}",
+            )
+
+        # Step 4: Validate cross-entity consistency
+        logger.info("sds.cross_entity_validation_start", song_id=str(song.id))
+        is_valid, errors = cross_entity_validator.validate_sds_consistency(sds)
+        if not is_valid:
+            logger.warning(
+                "sds.cross_entity_validation_failed",
+                song_id=str(song.id),
+                errors=errors,
+            )
+            # Rollback song creation
+            await repo.delete(song.id)
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Cross-entity validation failed: {'; '.join(errors)}",
+            )
+
+        # Step 5: Store compiled SDS in song metadata
+        logger.info("sds.store_start", song_id=str(song.id))
+        update_dict = {
+            "extra_metadata": {
+                **(song.extra_metadata or {}),
+                "compiled_sds": sds,
+            }
+        }
+        song = await repo.update(song.id, update_dict)
+
+        logger.info(
+            "song.create_success",
+            song_id=str(song.id),
+            sds_hash=sds.get("_computed_hash", "unknown"),
+        )
+
         return SongResponse.model_validate(song)
+
+    except HTTPException:
+        # Re-raise HTTP exceptions (already logged)
+        raise
     except ValueError as e:
+        # Validation or data errors
+        if song:
+            await repo.delete(song.id)
+        logger.error("song.create_failed", error=str(e))
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e),
+        )
+    except Exception as e:
+        # Unexpected errors
+        if song:
+            await repo.delete(song.id)
+        logger.error("song.create_unexpected_error", error=str(e), exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Song creation failed: {str(e)}",
         )
 
 
@@ -334,3 +445,97 @@ async def update_song_status(
             detail=f"Song {song_id} not found",
         )
     return SongResponse.model_validate(song)
+
+
+@router.get(
+    "/{song_id}/sds",
+    response_model=Dict[str, Any],
+    summary="Get compiled Song Design Spec (SDS)",
+    description="Retrieve the compiled SDS for a song, either from cache or by recompiling",
+    responses={
+        200: {"description": "Compiled SDS returned successfully"},
+        400: {"model": ErrorResponse, "description": "SDS compilation failed"},
+        404: {"model": ErrorResponse, "description": "Song not found"},
+    },
+)
+async def get_song_sds(
+    song_id: UUID,
+    recompile: bool = Query(
+        False,
+        description="Force recompilation of SDS from current entity state"
+    ),
+    repo: SongRepository = Depends(get_song_repository),
+    sds_compiler: SDSCompilerService = Depends(get_sds_compiler_service),
+) -> Dict[str, Any]:
+    """Get compiled Song Design Spec (SDS) for a song.
+
+    This endpoint returns the compiled SDS dictionary for a song. By default, it returns
+    the cached SDS from the song's extra_metadata field if available. If the cache is
+    missing or the recompile parameter is True, the SDS is recompiled from the current
+    entity state.
+
+    The returned SDS contains all entity data aggregated according to the SDS schema,
+    including style, lyrics, producer notes, sources, and render configuration.
+
+    Args:
+        song_id: Song UUID
+        recompile: Whether to force recompilation (default: False, use cache if available)
+        repo: Song repository instance
+        sds_compiler: SDS compiler service
+
+    Returns:
+        Complete SDS dictionary with all entity data
+
+    Raises:
+        HTTPException:
+            - 404: If song not found
+            - 400: If SDS compilation fails
+    """
+    # Get song
+    song = await repo.get_by_id(song_id)
+    if not song:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Song {song_id} not found",
+        )
+
+    # Check for cached SDS
+    cached_sds = None
+    if song.extra_metadata and "compiled_sds" in song.extra_metadata:
+        cached_sds = song.extra_metadata["compiled_sds"]
+
+    # Return cached if available and not forcing recompile
+    if cached_sds and not recompile:
+        logger.info(
+            "sds.cache_hit",
+            song_id=str(song_id),
+            sds_hash=cached_sds.get("_computed_hash", "unknown"),
+        )
+        return cached_sds
+
+    # Compile SDS
+    logger.info(
+        "sds.compile_requested",
+        song_id=str(song_id),
+        recompile=recompile,
+        cache_available=cached_sds is not None,
+    )
+
+    try:
+        sds = sds_compiler.compile_sds(song_id, validate=True)
+        logger.info(
+            "sds.compile_success",
+            song_id=str(song_id),
+            sds_hash=sds.get("_computed_hash", "unknown"),
+        )
+        return sds
+    except ValueError as e:
+        logger.error(
+            "sds.compile_failed",
+            song_id=str(song_id),
+            error=str(e),
+        )
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"SDS compilation failed: {str(e)}",
+        )

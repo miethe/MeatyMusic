@@ -11,9 +11,6 @@ from app.services.source_service import SourceService
 from app.services.validation_service import ValidationService
 from app.services.workflow_run_service import WorkflowRunService
 
-# Common validation utilities (shared across all entity services)
-from app.services import common
-
 __all__ = [
     "BaseService",
     "SongService",
@@ -25,5 +22,4 @@ __all__ = [
     "SourceService",
     "ValidationService",
     "WorkflowRunService",
-    "common",  # Shared validation utilities module
 ]
