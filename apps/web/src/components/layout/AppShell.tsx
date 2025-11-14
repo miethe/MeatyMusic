@@ -171,7 +171,7 @@ function NavItem({ item, pathname }: NavItemProps) {
                     className={cn(
                       'block px-3 py-2 text-sm rounded-lg transition-all duration-ui',
                       isActive
-                        ? 'bg-primary-700/20 text-primary-300 font-medium'
+                        ? 'bg-primary/20 text-primary font-medium'
                         : 'text-text-secondary hover:bg-bg-overlay hover:text-text-primary'
                     )}
                   >
@@ -197,7 +197,7 @@ function NavItem({ item, pathname }: NavItemProps) {
         className={cn(
           'flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-ui',
           isActive
-            ? 'bg-primary-700/20 text-primary-300'
+            ? 'bg-primary/20 text-primary'
             : 'text-text-secondary hover:bg-bg-overlay hover:text-text-primary'
         )}
       >

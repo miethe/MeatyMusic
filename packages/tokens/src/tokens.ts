@@ -152,56 +152,56 @@ export const themes: Record<ThemeName, Partial<DesignTokens>> = {
   },
   "dark": {
     "color": {
-      "bg": "#0B0F17",
-      "surface": "#0F172A",
-      "panel": "#111827",
-      "border": "#232B3A",
-      "ring": "#9B8BFF",
+      "bg": "#0f0f1c",
+      "surface": "#1a1625",
+      "panel": "#252137",
+      "border": "#2d2742",
+      "ring": "#5b4cfa",
       "text": {
-        "strong": "#E6EAF2",
-        "base": "#D1D6E0",
-        "muted": "#8E96A3"
+        "strong": "#f8f9fc",
+        "base": "#f8f9fc",
+        "muted": "#7c7f8c"
       },
-      "primary": "#8E7CFF",
-      "primaryForeground": "#0B0F17",
-      "secondary": "#0BD1C5",
-      "accent": "#FFD285",
-      "success": "#48D26B",
-      "warning": "#F8B84E",
-      "danger": "#FF7A85",
-      "info": "#58AFFF",
+      "primary": "#6366f1",
+      "primaryForeground": "#f8f9fc",
+      "secondary": "#a78bfa",
+      "accent": "#6366f1",
+      "success": "#22c55e",
+      "warning": "#f97316",
+      "danger": "#ef4444",
+      "info": "#3b82f6",
       "collection": {
-        "primary": "#8E7CFF",
-        "secondary": "#0BD1C5",
-        "accent": "#FFD285",
-        "purple": "#A78BFA",
-        "green": "#34D399",
-        "orange": "#FB923C",
-        "blue": "#60A5FA",
-        "red": "#F87171"
+        "primary": "#6366f1",
+        "secondary": "#a78bfa",
+        "accent": "#8b87ff",
+        "purple": "#a78bfa",
+        "green": "#22c55e",
+        "orange": "#f97316",
+        "blue": "#3b82f6",
+        "red": "#ef4444"
       }
     },
     "badge": {
       "default": {
-        "border": "#232B3A",
-        "bg": "#0F172A",
-        "text": "#D1D6E0",
-        "hoverBg": "#111827",
+        "border": "#2d2742",
+        "bg": "#1a1625",
+        "text": "#f8f9fc",
+        "hoverBg": "#252137",
         "shadow": "0 1px 2px rgba(0,0,0,.2)"
       },
       "secondary": {
-        "border": "#232B3A",
-        "bg": "#111827",
-        "text": "#8E7CFF",
-        "hoverBg": "#1E1B33",
-        "shadow": "0 1px 2px rgba(142,124,255,.15)"
+        "border": "#2d2742",
+        "bg": "#252137",
+        "text": "#a5b4fc",
+        "hoverBg": "#2d2742",
+        "shadow": "0 1px 2px rgba(99,102,241,.15)"
       },
       "outline": {
-        "border": "#232B3A",
+        "border": "#2d2742",
         "bg": "transparent",
-        "text": "#D1D6E0",
-        "hoverBg": "#111827",
-        "hoverBorder": "#8E7CFF",
+        "text": "#f8f9fc",
+        "hoverBg": "#252137",
+        "hoverBorder": "#5b4cfa",
         "shadow": "none"
       }
     }

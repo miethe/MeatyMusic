@@ -32,7 +32,7 @@ export default function BlueprintsPage() {
           {blueprints.map((blueprint) => (
             <Card key={blueprint.id} className="bg-bg-surface border-border-default shadow-elevation-1 hover:shadow-elevation-2 hover:border-border-accent p-6 transition-all duration-ui cursor-pointer">
               <div className="flex items-center gap-3 mb-3">
-                <BookOpen className="w-5 h-5 text-primary-500" />
+                <BookOpen className="w-5 h-5 text-primary" />
                 <h3 className="text-lg font-semibold text-text-primary">{blueprint.name}</h3>
               </div>
               <Badge variant="secondary" className="mb-3">{blueprint.genre}</Badge>

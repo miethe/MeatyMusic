@@ -1,95 +1,95 @@
 {
   "color": {
     "bg": {
-      "value": "#0B0F17"
+      "value": "#0f0f1c"
     },
     "surface": {
-      "value": "#0F172A"
+      "value": "#1a1625"
     },
     "panel": {
-      "value": "#111827"
+      "value": "#252137"
     },
     "border": {
-      "value": "#232B3A"
+      "value": "#2d2742"
     },
     "ring": {
-      "value": "#9B8BFF"
+      "value": "#5b4cfa"
     },
     "text": {
       "strong": {
-        "value": "#E6EAF2"
+        "value": "#f8f9fc"
       },
       "base": {
-        "value": "#D1D6E0"
+        "value": "#f8f9fc"
       },
       "muted": {
-        "value": "#8E96A3"
+        "value": "#7c7f8c"
       }
     },
     "primary": {
-      "value": "#8E7CFF"
+      "value": "#6366f1"
     },
     "primaryForeground": {
-      "value": "#0B0F17"
+      "value": "#f8f9fc"
     },
     "secondary": {
-      "value": "#0BD1C5"
+      "value": "#a78bfa"
     },
     "accent": {
-      "value": "#FFD285"
+      "value": "#6366f1"
     },
     "success": {
-      "value": "#48D26B"
+      "value": "#22c55e"
     },
     "warning": {
-      "value": "#F8B84E"
+      "value": "#f97316"
     },
     "danger": {
-      "value": "#FF7A85"
+      "value": "#ef4444"
     },
     "info": {
-      "value": "#58AFFF"
+      "value": "#3b82f6"
     },
     "collection": {
       "primary": {
-        "value": "#8E7CFF"
+        "value": "#6366f1"
       },
       "secondary": {
-        "value": "#0BD1C5"
+        "value": "#a78bfa"
       },
       "accent": {
-        "value": "#FFD285"
+        "value": "#8b87ff"
       },
       "purple": {
-        "value": "#A78BFA"
+        "value": "#a78bfa"
       },
       "green": {
-        "value": "#34D399"
+        "value": "#22c55e"
       },
       "orange": {
-        "value": "#FB923C"
+        "value": "#f97316"
       },
       "blue": {
-        "value": "#60A5FA"
+        "value": "#3b82f6"
       },
       "red": {
-        "value": "#F87171"
+        "value": "#ef4444"
       }
     }
   },
   "badge": {
     "default": {
       "border": {
-        "value": "#232B3A"
+        "value": "#2d2742"
       },
       "bg": {
-        "value": "#0F172A"
+        "value": "#1a1625"
       },
       "text": {
-        "value": "#D1D6E0"
+        "value": "#f8f9fc"
       },
       "hoverBg": {
-        "value": "#111827"
+        "value": "#252137"
       },
       "shadow": {
         "value": "0 1px 2px rgba(0,0,0,.2)"
@@ -97,36 +97,36 @@
     },
     "secondary": {
       "border": {
-        "value": "#232B3A"
+        "value": "#2d2742"
       },
       "bg": {
-        "value": "#111827"
+        "value": "#252137"
       },
       "text": {
-        "value": "#8E7CFF"
+        "value": "#a5b4fc"
       },
       "hoverBg": {
-        "value": "#1E1B33"
+        "value": "#2d2742"
       },
       "shadow": {
-        "value": "0 1px 2px rgba(142,124,255,.15)"
+        "value": "0 1px 2px rgba(99,102,241,.15)"
       }
     },
     "outline": {
       "border": {
-        "value": "#232B3A"
+        "value": "#2d2742"
       },
       "bg": {
         "value": "transparent"
       },
       "text": {
-        "value": "#D1D6E0"
+        "value": "#f8f9fc"
       },
       "hoverBg": {
-        "value": "#111827"
+        "value": "#252137"
       },
       "hoverBorder": {
-        "value": "#8E7CFF"
+        "value": "#5b4cfa"
       },
       "shadow": {
         "value": "none"

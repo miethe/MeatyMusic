@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import '@meatymusic/tokens/css/tokens.css';
 
 @tailwind base;
 @tailwind components;
@@ -7,106 +8,6 @@
 @layer base {
   * {
     @apply border-border-default;
-  }
-
-  :root {
-    /* MeatyPrompts token compatibility layer */
-    /* Map MP tokens to MM tokens for UI components */
-    --mp-color-bg: #0f0f1c;
-    --mp-color-surface: #1a1625;
-    --mp-color-panel: #252137;
-    --mp-color-border: #2d2742;
-    --mp-color-ring: #5b4cfa;
-    --mp-color-text-strong: #f8f9fc;
-    --mp-color-text-base: #f8f9fc;
-    --mp-color-text-muted: #7c7f8c;
-    --mp-color-primary: #6366f1;
-    --mp-color-primary-foreground: #f8f9fc;
-    --mp-color-secondary: #a78bfa;
-    --mp-color-accent: #6366f1;
-    --mp-color-success: #22c55e;
-    --mp-color-warning: #f97316;
-    --mp-color-danger: #ef4444;
-    --mp-color-info: #3b82f6;
-
-    /* Badge tokens */
-    --mp-badge-default-border: #2d2742;
-    --mp-badge-default-bg: #1a1625;
-    --mp-badge-default-text: #f8f9fc;
-    --mp-badge-default-hover-bg: #252137;
-    --mp-badge-default-shadow: 0 1px 2px rgba(0,0,0,.2);
-
-    --mp-badge-secondary-border: #2d2742;
-    --mp-badge-secondary-bg: #252137;
-    --mp-badge-secondary-text: #a5b4fc;
-    --mp-badge-secondary-hover-bg: #2d2742;
-    --mp-badge-secondary-shadow: 0 1px 2px rgba(99,102,241,.15);
-
-    --mp-badge-outline-border: #2d2742;
-    --mp-badge-outline-bg: transparent;
-    --mp-badge-outline-text: #f8f9fc;
-    --mp-badge-outline-hover-bg: #252137;
-    --mp-badge-outline-hover-border: #5b4cfa;
-    --mp-badge-outline-shadow: none;
-
-    /* Collection colors */
-    --mp-collection-primary: #6366f1;
-    --mp-collection-secondary: #a78bfa;
-    --mp-collection-accent: #c4b5fd;
-    --mp-collection-purple: #a78bfa;
-    --mp-collection-green: #22c55e;
-    --mp-collection-orange: #f97316;
-    --mp-collection-blue: #3b82f6;
-    --mp-collection-red: #ef4444;
-
-    /* Spacing */
-    --mp-spacing-1: 4px;
-    --mp-spacing-2: 8px;
-    --mp-spacing-3: 12px;
-    --mp-spacing-4: 16px;
-    --mp-spacing-5: 24px;
-    --mp-spacing-6: 32px;
-    --mp-spacing-7: 40px;
-    --mp-spacing-8: 56px;
-
-    /* Radius */
-    --mp-radius-sm: 6px;
-    --mp-radius-md: 8px;
-    --mp-radius-lg: 12px;
-    --mp-radius-pill: 9999px;
-
-    /* Elevation */
-    --mp-elevation-0: none;
-    --mp-elevation-1: 0 2px 8px rgba(0, 0, 0, 0.15);
-    --mp-elevation-2: 0 4px 16px rgba(0, 0, 0, 0.2);
-    --mp-elevation-3: 0 8px 24px rgba(0, 0, 0, 0.25);
-    --mp-elevation-4: 0 16px 32px rgba(0, 0, 0, 0.3);
-
-    /* Typography */
-    --mp-typography-font-family-ui: 'Inter', system-ui, -apple-system, sans-serif;
-    --mp-typography-font-family-mono: 'JetBrains Mono', monospace;
-    --mp-typography-font-family-display: 'Inter', system-ui, -apple-system, sans-serif;
-
-    --mp-typography-font-size-1: 12px;
-    --mp-typography-font-size-2: 14px;
-    --mp-typography-font-size-3: 16px;
-    --mp-typography-font-size-4: 20px;
-    --mp-typography-font-size-5: 24px;
-
-    --mp-typography-line-height-body: 1.5;
-    --mp-typography-line-height-heading: 1.35;
-
-    --mp-typography-letter-spacing-default: 0;
-    --mp-typography-letter-spacing-tight: -0.01em;
-
-    /* Motion */
-    --mp-motion-duration-micro: 70ms;
-    --mp-motion-duration-ui: 150ms;
-    --mp-motion-duration-panel: 250ms;
-    --mp-motion-duration-modal: 400ms;
-
-    --mp-motion-easing-enter: cubic-bezier(0, 0, 0.2, 1);
-    --mp-motion-easing-exit: cubic-bezier(0.4, 0, 1, 1);
   }
 
   body {
@@ -123,7 +24,7 @@
   }
 
   a {
-    @apply text-text-accent transition-colors hover:text-primary-300;
+    @apply text-text-accent transition-colors hover:text-primary;
   }
 
   /* Scrollbar styling */
@@ -146,7 +47,7 @@
 
   /* Selection */
   ::selection {
-    @apply bg-primary-700/30 text-text-primary;
+    @apply bg-primary/30 text-text-primary;
   }
 
   /* Focus visible */
@@ -191,7 +92,7 @@
   /* Input base styles */
   .input {
     @apply bg-bg-elevated border border-border-default text-text-primary px-3 py-2 rounded-lg;
-    @apply focus:border-border-accent focus:ring-2 focus:ring-primary-700/20;
+    @apply focus:border-border-accent focus:ring-2 focus:ring-primary/20;
     @apply transition-all duration-ui;
     @apply placeholder:text-text-muted;
   }

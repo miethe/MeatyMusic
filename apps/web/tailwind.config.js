@@ -89,103 +89,40 @@ module.exports = {
                           radial-gradient(at 0% 100%, rgba(99, 102, 241, 0.08) 0px, transparent 50%)`,
       },
       colors: {
-        // MeatyMusic Dark Mode Design System
-        // Background layers
-        'bg-base': '#0f0f1c',
-        'bg-surface': '#1a1625',
-        'bg-elevated': '#252137',
+        // MeatyMusic-specific color aliases mapped to token system
+        'bg-base': 'var(--mp-color-bg)',
+        'bg-surface': 'var(--mp-color-surface)',
+        'bg-elevated': 'var(--mp-color-panel)',
         'bg-overlay': '#2d2742',
-        'bg-muted': '#1a1625',
+        'bg-muted': 'var(--mp-color-surface)',
 
-        // Text colors
-        'text-primary': '#f8f9fc',
+        'text-primary': 'var(--mp-color-text-strong)',
         'text-secondary': '#b8bcc8',
-        'text-muted': '#7c7f8c',
-        'text-inverse': '#0f0f1c',
+        'text-muted': 'var(--mp-color-text-muted)',
+        'text-inverse': 'var(--mp-color-bg)',
         'text-accent': '#8b87ff',
 
-        // Border colors
-        'border-default': '#2d2742',
+        'border-default': 'var(--mp-color-border)',
         'border-strong': '#3f3a56',
         'border-subtle': '#1f1b2e',
         'border-accent': '#5b4cfa',
 
-        // Primary accent (purple-blue)
-        primary: {
-          900: '#3730a3',
-          700: '#5b4cfa',
-          500: '#6366f1',
-          300: '#a5b4fc',
-          100: '#e0e7ff',
-          DEFAULT: '#6366f1',
-          foreground: '#f8f9fc',
-        },
+        // Primary needs hardcoded value for opacity support
+        'primary': '#6366f1',
 
-        // Secondary accent (purple)
-        secondary: {
-          700: '#7c3aed',
-          500: '#a78bfa',
-          300: '#c4b5fd',
-          DEFAULT: '#a78bfa',
-          foreground: '#f8f9fc',
-        },
-
-        // Semantic colors
+        // Semantic color backgrounds for badges
         success: {
-          700: '#15803d',
-          500: '#22c55e',
-          300: '#86efac',
           bg: 'rgba(34, 197, 94, 0.1)',
-          DEFAULT: '#22c55e',
         },
         warning: {
-          700: '#c2410c',
-          500: '#f97316',
-          300: '#fdba74',
           bg: 'rgba(249, 115, 22, 0.1)',
-          DEFAULT: '#f97316',
         },
         error: {
-          700: '#b91c1c',
-          500: '#ef4444',
-          300: '#fca5a5',
           bg: 'rgba(239, 68, 68, 0.1)',
-          DEFAULT: '#ef4444',
         },
         info: {
-          700: '#0369a1',
-          500: '#3b82f6',
-          300: '#93c5fd',
           bg: 'rgba(59, 130, 246, 0.1)',
-          DEFAULT: '#3b82f6',
         },
-
-        // Shadcn compatibility
-        background: '#0f0f1c',
-        foreground: '#f8f9fc',
-        card: {
-          DEFAULT: '#1a1625',
-          foreground: '#f8f9fc'
-        },
-        popover: {
-          DEFAULT: '#252137',
-          foreground: '#f8f9fc'
-        },
-        muted: {
-          DEFAULT: '#2d2742',
-          foreground: '#b8bcc8'
-        },
-        accent: {
-          DEFAULT: '#6366f1',
-          foreground: '#f8f9fc'
-        },
-        destructive: {
-          DEFAULT: '#ef4444',
-          foreground: '#f8f9fc'
-        },
-        border: '#2d2742',
-        input: '#2d2742',
-        ring: '#5b4cfa',
       },
     }
   },
