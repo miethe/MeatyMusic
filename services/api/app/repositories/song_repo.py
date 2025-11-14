@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, Dict, Any
 from uuid import UUID
 
 from sqlalchemy.orm import Session, joinedload
@@ -169,3 +169,86 @@ class SongRepository(BaseRepository[Song]):
             query = guard.filter_query(query)
 
         return query.all()
+
+    def get_with_all_entities_for_sds(self, song_id: UUID) -> Optional[dict]:
+        """Fetch song with all entities needed for SDS compilation.
+
+        This method performs a single optimized query with eager loading to fetch
+        all entities required for Song Design Spec (SDS) compilation, including
+        style, lyrics, producer notes, persona, and blueprint.
+
+        Parameters
+        ----------
+        song_id : UUID
+            The song ID to retrieve
+
+        Returns
+        -------
+        Optional[dict]
+            Dictionary containing all SDS entities if found and accessible:
+            {
+                "song": Song,
+                "style": Optional[Style],
+                "lyrics": Optional[Lyrics],
+                "producer_notes": Optional[ProducerNotes],
+                "persona": Optional[Persona],
+                "blueprint": Optional[Blueprint],
+                "sources": List[Source]  # Empty list until song-source association implemented
+            }
+            Returns None if song not found or inaccessible due to RLS
+
+        Notes
+        -----
+        - Uses single query with joinedload for optimal performance
+        - Enforces row-level security via UnifiedRowGuard
+        - Returns first lyrics/producer_notes artifact if multiple exist
+        - Sources loading requires song_sources association table (TODO: SDS-002)
+        """
+        from app.models.style import Style
+        from app.models.lyrics import Lyrics
+        from app.models.producer_notes import ProducerNotes
+        from app.models.persona import Persona
+        from app.models.blueprint import Blueprint
+
+        # Build query with eager loading of all related entities
+        query = self.db.query(Song).filter(
+            Song.id == song_id,
+            Song.deleted_at.is_(None)
+        ).options(
+            joinedload(Song.style),
+            joinedload(Song.persona),
+            joinedload(Song.blueprint),
+            joinedload(Song.lyrics),
+            joinedload(Song.producer_notes)
+        )
+
+        # Apply row-level security using UnifiedRowGuard
+        guard = self.get_unified_guard(Song)
+        if guard:
+            query = guard.filter_query(query)
+
+        song = query.first()
+        if song is None:
+            return None
+
+        # Extract first lyrics and producer_notes artifacts
+        # (relationships are one-to-many, take most recent if multiple)
+        lyrics = song.lyrics[0] if song.lyrics else None
+        producer_notes = song.producer_notes[0] if song.producer_notes else None
+
+        # TODO(SDS-002): Load sources via song_sources association table
+        # Once song_sources many-to-many relationship is implemented, load sources here:
+        # sources = self.db.query(Source).join(song_sources).filter(
+        #     song_sources.c.song_id == song_id
+        # ).all()
+        sources = []
+
+        return {
+            "song": song,
+            "style": song.style,
+            "lyrics": lyrics,
+            "producer_notes": producer_notes,
+            "persona": song.persona,
+            "blueprint": song.blueprint,
+            "sources": sources
+        }

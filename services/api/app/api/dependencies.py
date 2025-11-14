@@ -28,6 +28,9 @@ from app.services import (
     StyleService,
     ValidationService,
     WorkflowRunService,
+    SDSCompilerService,
+    BlueprintValidatorService,
+    CrossEntityValidator,
 )
 
 
@@ -141,6 +144,41 @@ def get_workflow_run_service(
     return WorkflowRunService(workflow_run_repo=workflow_run_repo)
 
 
+def get_sds_compiler_service(
+    song_repo: SongRepository = Depends(get_song_repository),
+    style_repo: StyleRepository = Depends(get_style_repository),
+    lyrics_repo: LyricsRepository = Depends(get_lyrics_repository),
+    producer_notes_repo: ProducerNotesRepository = Depends(get_producer_notes_repository),
+    persona_repo: PersonaRepository = Depends(get_persona_repository),
+    blueprint_repo: BlueprintRepository = Depends(get_blueprint_repository),
+    source_repo: SourceRepository = Depends(get_source_repository),
+    validation_service: ValidationService = Depends(get_validation_service),
+) -> SDSCompilerService:
+    """Get SDSCompilerService instance with all dependencies."""
+    return SDSCompilerService(
+        song_repo=song_repo,
+        style_repo=style_repo,
+        lyrics_repo=lyrics_repo,
+        producer_notes_repo=producer_notes_repo,
+        persona_repo=persona_repo,
+        blueprint_repo=blueprint_repo,
+        source_repo=source_repo,
+        validation_service=validation_service,
+    )
+
+
+def get_blueprint_validator_service(
+    blueprint_repo: BlueprintRepository = Depends(get_blueprint_repository),
+) -> BlueprintValidatorService:
+    """Get BlueprintValidatorService instance."""
+    return BlueprintValidatorService(blueprint_repo=blueprint_repo)
+
+
+def get_cross_entity_validator() -> CrossEntityValidator:
+    """Get CrossEntityValidator instance."""
+    return CrossEntityValidator()
+
+
 __all__ = [
     "get_db_session",
     "get_blueprint_repository",
@@ -156,4 +194,7 @@ __all__ = [
     "get_validation_service",
     "get_song_service",
     "get_workflow_run_service",
+    "get_sds_compiler_service",
+    "get_blueprint_validator_service",
+    "get_cross_entity_validator",
 ]
