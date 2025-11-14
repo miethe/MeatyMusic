@@ -80,3 +80,43 @@ class SourceResponse(SourceBase):
     created_at: datetime
     updated_at: datetime
     deleted_at: Optional[datetime] = None
+
+
+# =============================================================================
+# MCP Integration Schemas
+# =============================================================================
+
+
+class MCPServerInfo(BaseModel):
+    """Schema for MCP server discovery information."""
+
+    server_id: str = Field(..., min_length=1, description="Unique server identifier")
+    name: str = Field(..., min_length=1, description="Human-readable server name")
+    capabilities: List[str] = Field(default_factory=list, description="Server capabilities")
+    scopes: List[str] = Field(default_factory=list, description="Available scopes")
+    version: Optional[str] = Field(None, description="Server version")
+    metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
+
+
+class Chunk(BaseModel):
+    """Schema for retrieved chunk from MCP server."""
+
+    text: str = Field(..., min_length=1, description="Chunk text content")
+    score: float = Field(..., ge=0.0, le=1.0, description="Relevance score")
+    metadata: Dict[str, Any] = Field(default_factory=dict, description="Chunk metadata")
+    timestamp: Optional[datetime] = Field(None, description="Chunk timestamp for pinned retrieval")
+
+
+class ChunkWithHash(Chunk):
+    """Schema for chunk with computed citation hash for deterministic retrieval."""
+
+    content_hash: str = Field(..., min_length=64, max_length=64, description="SHA-256 hash of chunk content")
+    source_id: UUID = Field(..., description="Source ID for provenance tracking")
+
+    @field_validator("content_hash")
+    @classmethod
+    def validate_hash_format(cls, v: str) -> str:
+        """Validate hash is valid hex string."""
+        if not all(c in "0123456789abcdef" for c in v.lower()):
+            raise ValueError("content_hash must be a valid hexadecimal string")
+        return v.lower()
