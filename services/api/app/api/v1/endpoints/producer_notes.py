@@ -11,8 +11,12 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
-from app.api.dependencies import get_producer_notes_repository
+from app.api.dependencies import (
+    get_producer_notes_repository,
+    get_producer_notes_service,
+)
 from app.repositories import ProducerNotesRepository
+from app.services import ProducerNotesService
 from app.schemas import (
     ErrorResponse,
     PageInfo,
@@ -38,13 +42,13 @@ router = APIRouter(prefix="/producer-notes", tags=["Producer Notes"])
 )
 async def create_producer_notes(
     notes_data: ProducerNotesCreate,
-    repo: ProducerNotesRepository = Depends(get_producer_notes_repository),
+    service: ProducerNotesService = Depends(get_producer_notes_service),
 ) -> ProducerNotesResponse:
     """Create new producer notes.
 
     Args:
         notes_data: Producer notes creation data
-        repo: ProducerNotes repository instance
+        service: ProducerNotes service instance
 
     Returns:
         Created producer notes
@@ -53,8 +57,7 @@ async def create_producer_notes(
         HTTPException: If creation fails
     """
     try:
-        notes = await repo.create(notes_data.model_dump())
-        return ProducerNotesResponse.model_validate(notes)
+        return await service.create_producer_notes(notes_data)
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -114,13 +117,13 @@ async def list_producer_notes(
 )
 async def get_producer_notes(
     notes_id: UUID,
-    repo: ProducerNotesRepository = Depends(get_producer_notes_repository),
+    service: ProducerNotesService = Depends(get_producer_notes_service),
 ) -> ProducerNotesResponse:
     """Get producer notes by ID.
 
     Args:
         notes_id: ProducerNotes UUID
-        repo: ProducerNotes repository instance
+        service: ProducerNotes service instance
 
     Returns:
         Producer notes data
@@ -128,13 +131,13 @@ async def get_producer_notes(
     Raises:
         HTTPException: If notes not found
     """
-    notes = await repo.get_by_id(notes_id)
+    notes = await service.get_producer_notes(notes_id)
     if not notes:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Producer notes {notes_id} not found",
         )
-    return ProducerNotesResponse.model_validate(notes)
+    return notes
 
 
 @router.patch(
@@ -150,33 +153,36 @@ async def get_producer_notes(
 async def update_producer_notes(
     notes_id: UUID,
     notes_data: ProducerNotesUpdate,
-    repo: ProducerNotesRepository = Depends(get_producer_notes_repository),
+    service: ProducerNotesService = Depends(get_producer_notes_service),
 ) -> ProducerNotesResponse:
     """Update producer notes.
 
     Args:
         notes_id: ProducerNotes UUID
         notes_data: Fields to update
-        repo: ProducerNotes repository instance
+        service: ProducerNotes service instance
 
     Returns:
         Updated producer notes
 
     Raises:
-        HTTPException: If notes not found
+        HTTPException: If notes not found or validation fails
     """
-    existing = await repo.get_by_id(notes_id)
-    if not existing:
+    try:
+        return await service.update_producer_notes(notes_id, notes_data)
+    except ValueError as e:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Producer notes {notes_id} not found",
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
         )
-
-    updated = await repo.update(
-        notes_id,
-        notes_data.model_dump(exclude_unset=True),
-    )
-    return ProducerNotesResponse.model_validate(updated)
+    except Exception as e:
+        # Handle NotFoundError from service
+        if "not found" in str(e).lower():
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Producer notes {notes_id} not found",
+            )
+        raise
 
 
 @router.delete(
@@ -191,22 +197,45 @@ async def update_producer_notes(
 )
 async def delete_producer_notes(
     notes_id: UUID,
-    repo: ProducerNotesRepository = Depends(get_producer_notes_repository),
+    service: ProducerNotesService = Depends(get_producer_notes_service),
 ) -> None:
     """Delete producer notes (soft delete).
 
     Args:
         notes_id: ProducerNotes UUID
-        repo: ProducerNotes repository instance
+        service: ProducerNotes service instance
 
     Raises:
         HTTPException: If notes not found
     """
-    existing = await repo.get_by_id(notes_id)
-    if not existing:
+    success = await service.delete_producer_notes(notes_id)
+    if not success:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Producer notes {notes_id} not found",
         )
 
-    await repo.delete(notes_id)
+
+@router.get(
+    "/song/{song_id}",
+    response_model=list[ProducerNotesResponse],
+    summary="Get producer notes by song ID",
+    description="Retrieve all producer notes versions for a specific song",
+    responses={
+        200: {"description": "Producer notes found for song"},
+    },
+)
+async def get_by_song_id(
+    song_id: UUID,
+    service: ProducerNotesService = Depends(get_producer_notes_service),
+) -> list[ProducerNotesResponse]:
+    """Get all producer notes for a specific song.
+
+    Args:
+        song_id: Song UUID
+        service: ProducerNotes service instance
+
+    Returns:
+        List of producer notes versions for the song, ordered by created_at descending
+    """
+    return await service.get_by_song_id(song_id)

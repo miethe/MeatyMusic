@@ -11,8 +11,10 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
-from app.api.dependencies import get_persona_repository
+from app.api.dependencies import get_persona_repository, get_persona_service
+from app.errors import BadRequestError, NotFoundError
 from app.repositories import PersonaRepository
+from app.services import PersonaService
 from app.schemas import (
     ErrorResponse,
     PageInfo,
@@ -30,7 +32,7 @@ router = APIRouter(prefix="/personas", tags=["Personas"])
     response_model=PersonaResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Create a new persona",
-    description="Create a new artist or band persona with vocal characteristics",
+    description="Create a new artist or band persona with vocal characteristics and automatic influence normalization",
     responses={
         201: {"description": "Persona created successfully"},
         400: {"model": ErrorResponse, "description": "Invalid persona data"},
@@ -38,23 +40,32 @@ router = APIRouter(prefix="/personas", tags=["Personas"])
 )
 async def create_persona(
     persona_data: PersonaCreate,
-    repo: PersonaRepository = Depends(get_persona_repository),
+    service: PersonaService = Depends(get_persona_service),
 ) -> PersonaResponse:
-    """Create a new persona.
+    """Create a new persona with validation and normalization.
+
+    Automatically applies:
+    - Influence normalization if public_release=True
+    - Vocal range validation
+    - Delivery style conflict detection
 
     Args:
         persona_data: Persona creation data
-        repo: Persona repository instance
+        service: Persona service instance
 
     Returns:
-        Created persona
+        Created persona with all validations applied
 
     Raises:
-        HTTPException: If persona creation fails
+        HTTPException: If validation fails
     """
     try:
-        persona = await repo.create(persona_data.model_dump())
-        return PersonaResponse.model_validate(persona)
+        return await service.create_persona(persona_data)
+    except BadRequestError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=e.message,
+        )
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -114,13 +125,13 @@ async def list_personas(
 )
 async def get_persona(
     persona_id: UUID,
-    repo: PersonaRepository = Depends(get_persona_repository),
+    service: PersonaService = Depends(get_persona_service),
 ) -> PersonaResponse:
     """Get a persona by ID.
 
     Args:
         persona_id: Persona UUID
-        repo: Persona repository instance
+        service: Persona service instance
 
     Returns:
         Persona data
@@ -128,55 +139,66 @@ async def get_persona(
     Raises:
         HTTPException: If persona not found
     """
-    persona = await repo.get_by_id(persona_id)
+    persona = await service.get_persona(persona_id)
     if not persona:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Persona {persona_id} not found",
         )
-    return PersonaResponse.model_validate(persona)
+    return persona
 
 
 @router.patch(
     "/{persona_id}",
     response_model=PersonaResponse,
     summary="Update a persona",
-    description="Update an existing persona's fields",
+    description="Update an existing persona's fields with validation and normalization",
     responses={
         200: {"description": "Persona updated successfully"},
         404: {"model": ErrorResponse, "description": "Persona not found"},
+        400: {"model": ErrorResponse, "description": "Invalid update data"},
     },
 )
 async def update_persona(
     persona_id: UUID,
     persona_data: PersonaUpdate,
-    repo: PersonaRepository = Depends(get_persona_repository),
+    service: PersonaService = Depends(get_persona_service),
 ) -> PersonaResponse:
-    """Update a persona.
+    """Update a persona with validation and normalization.
+
+    Automatically applies:
+    - Influence normalization if public_release=True
+    - Vocal range validation
+    - Delivery style conflict detection
 
     Args:
         persona_id: Persona UUID
         persona_data: Fields to update
-        repo: Persona repository instance
+        service: Persona service instance
 
     Returns:
         Updated persona
 
     Raises:
-        HTTPException: If persona not found
+        HTTPException: If persona not found or validation fails
     """
-    existing = await repo.get_by_id(persona_id)
-    if not existing:
+    try:
+        return await service.update_persona(persona_id, persona_data)
+    except NotFoundError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Persona {persona_id} not found",
+            detail=e.message,
         )
-
-    updated = await repo.update(
-        persona_id,
-        persona_data.model_dump(exclude_unset=True),
-    )
-    return PersonaResponse.model_validate(updated)
+    except BadRequestError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=e.message,
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
 
 
 @router.delete(
@@ -191,45 +213,69 @@ async def update_persona(
 )
 async def delete_persona(
     persona_id: UUID,
-    repo: PersonaRepository = Depends(get_persona_repository),
+    service: PersonaService = Depends(get_persona_service),
 ) -> None:
     """Delete a persona (soft delete).
 
     Args:
         persona_id: Persona UUID
-        repo: Persona repository instance
+        service: Persona service instance
 
     Raises:
         HTTPException: If persona not found
     """
-    existing = await repo.get_by_id(persona_id)
-    if not existing:
+    deleted = await service.delete_persona(persona_id)
+    if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Persona {persona_id} not found",
         )
 
-    await repo.delete(persona_id)
+
+@router.get(
+    "/type/{persona_type}",
+    response_model=List[PersonaResponse],
+    summary="Get personas by type",
+    description="Retrieve all personas of a specific type (artist or band)",
+    responses={
+        200: {"description": "List of personas matching the type"},
+    },
+)
+async def get_by_type(
+    persona_type: str,
+    service: PersonaService = Depends(get_persona_service),
+) -> List[PersonaResponse]:
+    """Get all personas by type (kind).
+
+    Args:
+        persona_type: Type of persona ("artist" or "band")
+        service: Persona service instance
+
+    Returns:
+        List of personas matching the specified type
+    """
+    return await service.get_by_type(persona_type)
 
 
 @router.get(
     "/search/influences",
     response_model=List[PersonaResponse],
     summary="Search personas by influences",
-    description="Find personas with specific influences",
+    description="Find personas with specific influences using PostgreSQL array overlap",
 )
 async def search_personas_by_influences(
     influences: List[str] = Query(..., description="Influences to search for"),
-    repo: PersonaRepository = Depends(get_persona_repository),
+    service: PersonaService = Depends(get_persona_service),
 ) -> List[PersonaResponse]:
     """Search personas by influences.
 
+    Uses PostgreSQL array overlap operator for efficient searching.
+
     Args:
         influences: List of influences to search for
-        repo: Persona repository instance
+        service: Persona service instance
 
     Returns:
-        List of personas with matching influences
+        List of personas with any of the specified influences
     """
-    personas = await repo.search_by_influences(influences)
-    return [PersonaResponse.model_validate(p) for p in personas]
+    return await service.search_by_influences(influences)
