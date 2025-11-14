@@ -1,3 +1,20 @@
+{
+  "whisper": ["anthemic", "high-energy", "aggressive", "stadium"],
+  "anthemic": ["whisper", "intimate", "low-energy", "minimal"],
+  "intimate": ["anthemic", "stadium", "epic", "aggressive"],
+  "acoustic": ["electronic", "synth-heavy", "industrial"],
+  "electronic": ["acoustic", "organic"],
+  "minimal": ["maximal", "wall-of-sound", "dense"],
+  "maximal": ["minimal", "sparse", "intimate"],
+  "lo-fi": ["hi-fi", "polished", "pristine"],
+  "hi-fi": ["lo-fi", "raw", "gritty"],
+  "slow": ["fast", "uptempo", "energetic"],
+  "fast": ["slow", "downtempo", "ballad"],
+  "major": ["minor", "dark"],
+  "minor": ["major", "uplifting"],
+  "vintage": ["modern", "futuristic"],
+  "modern": ["vintage", "retro", "nostalgic"]
+}
 [
   {
     "tag_a": "whisper",

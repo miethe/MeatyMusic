@@ -24,7 +24,12 @@ from app.repositories import (
     WorkflowRunRepository,
 )
 from app.services import (
+    BlueprintService,
+    LyricsService,
+    PersonaService,
+    ProducerNotesService,
     SongService,
+    SourceService,
     StyleService,
     ValidationService,
     WorkflowRunService,
@@ -106,6 +111,17 @@ def get_composed_prompt_repository(
 
 
 # Service dependencies
+def get_blueprint_service(
+    blueprint_repo: BlueprintRepository = Depends(get_blueprint_repository),
+) -> BlueprintService:
+    """Get BlueprintService instance.
+
+    Note: BlueprintService doesn't use BaseService pattern,
+    so no session dependency is needed.
+    """
+    return BlueprintService(blueprint_repo=blueprint_repo)
+
+
 def get_style_service(
     style_repo: StyleRepository = Depends(get_style_repository),
 ) -> StyleService:
@@ -179,6 +195,45 @@ def get_cross_entity_validator() -> CrossEntityValidator:
     return CrossEntityValidator()
 
 
+def get_persona_service(
+    db: AsyncSession = Depends(get_db_session),
+    repo: PersonaRepository = Depends(get_persona_repository),
+) -> PersonaService:
+    """Get PersonaService instance with all dependencies."""
+    return PersonaService(session=db, repo=repo)
+
+
+def get_source_service(
+    db: AsyncSession = Depends(get_db_session),
+    repo: SourceRepository = Depends(get_source_repository),
+) -> SourceService:
+    """Get SourceService instance with all dependencies."""
+    return SourceService(session=db, repo=repo)
+
+
+def get_lyrics_service(
+    db: AsyncSession = Depends(get_db_session),
+    repo: LyricsRepository = Depends(get_lyrics_repository),
+) -> LyricsService:
+    """Get LyricsService instance with all dependencies."""
+    return LyricsService(session=db, repo=repo)
+
+
+def get_producer_notes_service(
+    db: AsyncSession = Depends(get_db_session),
+    repo: ProducerNotesRepository = Depends(get_producer_notes_repository),
+    blueprint_repo: BlueprintRepository = Depends(get_blueprint_repository),
+    lyrics_repo: LyricsRepository = Depends(get_lyrics_repository),
+) -> ProducerNotesService:
+    """Get ProducerNotesService instance with all dependencies."""
+    return ProducerNotesService(
+        session=db,
+        repo=repo,
+        blueprint_repo=blueprint_repo,
+        lyrics_repo=lyrics_repo,
+    )
+
+
 __all__ = [
     "get_db_session",
     "get_blueprint_repository",
@@ -190,6 +245,11 @@ __all__ = [
     "get_producer_notes_repository",
     "get_workflow_run_repository",
     "get_composed_prompt_repository",
+    "get_blueprint_service",
+    "get_lyrics_service",
+    "get_persona_service",
+    "get_producer_notes_service",
+    "get_source_service",
     "get_style_service",
     "get_validation_service",
     "get_song_service",
