@@ -136,9 +136,9 @@ function useWizardSubmission() {
         if (formData.style) {
           setProgress({ current: currentStep, total: totalSteps, action: 'Creating style...' });
           const styleData: StyleCreate = {
-            name: formData.style.name || 'Unnamed Style',
-            genre: formData.style.genre || 'Unknown',
             ...formData.style,
+            name: formData.style.name ?? 'Unnamed Style',
+            genre: formData.style.genre ?? 'Unknown',
           };
           const createdStyle = await createStyle.mutateAsync(styleData);
           styleId = createdStyle.id;
