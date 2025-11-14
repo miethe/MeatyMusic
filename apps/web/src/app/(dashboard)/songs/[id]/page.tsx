@@ -13,6 +13,7 @@ import { Button } from '@meatymusic/ui';
 import { Card } from '@meatymusic/ui';
 import { Badge } from '@meatymusic/ui';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@meatymusic/ui';
+import { useSong, useDeleteSong } from '@/hooks/api/useSongs';
 import {
   Edit,
   Play,
@@ -24,6 +25,7 @@ import {
   FileText,
   User,
   Settings as SettingsIcon,
+  Loader2,
 } from 'lucide-react';
 import { ROUTES } from '@/config/routes';
 
@@ -32,45 +34,69 @@ export default function SongDetailPage() {
   const router = useRouter();
   const songId = params.id as string;
 
-  // TODO: Fetch song data
-  const song = {
-    id: songId,
-    name: 'Example Song',
-    description: 'A placeholder song for demonstration',
-    genre: 'Pop',
-    mood: ['upbeat', 'energetic'],
-    status: 'draft' as const,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    entities: {
-      style: null,
-      lyrics: null,
-      persona: null,
-      producer: null,
-    },
-    workflow: null,
-  };
+  const { data: song, isLoading, error } = useSong(songId);
+  const deleteSong = useDeleteSong();
 
   const handleStartWorkflow = () => {
     console.log('Starting workflow for song:', songId);
+    // TODO: Implement workflow start
   };
 
   const handleClone = () => {
     console.log('Cloning song:', songId);
+    // TODO: Implement song cloning
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (confirm('Are you sure you want to delete this song?')) {
-      console.log('Deleting song:', songId);
-      router.push(ROUTES.SONGS);
+      try {
+        await deleteSong.mutateAsync(songId);
+        router.push(ROUTES.SONGS);
+      } catch (error) {
+        console.error('Failed to delete song:', error);
+      }
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (error || !song) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="bg-destructive/10 border-2 border-destructive/30 rounded-xl p-6 max-w-md text-center">
+          <p className="text-destructive font-medium">Failed to load song</p>
+          <p className="text-text-muted text-sm mt-2">
+            {error?.message || 'Song not found'}
+          </p>
+          <Button
+            variant="outline"
+            className="mt-4"
+            onClick={() => router.push(ROUTES.SONGS)}
+          >
+            Back to Songs
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Extract metadata from extra_metadata
+  const metadata = song.extra_metadata || {};
+  const description = metadata.description || 'No description';
+  const genre = metadata.genre || 'Unknown';
+  const mood = metadata.mood || [];
 
   return (
     <div className="min-h-screen">
       <PageHeader
-        title={song.name}
-        description={song.description}
+        title={song.title}
+        description={description}
         actions={
           <>
             <Button variant="outline" onClick={handleClone}>
@@ -96,7 +122,7 @@ export default function SongDetailPage() {
         <div className="grid md:grid-cols-4 gap-4 mb-8">
           <Card className="p-4">
             <div className="text-sm text-muted-foreground mb-1">Genre</div>
-            <div className="font-semibold">{song.genre}</div>
+            <div className="font-semibold">{genre}</div>
           </Card>
           <Card className="p-4">
             <div className="text-sm text-muted-foreground mb-1">Status</div>
@@ -105,13 +131,13 @@ export default function SongDetailPage() {
           <Card className="p-4">
             <div className="text-sm text-muted-foreground mb-1">Created</div>
             <div className="font-semibold">
-              {new Date(song.created_at).toLocaleDateString()}
+              {new Date(song.createdAt).toLocaleDateString()}
             </div>
           </Card>
           <Card className="p-4">
             <div className="text-sm text-muted-foreground mb-1">Updated</div>
             <div className="font-semibold">
-              {new Date(song.updated_at).toLocaleDateString()}
+              {new Date(song.updatedAt).toLocaleDateString()}
             </div>
           </Card>
         </div>
@@ -132,15 +158,21 @@ export default function SongDetailPage() {
                 <dl className="space-y-4">
                   <div>
                     <dt className="text-sm text-muted-foreground">Description</dt>
-                    <dd className="mt-1">{song.description}</dd>
+                    <dd className="mt-1">{description}</dd>
                   </div>
+                  {mood.length > 0 && (
+                    <div>
+                      <dt className="text-sm text-muted-foreground">Mood</dt>
+                      <dd className="mt-1 flex gap-2">
+                        {mood.map((m: string) => (
+                          <Badge key={m} variant="outline">{m}</Badge>
+                        ))}
+                      </dd>
+                    </div>
+                  )}
                   <div>
-                    <dt className="text-sm text-muted-foreground">Mood</dt>
-                    <dd className="mt-1 flex gap-2">
-                      {song.mood.map((m) => (
-                        <Badge key={m} variant="outline">{m}</Badge>
-                      ))}
-                    </dd>
+                    <dt className="text-sm text-muted-foreground">Global Seed</dt>
+                    <dd className="mt-1 font-mono text-sm">{song.global_seed}</dd>
                   </div>
                 </dl>
               </Card>
@@ -172,26 +204,26 @@ export default function SongDetailPage() {
               <EntityCard
                 title="Style"
                 icon={<Palette className="w-5 h-5" />}
-                entity={song.entities.style}
+                entityId={song.style_id}
                 createHref={ROUTES.ENTITIES.STYLE_NEW}
               />
               <EntityCard
                 title="Lyrics"
                 icon={<FileText className="w-5 h-5" />}
-                entity={song.entities.lyrics}
+                entityId={null} // TODO: Fetch lyrics for this song
                 createHref={ROUTES.ENTITIES.LYRICS_NEW}
               />
               <EntityCard
                 title="Persona"
                 icon={<User className="w-5 h-5" />}
-                entity={song.entities.persona}
+                entityId={song.persona_id}
                 createHref={ROUTES.ENTITIES.PERSONA_NEW}
               />
               <EntityCard
-                title="Producer Notes"
+                title="Blueprint"
                 icon={<SettingsIcon className="w-5 h-5" />}
-                entity={song.entities.producer}
-                createHref={ROUTES.ENTITIES.PRODUCER_NOTE_NEW}
+                entityId={song.blueprint_id}
+                createHref={ROUTES.ENTITIES.BLUEPRINT_NEW}
               />
             </div>
           </TabsContent>
@@ -230,12 +262,12 @@ export default function SongDetailPage() {
 function EntityCard({
   title,
   icon,
-  entity,
+  entityId,
   createHref,
 }: {
   title: string;
   icon: React.ReactNode;
-  entity: any;
+  entityId: string | null | undefined;
   createHref: string;
 }) {
   return (
@@ -245,15 +277,15 @@ function EntityCard({
         <h3 className="text-lg font-semibold">{title}</h3>
       </div>
 
-      {entity ? (
+      {entityId ? (
         <div>
-          <p className="font-medium mb-2">{entity.name}</p>
-          <Link href={entity.href}>
-            <Button variant="outline" size="sm">
-              <ExternalLink className="w-3 h-3 mr-2" />
-              View Details
-            </Button>
-          </Link>
+          <p className="font-medium mb-2 font-mono text-sm text-muted-foreground">
+            ID: {entityId}
+          </p>
+          <Button variant="outline" size="sm" disabled>
+            <ExternalLink className="w-3 h-3 mr-2" />
+            View Details (Coming Soon)
+          </Button>
         </div>
       ) : (
         <div>

@@ -10,7 +10,8 @@ import Link from 'next/link';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@meatymusic/ui';
 import { SongList, type SongFilters } from '@/components/songs/SongList';
-import { Plus, Filter } from 'lucide-react';
+import { useSongs } from '@/hooks/api/useSongs';
+import { Plus, Filter, Loader2 } from 'lucide-react';
 import { ROUTES } from '@/config/routes';
 
 export default function SongsPage() {
@@ -18,6 +19,8 @@ export default function SongsPage() {
   const [filters, setFilters] = React.useState<SongFilters>({
     q: '',
   });
+
+  const { data, isLoading, error } = useSongs(filters);
 
   return (
     <div className="min-h-screen">
@@ -55,8 +58,25 @@ export default function SongsPage() {
           </Button>
         </div>
 
+        {/* Loading State */}
+        {isLoading && (
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="bg-destructive/10 border-2 border-destructive/30 rounded-xl p-6 text-center">
+            <p className="text-destructive font-medium">Failed to load songs</p>
+            <p className="text-text-muted text-sm mt-2">{error.message}</p>
+          </div>
+        )}
+
         {/* Song List */}
-        <SongList songs={[]} filters={filters} />
+        {!isLoading && !error && (
+          <SongList songs={data?.items || []} filters={filters} />
+        )}
       </div>
     </div>
   );

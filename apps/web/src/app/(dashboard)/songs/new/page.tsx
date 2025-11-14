@@ -11,6 +11,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { Card } from '@meatymusic/ui';
 import { Button } from '@meatymusic/ui';
 import { ROUTES } from '@/config/routes';
+import { useCreateSong } from '@/hooks/api/useSongs';
 import {
   ChevronLeft,
   ChevronRight,
@@ -21,6 +22,7 @@ import {
   User,
   Settings,
   Eye,
+  Loader2,
 } from 'lucide-react';
 
 const WIZARD_STEPS = [
@@ -34,12 +36,14 @@ const WIZARD_STEPS = [
 
 export default function NewSongPage() {
   const router = useRouter();
+  const createSong = useCreateSong();
   const [currentStep, setCurrentStep] = React.useState(0);
   const [formData, setFormData] = React.useState({
-    name: '',
+    title: '',
     description: '',
     genre: '',
     mood: [] as string[],
+    global_seed: Date.now(), // Default to current timestamp for determinism
   });
 
   const handleNext = () => {
@@ -58,10 +62,25 @@ export default function NewSongPage() {
     router.push(ROUTES.SONGS);
   };
 
-  const handleSubmit = () => {
-    // TODO: Implement song creation
-    console.log('Creating song:', formData);
-    router.push(ROUTES.SONGS);
+  const handleSubmit = async () => {
+    try {
+      const songData = {
+        title: formData.title,
+        global_seed: formData.global_seed,
+        sds_version: '1.0.0',
+        extra_metadata: {
+          description: formData.description,
+          genre: formData.genre,
+          mood: formData.mood,
+        },
+      };
+
+      const newSong = await createSong.mutateAsync(songData);
+      router.push(ROUTES.SONGS);
+    } catch (error) {
+      console.error('Failed to create song:', error);
+      // Error toast is handled by the mutation hook
+    }
   };
 
   const currentStepConfig = WIZARD_STEPS[currentStep];
@@ -154,6 +173,7 @@ export default function NewSongPage() {
             {currentStep < WIZARD_STEPS.length - 1 ? (
               <Button
                 onClick={handleNext}
+                disabled={currentStep === 0 && !formData.title}
                 className="bg-primary text-primaryForeground hover:opacity-90 transition-all duration-ui px-6 py-3"
               >
                 Next
@@ -162,10 +182,20 @@ export default function NewSongPage() {
             ) : (
               <Button
                 onClick={handleSubmit}
+                disabled={!formData.title || createSong.isPending}
                 className="bg-primary text-primaryForeground hover:opacity-90 transition-all duration-ui px-6 py-3"
               >
-                <Check className="w-4 h-4 mr-2" />
-                Create Song
+                {createSong.isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    <Check className="w-4 h-4 mr-2" />
+                    Create Song
+                  </>
+                )}
               </Button>
             )}
           </div>
@@ -190,8 +220,8 @@ function SongInfoStep({
           type="text"
           className="w-full px-5 py-3.5 rounded-lg border-2 border-border bg-panel text-text-base placeholder:text-text-muted focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-ui"
           placeholder="Enter song title..."
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          value={formData.title}
+          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
         />
       </div>
 
@@ -245,7 +275,7 @@ function ReviewStep({ formData }: { formData: any }) {
         <dl className="grid grid-cols-2 gap-6">
           <div>
             <dt className="text-sm font-medium text-text-muted mb-2">Title</dt>
-            <dd className="font-medium text-text-base text-lg">{formData.name || 'Not set'}</dd>
+            <dd className="font-medium text-text-base text-lg">{formData.title || 'Not set'}</dd>
           </div>
           <div>
             <dt className="text-sm font-medium text-text-muted mb-2">Genre</dt>
@@ -260,8 +290,8 @@ function ReviewStep({ formData }: { formData: any }) {
 
       <div className="bg-info/10 border-2 border-info/30 rounded-xl p-6">
         <p className="text-sm text-text-base leading-relaxed">
-          Note: Style, Lyrics, Persona, and Producer Notes editors are coming soon.
-          You'll be able to define these entities in future steps.
+          Note: The song will be created as a draft. You can add Style, Lyrics, Persona, and Producer Notes
+          after creation by editing the song. Full entity editors will be integrated into this wizard in a future update.
         </p>
       </div>
     </div>
