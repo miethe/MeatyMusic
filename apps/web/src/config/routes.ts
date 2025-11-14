@@ -46,6 +46,7 @@ export const ROUTES = {
     PRODUCER_NOTE_DETAIL: (id: string) => `/entities/producer-notes/${id}`,
 
     BLUEPRINTS: '/entities/blueprints',
+    BLUEPRINT_NEW: '/entities/blueprints/new',
     BLUEPRINT_DETAIL: (id: string) => `/entities/blueprints/${id}`,
 
     SOURCES: '/entities/sources',
