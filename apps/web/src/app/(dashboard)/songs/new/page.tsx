@@ -16,7 +16,13 @@ import { PersonaEditor } from '@/components/entities/PersonaEditor';
 import { ProducerNotesEditor } from '@/components/entities/ProducerNotesEditor';
 import { ROUTES } from '@/config/routes';
 import { useCreateSong } from '@/hooks/api/useSongs';
-import { SongCreate, StyleCreate, LyricsCreate, PersonaCreate, ProducerNotesCreate } from '@/types/api/entities';
+import { useCreateStyle } from '@/hooks/api/useStyles';
+import { useCreateLyrics } from '@/hooks/api/useLyrics';
+import { useCreatePersona } from '@/hooks/api/usePersonas';
+import { useCreateProducerNotes } from '@/hooks/api/useProducerNotes';
+import { useUIStore } from '@/stores';
+import { songsApi } from '@/lib/api';
+import { SongCreate, StyleCreate, LyricsCreate, PersonaCreate, ProducerNotesCreate, UUID } from '@/types/api/entities';
 import {
   ChevronLeft,
   ChevronRight,
@@ -59,9 +65,218 @@ interface WizardFormData {
   producerNotes: Partial<ProducerNotesCreate> | null;
 }
 
+/**
+ * Progress state for submission tracking
+ */
+interface SubmissionProgress {
+  current: number;
+  total: number;
+  action: string;
+}
+
+/**
+ * useWizardSubmission Hook
+ * Orchestrates sequential creation of Song and all provided entities
+ * Handles dependencies (Lyrics and ProducerNotes require song_id)
+ *
+ * Sequential order of operations:
+ * 1. Create Song → get song.id
+ * 2. Create Style (if provided) → get style.id
+ * 3. Create Persona (if provided) → get persona.id
+ * 4. Create Lyrics with song_id (if provided)
+ * 5. Create ProducerNotes with song_id (if provided)
+ * 6. Update Song with style_id and persona_id references
+ */
+function useWizardSubmission() {
+  const createSong = useCreateSong();
+  const createStyle = useCreateStyle();
+  const createLyrics = useCreateLyrics();
+  const createPersona = useCreatePersona();
+  const createProducerNotes = useCreateProducerNotes();
+  const { addToast } = useUIStore();
+
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [progress, setProgress] = React.useState<SubmissionProgress>({ current: 0, total: 0, action: '' });
+
+  const submitWizard = React.useCallback(
+    async (formData: WizardFormData): Promise<string> => {
+      try {
+        setIsSubmitting(true);
+
+        // Calculate total steps dynamically based on what's provided
+        let totalSteps = 1; // Always create song
+        if (formData.style) totalSteps++;
+        if (formData.persona) totalSteps++;
+        if (formData.lyrics) totalSteps++;
+        if (formData.producerNotes) totalSteps++;
+        // Only count final update step if we have entities to link
+        if (formData.style || formData.persona) totalSteps++;
+
+        let currentStep = 1;
+
+        // Step 1: Create Song
+        setProgress({ current: currentStep, total: totalSteps, action: 'Creating song...' });
+        const songData: SongCreate = {
+          title: formData.song.title,
+          global_seed: formData.song.global_seed,
+          sds_version: formData.song.sds_version,
+          extra_metadata: {
+            description: formData.song.description,
+            genre: formData.song.genre,
+            mood: formData.song.mood,
+          },
+        };
+
+        const createdSong = await createSong.mutateAsync(songData);
+        const songId = createdSong.id;
+        currentStep++;
+
+        // Step 2: Create Style (if provided)
+        let styleId: UUID | undefined;
+        if (formData.style) {
+          setProgress({ current: currentStep, total: totalSteps, action: 'Creating style...' });
+          const styleData: StyleCreate = {
+            name: formData.style.name || 'Unnamed Style',
+            genre: formData.style.genre || 'Unknown',
+            ...formData.style,
+          };
+          const createdStyle = await createStyle.mutateAsync(styleData);
+          styleId = createdStyle.id;
+          currentStep++;
+        }
+
+        // Step 3: Create Persona (if provided)
+        let personaId: UUID | undefined;
+        if (formData.persona) {
+          setProgress({ current: currentStep, total: totalSteps, action: 'Creating persona...' });
+          const personaData: PersonaCreate = {
+            name: formData.persona.name || 'Unnamed Persona',
+            ...formData.persona,
+          };
+          const createdPersona = await createPersona.mutateAsync(personaData);
+          personaId = createdPersona.id;
+          currentStep++;
+        }
+
+        // Step 4: Create Lyrics (if provided)
+        // Critical: Lyrics require the actual created song_id, not a temporary one
+        if (formData.lyrics) {
+          setProgress({ current: currentStep, total: totalSteps, action: 'Creating lyrics...' });
+          const lyricsData: LyricsCreate = {
+            song_id: songId, // Inject the actual song ID here
+            sections: formData.lyrics.sections || [],
+            section_order: formData.lyrics.section_order || [],
+            ...formData.lyrics,
+          };
+          await createLyrics.mutateAsync(lyricsData);
+          currentStep++;
+        }
+
+        // Step 5: Create ProducerNotes (if provided)
+        // Critical: ProducerNotes require the actual created song_id, not a temporary one
+        if (formData.producerNotes) {
+          setProgress({ current: currentStep, total: totalSteps, action: 'Creating producer notes...' });
+          const producerNotesData: ProducerNotesCreate = {
+            song_id: songId, // Inject the actual song ID here
+            structure: formData.producerNotes.structure || '',
+            hooks: formData.producerNotes.hooks || 1,
+            ...formData.producerNotes,
+          };
+          await createProducerNotes.mutateAsync(producerNotesData);
+          currentStep++;
+        }
+
+        // Step 6: Update Song with entity references (if any entities were created)
+        // Use API directly to avoid hook call restrictions
+        if (styleId || personaId) {
+          setProgress({ current: currentStep, total: totalSteps, action: 'Linking entities...' });
+          await songsApi.update(songId, {
+            ...(styleId && { style_id: styleId }),
+            ...(personaId && { persona_id: personaId }),
+          });
+          currentStep++;
+        }
+
+        setProgress({ current: totalSteps, total: totalSteps, action: 'Complete!' });
+        addToast('Song created successfully with all entities!', 'success');
+
+        return songId;
+      } catch (error) {
+        console.error('Failed to create song:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Failed to create song and entities';
+        addToast(errorMessage, 'error');
+        throw error;
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [createSong, createStyle, createLyrics, createPersona, createProducerNotes, addToast]
+  );
+
+  return {
+    submitWizard,
+    isSubmitting,
+    progress,
+  };
+}
+
+/**
+ * SubmissionProgressModal Component
+ * Displays progress during multi-entity submission
+ * Shows animated progress bar, current step, and total steps
+ */
+function SubmissionProgressModal({
+  progress,
+  isOpen,
+}: {
+  progress: SubmissionProgress;
+  isOpen: boolean;
+}) {
+  if (!isOpen) return null;
+
+  const percentage = progress.total > 0 ? (progress.current / progress.total) * 100 : 0;
+
+  return (
+    <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-50">
+      <Card className="p-8 max-w-md w-full mx-4 shadow-xl">
+        <div className="flex flex-col items-center">
+          <div className="mb-6">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+          <h3 className="font-semibold text-lg text-text-strong mb-4 text-center">Creating Song...</h3>
+          <div className="w-full space-y-4">
+            {/* Progress Bar */}
+            <div className="space-y-2">
+              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-primary transition-all duration-300 ease-out"
+                  style={{ width: `${percentage}%` }}
+                />
+              </div>
+              <p className="text-xs text-text-muted text-center font-mono">
+                {percentage.toFixed(0)}%
+              </p>
+            </div>
+
+            {/* Current Action */}
+            <div className="text-center">
+              <p className="text-sm font-medium text-text-base">{progress.action}</p>
+              <p className="text-xs text-text-muted mt-1">
+                Step {progress.current} of {progress.total}
+              </p>
+            </div>
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
 export default function NewSongPage() {
   const router = useRouter();
+  const { submitWizard, isSubmitting: wizardIsSubmitting, progress } = useWizardSubmission();
   const createSong = useCreateSong();
+
   const [currentStep, setCurrentStep] = React.useState(0);
   const [completedSteps, setCompletedSteps] = React.useState<Set<number>>(new Set([0])); // Step 0 is always completed
   const [skippedSteps, setSkippedSteps] = React.useState<Set<number>>(new Set());
@@ -286,28 +501,23 @@ export default function NewSongPage() {
     setCurrentStep(stepIndex);
   };
 
+  /**
+   * Handle final submission - orchestrate multi-entity creation
+   * On success, navigates to the created song's detail page
+   */
   const handleSubmit = async () => {
     try {
-      const songData = {
-        title: formData.song.title,
-        global_seed: formData.song.global_seed,
-        sds_version: formData.song.sds_version,
-        extra_metadata: {
-          description: formData.song.description,
-          genre: formData.song.genre,
-          mood: formData.song.mood,
-        },
-      };
-
-      await createSong.mutateAsync(songData);
-      router.push(ROUTES.SONGS);
+      const songId = await submitWizard(formData);
+      // Navigate to the created song's detail page
+      router.push(ROUTES.SONG_DETAIL(songId));
     } catch (error) {
-      console.error('Failed to create song:', error);
-      // Error toast is handled by the mutation hook
+      // Error handling is done in the hook via toast notifications
+      console.error('Submission failed:', error);
     }
   };
 
   const currentStepConfig = WIZARD_STEPS[currentStep];
+  const isSubmitting = wizardIsSubmitting || createSong.isPending;
 
   return (
     <div className="min-h-screen">
@@ -430,13 +640,13 @@ export default function NewSongPage() {
         {/* Navigation */}
         {![1, 2, 3, 4].includes(currentStep) && (
           <div className="flex items-center justify-between">
-            <Button variant="outline" onClick={handleCancel} className="px-6 py-3">
+            <Button variant="outline" onClick={handleCancel} className="px-6 py-3" disabled={isSubmitting}>
               Cancel
             </Button>
 
             <div className="flex items-center gap-3">
               {currentStep > 0 && (
-                <Button variant="outline" onClick={handlePrevious} className="px-6 py-3">
+                <Button variant="outline" onClick={handlePrevious} className="px-6 py-3" disabled={isSubmitting}>
                   <ChevronLeft className="w-4 h-4 mr-2" />
                   Previous
                 </Button>
@@ -445,7 +655,7 @@ export default function NewSongPage() {
               {currentStep < WIZARD_STEPS.length - 1 ? (
                 <Button
                   onClick={handleNext}
-                  disabled={!canProgress}
+                  disabled={!canProgress || isSubmitting}
                   className="bg-primary text-primaryForeground hover:opacity-90 transition-all duration-ui px-6 py-3"
                 >
                   Next
@@ -454,10 +664,10 @@ export default function NewSongPage() {
               ) : (
                 <Button
                   onClick={handleSubmit}
-                  disabled={!formData.song.title || createSong.isPending}
+                  disabled={!formData.song.title || isSubmitting}
                   className="bg-primary text-primaryForeground hover:opacity-90 transition-all duration-ui px-6 py-3"
                 >
-                  {createSong.isPending ? (
+                  {isSubmitting ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                       Creating...
@@ -477,13 +687,16 @@ export default function NewSongPage() {
         {/* Previous Button for Editor Steps */}
         {[1, 2, 3, 4].includes(currentStep) && currentStep > 0 && (
           <div className="flex justify-start">
-            <Button variant="outline" onClick={handlePrevious} className="px-6 py-3">
+            <Button variant="outline" onClick={handlePrevious} className="px-6 py-3" disabled={isSubmitting}>
               <ChevronLeft className="w-4 h-4 mr-2" />
               Previous
             </Button>
           </div>
         )}
       </div>
+
+      {/* Submission Progress Modal */}
+      <SubmissionProgressModal progress={progress} isOpen={isSubmitting} />
     </div>
   );
 }
