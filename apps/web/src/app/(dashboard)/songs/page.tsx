@@ -36,12 +36,12 @@ export default function SongsPage() {
 
       <div className="container mx-auto px-4 py-8">
         {/* Filters Bar */}
-        <div className="mb-6 flex items-center gap-4">
+        <div className="mb-6 flex items-center gap-4 animate-fade-in">
           <div className="flex-1">
             <input
               type="search"
               placeholder="Search songs..."
-              className="w-full px-4 py-2 rounded-lg border bg-background"
+              className="w-full px-4 py-2 rounded-lg border border-border-default bg-bg-elevated text-text-primary placeholder:text-text-muted focus:border-border-accent focus:ring-2 focus:ring-primary-500/20 transition-all duration-ui"
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);

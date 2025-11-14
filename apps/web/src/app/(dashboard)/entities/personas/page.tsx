@@ -29,14 +29,14 @@ export default function PersonasPage() {
       />
 
       <div className="container mx-auto px-4 py-8">
-        <Card className="p-12 text-center">
-          <User className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium mb-2">No personas yet</h3>
-          <p className="text-muted-foreground mb-6">
+        <Card className="bg-bg-surface border-border-default shadow-elevation-1 p-12 text-center animate-fade-in">
+          <User className="w-16 h-16 mx-auto text-text-muted mb-4" />
+          <h3 className="text-lg font-medium text-text-primary mb-2">No personas yet</h3>
+          <p className="text-text-secondary mb-6">
             Define artist personas with vocal range, delivery style, and influences
           </p>
           <Link href={ROUTES.ENTITIES.PERSONA_NEW}>
-            <Button>
+            <Button className="bg-gradient-primary shadow-accent-glow hover:shadow-accent-glow-lg transition-all duration-ui">
               <Plus className="w-4 h-4 mr-2" />
               Create First Persona
             </Button>

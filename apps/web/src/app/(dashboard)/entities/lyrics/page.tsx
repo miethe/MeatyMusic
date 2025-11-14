@@ -29,14 +29,14 @@ export default function LyricsPage() {
       />
 
       <div className="container mx-auto px-4 py-8">
-        <Card className="p-12 text-center">
-          <FileText className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium mb-2">No lyrics yet</h3>
-          <p className="text-muted-foreground mb-6">
+        <Card className="bg-bg-surface border-border-default shadow-elevation-1 p-12 text-center animate-fade-in">
+          <FileText className="w-16 h-16 mx-auto text-text-muted mb-4" />
+          <h3 className="text-lg font-medium text-text-primary mb-2">No lyrics yet</h3>
+          <p className="text-text-secondary mb-6">
             Create lyric specifications with sections, rhyme schemes, and structure
           </p>
           <Link href={ROUTES.ENTITIES.LYRICS_NEW}>
-            <Button>
+            <Button className="bg-gradient-primary shadow-accent-glow hover:shadow-accent-glow-lg transition-all duration-ui">
               <Plus className="w-4 h-4 mr-2" />
               Create First Lyrics
             </Button>
