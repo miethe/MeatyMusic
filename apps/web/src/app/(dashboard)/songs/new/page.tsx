@@ -1,6 +1,6 @@
 /**
  * New Song Page
- * Multi-step wizard for creating a new song
+ * Multi-step wizard for creating a new song with support for all entity types
  */
 
 'use client';
@@ -12,6 +12,7 @@ import { Card } from '@meatymusic/ui';
 import { Button } from '@meatymusic/ui';
 import { ROUTES } from '@/config/routes';
 import { useCreateSong } from '@/hooks/api/useSongs';
+import { SongCreate, StyleCreate, LyricsCreate, PersonaCreate, ProducerNotesCreate } from '@/types/api/entities';
 import {
   ChevronLeft,
   ChevronRight,
@@ -34,17 +35,109 @@ const WIZARD_STEPS = [
   { id: 'review', label: 'Review', icon: Eye },
 ] as const;
 
+/**
+ * WizardFormData interface for multi-entity song creation
+ * Extends basic song data with optional Style, Lyrics, Persona, and ProducerNotes
+ */
+interface WizardFormData {
+  song: {
+    title: string;
+    description: string;
+    genre: string;
+    mood: string[];
+    global_seed: number;
+    sds_version: string;
+  };
+  style: Partial<StyleCreate> | null;
+  lyrics: Partial<LyricsCreate> | null;
+  persona: Partial<PersonaCreate> | null;
+  producerNotes: Partial<ProducerNotesCreate> | null;
+}
+
 export default function NewSongPage() {
   const router = useRouter();
   const createSong = useCreateSong();
   const [currentStep, setCurrentStep] = React.useState(0);
-  const [formData, setFormData] = React.useState({
-    title: '',
-    description: '',
-    genre: '',
-    mood: [] as string[],
-    global_seed: Date.now(), // Default to current timestamp for determinism
+  const [formData, setFormData] = React.useState<WizardFormData>({
+    song: {
+      title: '',
+      description: '',
+      genre: '',
+      mood: [] as string[],
+      global_seed: Date.now(), // Default to current timestamp for determinism
+      sds_version: '1.0.0',
+    },
+    style: null,
+    lyrics: null,
+    persona: null,
+    producerNotes: null,
   });
+
+  /**
+   * Helper function to update song data
+   * Uses functional state update to avoid stale closures
+   */
+  const updateSongData = React.useCallback((updates: Partial<WizardFormData['song']>) => {
+    setFormData((prev: WizardFormData) => ({
+      ...prev,
+      song: { ...prev.song, ...updates },
+    }));
+  }, []);
+
+  /**
+   * Helper function to update style data
+   */
+  const updateStyleData = React.useCallback((style: Partial<StyleCreate> | null) => {
+    setFormData((prev: WizardFormData) => ({
+      ...prev,
+      style,
+    }));
+  }, []);
+
+  /**
+   * Helper function to update lyrics data
+   */
+  const updateLyricsData = React.useCallback((lyrics: Partial<LyricsCreate> | null) => {
+    setFormData((prev: WizardFormData) => ({
+      ...prev,
+      lyrics,
+    }));
+  }, []);
+
+  /**
+   * Helper function to update persona data
+   */
+  const updatePersonaData = React.useCallback((persona: Partial<PersonaCreate> | null) => {
+    setFormData((prev: WizardFormData) => ({
+      ...prev,
+      persona,
+    }));
+  }, []);
+
+  /**
+   * Helper function to update producer notes data
+   */
+  const updateProducerNotesData = React.useCallback((notes: Partial<ProducerNotesCreate> | null) => {
+    setFormData((prev: WizardFormData) => ({
+      ...prev,
+      producerNotes: notes,
+    }));
+  }, []);
+
+  /**
+   * Validation logic to determine if user can progress to next step
+   * Step 0: Require title
+   * Steps 1-4: Optional (always allow progression)
+   * Step 5: Review (always allow)
+   */
+  const canProgress = React.useMemo(() => {
+    if (currentStep === 0) {
+      // Step 0 (Song Info): Require title
+      return formData.song.title.trim().length > 0;
+    }
+    // All other steps: optional
+    return true;
+  }, [currentStep, formData.song.title]);
 
   const handleNext = () => {
     if (currentStep < WIZARD_STEPS.length - 1) {
@@ -65,17 +158,17 @@ export default function NewSongPage() {
   const handleSubmit = async () => {
     try {
       const songData = {
-        title: formData.title,
-        global_seed: formData.global_seed,
-        sds_version: '1.0.0',
+        title: formData.song.title,
+        global_seed: formData.song.global_seed,
+        sds_version: formData.song.sds_version,
         extra_metadata: {
-          description: formData.description,
-          genre: formData.genre,
-          mood: formData.mood,
+          description: formData.song.description,
+          genre: formData.song.genre,
+          mood: formData.song.mood,
         },
       };
 
-      const newSong = await createSong.mutateAsync(songData);
+      await createSong.mutateAsync(songData);
       router.push(ROUTES.SONGS);
     } catch (error) {
       console.error('Failed to create song:', error);
@@ -147,7 +240,7 @@ export default function NewSongPage() {
           <h2 className="text-2xl font-semibold text-text-strong mb-8">{currentStepConfig?.label}</h2>
 
           {currentStep === 0 && (
-            <SongInfoStep formData={formData} setFormData={setFormData} />
+            <SongInfoStep formData={formData} updateSongData={updateSongData} />
           )}
           {currentStep === 1 && <div className="py-16 text-center text-text-muted">Style editor coming soon</div>}
           {currentStep === 2 && <div className="py-16 text-center text-text-muted">Lyrics editor coming soon</div>}
@@ -173,7 +266,7 @@ export default function NewSongPage() {
             {currentStep < WIZARD_STEPS.length - 1 ? (
               <Button
                 onClick={handleNext}
-                disabled={currentStep === 0 && !formData.title}
+                disabled={!canProgress}
                 className="bg-primary text-primaryForeground hover:opacity-90 transition-all duration-ui px-6 py-3"
               >
                 Next
@@ -182,7 +275,7 @@ export default function NewSongPage() {
             ) : (
               <Button
                 onClick={handleSubmit}
-                disabled={!formData.title || createSong.isPending}
+                disabled={!formData.song.title || createSong.isPending}
                 className="bg-primary text-primaryForeground hover:opacity-90 transition-all duration-ui px-6 py-3"
               >
                 {createSong.isPending ? (
@@ -205,13 +298,12 @@ export default function NewSongPage() {
   );
 }
 
-function SongInfoStep({
-  formData,
-  setFormData,
-}: {
-  formData: any;
-  setFormData: (data: any) => void;
-}) {
+interface SongInfoStepProps {
+  formData: WizardFormData;
+  updateSongData: (updates: Partial<WizardFormData['song']>) => void;
+}
+
+function SongInfoStep({ formData, updateSongData }: SongInfoStepProps) {
   return (
     <div className="space-y-8">
       <div>
@@ -220,8 +312,8 @@ function SongInfoStep({
           type="text"
           className="w-full px-5 py-3.5 rounded-lg border-2 border-border bg-panel text-text-base placeholder:text-text-muted focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-ui"
           placeholder="Enter song title..."
-          value={formData.title}
-          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+          value={formData.song.title}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateSongData({ title: e.target.value })}
         />
       </div>
 
@@ -231,8 +323,8 @@ function SongInfoStep({
           className="w-full px-5 py-3.5 rounded-lg border-2 border-border bg-panel text-text-base placeholder:text-text-muted focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-ui resize-none"
           rows={5}
           placeholder="Describe your song concept..."
-          value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          value={formData.song.description}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => updateSongData({ description: e.target.value })}
         />
       </div>
 
@@ -241,8 +333,8 @@ function SongInfoStep({
           <label className="block text-sm font-medium text-text-strong mb-3">Genre *</label>
           <select
             className="w-full px-5 py-3.5 rounded-lg border-2 border-border bg-panel text-text-base focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-ui"
-            value={formData.genre}
-            onChange={(e) => setFormData({ ...formData, genre: e.target.value })}
+            value={formData.song.genre}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => updateSongData({ genre: e.target.value })}
           >
             <option value="">Select genre...</option>
             <option value="pop">Pop</option>
@@ -267,7 +359,11 @@ function SongInfoStep({
   );
 }
 
-function ReviewStep({ formData }: { formData: any }) {
+interface ReviewStepProps {
+  formData: WizardFormData;
+}
+
+function ReviewStep({ formData }: ReviewStepProps) {
   return (
     <div className="space-y-8">
       <div className="bg-panel border-2 border-border rounded-xl p-8">
@@ -275,15 +371,15 @@ function ReviewStep({ formData }: { formData: any }) {
         <dl className="grid grid-cols-2 gap-6">
           <div>
             <dt className="text-sm font-medium text-text-muted mb-2">Title</dt>
-            <dd className="font-medium text-text-base text-lg">{formData.title || 'Not set'}</dd>
+            <dd className="font-medium text-text-base text-lg">{formData.song.title || 'Not set'}</dd>
           </div>
           <div>
             <dt className="text-sm font-medium text-text-muted mb-2">Genre</dt>
-            <dd className="font-medium text-text-base text-lg">{formData.genre || 'Not set'}</dd>
+            <dd className="font-medium text-text-base text-lg">{formData.song.genre || 'Not set'}</dd>
           </div>
           <div className="col-span-2">
             <dt className="text-sm font-medium text-text-muted mb-2">Description</dt>
-            <dd className="font-medium text-text-base">{formData.description || 'Not set'}</dd>
+            <dd className="font-medium text-text-base">{formData.song.description || 'Not set'}</dd>
           </div>
         </dl>
       </div>
