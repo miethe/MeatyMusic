@@ -582,7 +582,7 @@ export default function NewSongPage() {
                     formData.producerNotes;
 
     if (hasData) {
-      if (confirm('Are you sure? All progress will be lost. You can save drafts to resume later.')) {
+      if (confirm('Are you sure? All progress will be lost. (Your draft is auto-saved and will be available when you return.)')) {
         localStorage.removeItem('song-wizard-draft');
         router.push(ROUTES.SONGS);
       }
