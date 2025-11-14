@@ -18,7 +18,7 @@ This guide provides step-by-step instructions for implementing the MeatyMusic de
 cd /home/user/MeatyMusic
 
 # Install Tailwind plugins
-pnpm add -D @tailwindcss/forms @tailwindcss/typography
+pnpm add -D @tailwindcss/forms
 
 # Install fonts (if using npm packages)
 pnpm add @fontsource/inter @fontsource/jetbrains-mono

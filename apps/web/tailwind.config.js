@@ -10,7 +10,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['var(--font-inter)', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },
       fontSize: {
@@ -73,6 +73,13 @@ module.exports = {
       transitionTimingFunction: {
         'enter': 'cubic-bezier(0, 0, 0.2, 1)',
         'exit': 'cubic-bezier(0.4, 0, 1, 1)',
+      },
+      animationDelay: {
+        '100': '100ms',
+        '200': '200ms',
+        '300': '300ms',
+        '400': '400ms',
+        '500': '500ms',
       },
       backgroundImage: {
         'gradient-primary': 'linear-gradient(135deg, #5b4cfa 0%, #6366f1 100%)',
@@ -182,5 +189,15 @@ module.exports = {
       },
     }
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    function({ addUtilities, theme }) {
+      const animationDelays = theme('animationDelay');
+      const utilities = Object.entries(animationDelays).reduce((acc, [key, value]) => {
+        acc[`.animation-delay-${key}`] = { animationDelay: value };
+        return acc;
+      }, {});
+      addUtilities(utilities);
+    },
+  ],
 }

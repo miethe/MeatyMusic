@@ -102,7 +102,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Quick Actions */}
-          <div className="space-y-6 animate-slide-up" style={{ animationDelay: '100ms' }}>
+          <div className="space-y-6 animate-slide-up animation-delay-100">
             <Card className="p-6 bg-bg-surface border-border-default shadow-elevation-1">
               <h2 className="text-xl font-semibold text-text-primary mb-6">Quick Actions</h2>
               <div className="space-y-3">
@@ -148,7 +148,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Getting Started */}
-        <Card className="p-6 mt-8 bg-bg-surface border-border-default shadow-elevation-1 animate-fade-in" style={{ animationDelay: '200ms' }}>
+        <Card className="p-6 mt-8 bg-bg-surface border-border-default shadow-elevation-1 animate-fade-in animation-delay-200">
           <h2 className="text-xl font-semibold text-text-primary mb-4">Getting Started</h2>
           <div className="grid md:grid-cols-3 gap-6">
             <StepCard
