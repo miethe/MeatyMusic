@@ -381,6 +381,7 @@ export default function NewSongPage() {
         e.returnValue = ''; // Chrome requires returnValue
         return '';
       }
+      return undefined;
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);

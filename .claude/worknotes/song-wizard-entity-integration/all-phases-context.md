@@ -95,7 +95,25 @@ interface EditorProps {
 
 ## Important Learnings
 
-(To be populated as development proceeds)
+### State Management
+- **Set serialization**: When persisting state with Sets to localStorage, convert to arrays (`Array.from(set)`) on save and restore with `new Set(array)`
+- **Functional state updates**: Always use functional form of setState to avoid stale closures, especially with nested updates
+- **Temporary IDs**: Use placeholder values like "wizard-temp-id" for required props in editors, then inject actual IDs during submission
+
+### Entity Integration Pattern
+- **No editor modifications**: All entity editors were integrated without any changes to their source code
+- **Consistent handler pattern**: Each editor needs save + cancel handlers that update state, mark step status, and advance
+- **Hide wizard navigation**: Editor steps should hide wizard navigation buttons since editors have built-in Save/Cancel
+
+### Sequential Submission
+- **Dependency order matters**: Song must be created first, then Style/Persona (standalone), then Lyrics/ProducerNotes (require song_id)
+- **Dynamic step counting**: Calculate total steps based on which entities are provided for accurate progress tracking
+- **Direct API access**: Use direct API imports (songsApi) instead of hooks when needing more control in async workflows
+
+### UX Polish
+- **Draft persistence**: Auto-save to localStorage provides excellent UX, but handle edge cases (quota full, corrupted JSON, private browsing)
+- **Validation summary**: Color-coded summary (destructive/warning/success) helps users understand completion status before submission
+- **beforeunload**: Essential for preventing data loss during submission, works across browsers with both preventDefault and returnValue
 
 ---
 
