@@ -694,7 +694,7 @@ export default function NewSongPage() {
                   {index < WIZARD_STEPS.length - 1 && (
                     <div
                       className={`flex-1 h-1 mx-4 rounded transition-colors duration-ui ${
-                        isCompleted ? 'bg-success' : isPending || isSkipped ? 'bg-border' : 'bg-border'
+                        isCompleted ? 'bg-success' : 'bg-border'
                       }`}
                     />
                   )}
