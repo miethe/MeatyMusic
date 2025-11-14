@@ -3,7 +3,15 @@
 **Plan:** docs/project_plans/implementation_plans/backend-entity-services-v1.md
 **Started:** 2025-11-14
 **Last Updated:** 2025-11-14
-**Status:** In Progress
+**Status:** In Progress - Critical Bug Fixed
+
+## ⚠️ CRITICAL FIX APPLIED (2025-11-14)
+
+**Issue**: Services were awaiting synchronous repository methods
+**Impact**: Would cause `TypeError: object is not awaitable` at runtime
+**Fix**: Removed all `await` from repo calls, changed AsyncSession → Session
+**Files Fixed**: 5 service files (base, lyrics, persona, producer_notes, source)
+**Commit**: 9f71698 - "fix(services): resolve critical sync/async mismatch"
 
 ---
 
