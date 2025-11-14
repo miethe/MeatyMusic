@@ -1,0 +1,62 @@
+[
+  {
+    "tag_a": "whisper",
+    "tag_b": "anthemic",
+    "reason": "vocal intensity contradiction",
+    "category": "vocal_style"
+  },
+  {
+    "tag_a": "upbeat",
+    "tag_b": "melancholic",
+    "reason": "mood contradiction",
+    "category": "mood"
+  },
+  {
+    "tag_a": "happy",
+    "tag_b": "sad",
+    "reason": "emotional contradiction",
+    "category": "mood"
+  },
+  {
+    "tag_a": "energetic",
+    "tag_b": "calm",
+    "reason": "energy level contradiction",
+    "category": "energy"
+  },
+  {
+    "tag_a": "acoustic",
+    "tag_b": "heavy synth",
+    "reason": "instrumentation conflict",
+    "category": "instrumentation"
+  },
+  {
+    "tag_a": "fast tempo",
+    "tag_b": "slow tempo",
+    "reason": "tempo contradiction",
+    "category": "tempo"
+  },
+  {
+    "tag_a": "aggressive",
+    "tag_b": "gentle",
+    "reason": "intensity contradiction",
+    "category": "intensity"
+  },
+  {
+    "tag_a": "distorted",
+    "tag_b": "clean",
+    "reason": "production style conflict",
+    "category": "production"
+  },
+  {
+    "tag_a": "minimal",
+    "tag_b": "orchestral",
+    "reason": "arrangement complexity conflict",
+    "category": "arrangement"
+  },
+  {
+    "tag_a": "lo-fi",
+    "tag_b": "hi-fi",
+    "reason": "production quality conflict",
+    "category": "production"
+  }
+]
