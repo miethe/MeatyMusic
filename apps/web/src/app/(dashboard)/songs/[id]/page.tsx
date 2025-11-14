@@ -87,10 +87,10 @@ export default function SongDetailPage() {
   }
 
   // Extract metadata from extra_metadata
-  const metadata = song.extra_metadata || {};
-  const description = metadata.description || 'No description';
-  const genre = metadata.genre || 'Unknown';
-  const mood = metadata.mood || [];
+  const metadata = (song.extra_metadata || {}) as Record<string, any>;
+  const description = String(metadata.description || 'No description');
+  const genre = String(metadata.genre || 'Unknown');
+  const mood = Array.isArray(metadata.mood) ? metadata.mood : [];
 
   return (
     <div className="min-h-screen">
