@@ -1,3 +1,30 @@
+import {
+  useEntitiesStore,
+  useStyles,
+  useStyleIds,
+  useStyleById,
+  useSelectedStyleId,
+  useRecentStyles,
+  useLyrics,
+  useLyricsIds,
+  useLyricsById,
+  useSelectedLyricsId,
+  useRecentLyrics,
+  usePersonas,
+  usePersonaIds,
+  usePersonaById,
+  useSelectedPersonaId,
+  useRecentPersonas,
+  useProducerNotes,
+  useProducerNotesIds,
+  useProducerNotesById,
+  useSources,
+  useSourceIds,
+  useSourceById,
+  useEntityLoading,
+  useEntityError,
+  useEntityMetadata,
+} from './stores/entitiesStore';
 import { useOnboardingStore } from './stores/onboardingStore';
 import { usePreferencesStore } from './stores/preferencesStore';
 import {
@@ -44,6 +71,7 @@ export {
   usePreferencesStore,
   useSongsStore,
   useWorkflowsStore,
+  useEntitiesStore,
 };
 
 export type {
@@ -95,6 +123,40 @@ export {
   useRunArtifacts,
   useIsRunCancelled,
   useRetryingNode,
+};
+
+// Entities selectors
+export {
+  // Styles
+  useStyles,
+  useStyleIds,
+  useStyleById,
+  useSelectedStyleId,
+  useRecentStyles,
+  // Lyrics
+  useLyrics,
+  useLyricsIds,
+  useLyricsById,
+  useSelectedLyricsId,
+  useRecentLyrics,
+  // Personas
+  usePersonas,
+  usePersonaIds,
+  usePersonaById,
+  useSelectedPersonaId,
+  useRecentPersonas,
+  // Producer Notes
+  useProducerNotes,
+  useProducerNotesIds,
+  useProducerNotesById,
+  // Sources
+  useSources,
+  useSourceIds,
+  useSourceById,
+  // Generic entity utilities
+  useEntityLoading,
+  useEntityError,
+  useEntityMetadata,
 };
 
 // ============================================================================
