@@ -1,4 +1,5 @@
 import type { StateCreator } from 'zustand';
+
 import { debounce } from '../utils';
 
 export const createLocalStorageMiddleware = <T extends object>(

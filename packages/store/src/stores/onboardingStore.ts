@@ -1,8 +1,9 @@
 import { create, type StateCreator } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import type { OnboardingStore } from '../types';
-import { createLocalStorageMiddleware } from '../middleware/localStorageMiddleware';
+
 import { createApiSyncMiddleware } from '../middleware/apiSyncMiddleware';
+import { createLocalStorageMiddleware } from '../middleware/localStorageMiddleware';
+import type { OnboardingStore } from '../types';
 
 const creator: StateCreator<OnboardingStore> = (set) => ({
   isActive: false,

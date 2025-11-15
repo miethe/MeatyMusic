@@ -1,4 +1,5 @@
 import type { StateCreator } from 'zustand';
+
 import { sleep } from '../utils';
 
 interface ApiSyncOptions {
