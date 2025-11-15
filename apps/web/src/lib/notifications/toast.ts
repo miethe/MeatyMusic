@@ -18,18 +18,18 @@ import { toast as sonnerToast, type ExternalToast } from 'sonner';
  * Toast Options
  * Extended options for toast notifications
  */
-export interface ToastOptions extends ExternalToast {
+export interface ToastOptions extends Omit<ExternalToast, 'action' | 'cancel'> {
   /** Duration in milliseconds (default varies by type) */
   duration?: number;
   /** Action button */
   action?: {
     label: string;
-    onClick: () => void;
+    onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   };
   /** Cancel button */
   cancel?: {
     label: string;
-    onClick?: () => void;
+    onClick?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   };
 }
 
@@ -46,7 +46,7 @@ export const toast = {
     return sonnerToast.success(message, {
       duration: 3000,
       ...options,
-    });
+    } as ExternalToast);
   },
 
   /**
@@ -57,7 +57,7 @@ export const toast = {
     return sonnerToast.error(message, {
       duration: 5000,
       ...options,
-    });
+    } as ExternalToast);
   },
 
   /**
@@ -68,7 +68,7 @@ export const toast = {
     return sonnerToast.warning(message, {
       duration: 4000,
       ...options,
-    });
+    } as ExternalToast);
   },
 
   /**
@@ -79,7 +79,7 @@ export const toast = {
     return sonnerToast.info(message, {
       duration: 3000,
       ...options,
-    });
+    } as ExternalToast);
   },
 
   /**
@@ -87,7 +87,7 @@ export const toast = {
    * No auto-dismiss - must be manually dismissed
    */
   loading: (message: string, options?: ToastOptions) => {
-    return sonnerToast.loading(message, options);
+    return sonnerToast.loading(message, options as ExternalToast);
   },
 
   /**
@@ -113,7 +113,7 @@ export const toast = {
     return sonnerToast(message, {
       duration: 3000,
       ...options,
-    });
+    } as ExternalToast);
   },
 
   /**

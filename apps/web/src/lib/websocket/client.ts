@@ -158,7 +158,7 @@ export class WebSocketClient {
       return;
     }
 
-    this.log('Connecting to', this.config.url);
+    this.log('Connecting to WebSocket', { url: this.config.url });
     this.setConnectionState(ConnectionState.CONNECTING);
 
     try {
@@ -278,7 +278,7 @@ export class WebSocketClient {
   /**
    * Listen to connection events
    */
-  public on(event: ConnectionEvent, callback: ConnectionEventCallback): Unsubscribe {
+  public on(_event: ConnectionEvent, callback: ConnectionEventCallback): Unsubscribe {
     const listenerId = uuidv4();
     this.state.connectionListeners.set(listenerId, callback);
 
@@ -392,10 +392,10 @@ export class WebSocketClient {
   /**
    * Handle WebSocket error event
    */
-  private handleError = (event: Event): void => {
+  private handleError = (_event: Event): void => {
     const error = new Error('WebSocket error');
     this.state.lastError = error;
-    this.log('WebSocket error', { event });
+    this.log('WebSocket error');
 
     this.emitConnectionEvent(ConnectionEvent.ERROR, {
       type: ConnectionEvent.ERROR,
@@ -557,7 +557,8 @@ export class WebSocketClient {
   /**
    * Queue message for later delivery (offline scenario)
    */
-  private queueMessage(event: WorkflowEvent): void {
+  // @ts-ignore - Reserved for future offline message queuing
+  private _queueMessage(event: WorkflowEvent): void {
     // Check queue size limit
     if (this.state.messageQueue.length >= this.config.maxQueueSize) {
       // Remove oldest message

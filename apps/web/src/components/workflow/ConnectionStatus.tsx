@@ -16,7 +16,7 @@
 
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-import { Badge, Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@meatymusic/ui';
+import { Badge, Button, Tooltip, TooltipProvider } from '@meatymusic/ui';
 import { useWebSocketStatus } from '@/hooks/useWebSocketStatus';
 import { ConnectionState, getWebSocketClient } from '@/lib/websocket';
 import { Wifi, WifiOff, RefreshCw, AlertCircle } from 'lucide-react';
@@ -91,9 +91,10 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
       }, 1000);
 
       return () => clearInterval(interval);
-    } else {
-      setReconnectCountdown(0);
     }
+
+    setReconnectCountdown(0);
+    return undefined;
   }, [status.state, status.reconnectAttempt]);
 
   /**
@@ -108,7 +109,16 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
   /**
    * Get state display config
    */
-  const getStateConfig = React.useCallback(() => {
+  const getStateConfig = React.useCallback((): {
+    label: string;
+    icon: typeof Wifi;
+    color: string;
+    bgColor: string;
+    borderColor: string;
+    pulse: boolean;
+    spin?: boolean;
+    showError: boolean;
+  } => {
     switch (status.state) {
       case ConnectionState.CONNECTED:
         return {
@@ -212,14 +222,15 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
     if (config.showError && status.error) {
       return (
         <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>{content}</TooltipTrigger>
-            <TooltipContent>
+          <Tooltip
+            content={
               <div className="max-w-xs">
                 <p className="font-semibold text-sm mb-1">{config.label}</p>
                 <p className="text-xs text-text-secondary">{status.error.message}</p>
               </div>
-            </TooltipContent>
+            }
+          >
+            {content}
           </Tooltip>
         </TooltipProvider>
       );
@@ -257,14 +268,15 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
     if (config.showError && status.error) {
       return (
         <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>{content}</TooltipTrigger>
-            <TooltipContent>
+          <Tooltip
+            content={
               <div className="max-w-xs">
                 <p className="font-semibold text-sm mb-1">Connection Error</p>
                 <p className="text-xs text-text-secondary">{status.error.message}</p>
               </div>
-            </TooltipContent>
+            }
+          >
+            {content}
           </Tooltip>
         </TooltipProvider>
       );

@@ -219,9 +219,9 @@ export const WorkflowEventLog: React.FC<WorkflowEventLogProps> = ({
           </div>
 
           {/* Node name */}
-          {event.node_name && (
+          {event.node_name != null && (
             <Badge size="sm" variant="outline" className="uppercase font-mono">
-              {event.node_name}
+              {String(event.node_name)}
             </Badge>
           )}
 
@@ -232,7 +232,7 @@ export const WorkflowEventLog: React.FC<WorkflowEventLogProps> = ({
           </Badge>
 
           {/* Duration (for end events) */}
-          {event.phase === 'end' && event.data?.duration_ms && (
+          {event.phase === 'end' && event.data?.duration_ms != null && (
             <span className="text-xs text-text-secondary">
               {Math.round(event.data.duration_ms as number)}ms
             </span>

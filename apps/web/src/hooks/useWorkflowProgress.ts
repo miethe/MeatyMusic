@@ -15,7 +15,6 @@
 
 import { useMemo } from 'react';
 import { useWorkflowEvents } from './useWorkflowEvents';
-import type { WorkflowEvent } from '@/types/api/events';
 import { WorkflowNode } from '@/types/api';
 
 /**
