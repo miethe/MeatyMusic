@@ -46,10 +46,12 @@ export default function SongWorkflowPage() {
         {/* Workflow Status Summary */}
         <div className="mb-8">
           <WorkflowStatus
+            runId="example-run-id"
             status={WorkflowRunStatus.RUNNING}
             currentNode="LYRICS"
             progress={33}
             durationMs={60000}
+            showEventLog={true}
           />
         </div>
 

@@ -14,3 +14,10 @@ export type { NodeDetailsProps } from './NodeDetails';
 
 export { ArtifactPreview } from './ArtifactPreview';
 export type { ArtifactPreviewProps, ArtifactData } from './ArtifactPreview';
+
+// Phase 3: Real-time components
+export { ConnectionStatus } from './ConnectionStatus';
+export type { ConnectionStatusProps } from './ConnectionStatus';
+
+export { WorkflowEventLog } from './WorkflowEventLog';
+export type { WorkflowEventLogProps } from './WorkflowEventLog';
