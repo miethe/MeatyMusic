@@ -11,6 +11,23 @@ import {
   useSongsSelectedId,
   useSongsPagination,
 } from './stores/songsStore';
+import {
+  useWorkflowsStore,
+  useWorkflows,
+  useWorkflowIds,
+  useWorkflowById,
+  useWorkflowsFilters,
+  useWorkflowsSorting,
+  useWorkflowsPagination,
+  useWorkflowsLoading,
+  useWorkflowsError,
+  useActiveRunId,
+  useNodeEvents,
+  useRunScores,
+  useRunArtifacts,
+  useIsRunCancelled,
+  useRetryingNode,
+} from './stores/workflowsStore';
 import type {
   OnboardingState,
   OnboardingStore,
@@ -26,6 +43,7 @@ export {
   useOnboardingStore,
   usePreferencesStore,
   useSongsStore,
+  useWorkflowsStore,
 };
 
 export type {
@@ -59,6 +77,24 @@ export {
   useSongsError,
   useSongsSelectedId,
   useSongsPagination,
+};
+
+// Workflows selectors
+export {
+  useWorkflows,
+  useWorkflowIds,
+  useWorkflowById,
+  useWorkflowsFilters,
+  useWorkflowsSorting,
+  useWorkflowsPagination,
+  useWorkflowsLoading,
+  useWorkflowsError,
+  useActiveRunId,
+  useNodeEvents,
+  useRunScores,
+  useRunArtifacts,
+  useIsRunCancelled,
+  useRetryingNode,
 };
 
 // ============================================================================
