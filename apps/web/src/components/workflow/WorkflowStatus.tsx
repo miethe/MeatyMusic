@@ -3,27 +3,37 @@
  * Real-time workflow status display with node states
  *
  * Shows current workflow execution state, progress, and key metrics.
+ * Enhanced with real-time WebSocket updates via useWorkflowProgress hook.
+ *
+ * Phase 3, Task 3.1
  */
 
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-import { Badge } from '@meatymusic/ui';
-import { Progress } from '@meatymusic/ui';
+import { Badge, Progress, Collapsible, CollapsibleContent, CollapsibleTrigger } from '@meatymusic/ui';
 import { WorkflowRunStatus } from '@/types/api';
+import { useWorkflowProgress } from '@/hooks/useWorkflowProgress';
+import { useWorkflowEvents } from '@/hooks/useWorkflowEvents';
+import { WorkflowEventLog } from './WorkflowEventLog';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 
 export interface WorkflowStatusProps {
-  /** Overall workflow status */
-  status: WorkflowRunStatus;
-  /** Current node being executed */
+  /** Run ID for real-time subscription (NEW: required for real-time updates) */
+  runId: string;
+  /** Overall workflow status (optional: falls back to real-time data) */
+  status?: WorkflowRunStatus;
+  /** Current node being executed (optional: falls back to real-time data) */
   currentNode?: string;
-  /** Workflow progress (0-100) */
+  /** Workflow progress 0-100 (optional: falls back to real-time data) */
   progress?: number;
-  /** Total duration in milliseconds */
+  /** Total duration in milliseconds (optional: calculated from events) */
   durationMs?: number;
-  /** Number of fix iterations */
+  /** Number of fix iterations (optional: from real-time data) */
   fixAttempts?: number;
-  /** Validation scores */
+  /** Validation scores (optional: from real-time data) */
   scores?: Record<string, number>;
+  /** Show event log panel (default: false) */
+  showEventLog?: boolean;
   /** Additional class name */
   className?: string;
 }
@@ -69,14 +79,58 @@ const StatusBadge: React.FC<{ status: WorkflowRunStatus }> = ({ status }) => {
  * Main WorkflowStatus Component
  */
 export const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
-  status,
-  currentNode,
-  progress = 0,
-  durationMs,
-  fixAttempts = 0,
-  scores,
+  runId,
+  status: statusProp,
+  currentNode: currentNodeProp,
+  progress: progressProp,
+  durationMs: durationMsProp,
+  fixAttempts: fixAttemptsProp,
+  scores: scoresProp,
+  showEventLog = false,
   className,
 }) => {
+  // Get real-time progress data
+  const realtimeProgress = useWorkflowProgress(runId);
+  const { events } = useWorkflowEvents(runId);
+  const [isEventLogOpen, setIsEventLogOpen] = React.useState(false);
+
+  // Merge props with real-time data (props take precedence for backward compatibility)
+  const status = statusProp ?? (realtimeProgress.isComplete
+    ? WorkflowRunStatus.COMPLETED
+    : realtimeProgress.isFailed
+    ? WorkflowRunStatus.FAILED
+    : realtimeProgress.isRunning
+    ? WorkflowRunStatus.RUNNING
+    : WorkflowRunStatus.RUNNING);
+
+  const currentNode = currentNodeProp ?? realtimeProgress.currentNode?.toString();
+  const progress = progressProp ?? realtimeProgress.progressPercentage;
+  const scores = scoresProp ?? realtimeProgress.scores;
+
+  // Calculate duration from events
+  const durationMs = React.useMemo(() => {
+    if (durationMsProp !== undefined) return durationMsProp;
+
+    if (events.length === 0) return undefined;
+
+    const firstEvent = events[0];
+    const lastEvent = events[events.length - 1];
+
+    if (!firstEvent || !lastEvent) return undefined;
+
+    const start = new Date(firstEvent.timestamp).getTime();
+    const end = new Date(lastEvent.timestamp).getTime();
+
+    return end - start;
+  }, [durationMsProp, events]);
+
+  // Count fix iterations from events
+  const fixAttempts = React.useMemo(() => {
+    if (fixAttemptsProp !== undefined) return fixAttemptsProp;
+
+    return events.filter((e) => e.node_name === 'FIX' && e.phase === 'end').length;
+  }, [fixAttemptsProp, events]);
+
   // Format duration
   const formatDuration = (ms: number) => {
     const seconds = Math.floor(ms / 1000);
@@ -203,10 +257,42 @@ export const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
             <div>
               <div className="text-sm font-medium text-status-failed mb-1">Workflow Failed</div>
               <div className="text-xs text-text-secondary">
-                Check the node details below for error information
+                {realtimeProgress.issues.length > 0
+                  ? `${realtimeProgress.issues.length} issue${realtimeProgress.issues.length === 1 ? '' : 's'} detected`
+                  : 'Check the event log below for error information'}
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Event Log (collapsible) */}
+      {showEventLog && (
+        <div className="mt-4 pt-4 border-t border-border/10">
+          <Collapsible open={isEventLogOpen} onOpenChange={setIsEventLogOpen}>
+            <CollapsibleTrigger asChild>
+              <button
+                type="button"
+                className="flex items-center justify-between w-full text-sm font-semibold text-text-primary hover:text-text-strong transition-colors"
+                aria-label={isEventLogOpen ? 'Collapse event log' : 'Expand event log'}
+              >
+                <span>Event Log ({events.length})</span>
+                {isEventLogOpen ? (
+                  <ChevronDown className="h-4 w-4 text-text-tertiary" />
+                ) : (
+                  <ChevronRight className="h-4 w-4 text-text-tertiary" />
+                )}
+              </button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-3">
+              <WorkflowEventLog
+                runId={runId}
+                maxEvents={100}
+                showFilters={true}
+                autoScroll={true}
+              />
+            </CollapsibleContent>
+          </Collapsible>
         </div>
       )}
     </div>

@@ -1,0 +1,289 @@
+name: E2E Tests - WebSocket Real-Time Client
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      browser:
+        description: 'Browser to test'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - chromium
+          - firefox
+          - webkit
+          - mobile
+
+jobs:
+  e2e-tests:
+    name: E2E Tests (${{ matrix.browser }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    strategy:
+      fail-fast: false
+      matrix:
+        browser:
+          - chromium
+          - firefox
+          - webkit
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm --filter "./apps/web" exec playwright install --with-deps ${{ matrix.browser }}
+
+      - name: Build web application
+        run: pnpm --filter "./apps/web" build
+        env:
+          NODE_ENV: production
+
+      - name: Run E2E tests
+        run: pnpm --filter "./apps/web" test:e2e --project=${{ matrix.browser }}
+        env:
+          CI: true
+          PLAYWRIGHT_TEST_BASE_URL: http://localhost:3000
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ matrix.browser }}
+          path: apps/web/playwright-report/
+          retention-days: 7
+
+      - name: Upload screenshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-screenshots-${{ matrix.browser }}
+          path: apps/web/test-results/
+          retention-days: 7
+
+  e2e-mobile:
+    name: E2E Tests (Mobile)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    strategy:
+      fail-fast: false
+      matrix:
+        device:
+          - mobile-chrome
+          - mobile-safari
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm --filter "./apps/web" exec playwright install --with-deps chromium webkit
+
+      - name: Build web application
+        run: pnpm --filter "./apps/web" build
+        env:
+          NODE_ENV: production
+
+      - name: Run mobile E2E tests
+        run: pnpm --filter "./apps/web" test:e2e --project=${{ matrix.device }}
+        env:
+          CI: true
+          PLAYWRIGHT_TEST_BASE_URL: http://localhost:3000
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ matrix.device }}
+          path: apps/web/playwright-report/
+          retention-days: 7
+
+  performance-tests:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm --filter "./apps/web" exec playwright install --with-deps chromium
+
+      - name: Build web application
+        run: pnpm --filter "./apps/web" build
+        env:
+          NODE_ENV: production
+
+      - name: Run performance tests
+        run: pnpm --filter "./apps/web" exec playwright test e2e/performance.spec.ts --project=chromium
+        env:
+          CI: true
+          PLAYWRIGHT_TEST_BASE_URL: http://localhost:3000
+
+      - name: Upload performance results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-test-results
+          path: apps/web/playwright-report/
+          retention-days: 14
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm --filter "./apps/web" exec playwright install --with-deps chromium
+
+      - name: Build web application
+        run: pnpm --filter "./apps/web" build
+        env:
+          NODE_ENV: production
+
+      - name: Run integration tests
+        run: pnpm --filter "./apps/web" exec playwright test e2e/integration.spec.ts --project=chromium
+        env:
+          CI: true
+          PLAYWRIGHT_TEST_BASE_URL: http://localhost:3000
+
+      - name: Upload integration results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-results
+          path: apps/web/playwright-report/
+          retention-days: 14
+
+  test-summary:
+    name: Test Summary
+    runs-on: ubuntu-latest
+    needs: [e2e-tests, e2e-mobile, performance-tests, integration-tests]
+    if: always()
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: test-results/
+
+      - name: Generate test summary
+        run: |
+          echo "## E2E Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Test Jobs Status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| E2E Tests | ${{ needs.e2e-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Mobile Tests | ${{ needs.e2e-mobile.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Performance Tests | ${{ needs.performance-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Integration Tests | ${{ needs.integration-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ needs.e2e-tests.result }}" = "success" ] && \
+             [ "${{ needs.e2e-mobile.result }}" = "success" ] && \
+             [ "${{ needs.performance-tests.result }}" = "success" ] && \
+             [ "${{ needs.integration-tests.result }}" = "success" ]; then
+            echo "✅ All E2E tests passed!" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Some E2E tests failed. Please review the artifacts." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const summary = `## E2E Test Results
+
+            | Job | Status |
+            |-----|--------|
+            | E2E Tests | ${{ needs.e2e-tests.result }} |
+            | Mobile Tests | ${{ needs.e2e-mobile.result }} |
+            | Performance Tests | ${{ needs.performance-tests.result }} |
+            | Integration Tests | ${{ needs.integration-tests.result }} |
+
+            ${
+              ('${{ needs.e2e-tests.result }}' === 'success' &&
+               '${{ needs.e2e-mobile.result }}' === 'success' &&
+               '${{ needs.performance-tests.result }}' === 'success' &&
+               '${{ needs.integration-tests.result }}' === 'success')
+                ? '✅ All E2E tests passed!'
+                : '❌ Some E2E tests failed. Please review the artifacts.'
+            }`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            });
