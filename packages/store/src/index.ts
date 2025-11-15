@@ -83,6 +83,7 @@ export {
   createLocalStorageMiddleware,
   createApiSyncMiddleware,
   createQueryIntegrationMiddleware,
+  createMultiTabMiddleware,
 } from './middleware';
 
 export type {
