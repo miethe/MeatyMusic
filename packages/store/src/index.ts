@@ -77,3 +77,17 @@ export type {
   EntitiesActions,
   EntitiesStore,
 } from './types';
+
+// Export middleware
+export {
+  createLocalStorageMiddleware,
+  createApiSyncMiddleware,
+  createQueryIntegrationMiddleware,
+} from './middleware';
+
+export type {
+  MutationHooks,
+  QueryIntegrationState,
+  QueryIntegrationActions,
+  QueryIntegrationStore,
+} from './middleware';
