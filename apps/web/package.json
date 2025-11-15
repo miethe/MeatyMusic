@@ -30,6 +30,7 @@
     "@lexical/rich-text": "^0.17.1",
     "@lexical/table": "^0.38.2",
     "@lexical/utils": "^0.17.1",
+    "@meatymusic/store": "workspace:*",
     "@meatymusic/tokens": "workspace:*",
     "@meatymusic/ui": "workspace:*",
     "@opentelemetry/api": "^1.9.0",

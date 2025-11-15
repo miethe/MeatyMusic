@@ -1,8 +1,9 @@
 import { create, type StateCreator } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import type { PreferencesStore } from '../types';
-import { createLocalStorageMiddleware } from '../middleware/localStorageMiddleware';
+
 import { createApiSyncMiddleware } from '../middleware/apiSyncMiddleware';
+import { createLocalStorageMiddleware } from '../middleware/localStorageMiddleware';
+import type { PreferencesStore } from '../types';
 
 const creator: StateCreator<PreferencesStore> = (set) => ({
   theme: 'light',
