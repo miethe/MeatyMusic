@@ -1,5 +1,16 @@
 import { useOnboardingStore } from './stores/onboardingStore';
 import { usePreferencesStore } from './stores/preferencesStore';
+import {
+  useSongsStore,
+  useSongs,
+  useSongsIds,
+  useSongById,
+  useSongsFilters,
+  useSongsLoading,
+  useSongsError,
+  useSongsSelectedId,
+  useSongsPagination,
+} from './stores/songsStore';
 import type {
   OnboardingState,
   OnboardingStore,
@@ -7,9 +18,14 @@ import type {
   PreferencesStore,
 } from './types';
 
+// ============================================================================
+// Store Exports
+// ============================================================================
+
 export {
   useOnboardingStore,
   usePreferencesStore,
+  useSongsStore,
 };
 
 export type {
@@ -19,12 +35,35 @@ export type {
   PreferencesStore,
 };
 
+// ============================================================================
+// Selector Exports
+// ============================================================================
+
+// Onboarding selectors
 export const useOnboardingState = () =>
   useOnboardingStore((state: OnboardingState) => state);
+
+// Preferences selectors
 export const usePreferences = () =>
   usePreferencesStore((state: PreferencesState) => state);
 export const useTheme = () =>
   usePreferencesStore((state: PreferencesState) => state.theme);
+
+// Songs selectors
+export {
+  useSongs,
+  useSongsIds,
+  useSongById,
+  useSongsFilters,
+  useSongsLoading,
+  useSongsError,
+  useSongsSelectedId,
+  useSongsPagination,
+};
+
+// ============================================================================
+// Type Exports
+// ============================================================================
 
 // Export all store types for use in implementation
 export type {
@@ -78,7 +117,10 @@ export type {
   EntitiesStore,
 } from './types';
 
-// Export middleware
+// ============================================================================
+// Middleware Exports
+// ============================================================================
+
 export {
   createLocalStorageMiddleware,
   createApiSyncMiddleware,
