@@ -8,6 +8,7 @@
  * - Event subscription/unsubscription
  * - Message queuing
  * - Connection state transitions
+ * - Network status detection (Phase 4)
  * - Error scenarios
  * - Edge cases
  */
@@ -89,6 +90,12 @@ class MockWebSocket {
 // Replace global WebSocket with mock
 (global as any).WebSocket = MockWebSocket;
 
+// Mock navigator.onLine
+Object.defineProperty(global.navigator, 'onLine', {
+  writable: true,
+  value: true,
+});
+
 // Mock timers
 jest.useFakeTimers();
 
@@ -100,6 +107,11 @@ describe('WebSocketClient', () => {
     WebSocketClient.resetInstance();
     client = WebSocketClient.getInstance({ debug: false });
     jest.clearAllTimers();
+    // Reset navigator.onLine to true
+    Object.defineProperty(global.navigator, 'onLine', {
+      writable: true,
+      value: true,
+    });
   });
 
   afterEach(() => {
@@ -305,6 +317,136 @@ describe('WebSocketClient', () => {
       // Should stop after 3 attempts
       jest.advanceTimersByTime(10000);
       expect(client.getConnectionState()).toBe(ConnectionState.FAILED);
+    });
+  });
+
+  describe('Network Status Detection', () => {
+    it('should not connect when browser is offline', async () => {
+      // Set browser to offline
+      Object.defineProperty(global.navigator, 'onLine', {
+        writable: true,
+        value: false,
+      });
+
+      WebSocketClient.resetInstance();
+      const client = WebSocketClient.getInstance({ debug: false });
+
+      await client.connect();
+
+      // Should not create WebSocket instance when offline
+      expect(client.getConnectionState()).toBe(ConnectionState.DISCONNECTED);
+    });
+
+    it('should include isOnline in stats', () => {
+      const stats = client.getStats();
+      expect(stats.isOnline).toBeDefined();
+      expect(typeof stats.isOnline).toBe('boolean');
+      expect(stats.isOnline).toBe(true); // Default mock value
+    });
+
+    it('should attempt reconnect when browser comes online', async () => {
+      // Start offline
+      Object.defineProperty(global.navigator, 'onLine', {
+        writable: true,
+        value: false,
+      });
+
+      WebSocketClient.resetInstance();
+      const client = WebSocketClient.getInstance({ debug: false });
+
+      // Try to connect while offline - should not connect
+      await client.connect();
+      expect(client.getConnectionState()).toBe(ConnectionState.DISCONNECTED);
+
+      // Simulate browser coming online
+      Object.defineProperty(global.navigator, 'onLine', {
+        writable: true,
+        value: true,
+      });
+
+      // Trigger online event
+      const onlineEvent = new Event('online');
+      window.dispatchEvent(onlineEvent);
+
+      // Should attempt to connect
+      await jest.runAllTimersAsync();
+      const ws = MockWebSocket.getLastInstance();
+      expect(ws).toBeDefined();
+    });
+
+    it('should pause reconnection when browser goes offline', async () => {
+      await client.connect();
+      const ws1 = MockWebSocket.getLastInstance();
+      ws1!.simulateOpen();
+
+      // Close connection to trigger reconnect
+      ws1!.simulateClose(1006, false);
+      expect(client.getConnectionState()).toBe(ConnectionState.RECONNECTING);
+
+      // Simulate browser going offline
+      Object.defineProperty(global.navigator, 'onLine', {
+        writable: true,
+        value: false,
+      });
+
+      const offlineEvent = new Event('offline');
+      window.dispatchEvent(offlineEvent);
+
+      // Advance time - should not attempt reconnect while offline
+      jest.advanceTimersByTime(10000);
+
+      // Should still be in reconnecting state but not create new WebSocket
+      const ws2 = MockWebSocket.getLastInstance();
+      expect(ws2).toBe(ws1); // No new instance created
+    });
+
+    it('should resume reconnection when browser comes back online', async () => {
+      await client.connect();
+      const ws1 = MockWebSocket.getLastInstance();
+      ws1!.simulateOpen();
+
+      // Close connection
+      ws1!.simulateClose(1006, false);
+
+      // Go offline
+      Object.defineProperty(global.navigator, 'onLine', {
+        writable: true,
+        value: false,
+      });
+      window.dispatchEvent(new Event('offline'));
+
+      // Come back online
+      Object.defineProperty(global.navigator, 'onLine', {
+        writable: true,
+        value: true,
+      });
+      window.dispatchEvent(new Event('online'));
+
+      // Should attempt reconnect
+      await jest.runAllTimersAsync();
+      const ws2 = MockWebSocket.getLastInstance();
+      expect(ws2).not.toBe(ws1); // New instance created
+    });
+
+    it('should clean up network event listeners on destroy', () => {
+      const addEventListenerSpy = jest.spyOn(window, 'addEventListener');
+      const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
+
+      WebSocketClient.resetInstance();
+      const client = WebSocketClient.getInstance({ debug: false });
+
+      // Verify listeners were added
+      expect(addEventListenerSpy).toHaveBeenCalledWith('online', expect.any(Function));
+      expect(addEventListenerSpy).toHaveBeenCalledWith('offline', expect.any(Function));
+
+      client.destroy();
+
+      // Verify listeners were removed
+      expect(removeEventListenerSpy).toHaveBeenCalledWith('online', expect.any(Function));
+      expect(removeEventListenerSpy).toHaveBeenCalledWith('offline', expect.any(Function));
+
+      addEventListenerSpy.mockRestore();
+      removeEventListenerSpy.mockRestore();
     });
   });
 

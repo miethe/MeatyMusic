@@ -46,7 +46,7 @@ describe('ConnectionStatus', () => {
           totalEventsProcessed: 100,
           totalReconnections: 0,
           uptimeMs: 60000,
-          lastPingMs: 20,
+          isOnline: true,
         },
       });
 
@@ -68,7 +68,7 @@ describe('ConnectionStatus', () => {
           totalEventsProcessed: 0,
           totalReconnections: 0,
           uptimeMs: 0,
-          lastPingMs: 0,
+          isOnline: true,
         },
       });
 
@@ -90,7 +90,7 @@ describe('ConnectionStatus', () => {
           totalEventsProcessed: 0,
           totalReconnections: 0,
           uptimeMs: 0,
-          lastPingMs: 0,
+          isOnline: true,
         },
       });
 
@@ -113,7 +113,7 @@ describe('ConnectionStatus', () => {
           totalEventsProcessed: 0,
           totalReconnections: 0,
           uptimeMs: 0,
-          lastPingMs: 0,
+          isOnline: true,
         },
       });
 
@@ -142,7 +142,7 @@ describe('ConnectionStatus', () => {
           totalEventsProcessed: 100,
           totalReconnections: 0,
           uptimeMs: 60000,
-          lastPingMs: 20,
+          isOnline: true,
         },
       });
 
@@ -166,7 +166,7 @@ describe('ConnectionStatus', () => {
           totalEventsProcessed: 0,
           totalReconnections: 0,
           uptimeMs: 0,
-          lastPingMs: 0,
+          isOnline: true,
         },
       });
 
@@ -198,7 +198,7 @@ describe('ConnectionStatus', () => {
           totalEventsProcessed: 100,
           totalReconnections: 2,
           uptimeMs: 60000,
-          lastPingMs: 20,
+          isOnline: true,
         },
       });
 
@@ -223,7 +223,7 @@ describe('ConnectionStatus', () => {
           totalEventsProcessed: 0,
           totalReconnections: 0,
           uptimeMs: 0,
-          lastPingMs: 0,
+          isOnline: true,
         },
       });
 
@@ -245,7 +245,7 @@ describe('ConnectionStatus', () => {
           totalEventsProcessed: 100,
           totalReconnections: 0,
           uptimeMs: 60000,
-          lastPingMs: 20,
+          isOnline: true,
         },
       });
 
@@ -269,7 +269,7 @@ describe('ConnectionStatus', () => {
           totalEventsProcessed: 0,
           totalReconnections: 0,
           uptimeMs: 0,
-          lastPingMs: 0,
+          isOnline: true,
         },
       });
 
@@ -291,7 +291,7 @@ describe('ConnectionStatus', () => {
           totalEventsProcessed: 0,
           totalReconnections: 0,
           uptimeMs: 0,
-          lastPingMs: 0,
+          isOnline: true,
         },
       });
 
@@ -320,7 +320,7 @@ describe('ConnectionStatus', () => {
           totalEventsProcessed: 0,
           totalReconnections: 1,
           uptimeMs: 0,
-          lastPingMs: 0,
+          isOnline: true,
         },
       });
 
@@ -346,7 +346,7 @@ describe('ConnectionStatus', () => {
           totalEventsProcessed: 100,
           totalReconnections: 0,
           uptimeMs: 60000,
-          lastPingMs: 20,
+          isOnline: true,
         },
       });
 
@@ -369,7 +369,7 @@ describe('ConnectionStatus', () => {
           totalEventsProcessed: 100,
           totalReconnections: 0,
           uptimeMs: 60000,
-          lastPingMs: 20,
+          isOnline: true,
         },
       });
 
@@ -394,7 +394,7 @@ describe('ConnectionStatus', () => {
           totalEventsProcessed: 100,
           totalReconnections: 0,
           uptimeMs: 60000,
-          lastPingMs: 20,
+          isOnline: true,
         },
       });
 

@@ -9,6 +9,7 @@
  * - Event deduplication
  * - Subscription registry with pub/sub
  * - Connection state machine
+ * - Network status detection
  *
  * Architecture: Section 5.2 - WebSocket Client Core
  */
@@ -148,6 +149,12 @@ export class WebSocketClient {
 
     if (this.state.connectionState === ConnectionState.CONNECTING) {
       this.log('Connection already in progress');
+      return;
+    }
+
+    // Check if browser is offline
+    if (typeof window !== 'undefined' && !navigator.onLine) {
+      this.log('Browser is offline, cannot connect');
       return;
     }
 
@@ -292,6 +299,7 @@ export class WebSocketClient {
     return {
       connectionState: this.state.connectionState,
       isConnected: this.isConnected(),
+      isOnline: typeof window !== 'undefined' ? navigator.onLine : true,
       subscriptionCount: this.state.subscriptions.size,
       queuedMessages: this.state.messageQueue.length,
       reconnectAttempts: this.state.reconnectAttempt,
@@ -425,8 +433,8 @@ export class WebSocketClient {
       metadata: { code: event.code, reason: event.reason, wasClean: event.wasClean },
     });
 
-    // Attempt reconnection
-    if (shouldReconnect) {
+    // Attempt reconnection (only if browser is online)
+    if (shouldReconnect && (typeof window === 'undefined' || navigator.onLine)) {
       this.scheduleReconnect();
     }
   };
@@ -436,6 +444,8 @@ export class WebSocketClient {
    */
   private handleOnline = (): void => {
     this.log('Browser online');
+
+    // If we were disconnected, attempt to reconnect
     if (this.state.connectionState === ConnectionState.DISCONNECTED) {
       this.connect().catch((error) => {
         this.log('Failed to reconnect on online event', { error });
@@ -447,14 +457,28 @@ export class WebSocketClient {
    * Handle browser offline event
    */
   private handleOffline = (): void => {
-    this.log('Browser offline');
-    this.disconnect();
+    this.log('Browser offline - pausing reconnection attempts');
+
+    // Clear any pending reconnection timeout
+    if (this.state.reconnectTimeout) {
+      clearTimeout(this.state.reconnectTimeout);
+      this.state.reconnectTimeout = null;
+    }
+
+    // Note: We don't forcefully disconnect here as the connection might already be closed
+    // The natural WebSocket close event will handle state transitions
   };
 
   /**
    * Schedule reconnection with exponential backoff
    */
   private scheduleReconnect(): void {
+    // Don't schedule reconnection if browser is offline
+    if (typeof window !== 'undefined' && !navigator.onLine) {
+      this.log('Skipping reconnect - browser offline');
+      return;
+    }
+
     const { reconnection } = this.config;
 
     // Check max attempts (before incrementing)

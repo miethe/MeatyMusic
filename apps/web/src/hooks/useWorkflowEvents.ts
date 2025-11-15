@@ -8,8 +8,9 @@
  * - Loading and error states
  * - Memory leak prevention
  * - Optional event callback
+ * - Toast notifications for workflow completion/failure
  *
- * Phase 2, Task 2.1
+ * Phase 2, Task 2.1 + Phase 4, Task 4.3
  */
 
 import { useEffect, useState, useCallback, useRef } from 'react';
@@ -19,6 +20,7 @@ import { queryKeys } from '@/lib/query/config';
 import type { WorkflowEvent } from '@/types/api/events';
 import { WorkflowNode, WorkflowRunStatus } from '@/types/api';
 import { getWebSocketClient, ConnectionState } from '@/lib/websocket';
+import { toast } from '@/lib/notifications/toast';
 
 /**
  * Hook options
@@ -30,6 +32,8 @@ export interface UseWorkflowEventsOptions {
   maxEvents?: number;
   /** Callback invoked for each event */
   onEvent?: (event: WorkflowEvent) => void;
+  /** Enable toast notifications for workflow completion/failure (default: true) */
+  enableNotifications?: boolean;
 }
 
 /**
@@ -51,7 +55,8 @@ export interface UseWorkflowEventsReturn {
  *
  * This hook subscribes to real-time workflow events via WebSocket and accumulates
  * them in an array with FIFO ordering. It also updates the workflow store and
- * React Query cache for each event.
+ * React Query cache for each event. Optionally shows toast notifications for
+ * workflow completion and failure.
  *
  * @example
  * ```tsx
@@ -59,9 +64,10 @@ export interface UseWorkflowEventsReturn {
  *   maxEvents: 500,
  *   onEvent: (event) => {
  *     if (event.phase === 'fail') {
- *       toast.error('Node failed!');
+ *       console.log('Node failed:', event);
  *     }
  *   },
+ *   enableNotifications: true,
  * });
  *
  * if (isLoading) return <Spinner />;
@@ -74,7 +80,7 @@ export function useWorkflowEvents(
   runId: string,
   options: UseWorkflowEventsOptions = {}
 ): UseWorkflowEventsReturn {
-  const { enabled = true, maxEvents = 1000, onEvent } = options;
+  const { enabled = true, maxEvents = 1000, onEvent, enableNotifications = true } = options;
 
   // Local state for events and error
   const [events, setEvents] = useState<WorkflowEvent[]>([]);
@@ -83,6 +89,8 @@ export function useWorkflowEvents(
 
   // Ref to track if we're mounted (prevent state updates after unmount)
   const isMountedRef = useRef(true);
+  // Ref to track if we've already shown completion notification
+  const hasShownCompletionNotificationRef = useRef(false);
 
   // Store and query client
   const { updateRunStatus, updateNodeStatus, addEvent } = useWorkflowStore();
@@ -99,6 +107,7 @@ export function useWorkflowEvents(
   const clearEvents = useCallback(() => {
     setEvents([]);
     setError(null);
+    hasShownCompletionNotificationRef.current = false;
   }, []);
 
   /**
@@ -139,11 +148,28 @@ export function useWorkflowEvents(
           });
         }
       } else {
-        // Run-level event
-        if (phase === 'end') {
+        // Run-level event (no node_name)
+        if (phase === 'end' && !hasShownCompletionNotificationRef.current) {
           updateRunStatus(run_id, { status: WorkflowRunStatus.COMPLETED });
-        } else if (phase === 'fail') {
+
+          // Show success notification
+          if (enableNotifications) {
+            toast.success('Workflow completed successfully!', {
+              duration: 4000,
+            });
+            hasShownCompletionNotificationRef.current = true;
+          }
+        } else if (phase === 'fail' && !hasShownCompletionNotificationRef.current) {
           updateRunStatus(run_id, { status: WorkflowRunStatus.FAILED });
+
+          // Show error notification
+          if (enableNotifications) {
+            const errorMessage = (data as any)?.error_message || 'Unknown error';
+            toast.error(`Workflow failed: ${errorMessage}`, {
+              duration: 6000,
+            });
+            hasShownCompletionNotificationRef.current = true;
+          }
         }
       }
 
@@ -165,7 +191,7 @@ export function useWorkflowEvents(
       // Call custom handler
       onEvent?.(event);
     },
-    [addEvent, updateNodeStatus, updateRunStatus, queryClient, onEvent, maxEvents]
+    [addEvent, updateNodeStatus, updateRunStatus, queryClient, onEvent, maxEvents, enableNotifications]
   );
 
   /**

@@ -191,6 +191,8 @@ export interface WebSocketClientStats {
   connectionState: ConnectionState;
   /** Is currently connected */
   isConnected: boolean;
+  /** Is browser online (network available) */
+  isOnline: boolean;
   /** Total subscriptions */
   subscriptionCount: number;
   /** Queued messages */
