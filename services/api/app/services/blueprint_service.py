@@ -641,19 +641,39 @@ class BlueprintService:
         try:
             # Load JSON file
             with open(self.CONFLICT_MATRIX_PATH, 'r', encoding='utf-8') as f:
-                matrix = json.load(f)
+                data = json.load(f)
 
-            if not isinstance(matrix, dict):
-                raise ValueError("Conflict matrix must be a JSON object")
+            # Convert new array structure to dict for backward compatibility
+            if isinstance(data, list):
+                # New format: array of {tag, Tags, Reason, Category}
+                matrix = {}
+                for entry in data:
+                    if isinstance(entry, dict):
+                        tag = entry.get("tag")
+                        tags = entry.get("Tags")
+                        if tag and isinstance(tags, list):
+                            # Normalize to lowercase for case-insensitive lookups
+                            matrix[tag.lower()] = tags
+                
+                logger.info(
+                    "conflict_matrix.loaded",
+                    path=str(self.CONFLICT_MATRIX_PATH),
+                    format="array",
+                    tag_count=len(matrix)
+                )
+            elif isinstance(data, dict):
+                # Old format: already a dict
+                matrix = data
+                logger.info(
+                    "conflict_matrix.loaded",
+                    path=str(self.CONFLICT_MATRIX_PATH),
+                    format="dict",
+                    tag_count=len(matrix)
+                )
+            else:
+                raise ValueError("Conflict matrix must be a JSON object or array")
 
             self._conflict_matrix = matrix
-
-            logger.info(
-                "conflict_matrix.loaded",
-                path=str(self.CONFLICT_MATRIX_PATH),
-                tag_count=len(matrix)
-            )
-
             return matrix
 
         except json.JSONDecodeError as e:

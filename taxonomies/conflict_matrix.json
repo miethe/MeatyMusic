@@ -1,79 +1,151 @@
-{
-  "whisper": ["anthemic", "high-energy", "aggressive", "stadium"],
-  "anthemic": ["whisper", "intimate", "low-energy", "minimal"],
-  "intimate": ["anthemic", "stadium", "epic", "aggressive"],
-  "acoustic": ["electronic", "synth-heavy", "industrial"],
-  "electronic": ["acoustic", "organic"],
-  "minimal": ["maximal", "wall-of-sound", "dense"],
-  "maximal": ["minimal", "sparse", "intimate"],
-  "lo-fi": ["hi-fi", "polished", "pristine"],
-  "hi-fi": ["lo-fi", "raw", "gritty"],
-  "slow": ["fast", "uptempo", "energetic"],
-  "fast": ["slow", "downtempo", "ballad"],
-  "major": ["minor", "dark"],
-  "minor": ["major", "uplifting"],
-  "vintage": ["modern", "futuristic"],
-  "modern": ["vintage", "retro", "nostalgic"]
-}
 [
   {
-    "tag_a": "whisper",
-    "tag_b": "anthemic",
-    "reason": "vocal intensity contradiction",
-    "category": "vocal_style"
+    "tag": "acoustic",
+    "Tags": [
+      "electronic",
+      "synth-heavy",
+      "industrial"
+    ],
+    "Reason": "instrumentation conflict",
+    "Category": "instrumentation"
   },
   {
-    "tag_a": "upbeat",
-    "tag_b": "melancholic",
-    "reason": "mood contradiction",
-    "category": "mood"
+    "tag": "anthemic",
+    "Tags": [
+      "whisper",
+      "intimate",
+      "low-energy",
+      "minimal"
+    ],
+    "Reason": "vocal intensity contradiction",
+    "Category": "vocal_style"
   },
   {
-    "tag_a": "happy",
-    "tag_b": "sad",
-    "reason": "emotional contradiction",
-    "category": "mood"
+    "tag": "electronic",
+    "Tags": [
+      "acoustic",
+      "organic"
+    ],
+    "Reason": null,
+    "Category": null
   },
   {
-    "tag_a": "energetic",
-    "tag_b": "calm",
-    "reason": "energy level contradiction",
-    "category": "energy"
+    "tag": "fast",
+    "Tags": [
+      "slow",
+      "downtempo",
+      "ballad"
+    ],
+    "Reason": null,
+    "Category": null
   },
   {
-    "tag_a": "acoustic",
-    "tag_b": "heavy synth",
-    "reason": "instrumentation conflict",
-    "category": "instrumentation"
+    "tag": "hi-fi",
+    "Tags": [
+      "lo-fi",
+      "raw",
+      "gritty"
+    ],
+    "Reason": "production quality conflict",
+    "Category": "production"
   },
   {
-    "tag_a": "fast tempo",
-    "tag_b": "slow tempo",
-    "reason": "tempo contradiction",
-    "category": "tempo"
+    "tag": "intimate",
+    "Tags": [
+      "anthemic",
+      "stadium",
+      "epic",
+      "aggressive"
+    ],
+    "Reason": null,
+    "Category": null
   },
   {
-    "tag_a": "aggressive",
-    "tag_b": "gentle",
-    "reason": "intensity contradiction",
-    "category": "intensity"
+    "tag": "lo-fi",
+    "Tags": [
+      "hi-fi",
+      "polished",
+      "pristine"
+    ],
+    "Reason": "production quality conflict",
+    "Category": "production"
   },
   {
-    "tag_a": "distorted",
-    "tag_b": "clean",
-    "reason": "production style conflict",
-    "category": "production"
+    "tag": "major",
+    "Tags": [
+      "minor",
+      "dark"
+    ],
+    "Reason": null,
+    "Category": null
   },
   {
-    "tag_a": "minimal",
-    "tag_b": "orchestral",
-    "reason": "arrangement complexity conflict",
-    "category": "arrangement"
+    "tag": "maximal",
+    "Tags": [
+      "minimal",
+      "sparse",
+      "intimate"
+    ],
+    "Reason": null,
+    "Category": null
   },
   {
-    "tag_a": "lo-fi",
-    "tag_b": "hi-fi",
-    "reason": "production quality conflict",
-    "category": "production"
+    "tag": "minimal",
+    "Tags": [
+      "maximal",
+      "wall-of-sound",
+      "dense"
+    ],
+    "Reason": "arrangement complexity conflict",
+    "Category": "arrangement"
+  },
+  {
+    "tag": "minor",
+    "Tags": [
+      "major",
+      "uplifting"
+    ],
+    "Reason": null,
+    "Category": null
+  },
+  {
+    "tag": "modern",
+    "Tags": [
+      "vintage",
+      "retro",
+      "nostalgic"
+    ],
+    "Reason": null,
+    "Category": null
+  },
+  {
+    "tag": "slow",
+    "Tags": [
+      "fast",
+      "uptempo",
+      "energetic"
+    ],
+    "Reason": null,
+    "Category": null
+  },
+  {
+    "tag": "vintage",
+    "Tags": [
+      "modern",
+      "futuristic"
+    ],
+    "Reason": null,
+    "Category": null
+  },
+  {
+    "tag": "whisper",
+    "Tags": [
+      "anthemic",
+      "high-energy",
+      "aggressive",
+      "stadium"
+    ],
+    "Reason": "vocal intensity contradiction",
+    "Category": "vocal_style"
   }
 ]
