@@ -7,7 +7,7 @@
  * Phase 5, Task 5.4
  */
 
-import { chromium, FullConfig } from '@playwright/test';
+import { FullConfig } from '@playwright/test';
 
 async function globalSetup(config: FullConfig) {
   console.log('🚀 Starting E2E test suite setup...');

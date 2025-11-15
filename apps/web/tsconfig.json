@@ -58,6 +58,7 @@
     "node_modules",
     ".next",
     "out",
-    "dist"
+    "dist",
+    "e2e"
   ]
 }
