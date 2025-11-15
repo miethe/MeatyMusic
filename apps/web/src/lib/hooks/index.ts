@@ -104,6 +104,19 @@ export {
 } from './useEntitiesWithStore';
 
 // ============================================================================
+// WebSocket Store Sync Hooks
+// ============================================================================
+
+export {
+  // Store sync hooks
+  useStoreSync,
+  useGlobalStoreSync,
+
+  // Type exports
+  type UseStoreSyncOptions,
+} from './useStoreSync';
+
+// ============================================================================
 // Type Exports
 // ============================================================================
 
@@ -175,6 +188,38 @@ export type {
  * };
  * ```
  *
+ * ## Store Sync Hook (Real-time WebSocket Updates)
+ *
+ * The useStoreSync hook synchronizes stores with WebSocket events.
+ * Use it in workflow detail pages to get automatic real-time updates:
+ *
+ * ```tsx
+ * function WorkflowDetailsPage({ runId }: { runId: string }) {
+ *   // Automatically syncs stores with WebSocket events
+ *   useStoreSync(runId);
+ *
+ *   // All stores are now kept in sync with real-time events:
+ *   // - Songs store updates when workflow completes
+ *   // - Entities store updates when entities are generated
+ *   // - Workflow store updates with node progress
+ *   // - React Query cache invalidates appropriately
+ *
+ *   return <WorkflowProgress runId={runId} />;
+ * }
+ * ```
+ *
+ * For dashboard pages that need to react to any workflow:
+ *
+ * ```tsx
+ * function WorkflowsDashboard() {
+ *   // Syncs all workflow events globally (placeholder for future)
+ *   useGlobalStoreSync();
+ *
+ *   const { data: workflows } = useWorkflowsWithStore();
+ *   return <WorkflowsList workflows={workflows} />;
+ * }
+ * ```
+ *
  * ## Loading States
  *
  * Query loading states are automatically synced to stores:
@@ -229,9 +274,10 @@ export type {
  * 1. Use query hooks in page/route components
  * 2. Use store selectors in child components
  * 3. Mutations handle optimistic updates automatically
- * 4. Prefetch on hover for instant navigation
- * 5. Let the hooks manage loading/error states
- * 6. Don't manually sync query data to stores (it's automatic)
+ * 4. Use useStoreSync in workflow detail pages for real-time sync
+ * 5. Prefetch on hover for instant navigation
+ * 6. Let the hooks manage loading/error states
+ * 7. Don't manually sync query data to stores (it's automatic)
  *
  * ## Performance Tips
  *
@@ -240,4 +286,5 @@ export type {
  * - Store data persists across component unmounts
  * - Optimistic updates make UI feel instant
  * - React Query handles caching and deduplication
+ * - WebSocket events trigger targeted cache invalidation (not full refetches)
  */
