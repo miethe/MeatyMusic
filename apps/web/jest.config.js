@@ -11,8 +11,13 @@ const customJestConfig = {
   testEnvironment: 'jest-environment-jsdom',
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    '^@meatymusic/ui$': '<rootDir>/../../packages/ui/src/index.ts',
+    '^@meatymusic/ui/(.*)$': '<rootDir>/../../packages/ui/src/$1',
   },
   testPathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/'],
+  transformIgnorePatterns: [
+    'node_modules/(?!(react-markdown|remark-.*|micromark.*|decode-named-character-reference|character-entities|unist-.*|unified|bail|is-plain-obj|trough|vfile|vfile-message|zwitch|mdast-util-.*|ccount|escape-string-regexp|markdown-table)/)',
+  ],
   transform: {
     '^.+\\.(ts|tsx)$': ['ts-jest', {
       tsconfig: {

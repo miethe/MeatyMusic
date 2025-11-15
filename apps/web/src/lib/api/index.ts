@@ -6,7 +6,7 @@
 export { apiClient } from './client';
 
 export { songsApi } from './songs';
-export type { SongFilters } from './songs';
+export type { SongFilters, SDS } from './songs';
 
 export { stylesApi } from './styles';
 export type { StyleFilters } from './styles';

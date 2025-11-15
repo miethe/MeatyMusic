@@ -451,15 +451,19 @@ async def update_song_status(
     "/{song_id}/sds",
     response_model=Dict[str, Any],
     summary="Get compiled Song Design Spec (SDS)",
-    description="Retrieve the compiled SDS for a song, either from cache or by recompiling",
+    description="Retrieve the compiled SDS for a song with optional default generation for missing entities",
     responses={
         200: {"description": "Compiled SDS returned successfully"},
-        400: {"model": ErrorResponse, "description": "SDS compilation failed"},
         404: {"model": ErrorResponse, "description": "Song not found"},
+        422: {"model": ErrorResponse, "description": "SDS compilation failed"},
     },
 )
 async def get_song_sds(
     song_id: UUID,
+    use_defaults: bool = Query(
+        True,
+        description="Apply defaults for missing entities"
+    ),
     recompile: bool = Query(
         False,
         description="Force recompilation of SDS from current entity state"
@@ -474,11 +478,16 @@ async def get_song_sds(
     missing or the recompile parameter is True, the SDS is recompiled from the current
     entity state.
 
+    If entities (style, lyrics, producer notes) are missing and use_defaults is True,
+    the compiler will generate sensible defaults based on the blueprint's genre conventions.
+    This allows previewing a complete SDS even when the song is only partially specified.
+
     The returned SDS contains all entity data aggregated according to the SDS schema,
     including style, lyrics, producer notes, sources, and render configuration.
 
     Args:
         song_id: Song UUID
+        use_defaults: Apply defaults for missing entities (default: True)
         recompile: Whether to force recompilation (default: False, use cache if available)
         repo: Song repository instance
         sds_compiler: SDS compiler service
@@ -489,7 +498,7 @@ async def get_song_sds(
     Raises:
         HTTPException:
             - 404: If song not found
-            - 400: If SDS compilation fails
+            - 422: If SDS compilation fails (missing entities with use_defaults=False, validation errors, etc.)
     """
     # Get song
     song = await repo.get_by_id(song_id)
@@ -517,12 +526,13 @@ async def get_song_sds(
     logger.info(
         "sds.compile_requested",
         song_id=str(song_id),
+        use_defaults=use_defaults,
         recompile=recompile,
         cache_available=cached_sds is not None,
     )
 
     try:
-        sds = sds_compiler.compile_sds(song_id, validate=True)
+        sds = sds_compiler.compile_sds(song_id, use_defaults=use_defaults, validate=True)
         logger.info(
             "sds.compile_success",
             song_id=str(song_id),
@@ -536,6 +546,123 @@ async def get_song_sds(
             error=str(e),
         )
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=f"SDS compilation failed: {str(e)}",
         )
+
+
+@router.get(
+    "/{song_id}/export",
+    response_class=StreamingResponse,
+    summary="Export SDS as JSON file",
+    description="Downloads compiled SDS as formatted JSON file with proper filename",
+    responses={
+        200: {
+            "description": "SDS exported successfully as downloadable JSON file",
+            "content": {"application/json": {}},
+        },
+        404: {"model": ErrorResponse, "description": "Song not found"},
+        422: {"model": ErrorResponse, "description": "SDS compilation failed"},
+    },
+)
+async def export_song_sds(
+    song_id: UUID,
+    use_defaults: bool = Query(
+        True,
+        description="Apply defaults for missing entities"
+    ),
+    repo: SongRepository = Depends(get_song_repository),
+    sds_compiler: SDSCompilerService = Depends(get_sds_compiler_service),
+) -> StreamingResponse:
+    """Export compiled SDS as a downloadable JSON file.
+
+    This endpoint compiles the Song Design Spec (SDS) for a song and returns it
+    as a formatted JSON file download. The filename is generated from the song
+    title and current date in kebab-case format.
+
+    The SDS is compiled from the current entity state with full validation.
+    If entities (style, lyrics, producer notes) are missing and use_defaults is True,
+    the compiler will generate sensible defaults based on the blueprint's genre conventions.
+    The JSON is pretty-printed with 2-space indentation for readability.
+
+    Args:
+        song_id: Song UUID
+        use_defaults: Apply defaults for missing entities (default: True)
+        repo: Song repository instance
+        sds_compiler: SDS compiler service
+
+    Returns:
+        StreamingResponse with JSON file download
+
+    Raises:
+        HTTPException:
+            - 404: If song not found
+            - 422: If SDS compilation fails
+    """
+    # 1. Verify song exists
+    song = await repo.get_by_id(song_id)
+    if not song:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Song {song_id} not found",
+        )
+
+    # 2. Compile SDS (with validation, using defaults if requested)
+    logger.info(
+        "sds.export_requested",
+        song_id=str(song_id),
+        song_title=song.title,
+        use_defaults=use_defaults,
+    )
+
+    try:
+        sds = sds_compiler.compile_sds(song_id, use_defaults=use_defaults, validate=True)
+    except ValueError as e:
+        logger.error(
+            "sds.export_compile_failed",
+            song_id=str(song_id),
+            error=str(e),
+        )
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"SDS compilation failed: {str(e)}",
+        )
+
+    # 3. Format as pretty JSON (indent=2, ensure_ascii=False for Unicode support)
+    json_content = json.dumps(sds, indent=2, ensure_ascii=False)
+
+    # 4. Generate filename: {song_title_kebab-case}_sds_{YYYYMMDD}.json
+    # Convert title to kebab-case
+    title_kebab = song.title.lower().replace(" ", "-").replace("_", "-")
+    # Remove special characters (keep only alphanumeric and hyphens)
+    title_kebab = re.sub(r'[^a-z0-9-]', '', title_kebab)
+    # Remove consecutive hyphens and leading/trailing hyphens
+    title_kebab = re.sub(r'-+', '-', title_kebab).strip('-')
+    # Fallback if title becomes empty after sanitization
+    if not title_kebab:
+        title_kebab = "song"
+
+    # Add timestamp
+    timestamp = datetime.now().strftime("%Y%m%d")
+    filename = f"{title_kebab}_sds_{timestamp}.json"
+
+    # 5. Create StreamingResponse with proper headers
+    headers = {
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Disposition": f'attachment; filename="{filename}"',
+    }
+
+    logger.info(
+        "sds.export_success",
+        song_id=str(song_id),
+        filename=filename,
+        sds_hash=sds.get("_computed_hash", "unknown"),
+        size_bytes=len(json_content.encode('utf-8')),
+    )
+
+    # Return streaming response with JSON content
+    return StreamingResponse(
+        io.BytesIO(json_content.encode('utf-8')),
+        media_type="application/json; charset=utf-8",
+        headers=headers,
+    )

@@ -13,19 +13,20 @@ import { Button } from '@meatymusic/ui';
 import { Card } from '@meatymusic/ui';
 import { Badge } from '@meatymusic/ui';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@meatymusic/ui';
-import { useSong, useDeleteSong } from '@/hooks/api/useSongs';
+import { useSong, useDeleteSong, useSDS } from '@/hooks/api';
+import { songsApi } from '@/lib/api/songs';
+import { useUIStore } from '@/stores';
+import { EntityDetailSection } from '@/components/songs/EntityDetailSection';
 import {
   Edit,
   Play,
   Copy,
   Trash2,
-  ExternalLink,
   Music2,
-  Palette,
-  FileText,
-  User,
-  Settings as SettingsIcon,
   Loader2,
+  Download,
+  AlertCircle,
+  FileText,
 } from 'lucide-react';
 import { ROUTES } from '@/config/routes';
 
@@ -36,6 +37,17 @@ export default function SongDetailPage() {
 
   const { data: song, isLoading, error } = useSong(songId);
   const deleteSong = useDeleteSong();
+  const { addToast } = useUIStore();
+
+  const [exporting, setExporting] = React.useState(false);
+
+  // SDS data for Preview tab - only fetch when enabled
+  const [previewTabActive, setPreviewTabActive] = React.useState(false);
+  const {
+    data: sdsData,
+    isLoading: isSdsLoading,
+    error: sdsError
+  } = useSDS(previewTabActive ? songId : undefined);
 
   const handleStartWorkflow = () => {
     console.log('Starting workflow for song:', songId);
@@ -55,6 +67,38 @@ export default function SongDetailPage() {
       } catch (error) {
         console.error('Failed to delete song:', error);
       }
+    }
+  };
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      const { blob, filename } = await songsApi.export(songId);
+
+      // Create blob URL and trigger download
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+
+      // Cleanup
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      addToast('SDS exported successfully', 'success');
+    } catch (error: any) {
+      console.error('Failed to export SDS:', error);
+      addToast(error?.message || 'Failed to export SDS', 'error');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleTabChange = (value: string) => {
+    if (value === 'preview') {
+      setPreviewTabActive(true);
     }
   };
 
@@ -99,6 +143,18 @@ export default function SongDetailPage() {
         description={description}
         actions={
           <>
+            <Button
+              variant="outline"
+              onClick={handleExport}
+              disabled={exporting}
+            >
+              {exporting ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Download className="w-4 h-4 mr-2" />
+              )}
+              Export SDS
+            </Button>
             <Button variant="outline" onClick={handleClone}>
               <Copy className="w-4 h-4 mr-2" />
               Clone
@@ -143,12 +199,13 @@ export default function SongDetailPage() {
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue="overview" className="w-full">
+        <Tabs defaultValue="overview" className="w-full" onValueChange={handleTabChange}>
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="entities">Entities</TabsTrigger>
             <TabsTrigger value="workflow">Workflow</TabsTrigger>
             <TabsTrigger value="history">History</TabsTrigger>
+            <TabsTrigger value="preview">Preview</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="mt-6">
@@ -184,6 +241,19 @@ export default function SongDetailPage() {
                     <Play className="w-4 h-4 mr-2" />
                     Start Workflow
                   </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={handleExport}
+                    disabled={exporting}
+                  >
+                    {exporting ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Download className="w-4 h-4 mr-2" />
+                    )}
+                    Export SDS
+                  </Button>
                   <Link href={ROUTES.SONG_EDIT(songId)} className="block">
                     <Button variant="outline" className="w-full justify-start">
                       <Edit className="w-4 h-4 mr-2" />
@@ -201,29 +271,76 @@ export default function SongDetailPage() {
 
           <TabsContent value="entities" className="mt-6">
             <div className="grid md:grid-cols-2 gap-6">
-              <EntityCard
-                title="Style"
-                icon={<Palette className="w-5 h-5" />}
-                entityId={song.style_id}
+              <EntityDetailSection
+                entityType="style"
+                entityId={song.style_id || null}
+                entityData={
+                  song.style_id
+                    ? {
+                        genre: genre,
+                        bpm_min: 120,
+                        bpm_max: 140,
+                        key: 'C Major',
+                        mood: mood as string[],
+                        energy_level: 7,
+                      }
+                    : undefined
+                }
+                editHref={song.style_id ? ROUTES.ENTITIES.STYLE_DETAIL(song.style_id) : '#'}
                 createHref={ROUTES.ENTITIES.STYLE_NEW}
               />
-              <EntityCard
-                title="Lyrics"
-                icon={<FileText className="w-5 h-5" />}
-                entityId={null} // TODO: Fetch lyrics for this song
+              <EntityDetailSection
+                entityType="lyrics"
+                entityId={null}
+                entityData={undefined}
+                editHref="#"
                 createHref={ROUTES.ENTITIES.LYRICS_NEW}
               />
-              <EntityCard
-                title="Persona"
-                icon={<User className="w-5 h-5" />}
-                entityId={song.persona_id}
+              <EntityDetailSection
+                entityType="persona"
+                entityId={song.persona_id || null}
+                entityData={
+                  song.persona_id
+                    ? {
+                        name: 'Default Artist',
+                        vocal_range: 'Tenor',
+                        delivery: ['smooth', 'powerful'],
+                        kind: 'artist' as const,
+                      }
+                    : undefined
+                }
+                editHref={song.persona_id ? ROUTES.ENTITIES.PERSONA_DETAIL(song.persona_id) : '#'}
                 createHref={ROUTES.ENTITIES.PERSONA_NEW}
               />
-              <EntityCard
-                title="Blueprint"
-                icon={<SettingsIcon className="w-5 h-5" />}
-                entityId={song.blueprint_id}
+              <EntityDetailSection
+                entityType="blueprint"
+                entityId={song.blueprint_id || null}
+                entityData={
+                  song.blueprint_id
+                    ? {
+                        genre: genre,
+                        version: '1.0',
+                        rules: {
+                          required_sections: ['verse', 'chorus', 'bridge'],
+                          tempo_bpm: [100, 160],
+                        },
+                        eval_rubric: {
+                          thresholds: {
+                            min_total: 80,
+                          },
+                        },
+                      }
+                    : undefined
+                }
+                editHref={song.blueprint_id ? ROUTES.ENTITIES.BLUEPRINT_DETAIL(song.blueprint_id) : '#'}
                 createHref={ROUTES.ENTITIES.BLUEPRINT_NEW}
+              />
+              <EntityDetailSection
+                entityType="producer_notes"
+                entityId={null}
+                entityData={undefined}
+                editHref="#"
+                createHref={ROUTES.ENTITIES.PRODUCER_NOTE_NEW}
               />
             </div>
           </TabsContent>
@@ -247,52 +364,82 @@ export default function SongDetailPage() {
               <p className="text-muted-foreground">No workflow history yet</p>
             </Card>
           </TabsContent>
+
+          <TabsContent value="preview" className="mt-6">
+            <Card className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-semibold">Song Design Spec (SDS)</h3>
+                <Button onClick={handleExport} variant="outline" size="sm" disabled={exporting}>
+                  {exporting ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <Download className="w-4 h-4 mr-2" />
+                  )}
+                  Export SDS
+                </Button>
+              </div>
+
+              {isSdsLoading && (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                  <span className="ml-3 text-muted-foreground">Loading SDS...</span>
+                </div>
+              )}
+
+              {sdsError && (
+                <div className="bg-destructive/10 border-2 border-destructive/30 rounded-lg p-6 text-center">
+                  <AlertCircle className="w-12 h-12 mx-auto text-destructive mb-3" />
+                  <p className="text-destructive font-medium mb-2">Failed to load SDS</p>
+                  <p className="text-sm text-muted-foreground">
+                    {sdsError?.message || 'Unable to compile Song Design Spec'}
+                  </p>
+                </div>
+              )}
+
+              {sdsData && !isSdsLoading && !sdsError && (
+                <div className="space-y-4">
+                  {/* Placeholder for JsonViewer component (Task SDS-PREVIEW-010) */}
+                  {/* Once JsonViewer is implemented, replace this with: */}
+                  {/* <JsonViewer data={sdsData} collapsed={1} theme="dark" enableClipboard={true} /> */}
+
+                  <div className="bg-muted/30 border-2 border-muted rounded-lg p-6">
+                    <div className="flex items-center gap-2 mb-4 text-muted-foreground">
+                      <FileText className="w-5 h-5" />
+                      <span className="text-sm font-medium">
+                        JSON Viewer Placeholder (awaiting Task SDS-PREVIEW-010)
+                      </span>
+                    </div>
+                    <pre className="bg-black/50 text-green-400 p-4 rounded-lg overflow-auto max-h-96 text-xs font-mono">
+                      {JSON.stringify(sdsData, null, 2)}
+                    </pre>
+                    <div className="mt-4 text-xs text-muted-foreground">
+                      This is a temporary placeholder. Once the JsonViewer component is implemented,
+                      this will be replaced with an interactive JSON viewer with syntax highlighting,
+                      collapsible sections, and clipboard support.
+                    </div>
+                  </div>
+
+                  {/* SDS Metadata Summary */}
+                  <div className="grid md:grid-cols-3 gap-4 mt-6">
+                    <Card className="p-4">
+                      <div className="text-sm text-muted-foreground mb-1">Song ID</div>
+                      <div className="font-mono text-xs truncate">{sdsData.song_id}</div>
+                    </Card>
+                    <Card className="p-4">
+                      <div className="text-sm text-muted-foreground mb-1">Title</div>
+                      <div className="font-semibold truncate">{sdsData.title}</div>
+                    </Card>
+                    <Card className="p-4">
+                      <div className="text-sm text-muted-foreground mb-1">Global Seed</div>
+                      <div className="font-mono text-sm">{sdsData.global_seed}</div>
+                    </Card>
+                  </div>
+                </div>
+              )}
+            </Card>
+          </TabsContent>
         </Tabs>
       </div>
     </div>
-  );
-}
-
-function EntityCard({
-  title,
-  icon,
-  entityId,
-  createHref,
-}: {
-  title: string;
-  icon: React.ReactNode;
-  entityId: string | null | undefined;
-  createHref: string;
-}) {
-  return (
-    <Card className="p-6">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="text-primary">{icon}</div>
-        <h3 className="text-lg font-semibold">{title}</h3>
-      </div>
-
-      {entityId ? (
-        <div>
-          <p className="font-medium mb-2 font-mono text-sm text-muted-foreground">
-            ID: {entityId}
-          </p>
-          <Button variant="outline" size="sm" disabled>
-            <ExternalLink className="w-3 h-3 mr-2" />
-            View Details (Coming Soon)
-          </Button>
-        </div>
-      ) : (
-        <div>
-          <p className="text-sm text-muted-foreground mb-4">
-            No {title.toLowerCase()} assigned
-          </p>
-          <Link href={createHref}>
-            <Button variant="outline" size="sm">
-              Create {title}
-            </Button>
-          </Link>
-        </div>
-      )}
-    </Card>
   );
 }
