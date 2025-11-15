@@ -35,8 +35,8 @@ class TagConflictResolver:
     def _load_conflict_matrix(self, path: str) -> Dict[str, Set[str]]:
         """Load and build bidirectional conflict lookup.
 
-        The conflict matrix JSON contains pairs of conflicting tags. This method
-        builds a bidirectional lookup map for efficient conflict detection.
+        The conflict matrix JSON contains tag entries with their conflicting tags.
+        This method builds a bidirectional lookup map for efficient conflict detection.
 
         Args:
             path: Path to conflict matrix JSON file
@@ -84,43 +84,56 @@ class TagConflictResolver:
         # Build bidirectional conflict map
         conflict_map: Dict[str, Set[str]] = {}
 
-        for conflict in conflicts:
-            if not isinstance(conflict, dict):
+        for entry in conflicts:
+            if not isinstance(entry, dict):
                 logger.warning(
                     "conflict_matrix.invalid_entry",
-                    conflict=conflict,
+                    entry=entry,
                     message="Conflict entry must be a dictionary"
                 )
                 continue
 
-            tag_a = conflict.get("tag_a")
-            tag_b = conflict.get("tag_b")
+            tag = entry.get("tag")
+            conflicting_tags = entry.get("Tags")
 
-            if not tag_a or not tag_b:
+            if not tag or not conflicting_tags:
                 logger.warning(
-                    "conflict_matrix.missing_tags",
-                    conflict=conflict,
-                    message="Conflict entry missing tag_a or tag_b"
+                    "conflict_matrix.missing_fields",
+                    entry=entry,
+                    message="Conflict entry missing 'tag' or 'Tags' field"
                 )
                 continue
 
-            # Normalize tags to lowercase for case-insensitive matching
-            tag_a = tag_a.lower()
-            tag_b = tag_b.lower()
+            if not isinstance(conflicting_tags, list):
+                logger.warning(
+                    "conflict_matrix.invalid_tags_field",
+                    entry=entry,
+                    message="'Tags' field must be a list"
+                )
+                continue
 
-            # Build bidirectional map
-            if tag_a not in conflict_map:
-                conflict_map[tag_a] = set()
-            if tag_b not in conflict_map:
-                conflict_map[tag_b] = set()
+            # Normalize tag to lowercase for case-insensitive matching
+            tag_lower = tag.lower()
 
-            conflict_map[tag_a].add(tag_b)
-            conflict_map[tag_b].add(tag_a)
+            # Initialize set for this tag if needed
+            if tag_lower not in conflict_map:
+                conflict_map[tag_lower] = set()
+
+            # Add all conflicting tags (normalized to lowercase)
+            for conflicting_tag in conflicting_tags:
+                if isinstance(conflicting_tag, str):
+                    conflicting_tag_lower = conflicting_tag.lower()
+                    conflict_map[tag_lower].add(conflicting_tag_lower)
+
+                    # Build bidirectional map: add reverse mapping
+                    if conflicting_tag_lower not in conflict_map:
+                        conflict_map[conflicting_tag_lower] = set()
+                    conflict_map[conflicting_tag_lower].add(tag_lower)
 
         logger.info(
             "conflict_matrix.loaded",
             path=path,
-            conflict_count=len(conflicts),
+            entry_count=len(conflicts),
             tag_count=len(conflict_map)
         )
 
