@@ -40,7 +40,8 @@ class ValidationService:
         Schemas are loaded from the project root /schemas directory.
         Missing schemas are logged as warnings but don't prevent initialization.
         """
-        # Find project root (4 levels up from this file)
+        # Find project root (5 levels up from this file: validation_service.py -> services -> app -> api -> services -> MeatyMusic)
+        # Path structure: /Users/miethe/dev/homelab/development/MeatyMusic/services/api/app/services/validation_service.py
         project_root = Path(__file__).parent.parent.parent.parent.parent
         schema_dir = project_root / "schemas"
 

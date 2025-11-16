@@ -24,6 +24,7 @@ from app.api.dependencies import (
     get_blueprint_validator_service,
     get_cross_entity_validator,
 )
+from app.models.song import Song
 from app.repositories import SongRepository
 from app.services import (
     SongService,
@@ -101,7 +102,7 @@ async def create_song(
             style_id=song_dict.get("style_id"),
             blueprint_id=song_dict.get("blueprint_id"),
         )
-        song = await repo.create(song_dict)
+        song = repo.create(Song, song_dict)
 
         # Step 2: Compile SDS from entity references
         logger.info("sds.compile_start", song_id=str(song.id))
@@ -114,7 +115,7 @@ async def create_song(
                 error=str(e),
             )
             # Rollback song creation
-            await repo.delete(song.id)
+            repo.delete(Song, song.id)
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"SDS compilation failed: {str(e)}",
@@ -132,7 +133,7 @@ async def create_song(
                 errors=errors,
             )
             # Rollback song creation
-            await repo.delete(song.id)
+            repo.delete(Song, song.id)
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Blueprint validation failed: {'; '.join(errors)}",
@@ -148,7 +149,7 @@ async def create_song(
                 errors=errors,
             )
             # Rollback song creation
-            await repo.delete(song.id)
+            repo.delete(Song, song.id)
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Cross-entity validation failed: {'; '.join(errors)}",
@@ -162,7 +163,7 @@ async def create_song(
                 "compiled_sds": sds,
             }
         }
-        song = await repo.update(song.id, update_dict)
+        song = repo.update(Song, song.id, update_dict)
 
         logger.info(
             "song.create_success",
@@ -178,7 +179,7 @@ async def create_song(
     except ValueError as e:
         # Validation or data errors
         if song:
-            await repo.delete(song.id)
+            repo.delete(Song, song.id)
         logger.error("song.create_failed", error=str(e))
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -187,7 +188,7 @@ async def create_song(
     except Exception as e:
         # Unexpected errors
         if song:
-            await repo.delete(song.id)
+            repo.delete(Song, song.id)
         logger.error("song.create_unexpected_error", error=str(e), exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -216,21 +217,24 @@ async def list_songs(
     Returns:
         Paginated list of songs
     """
-    cursor_uuid = UUID(cursor) if cursor else None
-    songs = await repo.list(limit=limit + 1, offset=cursor_uuid)
-
-    has_next = len(songs) > limit
-    items = songs[:limit]
+    # Use list_paginated from BaseRepository
+    songs, next_cursor = repo.list_paginated(
+        model_class=Song,
+        limit=limit,
+        cursor=cursor,
+        sort_field="created_at",
+        sort_desc=True
+    )
 
     page_info = PageInfo(
-        has_next_page=has_next,
+        has_next_page=next_cursor is not None,
         has_previous_page=cursor is not None,
-        start_cursor=str(items[0].id) if items else None,
-        end_cursor=str(items[-1].id) if items else None,
+        start_cursor=str(songs[0].id) if songs else None,
+        end_cursor=str(songs[-1].id) if songs else None,
     )
 
     return PaginatedResponse(
-        items=[SongResponse.model_validate(s) for s in items],
+        items=[SongResponse.model_validate(s) for s in songs],
         page_info=page_info,
     )
 
@@ -261,7 +265,7 @@ async def get_song(
     Raises:
         HTTPException: If song not found
     """
-    song = await repo.get_by_id(song_id)
+    song = repo.get_by_id(Song, song_id)
     if not song:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -301,7 +305,7 @@ async def update_song(
     Raises:
         HTTPException: If song not found or SDS validation fails
     """
-    existing = await repo.get_by_id(song_id)
+    existing = repo.get_by_id(Song, song_id)
     if not existing:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -320,7 +324,7 @@ async def update_song(
                 detail=f"SDS validation failed: {str(e)}",
             )
 
-    updated = await repo.update(song_id, update_dict)
+    updated = repo.update(Song, song_id, update_dict)
     return SongResponse.model_validate(updated)
 
 
@@ -347,14 +351,14 @@ async def delete_song(
     Raises:
         HTTPException: If song not found
     """
-    existing = await repo.get_by_id(song_id)
+    existing = repo.get_by_id(Song, song_id)
     if not existing:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Song {song_id} not found",
         )
 
-    await repo.delete(song_id)
+    repo.delete(Song, song_id)
 
 
 @router.get(
@@ -376,7 +380,7 @@ async def get_songs_by_status(
     Returns:
         List of songs matching the status
     """
-    songs = await repo.get_by_status(status.value)
+    songs = repo.get_by_status(status.value)
     return [SongResponse.model_validate(s) for s in songs]
 
 
@@ -506,7 +510,7 @@ async def get_song_sds(
             - 422: If SDS compilation fails (missing entities with use_defaults=False, validation errors, etc.)
     """
     # Get song
-    song = await repo.get_by_id(song_id)
+    song = repo.get_by_id(Song, song_id)
     if not song:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -605,7 +609,7 @@ async def export_song_sds(
             - 422: If SDS compilation fails
     """
     # 1. Verify song exists
-    song = await repo.get_by_id(song_id)
+    song = repo.get_by_id(Song, song_id)
     if not song:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
