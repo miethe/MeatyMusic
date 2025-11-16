@@ -18,6 +18,13 @@ from app.repositories.persona_repo import PersonaRepository
 from app.repositories.blueprint_repo import BlueprintRepository
 from app.repositories.source_repo import SourceRepository
 from app.services.validation_service import ValidationService
+from app.services.blueprint_reader import BlueprintReaderService
+from app.services.default_generators import (
+    StyleDefaultGenerator,
+    LyricsDefaultGenerator,
+    PersonaDefaultGenerator,
+    ProducerDefaultGenerator,
+)
 
 logger = structlog.get_logger(__name__)
 
@@ -35,8 +42,29 @@ class SDSCompilerService:
         blueprint_repo: BlueprintRepository,
         source_repo: SourceRepository,
         validation_service: ValidationService,
+        blueprint_reader: Optional[BlueprintReaderService] = None,
+        style_generator: Optional[StyleDefaultGenerator] = None,
+        lyrics_generator: Optional[LyricsDefaultGenerator] = None,
+        persona_generator: Optional[PersonaDefaultGenerator] = None,
+        producer_generator: Optional[ProducerDefaultGenerator] = None,
     ):
-        """Initialize SDS compiler with all required repositories."""
+        """Initialize SDS compiler with all required repositories.
+
+        Args:
+            song_repo: Repository for Song entities
+            style_repo: Repository for Style entities
+            lyrics_repo: Repository for Lyrics entities
+            producer_notes_repo: Repository for ProducerNotes entities
+            persona_repo: Repository for Persona entities
+            blueprint_repo: Repository for Blueprint entities
+            source_repo: Repository for Source entities
+            validation_service: Service for SDS validation
+            blueprint_reader: Service for reading blueprint defaults (optional)
+            style_generator: Generator for Style defaults (optional)
+            lyrics_generator: Generator for Lyrics defaults (optional)
+            persona_generator: Generator for Persona defaults (optional)
+            producer_generator: Generator for ProducerNotes defaults (optional)
+        """
         self.song_repo = song_repo
         self.style_repo = style_repo
         self.lyrics_repo = lyrics_repo
@@ -46,22 +74,32 @@ class SDSCompilerService:
         self.source_repo = source_repo
         self.validation_service = validation_service
 
+        # Initialize default generators (create instances if not provided)
+        self.blueprint_reader = blueprint_reader or BlueprintReaderService()
+        self.style_generator = style_generator or StyleDefaultGenerator()
+        self.lyrics_generator = lyrics_generator or LyricsDefaultGenerator()
+        self.persona_generator = persona_generator or PersonaDefaultGenerator()
+        self.producer_generator = producer_generator or ProducerDefaultGenerator()
+
     def compile_sds(
         self,
         song_id: UUID,
-        validate: bool = True
+        validate: bool = True,
+        use_defaults: bool = True
     ) -> Dict[str, Any]:
         """Compile SDS from song entity references.
 
         Args:
             song_id: Song UUID
             validate: Whether to run full validation (default: True)
+            use_defaults: Whether to generate defaults for missing entities (default: True)
 
         Returns:
             Complete SDS dictionary
 
         Raises:
-            ValueError: If entity references invalid or validation fails
+            ValueError: If entity references invalid or validation fails,
+                       or if use_defaults=False and entities are missing
         """
         # 1. Fetch all entities in single query
         entities = self.song_repo.get_with_all_entities_for_sds(song_id)
@@ -70,23 +108,46 @@ class SDSCompilerService:
 
         song = entities["song"]
 
-        # 2. Validate all required entities exist
+        # 2. Load blueprint (needed for defaults and validation)
+        if not entities["blueprint"]:
+            raise ValueError(f"Song {song_id} has no blueprint reference")
+
+        blueprint_dict = self.blueprint_reader.read_blueprint(
+            entities["blueprint"].genre
+        )
+
+        logger.debug(
+            "sds.blueprint_loaded",
+            song_id=str(song_id),
+            genre=entities["blueprint"].genre,
+            has_tempo=bool(blueprint_dict.get("tempo_bpm"))
+        )
+
+        # 3. Generate defaults for missing entities (if enabled)
+        entities = self._ensure_all_entities(
+            song,
+            entities,
+            blueprint_dict,
+            use_defaults
+        )
+
+        # 4. Validate all required entities exist
         self._validate_entity_references(entities)
 
-        # 3. Build SDS structure
+        # 5. Build SDS structure
         sds = self._build_sds_structure(song, entities)
 
-        # 4. Normalize source weights
+        # 6. Normalize source weights
         if sds["sources"]:
             sds["sources"] = self._normalize_source_weights(sds["sources"])
 
-        # 5. Validate SDS against JSON schema
+        # 7. Validate SDS against JSON schema
         if validate:
             is_valid, errors = self.validation_service.validate_sds(sds)
             if not is_valid:
                 raise ValueError(f"SDS validation failed: {'; '.join(errors)}")
 
-        # 6. Compute deterministic hash
+        # 8. Compute deterministic hash
         sds_hash = self._compute_sds_hash(sds)
 
         logger.info(
@@ -94,10 +155,143 @@ class SDSCompilerService:
             song_id=str(song_id),
             sds_hash=sds_hash,
             source_count=len(sds["sources"]),
-            seed=sds["seed"]
+            seed=sds["seed"],
+            used_defaults=any(
+                hasattr(entities.get(k), "is_default")
+                for k in ["style", "lyrics", "producer_notes", "persona"]
+            )
         )
 
         return sds
+
+    def _ensure_all_entities(
+        self,
+        song: Any,
+        entities: Dict[str, Any],
+        blueprint_dict: Dict[str, Any],
+        use_defaults: bool
+    ) -> Dict[str, Any]:
+        """Ensure all required entities exist, generating defaults if needed.
+
+        Args:
+            song: Song model instance
+            entities: Dictionary of fetched entities
+            blueprint_dict: Blueprint dictionary with genre defaults
+            use_defaults: Whether to generate defaults for missing entities
+
+        Returns:
+            Updated entities dictionary with all required entities
+
+        Raises:
+            ValueError: If use_defaults=False and entities are missing
+        """
+        # Create a "pseudo-entity" class to hold generated defaults
+        # This allows us to use the same dict-to-model conversion methods
+        class GeneratedEntity:
+            """Pseudo-entity to hold generated default data."""
+            def __init__(self, data: Dict[str, Any], entity_type: str):
+                self._data = data
+                self._type = entity_type
+                # Set is_default flag for tracking
+                self.is_default = True
+                # Copy dict attributes to this object for compatibility
+                for key, value in data.items():
+                    setattr(self, key, value)
+
+        # 1. Ensure Style entity exists
+        if not entities.get("style"):
+            if use_defaults:
+                logger.info(
+                    "sds.generating_default_style",
+                    song_id=str(song.id),
+                    genre=blueprint_dict.get("genre")
+                )
+                style_dict = self.style_generator.generate_default_style(
+                    blueprint_dict,
+                    None
+                )
+                entities["style"] = GeneratedEntity(style_dict, "style")
+            else:
+                raise ValueError(
+                    f"Song {song.id} has no style reference and use_defaults=False"
+                )
+
+        # 2. Ensure Lyrics entity exists
+        if not entities.get("lyrics"):
+            if use_defaults:
+                logger.info(
+                    "sds.generating_default_lyrics",
+                    song_id=str(song.id),
+                    genre=blueprint_dict.get("genre")
+                )
+                lyrics_dict = self.lyrics_generator.generate_default_lyrics(
+                    blueprint_dict,
+                    None
+                )
+                entities["lyrics"] = GeneratedEntity(lyrics_dict, "lyrics")
+            else:
+                raise ValueError(
+                    f"Song {song.id} has no lyrics reference and use_defaults=False"
+                )
+
+        # 3. Ensure ProducerNotes entity exists
+        if not entities.get("producer_notes"):
+            if use_defaults:
+                logger.info(
+                    "sds.generating_default_producer_notes",
+                    song_id=str(song.id),
+                    genre=blueprint_dict.get("genre")
+                )
+
+                # ProducerNotes generator needs style and lyrics
+                # Convert to dict format if they're ORM models
+                style_for_producer = (
+                    entities["style"]._data
+                    if hasattr(entities["style"], "_data")
+                    else self._style_to_dict(entities["style"])
+                )
+                lyrics_for_producer = (
+                    entities["lyrics"]._data
+                    if hasattr(entities["lyrics"], "_data")
+                    else self._lyrics_to_dict(entities["lyrics"])
+                )
+
+                producer_dict = self.producer_generator.generate_default_producer_notes(
+                    blueprint_dict,
+                    style_for_producer,
+                    lyrics_for_producer,
+                    None
+                )
+                entities["producer_notes"] = GeneratedEntity(producer_dict, "producer_notes")
+            else:
+                raise ValueError(
+                    f"Song {song.id} has no producer_notes reference and use_defaults=False"
+                )
+
+        # 4. Ensure Persona entity (optional - can be None)
+        # Persona is optional in SDS, so we only generate if partial data exists
+        # The persona generator will return None if no partial data is provided
+        if not entities.get("persona") and use_defaults:
+            # PersonaDefaultGenerator returns None if no persona is needed
+            persona_dict = self.persona_generator.generate_default_persona(
+                blueprint_dict,
+                None  # No partial persona
+            )
+            if persona_dict:
+                logger.info(
+                    "sds.generating_default_persona",
+                    song_id=str(song.id),
+                    genre=blueprint_dict.get("genre")
+                )
+                entities["persona"] = GeneratedEntity(persona_dict, "persona")
+            else:
+                # Persona remains None - this is valid
+                logger.debug(
+                    "sds.persona_not_needed",
+                    song_id=str(song.id)
+                )
+
+        return entities
 
     def _validate_entity_references(self, entities: Dict[str, Any]) -> None:
         """Validate all required entity references exist."""
@@ -169,7 +363,19 @@ class SDSCompilerService:
         return sds
 
     def _style_to_dict(self, style: Any) -> Dict[str, Any]:
-        """Convert Style ORM model to SDS style format."""
+        """Convert Style ORM model or GeneratedEntity to SDS style format.
+
+        Args:
+            style: Either an ORM Style model or a GeneratedEntity with style data
+
+        Returns:
+            Style dictionary in SDS format
+        """
+        # If this is a GeneratedEntity with pre-formatted data, return it directly
+        if hasattr(style, "_data") and hasattr(style, "is_default"):
+            return style._data
+
+        # Otherwise, convert ORM model to SDS format
         # Build tempo_bpm (single int or range)
         if style.bpm_min and style.bpm_max:
             if style.bpm_min == style.bpm_max:
@@ -241,7 +447,19 @@ class SDSCompilerService:
         return result
 
     def _lyrics_to_dict(self, lyrics: Any) -> Dict[str, Any]:
-        """Convert Lyrics ORM model to SDS lyrics format."""
+        """Convert Lyrics ORM model or GeneratedEntity to SDS lyrics format.
+
+        Args:
+            lyrics: Either an ORM Lyrics model or a GeneratedEntity with lyrics data
+
+        Returns:
+            Lyrics dictionary in SDS format
+        """
+        # If this is a GeneratedEntity with pre-formatted data, return it directly
+        if hasattr(lyrics, "_data") and hasattr(lyrics, "is_default"):
+            return lyrics._data
+
+        # Otherwise, convert ORM model to SDS format
         # Build constraints object from JSONB field and explicit_allowed
         constraints = lyrics.constraints.copy() if lyrics.constraints else {}
 
@@ -294,7 +512,19 @@ class SDSCompilerService:
         return result
 
     def _producer_notes_to_dict(self, producer_notes: Any) -> Dict[str, Any]:
-        """Convert ProducerNotes ORM model to SDS producer notes format."""
+        """Convert ProducerNotes ORM model or GeneratedEntity to SDS producer notes format.
+
+        Args:
+            producer_notes: Either an ORM ProducerNotes model or a GeneratedEntity
+
+        Returns:
+            ProducerNotes dictionary in SDS format
+        """
+        # If this is a GeneratedEntity with pre-formatted data, return it directly
+        if hasattr(producer_notes, "_data") and hasattr(producer_notes, "is_default"):
+            return producer_notes._data
+
+        # Otherwise, convert ORM model to SDS format
         # Build structure string
         if producer_notes.structure_string:
             structure = producer_notes.structure_string

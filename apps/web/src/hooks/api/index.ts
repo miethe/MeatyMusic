@@ -12,6 +12,9 @@ export {
   useDeleteSong,
 } from './useSongs';
 
+// SDS hooks
+export { useSDS, isValidSDS } from './useSDS';
+
 // Style hooks
 export {
   useStyles,
