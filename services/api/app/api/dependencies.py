@@ -6,10 +6,14 @@ and handling authentication/authorization.
 
 from __future__ import annotations
 
+from typing import Optional
+
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
+from app.core.dependencies import get_security_context, get_security_context_optional
+from app.core.security import SecurityContext
 
 # Alias for backward compatibility
 get_db_session = get_db
@@ -44,65 +48,74 @@ from app.services import (
 # Repository dependencies
 def get_blueprint_repository(
     db: Session = Depends(get_db),
+    security_context: SecurityContext = Depends(get_security_context),
 ) -> BlueprintRepository:
-    """Get BlueprintRepository instance."""
-    return BlueprintRepository(db)
+    """Get BlueprintRepository instance with security context."""
+    return BlueprintRepository(db=db, security_context=security_context)
 
 
 def get_persona_repository(
     db: Session = Depends(get_db),
+    security_context: SecurityContext = Depends(get_security_context),
 ) -> PersonaRepository:
-    """Get PersonaRepository instance."""
-    return PersonaRepository(db)
+    """Get PersonaRepository instance with security context."""
+    return PersonaRepository(db=db, security_context=security_context)
 
 
 def get_source_repository(
     db: Session = Depends(get_db),
+    security_context: SecurityContext = Depends(get_security_context),
 ) -> SourceRepository:
-    """Get SourceRepository instance."""
-    return SourceRepository(db)
+    """Get SourceRepository instance with security context."""
+    return SourceRepository(db=db, security_context=security_context)
 
 
 def get_style_repository(
     db: Session = Depends(get_db),
+    security_context: SecurityContext = Depends(get_security_context),
 ) -> StyleRepository:
-    """Get StyleRepository instance."""
-    return StyleRepository(db)
+    """Get StyleRepository instance with security context."""
+    return StyleRepository(db=db, security_context=security_context)
 
 
 def get_song_repository(
     db: Session = Depends(get_db),
+    security_context: SecurityContext = Depends(get_security_context),
 ) -> SongRepository:
-    """Get SongRepository instance."""
-    return SongRepository(db)
+    """Get SongRepository instance with security context."""
+    return SongRepository(db=db, security_context=security_context)
 
 
 def get_lyrics_repository(
     db: Session = Depends(get_db),
+    security_context: SecurityContext = Depends(get_security_context),
 ) -> LyricsRepository:
-    """Get LyricsRepository instance."""
-    return LyricsRepository(db)
+    """Get LyricsRepository instance with security context."""
+    return LyricsRepository(db=db, security_context=security_context)
 
 
 def get_producer_notes_repository(
     db: Session = Depends(get_db),
+    security_context: SecurityContext = Depends(get_security_context),
 ) -> ProducerNotesRepository:
-    """Get ProducerNotesRepository instance."""
-    return ProducerNotesRepository(db)
+    """Get ProducerNotesRepository instance with security context."""
+    return ProducerNotesRepository(db=db, security_context=security_context)
 
 
 def get_workflow_run_repository(
     db: Session = Depends(get_db),
+    security_context: SecurityContext = Depends(get_security_context),
 ) -> WorkflowRunRepository:
-    """Get WorkflowRunRepository instance."""
-    return WorkflowRunRepository(db)
+    """Get WorkflowRunRepository instance with security context."""
+    return WorkflowRunRepository(db=db, security_context=security_context)
 
 
 def get_composed_prompt_repository(
     db: Session = Depends(get_db),
+    security_context: SecurityContext = Depends(get_security_context),
 ) -> ComposedPromptRepository:
-    """Get ComposedPromptRepository instance."""
-    return ComposedPromptRepository(db)
+    """Get ComposedPromptRepository instance with security context."""
+    return ComposedPromptRepository(db=db, security_context=security_context)
 
 
 # Service dependencies

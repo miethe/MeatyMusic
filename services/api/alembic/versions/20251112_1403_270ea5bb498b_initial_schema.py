@@ -21,6 +21,34 @@ depends_on = None
 
 
 def upgrade():
+    # Enable pgcrypto extension for gen_random_bytes()
+    op.execute('CREATE EXTENSION IF NOT EXISTS "pgcrypto"')
+
+    # Create UUID v7 generation function
+    # UUIDv7 provides time-ordered UUIDs which are better for database indexing
+    op.execute("""
+        CREATE OR REPLACE FUNCTION generate_uuid_v7() RETURNS uuid
+        AS $$
+        DECLARE
+            unix_ts_ms bytea;
+            uuid_bytes bytea;
+        BEGIN
+            unix_ts_ms = substring(int8send(floor(extract(epoch from clock_timestamp()) * 1000)::bigint) from 3);
+
+            -- 6 bytes timestamp, 10 bytes random
+            uuid_bytes = unix_ts_ms || gen_random_bytes(10);
+
+            -- Set version 7
+            uuid_bytes = set_byte(uuid_bytes, 6, (b'0111' || substring(get_byte(uuid_bytes, 6)::bit(8)::text, 5, 4))::bit(8)::int);
+
+            -- Set variant to 10
+            uuid_bytes = set_byte(uuid_bytes, 8, (b'10' || substring(get_byte(uuid_bytes, 8)::bit(8)::text, 3, 6))::bit(8)::int);
+
+            RETURN encode(uuid_bytes, 'hex')::uuid;
+        END
+        $$ LANGUAGE plpgsql VOLATILE;
+    """)
+
     # Create tenants table
     op.create_table(
         'tenants',
@@ -99,6 +127,7 @@ def upgrade():
 
 
 def downgrade():
+    # Drop tables in reverse order
     # Drop RLS policies
     op.execute('DROP POLICY IF EXISTS tenant_isolation_policy ON user_preferences')
     op.execute('DROP POLICY IF EXISTS tenant_isolation_policy ON users')
@@ -116,3 +145,6 @@ def downgrade():
     op.drop_index('ix_tenants_slug', 'tenants')
     op.drop_index('ix_tenants_name', 'tenants')
     op.drop_table('tenants')
+
+    # Drop UUID v7 function
+    op.execute('DROP FUNCTION IF EXISTS generate_uuid_v7()')
