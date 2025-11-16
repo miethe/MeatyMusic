@@ -3,29 +3,49 @@
  */
 
 export const API_CONFIG = {
-  BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000',
+  BASE_URL: `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/v1`,
   TIMEOUT: 30000, // 30 seconds
   RETRY_ATTEMPTS: 2,
 } as const;
 
 /**
  * API endpoints
- * Will be populated in Phase 3 with actual MeatyMusic routes
+ * Note: BASE_URL already includes /api/v1, so these are relative to that
  */
 export const API_ENDPOINTS = {
   // User endpoints
-  USER_ME: '/api/v1/users/me',
-  USER_PREFERENCES: '/api/v1/users/me/preferences',
+  USER_ME: '/users/me',
+  USER_PREFERENCES: '/users/me/preferences',
 
-  // Song endpoints (placeholder)
-  SONGS: '/api/v1/songs',
-  SONG_DETAIL: (id: string) => `/api/v1/songs/${id}`,
+  // Song endpoints
+  SONGS: '/songs',
+  SONG_DETAIL: (id: string) => `/songs/${id}`,
 
-  // Persona endpoints (placeholder)
-  PERSONAS: '/api/v1/personas',
-  PERSONA_DETAIL: (id: string) => `/api/v1/personas/${id}`,
+  // Persona endpoints
+  PERSONAS: '/personas',
+  PERSONA_DETAIL: (id: string) => `/personas/${id}`,
 
-  // Style endpoints (placeholder)
-  STYLES: '/api/v1/styles',
-  STYLE_DETAIL: (id: string) => `/api/v1/styles/${id}`,
+  // Style endpoints
+  STYLES: '/styles',
+  STYLE_DETAIL: (id: string) => `/styles/${id}`,
+
+  // Lyrics endpoints
+  LYRICS: '/lyrics',
+  LYRICS_DETAIL: (id: string) => `/lyrics/${id}`,
+
+  // Producer Notes endpoints
+  PRODUCER_NOTES: '/producer-notes',
+  PRODUCER_NOTES_DETAIL: (id: string) => `/producer-notes/${id}`,
+
+  // Blueprint endpoints
+  BLUEPRINTS: '/blueprints',
+  BLUEPRINT_DETAIL: (id: string) => `/blueprints/${id}`,
+
+  // Workflow endpoints
+  WORKFLOW_RUNS: '/workflows/runs',
+  WORKFLOW_RUN_DETAIL: (id: string) => `/workflows/runs/${id}`,
+  WORKFLOW_EXECUTE: '/workflows/execute',
+  WORKFLOW_RUN_PROGRESS: (id: string) => `/workflows/runs/${id}/progress`,
+  WORKFLOW_RUN_SUMMARY: (id: string) => `/workflows/runs/${id}/summary`,
+  WORKFLOW_RUN_CANCEL: (id: string) => `/workflows/runs/${id}/cancel`,
 } as const;
