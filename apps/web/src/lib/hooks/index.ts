@@ -25,96 +25,66 @@
  */
 
 // ============================================================================
+// Store Integration Hooks - TEMPORARILY DISABLED
+// ============================================================================
+
+// TODO: Re-enable after resolving @meatymusic/store workspace dependency issues in Next.js build
+// The store package exists and is built, but Next.js has issues resolving workspace dependencies
+// during the production build. These hooks work fine in dev mode.
+
 // Songs Hooks
-// ============================================================================
+// export {
+//   useSongsWithStore,
+//   useSongWithStore,
+//   useCreateSongMutation,
+//   useUpdateSongMutation,
+//   useDeleteSongMutation,
+//   usePrefetchSongs,
+//   usePrefetchSong,
+//   songsKeys,
+// } from './useSongsWithStore';
 
-export {
-  // Query hooks
-  useSongsWithStore,
-  useSongWithStore,
-
-  // Mutation hooks
-  useCreateSongMutation,
-  useUpdateSongMutation,
-  useDeleteSongMutation,
-
-  // Prefetch utilities
-  usePrefetchSongs,
-  usePrefetchSong,
-
-  // Query keys
-  songsKeys,
-} from './useSongsWithStore';
-
-// ============================================================================
 // Workflows Hooks
-// ============================================================================
+// export {
+//   useWorkflowsWithStore,
+//   useWorkflowDetailsWithStore,
+//   useWorkflowProgressWithStore,
+//   useWorkflowSummaryWithStore,
+//   useStartWorkflowMutation,
+//   useCancelWorkflowMutation,
+//   useRetryWorkflowMutation,
+//   usePrefetchWorkflows,
+//   usePrefetchWorkflow,
+//   useClearWorkflowDetails,
+//   workflowsKeys,
+// } from './useWorkflowsWithStore';
 
-export {
-  // Query hooks
-  useWorkflowsWithStore,
-  useWorkflowDetailsWithStore,
-  useWorkflowProgressWithStore,
-  useWorkflowSummaryWithStore,
-
-  // Mutation hooks
-  useStartWorkflowMutation,
-  useCancelWorkflowMutation,
-  useRetryWorkflowMutation,
-
-  // Prefetch utilities
-  usePrefetchWorkflows,
-  usePrefetchWorkflow,
-
-  // Invalidation helpers
-  useClearWorkflowDetails,
-
-  // Query keys
-  workflowsKeys,
-} from './useWorkflowsWithStore';
-
-// ============================================================================
 // Entities Hooks
-// ============================================================================
+// export {
+//   useStylesWithStore,
+//   useStyleWithStore,
+//   useCreateStyleMutation,
+//   useUpdateStyleMutation,
+//   useDeleteStyleMutation,
+//   useLyricsWithStore,
+//   useLyricsItemWithStore,
+//   useCreateLyricsMutation,
+//   useUpdateLyricsMutation,
+//   useDeleteLyricsMutation,
+//   usePersonasWithStore,
+//   usePersonaWithStore,
+//   useCreatePersonaMutation,
+//   useUpdatePersonaMutation,
+//   useDeletePersonaMutation,
+//   entitiesKeys,
+// } from './useEntitiesWithStore';
 
-export {
-  // Styles
-  useStylesWithStore,
-  useStyleWithStore,
-  useCreateStyleMutation,
-  useUpdateStyleMutation,
-  useDeleteStyleMutation,
-
-  // Lyrics
-  useLyricsWithStore,
-  useLyricsItemWithStore,
-  useCreateLyricsMutation,
-  useUpdateLyricsMutation,
-  useDeleteLyricsMutation,
-
-  // Personas
-  usePersonasWithStore,
-  usePersonaWithStore,
-  useCreatePersonaMutation,
-  useUpdatePersonaMutation,
-  useDeletePersonaMutation,
-
-  // Query keys
-  entitiesKeys,
-} from './useEntitiesWithStore';
-
-// ============================================================================
 // WebSocket Store Sync Hooks
-// ============================================================================
-
-export {
-  // Store sync hooks
-  useStoreSync,
-  useGlobalStoreSync,
-
-  // Type exports
-  type UseStoreSyncOptions,
-} from './useStoreSync';
+// export {
+//   useStoreSync,
+//   useGlobalStoreSync,
+//   type UseStoreSyncOptions,
+// } from './useStoreSync';
 
 // ============================================================================
 // Type Exports
@@ -141,150 +111,3 @@ export type {
 export type {
   PersonaFilters,
 } from '@/lib/api/personas';
-
-// ============================================================================
-// Usage Documentation
-// ============================================================================
-
-/**
- * USAGE GUIDE
- * ===========
- *
- * ## Query Hooks (Fetching Data)
- *
- * All query hooks automatically sync data to their respective Zustand stores.
- * You can use either the React Query data directly or read from the store.
- *
- * ```tsx
- * // Option 1: Use React Query data directly
- * const { data, isLoading, error } = useSongsWithStore({ status: ['draft'] });
- *
- * // Option 2: Use store selectors (data is already synced)
- * import { useSongs } from '@meatymusic/store';
- * const songs = useSongs(); // Returns Map<UUID, Song>
- * ```
- *
- * ## Mutation Hooks (Creating/Updating/Deleting)
- *
- * All mutation hooks implement optimistic updates:
- * 1. Update happens immediately in UI (optimistic)
- * 2. API request is sent
- * 3. On success: optimistic update is committed
- * 4. On error: optimistic update is rolled back
- *
- * ```tsx
- * const createSong = useCreateSongMutation();
- *
- * const handleCreate = async () => {
- *   try {
- *     const song = await createSong.mutateAsync({
- *       title: 'My Song',
- *       global_seed: 12345
- *     });
- *     // Song appears in UI immediately, even before API responds
- *   } catch (error) {
- *     // Automatically rolled back on error
- *   }
- * };
- * ```
- *
- * ## Store Sync Hook (Real-time WebSocket Updates)
- *
- * The useStoreSync hook synchronizes stores with WebSocket events.
- * Use it in workflow detail pages to get automatic real-time updates:
- *
- * ```tsx
- * function WorkflowDetailsPage({ runId }: { runId: string }) {
- *   // Automatically syncs stores with WebSocket events
- *   useStoreSync(runId);
- *
- *   // All stores are now kept in sync with real-time events:
- *   // - Songs store updates when workflow completes
- *   // - Entities store updates when entities are generated
- *   // - Workflow store updates with node progress
- *   // - React Query cache invalidates appropriately
- *
- *   return <WorkflowProgress runId={runId} />;
- * }
- * ```
- *
- * For dashboard pages that need to react to any workflow:
- *
- * ```tsx
- * function WorkflowsDashboard() {
- *   // Syncs all workflow events globally (placeholder for future)
- *   useGlobalStoreSync();
- *
- *   const { data: workflows } = useWorkflowsWithStore();
- *   return <WorkflowsList workflows={workflows} />;
- * }
- * ```
- *
- * ## Loading States
- *
- * Query loading states are automatically synced to stores:
- *
- * ```tsx
- * // Both work:
- * const { isLoading } = useSongsWithStore();
- * // OR
- * import { useSongsLoading } from '@meatymusic/store';
- * const isLoading = useSongsLoading();
- * ```
- *
- * ## Error Handling
- *
- * Errors are automatically synced to stores:
- *
- * ```tsx
- * const { error } = useSongsWithStore();
- * // OR
- * import { useSongsError } from '@meatymusic/store';
- * const error = useSongsError();
- * ```
- *
- * ## Prefetching for Performance
- *
- * Use prefetch hooks to load data before navigation:
- *
- * ```tsx
- * const prefetchSong = usePrefetchSong();
- *
- * <SongRow
- *   onMouseEnter={() => prefetchSong(song.id)}
- *   onClick={() => navigate(`/songs/${song.id}`)}
- * />
- * ```
- *
- * ## Query Invalidation
- *
- * Mutations automatically invalidate related queries.
- * For manual invalidation:
- *
- * ```tsx
- * import { useQueryClient } from '@tanstack/react-query';
- * import { songsKeys } from '@/lib/hooks';
- *
- * const queryClient = useQueryClient();
- * queryClient.invalidateQueries({ queryKey: songsKeys.all });
- * ```
- *
- * ## Best Practices
- *
- * 1. Use query hooks in page/route components
- * 2. Use store selectors in child components
- * 3. Mutations handle optimistic updates automatically
- * 4. Use useStoreSync in workflow detail pages for real-time sync
- * 5. Prefetch on hover for instant navigation
- * 6. Let the hooks manage loading/error states
- * 7. Don't manually sync query data to stores (it's automatic)
- *
- * ## Performance Tips
- *
- * - Queries have built-in staleTime to reduce refetches
- * - Use prefetching for perceived instant navigation
- * - Store data persists across component unmounts
- * - Optimistic updates make UI feel instant
- * - React Query handles caching and deduplication
- * - WebSocket events trigger targeted cache invalidation (not full refetches)
- */

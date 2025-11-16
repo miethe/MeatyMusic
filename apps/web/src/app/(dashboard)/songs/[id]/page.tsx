@@ -17,6 +17,7 @@ import { useSong, useDeleteSong, useSDS } from '@/hooks/api';
 import { songsApi } from '@/lib/api/songs';
 import { useUIStore } from '@/stores';
 import { EntityDetailSection } from '@/components/songs/EntityDetailSection';
+import { PersonaKind } from '@/types/api/entities';
 import {
   Edit,
   Play,
@@ -305,7 +306,7 @@ export default function SongDetailPage() {
                         name: 'Default Artist',
                         vocal_range: 'Tenor',
                         delivery: ['smooth', 'powerful'],
-                        kind: 'artist' as const,
+                        kind: PersonaKind.ARTIST,
                       }
                     : undefined
                 }

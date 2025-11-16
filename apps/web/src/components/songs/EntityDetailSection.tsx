@@ -8,9 +8,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { Card } from '@meatymusic/ui/components/Card/Card';
-import { Button } from '@meatymusic/ui/components/Button/Button';
-import { Badge } from '@meatymusic/ui/components/Badge/Badge';
+import { Card, Button, Badge } from '@meatymusic/ui';
 import {
   Palette,
   FileText,
@@ -178,102 +176,98 @@ function getEntityProperties(
 /**
  * EntityDetailSection Component
  */
-export const EntityDetailSection = React.forwardRef<HTMLDivElement, EntityDetailSectionProps>(
-  ({ entityType, entityId, entityData, editHref, createHref }, ref) => {
-    const typeName = getEntityTypeName(entityType);
-    const icon = getEntityIcon(entityType);
-    const properties = getEntityProperties(entityType, entityData);
+export function EntityDetailSection({ entityType, entityId, entityData, editHref, createHref }: EntityDetailSectionProps) {
+  const typeName = getEntityTypeName(entityType);
+  const icon = getEntityIcon(entityType);
+  const properties = getEntityProperties(entityType, entityData);
 
-    return (
-      <Card ref={ref} className="p-6">
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-4">
-          <div className="text-primary">{icon}</div>
-          <h3 className="text-lg font-semibold flex-1">{typeName}</h3>
-          {entityData && (
-            <Badge variant="secondary" className="text-xs">
-              Assigned
-            </Badge>
-          )}
-        </div>
-
-        {entityId ? (
-          <>
-            {/* Entity ID */}
-            <div className="mb-4">
-              <p className="text-xs text-muted-foreground mb-1">Entity ID</p>
-              <p className="font-mono text-sm text-muted-foreground truncate" title={entityId}>
-                {entityId}
-              </p>
-            </div>
-
-            {/* Properties */}
-            {properties.length > 0 && (
-              <div className="space-y-3 mb-4">
-                {properties.map(({ label, value, type }) => {
-                  if (value === null || value === undefined) return null;
-
-                  return (
-                    <div key={label}>
-                      <dt className="text-xs text-muted-foreground mb-1">{label}</dt>
-                      <dd className="text-sm">
-                        {type === 'badge' ? (
-                          <Badge variant="outline" className="text-xs">
-                            {formatFieldValue(value)}
-                          </Badge>
-                        ) : Array.isArray(value) && value.length > 0 ? (
-                          <div className="flex flex-wrap gap-1">
-                            {value.slice(0, 3).map((item, idx) => (
-                              <Badge key={idx} variant="outline" className="text-xs">
-                                {String(item)}
-                              </Badge>
-                            ))}
-                            {value.length > 3 && (
-                              <Badge variant="outline" className="text-xs text-muted-foreground">
-                                +{value.length - 3} more
-                              </Badge>
-                            )}
-                          </div>
-                        ) : (
-                          <span className="text-text-primary">{formatFieldValue(value)}</span>
-                        )}
-                      </dd>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* Edit Button */}
-            <Link href={editHref}>
-              <Button variant="outline" size="sm" className="w-full">
-                <Edit className="w-3 h-3 mr-2" />
-                View / Edit {typeName}
-              </Button>
-            </Link>
-          </>
-        ) : (
-          <>
-            {/* Not Assigned State */}
-            <div className="mb-4 py-8 text-center">
-              <div className="text-muted-foreground/50 mb-2">{icon}</div>
-              <p className="text-sm text-muted-foreground">
-                No {typeName.toLowerCase()} assigned
-              </p>
-            </div>
-
-            {/* Create Button */}
-            <Link href={createHref}>
-              <Button variant="outline" size="sm" className="w-full">
-                <Plus className="w-3 h-3 mr-2" />
-                Create {typeName}
-              </Button>
-            </Link>
-          </>
+  return (
+    <Card className="p-6">
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-4">
+        <div className="text-primary">{icon}</div>
+        <h3 className="text-lg font-semibold flex-1">{typeName}</h3>
+        {entityData && (
+          <Badge variant="secondary" className="text-xs">
+            Assigned
+          </Badge>
         )}
-      </Card>
-    );
-  }
-);
+      </div>
 
-EntityDetailSection.displayName = 'EntityDetailSection';
+      {entityId ? (
+        <>
+          {/* Entity ID */}
+          <div className="mb-4">
+            <p className="text-xs text-muted-foreground mb-1">Entity ID</p>
+            <p className="font-mono text-sm text-muted-foreground truncate" title={entityId}>
+              {entityId}
+            </p>
+          </div>
+
+          {/* Properties */}
+          {properties.length > 0 && (
+            <div className="space-y-3 mb-4">
+              {properties.map(({ label, value, type }) => {
+                if (value === null || value === undefined) return null;
+
+                return (
+                  <div key={label}>
+                    <dt className="text-xs text-muted-foreground mb-1">{label}</dt>
+                    <dd className="text-sm">
+                      {type === 'badge' ? (
+                        <Badge variant="outline" className="text-xs">
+                          {formatFieldValue(value)}
+                        </Badge>
+                      ) : Array.isArray(value) && value.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {value.slice(0, 3).map((item, idx) => (
+                            <Badge key={idx} variant="outline" className="text-xs">
+                              {String(item)}
+                            </Badge>
+                          ))}
+                          {value.length > 3 && (
+                            <Badge variant="outline" className="text-xs text-muted-foreground">
+                              +{value.length - 3} more
+                            </Badge>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-text-primary">{formatFieldValue(value)}</span>
+                      )}
+                    </dd>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Edit Button */}
+          <Link href={editHref}>
+            <Button variant="outline" size="sm" className="w-full">
+              <Edit className="w-3 h-3 mr-2" />
+              View / Edit {typeName}
+            </Button>
+          </Link>
+        </>
+      ) : (
+        <>
+          {/* Not Assigned State */}
+          <div className="mb-4 py-8 text-center">
+            <div className="text-muted-foreground/50 mb-2">{icon}</div>
+            <p className="text-sm text-muted-foreground">
+              No {typeName.toLowerCase()} assigned
+            </p>
+          </div>
+
+          {/* Create Button */}
+          <Link href={createHref}>
+            <Button variant="outline" size="sm" className="w-full">
+              <Plus className="w-3 h-3 mr-2" />
+              Create {typeName}
+            </Button>
+          </Link>
+        </>
+      )}
+    </Card>
+  );
+}

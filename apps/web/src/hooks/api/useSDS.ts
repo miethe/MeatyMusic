@@ -8,9 +8,9 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { songsApi } from '@/lib/api';
+import { songsApi, type SDS } from '@/lib/api';
 import { queryKeys, getStaleTime } from '@/lib/query/config';
-import type { UUID, SDS } from '@/lib/api';
+import type { UUID } from '@/types/api/entities';
 
 /**
  * Fetch Song Design Spec (SDS) for a song
