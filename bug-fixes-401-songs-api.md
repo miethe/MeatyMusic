@@ -40,10 +40,20 @@
   - Added TODO comments for future production JWT auth
 - **Result**: Clean dev-only authentication system, ~70 lines of code removed
 
+### 8. Removed Header Requirement for Dev Bypass
+- **Why**: Browser usage requires seamless local development without header configuration
+- **Fix**:
+  - Modified `get_current_user_token()` to automatically bypass when `DEV_AUTH_BYPASS_ENABLED=true`
+  - Removed `X-Dev-Auth-Bypass` header requirement
+  - Removed `DEV_AUTH_BYPASS_SECRET` validation
+  - Updated config warning to reflect automatic authentication
+- **Result**: Zero-config local development - just start the server and use the app
+
 ## Validation
 - ✅ GET /api/v1/songs returns 200 with empty list
-- ✅ Dev auth bypass working with X-Dev-Auth-Bypass header
+- ✅ Dev auth bypass working automatically (no headers required)
 - ✅ Swagger UI accessible at http://localhost:8000/docs
 - ✅ Database UUID types correct
 - ✅ Tenant and user creation working
 - ✅ Simplified authentication (no Clerk dependencies)
+- ✅ Zero-config browser access for local development

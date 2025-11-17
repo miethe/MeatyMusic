@@ -34,7 +34,7 @@ async def get_current_user_token(
 ) -> str:
     """Extract authentication token from request.
 
-    MVP SIMPLIFIED: Only supports development auth bypass via X-Dev-Auth-Bypass header.
+    MVP SIMPLIFIED: Automatically bypasses auth in dev mode (no header required).
 
     TODO (Future): Add JWT Bearer token extraction from Authorization header
 
@@ -42,23 +42,21 @@ async def get_current_user_token(
         DEV_BYPASS_TOKEN marker for dev bypass
 
     Raises:
-        HTTPException: If dev bypass header is missing or invalid
+        HTTPException: If authentication is required but dev bypass is not enabled
     """
-    # Development bypass check (secure by environment validation in settings)
+    # Development bypass check - automatic when enabled
     if settings.DEV_AUTH_BYPASS_ENABLED:
-        bypass_header = request.headers.get("X-Dev-Auth-Bypass")
-        if bypass_header == settings.DEV_AUTH_BYPASS_SECRET:
-            logger.warning(
-                "dev_bypass_token_extracted",
-                path=request.url.path,
-                msg="⚠️  Development auth bypass active"
-            )
-            return "DEV_BYPASS_TOKEN"
+        logger.debug(
+            "dev_bypass_token_auto",
+            path=request.url.path,
+            msg="Development auth bypass automatically applied"
+        )
+        return "DEV_BYPASS_TOKEN"
 
-    # No JWT validation in MVP - require dev bypass
+    # No JWT validation in MVP - require dev bypass to be enabled
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Authentication required. Use X-Dev-Auth-Bypass header in development mode."
+        detail="Authentication required. Enable DEV_AUTH_BYPASS_ENABLED in development mode."
     )
 
 
@@ -179,7 +177,7 @@ async def get_security_context_optional(
 ) -> Optional[SecurityContext]:
     """Optional security context dependency that doesn't raise on missing auth.
 
-    MVP SIMPLIFIED: Only supports dev bypass. Returns None if bypass header not present.
+    MVP SIMPLIFIED: Automatically provides context if dev bypass enabled.
 
     TODO (Future): Add optional JWT token validation
 
@@ -190,16 +188,14 @@ async def get_security_context_optional(
     Returns:
         SecurityContext if dev bypass active, None otherwise
     """
-    # Check for dev bypass
+    # Check for dev bypass - automatic when enabled
     if settings.DEV_AUTH_BYPASS_ENABLED:
-        bypass_header = request.headers.get("X-Dev-Auth-Bypass")
-        if bypass_header == settings.DEV_AUTH_BYPASS_SECRET:
-            try:
-                token = await get_current_user_token(request)
-                return await get_security_context(request, token, db)
-            except HTTPException:
-                logger.debug("Dev bypass header present but invalid")
-                return None
+        try:
+            token = await get_current_user_token(request)
+            return await get_security_context(request, token, db)
+        except HTTPException:
+            logger.debug("Dev bypass enabled but context creation failed")
+            return None
 
     # TODO (Future): Add JWT token validation
     # Example:

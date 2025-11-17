@@ -267,7 +267,7 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def _validate_dev_bypass_security(self) -> "Settings":
-        """Ensure dev bypass is only enabled in development with strong security."""
+        """Ensure dev bypass is only enabled in development."""
         if self.DEV_AUTH_BYPASS_ENABLED:
             # Never allow in production
             environment = self.ENVIRONMENT
@@ -276,18 +276,13 @@ class Settings(BaseSettings):
                     "DEV_AUTH_BYPASS_ENABLED cannot be true in production environment"
                 )
 
-            # Require strong secret
-            if not self.DEV_AUTH_BYPASS_SECRET or len(self.DEV_AUTH_BYPASS_SECRET) < 32:
-                raise ValueError(
-                    "DEV_AUTH_BYPASS_SECRET must be at least 32 characters when bypass is enabled"
-                )
-
             # Log warning for visibility
             import logging
             logger = logging.getLogger(__name__)
             logger.warning(
                 "⚠️  DEV_AUTH_BYPASS is ENABLED - development only! "
-                "This allows bypassing authentication with a secret header."
+                "ALL requests will be automatically authenticated as dev user. "
+                "This is INSECURE and should NEVER be used in production."
             )
 
         return self
