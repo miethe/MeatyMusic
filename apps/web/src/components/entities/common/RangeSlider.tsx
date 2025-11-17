@@ -111,14 +111,14 @@ export function RangeSlider({
       <div className="flex items-center justify-between">
         <label className="block text-sm font-medium text-text-primary">
           {label}
-          {required && <span className="text-accent-error ml-1">*</span>}
+          {required && <span className="text-red-500 ml-1">*</span>}
         </label>
         {allowRange && (
           <button
             type="button"
             onClick={toggleRangeMode}
             disabled={disabled}
-            className="text-xs text-accent-secondary hover:text-accent-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="text-xs text-text-secondary hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isRange ? 'Single value' : 'Range'}
           </button>
@@ -128,10 +128,10 @@ export function RangeSlider({
       <div className="relative pt-6 pb-2">
         <div
           ref={trackRef}
-          className="relative h-1.5 bg-background-tertiary rounded-full cursor-pointer"
+          className="relative h-1.5 bg-bg-elevated rounded-full cursor-pointer"
         >
           <div
-            className="absolute h-full rounded-full bg-gradient-to-r from-accent-primary to-accent-tertiary"
+            className="absolute h-full rounded-full bg-gradient-to-r from-primary to-primary/80"
             style={{
               left: `${getPositionFromValue(minValue)}%`,
               right: `${100 - getPositionFromValue(maxValue)}%`,
@@ -143,7 +143,7 @@ export function RangeSlider({
               type="button"
               onMouseDown={handleMouseDown('min')}
               disabled={disabled}
-              className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-accent-primary border-3 border-background-secondary shadow-md transition-transform hover:scale-110 active:scale-125 focus:outline-none focus:ring-2 focus:ring-border-focus disabled:opacity-50 disabled:cursor-not-allowed ${
+              className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-primary border-2 border-bg-base shadow-md transition-transform hover:scale-110 active:scale-125 focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50 disabled:cursor-not-allowed ${
                 isDragging === 'min' ? 'scale-125 shadow-lg' : ''
               }`}
               style={{ left: `${getPositionFromValue(minValue)}%` }}
@@ -155,7 +155,7 @@ export function RangeSlider({
             type="button"
             onMouseDown={handleMouseDown('max')}
             disabled={disabled}
-            className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-accent-primary border-3 border-background-secondary shadow-md transition-transform hover:scale-110 active:scale-125 focus:outline-none focus:ring-2 focus:ring-border-focus disabled:opacity-50 disabled:cursor-not-allowed ${
+            className={`absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-primary border-2 border-bg-base shadow-md transition-transform hover:scale-110 active:scale-125 focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50 disabled:cursor-not-allowed ${
               isDragging === 'max' ? 'scale-125 shadow-lg' : ''
             }`}
             style={{ left: `${getPositionFromValue(maxValue)}%` }}
@@ -198,7 +198,7 @@ export function RangeSlider({
               type="button"
               onClick={() => applyPreset(preset.value)}
               disabled={disabled}
-              className="px-3 py-1 text-xs rounded-md bg-background-tertiary text-text-secondary hover:bg-accent-primary/20 hover:text-accent-primary border border-border-secondary hover:border-accent-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1 text-xs rounded-md bg-bg-elevated text-text-secondary hover:bg-primary/20 hover:text-primary border border-border-default hover:border-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {preset.label}
             </button>
@@ -211,7 +211,7 @@ export function RangeSlider({
       )}
 
       {error && (
-        <p className="text-xs text-accent-error" role="alert">
+        <p className="text-xs text-red-500" role="alert">
           {error}
         </p>
       )}

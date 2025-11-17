@@ -20,6 +20,8 @@ class SourceRepository(BaseRepository[Source]):
     security context is set.
     """
 
+    model_class = Source  # Type annotation for generic list operations
+
     def get_by_scope(self, scope: str) -> List[Source]:
         """Get all sources for a specific MCP scope.
 

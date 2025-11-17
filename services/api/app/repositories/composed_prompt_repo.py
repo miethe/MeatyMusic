@@ -21,6 +21,8 @@ class ComposedPromptRepository(BaseRepository[ComposedPrompt]):
     security context is set.
     """
 
+    model_class = ComposedPrompt  # Type annotation for generic list operations
+
     def get_by_song_id(self, song_id: UUID) -> List[ComposedPrompt]:
         """Get all composed prompts for a specific song.
 

@@ -20,6 +20,8 @@ class NodeExecutionRepository(BaseRepository[NodeExecution]):
     workflow runs, including status updates and performance metrics.
     """
 
+    model_class = NodeExecution  # Type annotation for generic list operations
+
     def get_by_run_id(self, run_id: UUID) -> List[NodeExecution]:
         """Get all node executions for a specific workflow run.
 

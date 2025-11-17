@@ -21,6 +21,8 @@ class WorkflowEventRepository(BaseRepository[WorkflowEvent]):
     observability, debugging, and event replay.
     """
 
+    model_class = WorkflowEvent  # Type annotation for generic list operations
+
     def get_by_run_id(
         self, run_id: UUID, limit: Optional[int] = None
     ) -> List[WorkflowEvent]:

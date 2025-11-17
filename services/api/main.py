@@ -55,12 +55,20 @@ if settings.OBS.TRACING_ENABLED:
     init_tracing(app, engine)
 
 # Add CORS middleware
+# NOTE: allow_origins=["*"] with allow_credentials=True can cause issues in some browsers.
+# For development, we use ["*"] which works, but credentials won't be sent.
+# For production, specify exact origins.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # TODO: Configure for production
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:19006",
+        "http://127.0.0.1:3000",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 # Add middleware stack (order matters - last added is executed first)

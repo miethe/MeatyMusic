@@ -21,6 +21,8 @@ class LyricsRepository(BaseRepository[Lyrics]):
     security context is set.
     """
 
+    model_class = Lyrics  # Type annotation for generic list operations
+
     def get_by_song_id(self, song_id: UUID) -> List[Lyrics]:
         """Get all lyrics for a specific song.
 

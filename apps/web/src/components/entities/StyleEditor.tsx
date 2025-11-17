@@ -180,20 +180,20 @@ export function StyleEditor({
 
   return (
     <div className={`flex flex-col h-full ${className}`}>
-      <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-border-secondary bg-background-secondary">
+      <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-border-default bg-bg-surface">
         <h2 className="text-lg font-semibold text-text-primary">Style Editor</h2>
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={() => setShowPreview(!showPreview)}
-            className="text-sm text-accent-secondary hover:text-accent-primary transition-colors md:hidden"
+            className="text-sm text-text-secondary hover:text-primary transition-colors md:hidden"
           >
             {showPreview ? 'Hide' : 'Show'} Preview
           </button>
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 rounded-lg border border-border-secondary text-text-secondary hover:border-border-primary hover:text-text-primary transition-colors"
+            className="px-4 py-2 rounded-lg border border-border-default text-text-secondary hover:border-primary hover:text-text-primary transition-colors"
           >
             <X className="h-4 w-4" />
           </button>
@@ -232,35 +232,35 @@ export function StyleEditor({
               />
 
               <div className="flex items-center gap-4 text-sm text-text-tertiary">
-                <div className="flex-1 h-px bg-border-secondary" />
+                <div className="flex-1 h-px bg-border-default" />
                 <span>Or create new:</span>
-                <div className="flex-1 h-px bg-border-secondary" />
+                <div className="flex-1 h-px bg-border-default" />
               </div>
             </>
           )}
 
           <div>
             <label className="block text-sm font-medium text-text-primary mb-2">
-              Style Name <span className="text-accent-error">*</span>
+              Style Name <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               value={formData.name || ''}
               onChange={(e) => updateField('name', e.target.value)}
               placeholder="e.g., Modern Pop Ballad"
-              className="w-full px-4 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary placeholder:text-text-muted focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"
+              className="w-full px-4 py-2 rounded-lg bg-bg-elevated border border-border-default text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors"
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-text-primary mb-2">
-                Primary Genre <span className="text-accent-error">*</span>
+                Primary Genre <span className="text-red-500">*</span>
               </label>
               <select
                 value={formData.genre || ''}
                 onChange={(e) => updateField('genre', e.target.value)}
-                className="w-full px-4 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"
+                className="w-full px-4 py-2 rounded-lg bg-bg-elevated border border-border-default text-text-primary focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors"
               >
                 <option value="" className="bg-bg-base text-text-primary">Select genre...</option>
                 {GENRE_OPTIONS.map((genre) => (
@@ -278,7 +278,7 @@ export function StyleEditor({
               <select
                 value={formData.key || ''}
                 onChange={(e) => updateField('key', e.target.value)}
-                className="w-full px-4 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"
+                className="w-full px-4 py-2 rounded-lg bg-bg-elevated border border-border-default text-text-primary focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors"
               >
                 <option value="" className="bg-bg-base text-text-primary">Select key...</option>
                 {KEY_OPTIONS.map((key) => (
@@ -373,7 +373,7 @@ export function StyleEditor({
         </div>
 
         {showPreview && (
-          <div className="w-full md:w-96 border-l border-border-secondary bg-background-secondary">
+          <div className="w-full md:w-96 border-l border-border-default bg-bg-surface">
             <EntityPreviewPanel
               entity={formData as Record<string, unknown>}
               validationErrors={validationErrors}

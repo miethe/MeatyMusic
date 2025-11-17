@@ -91,7 +91,7 @@ async def list_lyrics(
     # Note: list() method needs to be added to LyricsService for full service layer compliance
     # For now, we access repo directly for pagination (this is acceptable for list operations)
     cursor_uuid = UUID(cursor) if cursor else None
-    lyrics_list = await service.repo.list(limit=limit + 1, offset=cursor_uuid)
+    lyrics_list = service.repo.list(limit=limit + 1, offset=cursor_uuid)
 
     has_next = len(lyrics_list) > limit
     items = lyrics_list[:limit]

@@ -24,6 +24,8 @@ class SongRepository(BaseRepository[Song]):
     security context is set.
     """
 
+    model_class = Song  # Type annotation for generic list operations
+
     def get_by_status(self, status: str) -> List[Song]:
         """Get all songs with a specific status.
 
