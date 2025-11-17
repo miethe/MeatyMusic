@@ -7,20 +7,47 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@meatymusic/ui';
 import { SongList, type SongFilters } from '@/components/songs/SongList';
 import { useSongs } from '@/hooks/api/useSongs';
 import { Plus, Filter, Loader2 } from 'lucide-react';
 import { ROUTES } from '@/config/routes';
+import type { Song } from '@/types/api';
 
 export default function SongsPage() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = React.useState('');
   const [filters, setFilters] = React.useState<SongFilters>({
     q: '',
   });
 
   const { data, isLoading, error } = useSongs(filters);
+
+  // Navigation handlers
+  const handleSongClick = React.useCallback((song: Song) => {
+    router.push(ROUTES.SONG_DETAIL(song.id));
+  }, [router]);
+
+  const handleViewWorkflow = React.useCallback((song: Song) => {
+    router.push(ROUTES.SONG_WORKFLOW(song.id));
+  }, [router]);
+
+  const handleEdit = React.useCallback((song: Song) => {
+    // TODO: Implement edit mode - Phase 4 feature
+    console.log('Edit song:', song.id);
+  }, []);
+
+  const handleClone = React.useCallback((song: Song) => {
+    // TODO: Implement clone functionality - Phase 4 feature
+    console.log('Clone song:', song.id);
+  }, []);
+
+  const handleDelete = React.useCallback((song: Song) => {
+    // TODO: Implement delete confirmation - Phase 4 feature
+    console.log('Delete song:', song.id);
+  }, []);
 
   return (
     <div className="min-h-screen">
@@ -75,7 +102,15 @@ export default function SongsPage() {
 
         {/* Song List */}
         {!isLoading && !error && (
-          <SongList songs={data?.items || []} filters={filters} />
+          <SongList
+            songs={data?.items || []}
+            filters={filters}
+            onSongClick={handleSongClick}
+            onViewWorkflow={handleViewWorkflow}
+            onEdit={handleEdit}
+            onClone={handleClone}
+            onDelete={handleDelete}
+          />
         )}
       </div>
     </div>

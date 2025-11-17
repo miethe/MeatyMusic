@@ -368,6 +368,7 @@ export const SongCard = React.forwardRef<HTMLDivElement, SongCardProps>(
         <Card
           className={cn(songCardVariants({ size, state: derivedState }), className)}
           onClick={handleCardClick}
+          interactive={!selectable && !!onCardClick}
         >
         <SongCardHeader
           title={song.title}

@@ -169,4 +169,37 @@
 | File | services/api/app/api/v1/endpoints/songs.py:108-179 |
 | Commit | 00f534e |
 
-**Note**: Docker daemon not running - services need restart to test fixes. Code changes validated syntactically.
+| Aspect | Value |
+|--------|-------|
+| Bug | /entities/lyrics failed with ValueError: model_class must be provided or set as class attribute - 6 repositories missing model_class |
+| Fix | Added model_class attribute to LyricsRepository, ComposedPromptRepository, SourceRepository, SongRepository, WorkflowEventRepository, NodeExecutionRepository |
+| Files | services/api/app/repositories/lyrics_repo.py:24, composed_prompt_repo.py:24, source_repo.py:23, song_repo.py:27, workflow_event_repo.py:24, node_execution_repo.py:23 |
+| Commit | 5c60ad8 |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | Lyrics endpoint using 'await' on synchronous repo.list() method causing "object list can't be used in 'await' expression" |
+| Fix | Removed 'await' from service.repo.list() call - BaseRepository.list() is synchronous (uses SQLAlchemy sync API) |
+| File | services/api/app/api/v1/endpoints/lyrics.py:94 |
+| Commit | 5c60ad8 |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | CORS policy blocking frontend requests from localhost:3000 - wildcard allow_origins=["*"] with credentials=True causes browser violations |
+| Fix | Changed to explicit allowed origins: localhost:3000, localhost:19006, 127.0.0.1:3000. Added expose_headers=["*"] |
+| File | services/api/main.py:58-71 |
+| Commit | 5c60ad8 |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | Slider components (Tempo, Energy Level, etc.) not rendering - invalid Tailwind classes not in design system |
+| Fix | Replaced undefined classes with proper tokens: border-3→border-2, background-tertiary→bg-elevated, accent-primary→primary, accent-error→red-500, border-accent→border-primary |
+| Files | apps/web/src/components/entities/common/RangeSlider.tsx, apps/web/src/components/entities/StyleEditor.tsx |
+| Commit | 5c60ad8 |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | Song card navigation broken - clicking song cards in /songs list had no effect, unable to navigate to detail page |
+| Fix | Added navigation handlers (onSongClick, onViewWorkflow, onEdit, onClone, onDelete) to SongList component, set interactive prop on Card component to enable cursor-pointer styling. Card component properly passes onClick through {...props} |
+| Files | apps/web/src/app/(dashboard)/songs/page.tsx, apps/web/src/components/songs/SongCard.tsx |
+| Commit | Pending |
