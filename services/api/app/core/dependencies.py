@@ -84,7 +84,31 @@ async def get_security_context(
     """
     # Handle development bypass
     if token == "DEV_BYPASS_TOKEN":
+        from app.models.tenant import TenantORM
+
         dev_user_id = UUID(settings.DEV_AUTH_BYPASS_USER_ID)
+        dev_tenant_id = UUID("00000000-0000-0000-0000-000000000001")
+
+        # Ensure default tenant exists
+        tenant = db.query(TenantORM).filter(TenantORM.id == dev_tenant_id).first()
+        if not tenant:
+            logger.warning(
+                "dev_bypass_tenant_creation",
+                tenant_id=str(dev_tenant_id),
+                msg="Creating development bypass tenant"
+            )
+            tenant = TenantORM(
+                id=dev_tenant_id,
+                name="dev-default",
+                display_name="Development Default",
+                slug="dev-default",
+                description="Default tenant for development bypass mode",
+                is_active=True,
+                is_trial=False
+            )
+            db.add(tenant)
+            db.commit()
+            db.refresh(tenant)
 
         # Try to find existing dev user
         user = db.query(UserORM).filter(UserORM.id == dev_user_id).first()
@@ -94,24 +118,28 @@ async def get_security_context(
             logger.warning(
                 "dev_bypass_user_creation",
                 user_id=str(dev_user_id),
+                tenant_id=str(dev_tenant_id),
                 msg="Creating development bypass user"
             )
             user = UserORM(
                 id=dev_user_id,
+                tenant_id=dev_tenant_id,
                 clerk_user_id="dev_bypass_user",
                 email="dev@meatymusic.local",
-                username="dev_bypass_user"
+                username="dev_bypass_user",
+                is_active=True,
+                email_verified=True
             )
             db.add(user)
             db.commit()
             db.refresh(user)
 
-        # Return security context with dev user (no tenant context)
+        # Return security context with dev user and tenant
         security_context = SecurityContext(
             user_id=dev_user_id,
-            tenant_id=None,
+            tenant_id=dev_tenant_id,
             permissions=set(),
-            scope="user",
+            scope="tenant",  # Changed from "user" to "tenant" since we now have tenant context
             metadata={"dev_bypass": True}
         )
 
@@ -389,7 +417,31 @@ async def get_current_user_with_context_async(
     with SessionLocal() as db:
         # Handle development bypass
         if token == "DEV_BYPASS_TOKEN":
+            from app.models.tenant import TenantORM
+
             dev_user_id = UUID(settings.DEV_AUTH_BYPASS_USER_ID)
+            dev_tenant_id = UUID("00000000-0000-0000-0000-000000000001")
+
+            # Ensure default tenant exists
+            tenant = db.query(TenantORM).filter(TenantORM.id == dev_tenant_id).first()
+            if not tenant:
+                logger.warning(
+                    "dev_bypass_tenant_creation_async",
+                    tenant_id=str(dev_tenant_id),
+                    msg="Creating development bypass tenant (async)"
+                )
+                tenant = TenantORM(
+                    id=dev_tenant_id,
+                    name="dev-default",
+                    display_name="Development Default",
+                    slug="dev-default",
+                    description="Default tenant for development bypass mode",
+                    is_active=True,
+                    is_trial=False
+                )
+                db.add(tenant)
+                db.commit()
+                db.refresh(tenant)
 
             # Try to find existing dev user
             user = db.query(UserORM).filter(UserORM.id == dev_user_id).first()
@@ -399,24 +451,28 @@ async def get_current_user_with_context_async(
                 logger.warning(
                     "dev_bypass_user_creation_async",
                     user_id=str(dev_user_id),
+                    tenant_id=str(dev_tenant_id),
                     msg="Creating development bypass user (async)"
                 )
                 user = UserORM(
                     id=dev_user_id,
+                    tenant_id=dev_tenant_id,
                     clerk_user_id="dev_bypass_user",
                     email="dev@meatymusic.local",
-                    username="dev_bypass_user"
+                    username="dev_bypass_user",
+                    is_active=True,
+                    email_verified=True
                 )
                 db.add(user)
                 db.commit()
                 db.refresh(user)
 
-            # Return security context with dev user (no tenant context)
+            # Return security context with dev user and tenant
             security_context = SecurityContext(
                 user_id=dev_user_id,
-                tenant_id=None,
+                tenant_id=dev_tenant_id,
                 permissions=set(),
-                scope="user",
+                scope="tenant",  # Changed from "user" to "tenant" since we now have tenant context
                 metadata={"dev_bypass": True}
             )
 

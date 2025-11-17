@@ -331,15 +331,26 @@ class UnifiedRowGuard(Generic[T]):
                 ) from e
 
     def _assign_user_ownership(self, instance: T) -> None:
-        """Assign user ownership to an instance."""
+        """Assign user ownership to an instance.
+
+        For user-owned tables, sets the owner_id (or user_id) field.
+        If the table also has a tenant_id field (like BaseModel descendants)
+        and the security context has tenant_id, also sets tenant_id.
+        """
         if not self.security_context.has_user_context():
             raise SecurityContextError(
                 f"User context required to create {self.table_name}",
                 context_type="user"
             )
 
+        # Set the primary ownership field (owner_id or user_id)
         owner_column_name = get_user_owned_column_name(self.model_class)
         setattr(instance, owner_column_name, self.security_context.user_id)
+
+        # Also set tenant_id if the model has it AND security context provides it
+        # This is needed for models inheriting from BaseModel which requires both fields
+        if hasattr(instance, 'tenant_id') and self.security_context.has_tenant_context():
+            setattr(instance, 'tenant_id', self.security_context.tenant_id)
 
     def _assign_tenant_ownership(self, instance: T) -> None:
         """Assign tenant ownership to an instance."""

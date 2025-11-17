@@ -19,7 +19,7 @@ services:
       TZ: UTC
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ../services/api/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+      - ./services/api/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
     networks:
       - meatymusic
     healthcheck:
@@ -53,7 +53,7 @@ services:
   # API Service (FastAPI)
   api:
     build:
-      context: ../services/api
+      context: ./services/api
       dockerfile: Dockerfile
     container_name: meatymusic-api
     restart: unless-stopped
@@ -71,6 +71,9 @@ services:
       # Clerk Authentication
       CLERK_WEBHOOK_SECRET: ${CLERK_WEBHOOK_SECRET}
       CLERK_SECRET_KEY: ${CLERK_SECRET_KEY}
+      CLERK_JWKS_URL: ${CLERK_JWKS_URL}
+      CLERK_JWT_ISSUER: ${CLERK_JWT_ISSUER}
+      CLERK_JWKS_CACHE_TTL: ${CLERK_JWKS_CACHE_TTL:-3600}
 
       # Environment
       ENVIRONMENT: ${ENVIRONMENT:-development}
@@ -90,7 +93,7 @@ services:
 
       TZ: UTC
     volumes:
-      - ../services/api:/app:cached
+      - ./services/api:/app:cached
     networks:
       - meatymusic
     depends_on:
@@ -108,7 +111,7 @@ services:
   # Web App (Next.js)
   web:
     build:
-      context: ..
+      context: .
       dockerfile: ./apps/web/Dockerfile
       args:
         NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000}
@@ -153,7 +156,7 @@ services:
   # Database Migration Runner (run once)
   migrations:
     build:
-      context: ../services/api
+      context: ./services/api
       dockerfile: Dockerfile
     container_name: meatymusic-migrations
     environment:

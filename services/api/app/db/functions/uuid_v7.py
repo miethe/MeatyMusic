@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from uuid import UUID
 import uuid
-from sqlalchemy import String
+from sqlalchemy.dialects.postgresql import UUID as SA_UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 
@@ -31,7 +31,7 @@ class UUIDv7Mixin:
     """Mixin to add UUIDv7 primary key to models."""
 
     id: Mapped[UUID] = mapped_column(
-        String(36),
+        SA_UUID(as_uuid=True),
         primary_key=True,
         default=generate_uuid_v7,
         nullable=False,

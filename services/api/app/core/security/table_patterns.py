@@ -21,11 +21,24 @@ class TablePattern(Enum):
 
 
 # Table pattern mapping for all known tables
-# Will be populated with AMCS domain tables in Phase 3
 TABLE_PATTERNS: Dict[str, TablePattern] = {
     # User-owned resources (filtered by user_id/owner_id)
-    # TODO Phase 3: Add AMCS tables: songs, personas, sources, etc.
     'user_preferences': TablePattern.USER_OWNED,
+
+    # AMCS user-owned resources (songs and related entities)
+    'songs': TablePattern.USER_OWNED,
+    'styles': TablePattern.USER_OWNED,
+    'lyrics': TablePattern.USER_OWNED,
+    'personas': TablePattern.USER_OWNED,
+    'producer_notes': TablePattern.USER_OWNED,
+    'sources': TablePattern.USER_OWNED,
+    'blueprints': TablePattern.USER_OWNED,
+    'composed_prompts': TablePattern.USER_OWNED,
+
+    # AMCS workflow execution resources (user-owned)
+    'workflow_runs': TablePattern.USER_OWNED,
+    'node_executions': TablePattern.USER_OWNED,
+    'workflow_events': TablePattern.USER_OWNED,
 
     # Tenant-owned model resources (filtered by tenant_id)
     'model_providers': TablePattern.TENANT_OWNED,
