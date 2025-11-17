@@ -11,14 +11,21 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@meatymusic/ui';
 import { Card } from '@meatymusic/ui';
 import { Badge } from '@meatymusic/ui';
-import { Plus, Filter, Palette } from 'lucide-react';
+import { Plus, Filter, Palette, Loader2 } from 'lucide-react';
 import { ROUTES } from '@/config/routes';
+import { useStyles } from '@/hooks/api/useStyles';
+import type { Style } from '@/types/api/entities';
 
 export default function StylesPage() {
   const [search, setSearch] = React.useState('');
 
-  // TODO: Fetch styles from API
-  const styles: any[] = [];
+  // Fetch styles from API
+  const { data, isLoading, error } = useStyles({
+    q: search || undefined,
+    limit: 50,
+  });
+
+  const styles = data?.items || [];
 
   return (
     <div className="min-h-screen">
@@ -53,25 +60,50 @@ export default function StylesPage() {
           </Button>
         </div>
 
+        {/* Loading State */}
+        {isLoading && (
+          <Card className="bg-bg-surface border-border-default shadow-elevation-1 p-12 text-center animate-fade-in">
+            <Loader2 className="w-16 h-16 mx-auto text-text-muted mb-4 animate-spin" />
+            <p className="text-text-secondary">Loading styles...</p>
+          </Card>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <Card className="bg-bg-surface border-border-default shadow-elevation-1 p-12 text-center animate-fade-in">
+            <div className="text-destructive mb-4">
+              <p className="font-medium">Failed to load styles</p>
+              <p className="text-sm text-text-secondary mt-2">{error.message}</p>
+            </div>
+          </Card>
+        )}
+
         {/* Empty State */}
-        {styles.length === 0 && (
+        {!isLoading && !error && styles.length === 0 && (
           <Card className="bg-bg-surface border-border-default shadow-elevation-1 p-12 text-center animate-fade-in">
             <Palette className="w-16 h-16 mx-auto text-text-muted mb-4" />
-            <h3 className="text-lg font-medium text-text-primary mb-2">No styles yet</h3>
+            <h3 className="text-lg font-medium text-text-primary mb-2">
+              {search ? 'No styles found' : 'No styles yet'}
+            </h3>
             <p className="text-text-secondary mb-6">
-              Create your first style specification to define the musical characteristics of your songs
+              {search
+                ? 'Try adjusting your search terms'
+                : 'Create your first style specification to define the musical characteristics of your songs'
+              }
             </p>
-            <Link href={ROUTES.ENTITIES.STYLE_NEW}>
-              <Button className="bg-gradient-primary shadow-accent-glow hover:shadow-accent-glow-lg transition-all duration-ui">
-                <Plus className="w-4 h-4 mr-2" />
-                Create First Style
-              </Button>
-            </Link>
+            {!search && (
+              <Link href={ROUTES.ENTITIES.STYLE_NEW}>
+                <Button className="bg-gradient-primary shadow-accent-glow hover:shadow-accent-glow-lg transition-all duration-ui">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create First Style
+                </Button>
+              </Link>
+            )}
           </Card>
         )}
 
         {/* Styles Grid */}
-        {styles.length > 0 && (
+        {!isLoading && !error && styles.length > 0 && (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
             {styles.map((style) => (
               <StyleCard key={style.id} style={style} />
@@ -83,18 +115,32 @@ export default function StylesPage() {
   );
 }
 
-function StyleCard({ style }: { style: any }) {
+function StyleCard({ style }: { style: Style }) {
   return (
     <Link href={ROUTES.ENTITIES.STYLE_DETAIL(style.id)}>
-      <Card className="bg-bg-surface border-border-default shadow-elevation-1 hover:shadow-elevation-2 hover:border-border-accent p-6 transition-all duration-ui">
+      <Card className="bg-bg-surface border-border-default shadow-elevation-1 hover:shadow-elevation-2 hover:border-border-accent p-6 transition-all duration-ui cursor-pointer">
         <h3 className="text-lg font-semibold text-text-primary mb-2">{style.name}</h3>
         <div className="flex flex-wrap gap-2 mb-4">
-          <Badge variant="secondary">{style.genre}</Badge>
-          <Badge variant="outline">{style.tempo_min}-{style.tempo_max} BPM</Badge>
+          {style.genre && <Badge variant="secondary">{style.genre}</Badge>}
+          {style.bpm_min && style.bpm_max && (
+            <Badge variant="outline">{style.bpm_min}-{style.bpm_max} BPM</Badge>
+          )}
+          {style.key && <Badge variant="outline">{style.key}</Badge>}
         </div>
-        <p className="text-sm text-text-secondary line-clamp-2">
-          {style.description}
-        </p>
+        {style.mood && style.mood.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-2">
+            {style.mood.slice(0, 3).map((moodItem) => (
+              <Badge key={moodItem} variant="outline" className="text-xs">
+                {moodItem}
+              </Badge>
+            ))}
+            {style.mood.length > 3 && (
+              <Badge variant="outline" className="text-xs">
+                +{style.mood.length - 3} more
+              </Badge>
+            )}
+          </div>
+        )}
       </Card>
     </Link>
   );

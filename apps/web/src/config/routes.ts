@@ -32,6 +32,7 @@ export const ROUTES = {
     STYLES: '/entities/styles',
     STYLE_NEW: '/entities/styles/new',
     STYLE_DETAIL: (id: string) => `/entities/styles/${id}`,
+    STYLE_EDIT: (id: string) => `/entities/styles/${id}/edit`,
 
     LYRICS: '/entities/lyrics',
     LYRICS_NEW: '/entities/lyrics/new',

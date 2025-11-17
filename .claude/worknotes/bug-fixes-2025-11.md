@@ -49,3 +49,24 @@
 | Fix | Added LibrarySelector component and integrated across all entity editors |
 | File | apps/web/src/components/entities/common/LibrarySelector.tsx |
 | Commit | b3fb1c1 |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | Style entity creation button has no effect - API not wired |
+| Fix | Replaced basic form with StyleEditor component, connected useStyles/useCreateStyle hooks, added proper loading/error states |
+| Files | apps/web/src/app/(dashboard)/entities/styles/new/page.tsx, apps/web/src/app/(dashboard)/entities/styles/page.tsx, apps/web/src/app/(dashboard)/entities/styles/[id]/page.tsx |
+| Commit | Pending |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | Field name mismatches: tempo_min/tempo_max vs bpm_min/bpm_max, moods vs mood |
+| Fix | Updated field references to match TypeScript schema (bpm_min/bpm_max, mood) |
+| Files | apps/web/src/app/(dashboard)/entities/styles/page.tsx, apps/web/src/app/(dashboard)/entities/styles/[id]/page.tsx |
+| Commit | Pending |
+
+| Aspect | Value |
+|--------|-------|
+| Enhancement | Added missing STYLE_EDIT route for style editing page |
+| Fix | Added STYLE_EDIT route to routes configuration |
+| File | apps/web/src/config/routes.ts |
+| Commit | Pending |
