@@ -38,3 +38,4 @@ infra/docker-compose.override.yml
 services/api/.venv
 services/api/.ruff_cache
 services/api/.mypy_cache
+*.pyc
