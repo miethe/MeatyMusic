@@ -76,4 +76,4 @@
 | Bug | TypeScript build error: Property 'tags' does not exist on type 'Style' |
 | Fix | Changed `style.tags` to `style.tags_positive` and `style.tags_negative` to match schema |
 | File | apps/web/src/app/(dashboard)/entities/styles/[id]/page.tsx |
-| Commit | Pending |
+| Commit | 82a9fba |
