@@ -11,13 +11,15 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@meatymusic/ui';
 import { Card } from '@meatymusic/ui';
 import { Badge } from '@meatymusic/ui';
-import { Plus, Filter, Palette, Loader2 } from 'lucide-react';
+import { Plus, Filter, Palette, Loader2, Upload } from 'lucide-react';
 import { ROUTES } from '@/config/routes';
 import { useStyles } from '@/hooks/api/useStyles';
 import type { Style } from '@/types/api/entities';
+import { ImportModal } from '@/components/import/ImportModal';
 
 export default function StylesPage() {
   const [search, setSearch] = React.useState('');
+  const [importModalOpen, setImportModalOpen] = React.useState(false);
 
   // Fetch styles from API
   const { data, isLoading, error } = useStyles({
@@ -33,12 +35,18 @@ export default function StylesPage() {
         title="Styles"
         description="Manage style specifications for your songs"
         actions={
-          <Link href={ROUTES.ENTITIES.STYLE_NEW}>
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              Create Style
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setImportModalOpen(true)}>
+              <Upload className="w-4 h-4 mr-2" />
+              Import
             </Button>
-          </Link>
+            <Link href={ROUTES.ENTITIES.STYLE_NEW}>
+              <Button>
+                <Plus className="w-4 h-4 mr-2" />
+                Create Style
+              </Button>
+            </Link>
+          </div>
         }
       />
 
@@ -111,6 +119,15 @@ export default function StylesPage() {
           </div>
         )}
       </div>
+
+      <ImportModal
+        open={importModalOpen}
+        onOpenChange={setImportModalOpen}
+        entityType="style"
+        onImportSuccess={() => {
+          setImportModalOpen(false);
+        }}
+      />
     </div>
   );
 }

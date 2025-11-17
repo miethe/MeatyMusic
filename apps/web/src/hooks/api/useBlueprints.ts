@@ -87,3 +87,19 @@ export function useDeleteBlueprint() {
     },
   });
 }
+
+export function useImportBlueprint() {
+  const queryClient = useQueryClient();
+  const { addToast } = useUIStore();
+
+  return useMutation({
+    mutationFn: (file: File) => blueprintsApi.import(file),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.blueprints.lists() });
+      addToast(`Blueprint for "${data.genre}" imported successfully`, 'success');
+    },
+    onError: (error: any) => {
+      addToast(error?.message || 'Failed to import blueprint', 'error');
+    },
+  });
+}

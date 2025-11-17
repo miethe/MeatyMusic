@@ -70,4 +70,19 @@ export const producerNotesApi = {
   delete: async (id: UUID): Promise<void> => {
     await apiClient.delete(`/producer-notes/${id}`);
   },
+
+  /**
+   * Import producer notes from JSON file
+   */
+  import: async (file: File): Promise<ProducerNotes> => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const { data } = await apiClient.post<ProducerNotes>('/producer-notes/import', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return data;
+  },
 };

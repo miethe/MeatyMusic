@@ -6,10 +6,13 @@ characteristics for song creation.
 
 from __future__ import annotations
 
+import json
+from datetime import datetime, timezone
 from typing import List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
+from pydantic import ValidationError
 
 from app.api.dependencies import get_style_repository, get_style_service
 from app.repositories import StyleRepository
@@ -66,6 +69,91 @@ async def create_style(
                 detail=f"Tag conflicts detected: {', '.join(conflicts)}",
             )
 
+    try:
+        style = repo.create(style_dict)
+        return StyleResponse.model_validate(style)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
+
+
+@router.post(
+    "/import",
+    response_model=StyleResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Import style from JSON file",
+    description="Import a style definition from an uploaded JSON file",
+    responses={
+        201: {"description": "Style imported successfully"},
+        400: {"model": ErrorResponse, "description": "Invalid JSON or validation error"},
+    },
+)
+async def import_style(
+    file: UploadFile = File(..., description="JSON file containing style definition"),
+    service: StyleService = Depends(get_style_service),
+    repo: StyleRepository = Depends(get_style_repository),
+) -> StyleResponse:
+    """Import a style from a JSON file.
+
+    Args:
+        file: Uploaded JSON file with style data
+        service: Style service instance (for validation)
+        repo: Style repository instance
+
+    Returns:
+        Created style with import metadata
+
+    Raises:
+        HTTPException: If file is not JSON, validation fails, or tags conflict
+    """
+    # Validate file type
+    if not file.filename or not file.filename.endswith('.json'):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Only JSON files are supported. File must have .json extension",
+        )
+
+    # Read and parse JSON
+    try:
+        content = await file.read()
+        data = json.loads(content)
+    except json.JSONDecodeError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid JSON format: {str(e)}",
+        )
+
+    # Validate against schema
+    try:
+        style_data = StyleCreate.model_validate(data)
+    except ValidationError as e:
+        errors = [
+            {"field": ".".join(str(loc) for loc in err["loc"]), "message": err["msg"]}
+            for err in e.errors()
+        ]
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "Validation failed", "errors": errors},
+        )
+
+    # Validate tag conflicts
+    style_dict = style_data.model_dump()
+    tags = style_dict.get("tags", [])
+    if tags:
+        conflicts = await service._validate_tag_conflicts(tags)
+        if conflicts:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Tag conflicts detected: {', '.join(conflicts)}",
+            )
+
+    # Add import metadata
+    style_dict["imported_at"] = datetime.now(timezone.utc)
+    style_dict["import_source_filename"] = file.filename
+
+    # Create style
     try:
         style = repo.create(style_dict)
         return StyleResponse.model_validate(style)

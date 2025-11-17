@@ -16,6 +16,7 @@ import {
   CheckCircle2,
   AlertCircle,
   Clock,
+  Upload,
   FileText,
   User,
   Settings,
@@ -23,6 +24,7 @@ import {
   Map
 } from 'lucide-react';
 import { ROUTES } from '@/config/routes';
+import { ImportModal } from '@/components/import/ImportModal';
 import { useSongs } from '@/hooks/api/useSongs';
 import { useWorkflowRuns } from '@/hooks/api/useWorkflows';
 import { useStyles } from '@/hooks/api/useStyles';
@@ -34,6 +36,8 @@ import { formatDistanceToNow } from 'date-fns';
 import type { Song, WorkflowRun, WorkflowRunStatus } from '@/types/api';
 
 export default function DashboardPage() {
+  const [importModalOpen, setImportModalOpen] = React.useState(false);
+
   // Fetch all data
   const {
     data: songsData,
@@ -88,12 +92,18 @@ export default function DashboardPage() {
         title="Dashboard"
         description="Welcome to MeatyMusic AMCS - Your music creation workspace"
         actions={
-          <Link href={ROUTES.SONG_NEW}>
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              Create Song
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setImportModalOpen(true)}>
+              <Upload className="w-4 h-4 mr-2" />
+              Import
             </Button>
-          </Link>
+            <Link href={ROUTES.SONG_NEW}>
+              <Button>
+                <Plus className="w-4 h-4 mr-2" />
+                Create Song
+              </Button>
+            </Link>
+          </div>
         }
       />
 
@@ -310,6 +320,14 @@ export default function DashboardPage() {
           </div>
         </Card>
       </div>
+
+      <ImportModal
+        open={importModalOpen}
+        onOpenChange={setImportModalOpen}
+        onImportSuccess={() => {
+          setImportModalOpen(false);
+        }}
+      />
     </div>
   );
 }

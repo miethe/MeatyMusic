@@ -87,3 +87,19 @@ export function useDeletePersona() {
     },
   });
 }
+
+export function useImportPersona() {
+  const queryClient = useQueryClient();
+  const { addToast } = useUIStore();
+
+  return useMutation({
+    mutationFn: (file: File) => personasApi.import(file),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.personas.lists() });
+      addToast(`Persona "${data.name}" imported successfully`, 'success');
+    },
+    onError: (error: any) => {
+      addToast(error?.message || 'Failed to import persona', 'error');
+    },
+  });
+}

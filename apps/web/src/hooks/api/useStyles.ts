@@ -87,3 +87,19 @@ export function useDeleteStyle() {
     },
   });
 }
+
+export function useImportStyle() {
+  const queryClient = useQueryClient();
+  const { addToast } = useUIStore();
+
+  return useMutation({
+    mutationFn: (file: File) => stylesApi.import(file),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.styles.lists() });
+      addToast(`Style "${data.name}" imported successfully`, 'success');
+    },
+    onError: (error: any) => {
+      addToast(error?.message || 'Failed to import style', 'error');
+    },
+  });
+}

@@ -6,11 +6,13 @@ for the music creation workflow.
 
 from __future__ import annotations
 
+import json
+from datetime import datetime, timezone
 from typing import Dict, List, Optional, Tuple
 from uuid import UUID
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Query, status
-from pydantic import BaseModel
+from fastapi import APIRouter, Body, Depends, File, HTTPException, Query, UploadFile, status
+from pydantic import BaseModel, ValidationError
 
 from app.api.dependencies import get_blueprint_repository, get_blueprint_service
 from app.errors import BadRequestError, NotFoundError
@@ -86,6 +88,80 @@ async def create_blueprint(
     """
     try:
         blueprint = service.create_blueprint(blueprint_data)
+        return BlueprintResponse.model_validate(blueprint)
+    except (ValueError, BadRequestError) as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
+
+
+@router.post(
+    "/import",
+    response_model=BlueprintResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Import blueprint from JSON file",
+    description="Import a blueprint definition from an uploaded JSON file",
+    responses={
+        201: {"description": "Blueprint imported successfully"},
+        400: {"model": ErrorResponse, "description": "Invalid JSON or validation error"},
+    },
+)
+async def import_blueprint(
+    file: UploadFile = File(..., description="JSON file containing blueprint definition"),
+    service: BlueprintService = Depends(get_blueprint_service),
+) -> BlueprintResponse:
+    """Import a blueprint from a JSON file.
+
+    Args:
+        file: Uploaded JSON file with blueprint data
+        service: Blueprint service instance
+
+    Returns:
+        Created blueprint with import metadata
+
+    Raises:
+        HTTPException: If file is not JSON or validation fails
+    """
+    # Validate file type
+    if not file.filename or not file.filename.endswith('.json'):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Only JSON files are supported. File must have .json extension",
+        )
+
+    # Read and parse JSON
+    try:
+        content = await file.read()
+        data = json.loads(content)
+    except json.JSONDecodeError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid JSON format: {str(e)}",
+        )
+
+    # Validate against schema
+    try:
+        blueprint_data = BlueprintCreate.model_validate(data)
+    except ValidationError as e:
+        errors = [
+            {"field": ".".join(str(loc) for loc in err["loc"]), "message": err["msg"]}
+            for err in e.errors()
+        ]
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "Validation failed", "errors": errors},
+        )
+
+    # Add import metadata
+    blueprint_dict = blueprint_data.model_dump()
+    blueprint_dict["imported_at"] = datetime.now(timezone.utc)
+    blueprint_dict["import_source_filename"] = file.filename
+
+    # Create blueprint via service
+    try:
+        blueprint_data_with_import = BlueprintCreate.model_validate(blueprint_dict)
+        blueprint = service.create_blueprint(blueprint_data_with_import)
         return BlueprintResponse.model_validate(blueprint)
     except (ValueError, BadRequestError) as e:
         raise HTTPException(

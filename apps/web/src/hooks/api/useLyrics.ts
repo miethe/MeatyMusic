@@ -87,3 +87,19 @@ export function useDeleteLyrics() {
     },
   });
 }
+
+export function useImportLyrics() {
+  const queryClient = useQueryClient();
+  const { addToast } = useUIStore();
+
+  return useMutation({
+    mutationFn: (file: File) => lyricsApi.import(file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.lyrics.lists() });
+      addToast('Lyrics imported successfully', 'success');
+    },
+    onError: (error: any) => {
+      addToast(error?.message || 'Failed to import lyrics', 'error');
+    },
+  });
+}

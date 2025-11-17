@@ -74,4 +74,19 @@ export const stylesApi = {
   delete: async (id: UUID): Promise<void> => {
     await apiClient.delete(`/styles/${id}`);
   },
+
+  /**
+   * Import a style from JSON file
+   */
+  import: async (file: File): Promise<Style> => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const { data } = await apiClient.post<Style>('/styles/import', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return data;
+  },
 };

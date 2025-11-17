@@ -6,10 +6,13 @@ and generated lyric content for songs.
 
 from __future__ import annotations
 
+import json
+from datetime import datetime, timezone
 from typing import Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
+from pydantic import ValidationError
 
 from app.api.dependencies import get_lyrics_service
 from app.errors import BadRequestError
@@ -55,6 +58,84 @@ async def create_lyrics(
     """
     try:
         return await service.create_lyrics(lyrics_data)
+    except BadRequestError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error",
+        )
+
+
+@router.post(
+    "/import",
+    response_model=LyricsResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Import lyrics from JSON file",
+    description="Import lyrics definition from an uploaded JSON file",
+    responses={
+        201: {"description": "Lyrics imported successfully"},
+        400: {"model": ErrorResponse, "description": "Invalid JSON or validation error"},
+    },
+)
+async def import_lyrics(
+    file: UploadFile = File(..., description="JSON file containing lyrics definition"),
+    service: LyricsService = Depends(get_lyrics_service),
+) -> LyricsResponse:
+    """Import lyrics from a JSON file.
+
+    Args:
+        file: Uploaded JSON file with lyrics data
+        service: Lyrics service instance
+
+    Returns:
+        Created lyrics with import metadata
+
+    Raises:
+        HTTPException: If file is not JSON or validation fails
+    """
+    # Validate file type
+    if not file.filename or not file.filename.endswith('.json'):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Only JSON files are supported. File must have .json extension",
+        )
+
+    # Read and parse JSON
+    try:
+        content = await file.read()
+        data = json.loads(content)
+    except json.JSONDecodeError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid JSON format: {str(e)}",
+        )
+
+    # Validate against schema
+    try:
+        lyrics_data = LyricsCreate.model_validate(data)
+    except ValidationError as e:
+        errors = [
+            {"field": ".".join(str(loc) for loc in err["loc"]), "message": err["msg"]}
+            for err in e.errors()
+        ]
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "Validation failed", "errors": errors},
+        )
+
+    # Add import metadata
+    lyrics_dict = lyrics_data.model_dump()
+    lyrics_dict["imported_at"] = datetime.now(timezone.utc)
+    lyrics_dict["import_source_filename"] = file.filename
+
+    # Create lyrics via service
+    try:
+        lyrics_data_with_import = LyricsCreate.model_validate(lyrics_dict)
+        return await service.create_lyrics(lyrics_data_with_import)
     except BadRequestError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

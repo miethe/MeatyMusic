@@ -72,4 +72,19 @@ export const lyricsApi = {
   delete: async (id: UUID): Promise<void> => {
     await apiClient.delete(`/lyrics/${id}`);
   },
+
+  /**
+   * Import lyrics from JSON file
+   */
+  import: async (file: File): Promise<Lyrics> => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const { data } = await apiClient.post<Lyrics>('/lyrics/import', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return data;
+  },
 };

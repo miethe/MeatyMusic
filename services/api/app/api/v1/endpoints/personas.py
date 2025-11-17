@@ -6,10 +6,13 @@ influences, and style preferences.
 
 from __future__ import annotations
 
+import json
+from datetime import datetime, timezone
 from typing import List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
+from pydantic import ValidationError
 
 from app.api.dependencies import get_persona_repository, get_persona_service
 from app.errors import BadRequestError, NotFoundError
@@ -61,6 +64,84 @@ async def create_persona(
     """
     try:
         return await service.create_persona(persona_data)
+    except BadRequestError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=e.message,
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
+
+
+@router.post(
+    "/import",
+    response_model=PersonaResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Import persona from JSON file",
+    description="Import a persona definition from an uploaded JSON file",
+    responses={
+        201: {"description": "Persona imported successfully"},
+        400: {"model": ErrorResponse, "description": "Invalid JSON or validation error"},
+    },
+)
+async def import_persona(
+    file: UploadFile = File(..., description="JSON file containing persona definition"),
+    service: PersonaService = Depends(get_persona_service),
+) -> PersonaResponse:
+    """Import a persona from a JSON file.
+
+    Args:
+        file: Uploaded JSON file with persona data
+        service: Persona service instance
+
+    Returns:
+        Created persona with import metadata
+
+    Raises:
+        HTTPException: If file is not JSON or validation fails
+    """
+    # Validate file type
+    if not file.filename or not file.filename.endswith('.json'):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Only JSON files are supported. File must have .json extension",
+        )
+
+    # Read and parse JSON
+    try:
+        content = await file.read()
+        data = json.loads(content)
+    except json.JSONDecodeError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid JSON format: {str(e)}",
+        )
+
+    # Validate against schema
+    try:
+        persona_data = PersonaCreate.model_validate(data)
+    except ValidationError as e:
+        errors = [
+            {"field": ".".join(str(loc) for loc in err["loc"]), "message": err["msg"]}
+            for err in e.errors()
+        ]
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "Validation failed", "errors": errors},
+        )
+
+    # Add import metadata
+    persona_dict = persona_data.model_dump()
+    persona_dict["imported_at"] = datetime.now(timezone.utc)
+    persona_dict["import_source_filename"] = file.filename
+
+    # Create persona via service (with automatic validation and normalization)
+    try:
+        persona_data_with_import = PersonaCreate.model_validate(persona_dict)
+        return await service.create_persona(persona_data_with_import)
     except BadRequestError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

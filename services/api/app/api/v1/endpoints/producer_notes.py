@@ -6,10 +6,13 @@ for song production.
 
 from __future__ import annotations
 
+import json
+from datetime import datetime, timezone
 from typing import Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
+from pydantic import ValidationError
 
 from app.api.dependencies import (
     get_producer_notes_repository,
@@ -58,6 +61,79 @@ async def create_producer_notes(
     """
     try:
         return await service.create_producer_notes(notes_data)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
+
+
+@router.post(
+    "/import",
+    response_model=ProducerNotesResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Import producer notes from JSON file",
+    description="Import producer notes definition from an uploaded JSON file",
+    responses={
+        201: {"description": "Producer notes imported successfully"},
+        400: {"model": ErrorResponse, "description": "Invalid JSON or validation error"},
+    },
+)
+async def import_producer_notes(
+    file: UploadFile = File(..., description="JSON file containing producer notes definition"),
+    service: ProducerNotesService = Depends(get_producer_notes_service),
+) -> ProducerNotesResponse:
+    """Import producer notes from a JSON file.
+
+    Args:
+        file: Uploaded JSON file with producer notes data
+        service: ProducerNotes service instance
+
+    Returns:
+        Created producer notes with import metadata
+
+    Raises:
+        HTTPException: If file is not JSON or validation fails
+    """
+    # Validate file type
+    if not file.filename or not file.filename.endswith('.json'):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Only JSON files are supported. File must have .json extension",
+        )
+
+    # Read and parse JSON
+    try:
+        content = await file.read()
+        data = json.loads(content)
+    except json.JSONDecodeError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid JSON format: {str(e)}",
+        )
+
+    # Validate against schema
+    try:
+        notes_data = ProducerNotesCreate.model_validate(data)
+    except ValidationError as e:
+        errors = [
+            {"field": ".".join(str(loc) for loc in err["loc"]), "message": err["msg"]}
+            for err in e.errors()
+        ]
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "Validation failed", "errors": errors},
+        )
+
+    # Add import metadata
+    notes_dict = notes_data.model_dump()
+    notes_dict["imported_at"] = datetime.now(timezone.utc)
+    notes_dict["import_source_filename"] = file.filename
+
+    # Create producer notes via service
+    try:
+        notes_data_with_import = ProducerNotesCreate.model_validate(notes_dict)
+        return await service.create_producer_notes(notes_data_with_import)
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

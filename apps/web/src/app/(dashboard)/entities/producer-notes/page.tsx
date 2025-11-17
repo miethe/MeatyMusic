@@ -11,13 +11,15 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@meatymusic/ui';
 import { Card } from '@meatymusic/ui';
 import { Badge } from '@meatymusic/ui';
-import { Plus, Filter, Settings, Loader2 } from 'lucide-react';
+import { Plus, Filter, Settings, Loader2, Upload } from 'lucide-react';
 import { ROUTES } from '@/config/routes';
 import { useProducerNotesList } from '@/hooks/api/useProducerNotes';
 import type { ProducerNotes } from '@/types/api/entities';
+import { ImportModal } from '@/components/import/ImportModal';
 
 export default function ProducerNotesPage() {
   const [search, setSearch] = React.useState('');
+  const [importModalOpen, setImportModalOpen] = React.useState(false);
 
   // Fetch producer notes from API
   const { data, isLoading, error } = useProducerNotesList({
@@ -33,12 +35,18 @@ export default function ProducerNotesPage() {
         title="Producer Notes"
         description="Manage production arrangement and mix specifications"
         actions={
-          <Link href={ROUTES.ENTITIES.PRODUCER_NOTE_NEW}>
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              Create Producer Notes
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setImportModalOpen(true)}>
+              <Upload className="w-4 h-4 mr-2" />
+              Import
             </Button>
-          </Link>
+            <Link href={ROUTES.ENTITIES.PRODUCER_NOTE_NEW}>
+              <Button>
+                <Plus className="w-4 h-4 mr-2" />
+                Create Producer Notes
+              </Button>
+            </Link>
+          </div>
         }
       />
 
@@ -111,6 +119,15 @@ export default function ProducerNotesPage() {
           </div>
         )}
       </div>
+
+      <ImportModal
+        open={importModalOpen}
+        onOpenChange={setImportModalOpen}
+        entityType="producerNotes"
+        onImportSuccess={() => {
+          setImportModalOpen(false);
+        }}
+      />
     </div>
   );
 }

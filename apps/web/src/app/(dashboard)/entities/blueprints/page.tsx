@@ -11,13 +11,15 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@meatymusic/ui';
 import { Card } from '@meatymusic/ui';
 import { Badge } from '@meatymusic/ui';
-import { Plus, Filter, BookOpen, Loader2 } from 'lucide-react';
+import { Plus, Filter, BookOpen, Loader2, Upload } from 'lucide-react';
 import { ROUTES } from '@/config/routes';
 import { useBlueprints } from '@/hooks/api/useBlueprints';
 import type { Blueprint } from '@/types/api/entities';
+import { ImportModal } from '@/components/import/ImportModal';
 
 export default function BlueprintsPage() {
   const [search, setSearch] = React.useState('');
+  const [importModalOpen, setImportModalOpen] = React.useState(false);
 
   // Fetch blueprints from API
   const { data, isLoading, error } = useBlueprints({
@@ -33,12 +35,18 @@ export default function BlueprintsPage() {
         title="Blueprints"
         description="Genre-specific composition rules and evaluation rubrics"
         actions={
-          <Link href={ROUTES.ENTITIES.BLUEPRINT_NEW}>
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              Create Blueprint
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setImportModalOpen(true)}>
+              <Upload className="w-4 h-4 mr-2" />
+              Import
             </Button>
-          </Link>
+            <Link href={ROUTES.ENTITIES.BLUEPRINT_NEW}>
+              <Button>
+                <Plus className="w-4 h-4 mr-2" />
+                Create Blueprint
+              </Button>
+            </Link>
+          </div>
         }
       />
 
@@ -111,6 +119,15 @@ export default function BlueprintsPage() {
           </div>
         )}
       </div>
+
+      <ImportModal
+        open={importModalOpen}
+        onOpenChange={setImportModalOpen}
+        entityType="blueprint"
+        onImportSuccess={() => {
+          setImportModalOpen(false);
+        }}
+      />
     </div>
   );
 }

@@ -87,3 +87,19 @@ export function useDeleteProducerNotes() {
     },
   });
 }
+
+export function useImportProducerNotes() {
+  const queryClient = useQueryClient();
+  const { addToast } = useUIStore();
+
+  return useMutation({
+    mutationFn: (file: File) => producerNotesApi.import(file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.producerNotes.lists() });
+      addToast('Producer notes imported successfully', 'success');
+    },
+    onError: (error: any) => {
+      addToast(error?.message || 'Failed to import producer notes', 'error');
+    },
+  });
+}

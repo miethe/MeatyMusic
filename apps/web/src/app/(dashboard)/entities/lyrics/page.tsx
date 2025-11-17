@@ -11,13 +11,15 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@meatymusic/ui';
 import { Card } from '@meatymusic/ui';
 import { Badge } from '@meatymusic/ui';
-import { Plus, Filter, FileText, Loader2 } from 'lucide-react';
+import { Plus, Filter, FileText, Loader2, Upload } from 'lucide-react';
 import { ROUTES } from '@/config/routes';
 import { useLyricsList } from '@/hooks/api/useLyrics';
 import type { Lyrics } from '@/types/api/entities';
+import { ImportModal } from '@/components/import/ImportModal';
 
 export default function LyricsPage() {
   const [search, setSearch] = React.useState('');
+  const [importModalOpen, setImportModalOpen] = React.useState(false);
 
   // Fetch lyrics from API
   const { data, isLoading, error } = useLyricsList({
@@ -33,12 +35,18 @@ export default function LyricsPage() {
         title="Lyrics"
         description="Manage lyric specifications for your songs"
         actions={
-          <Link href={ROUTES.ENTITIES.LYRICS_NEW}>
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              Create Lyrics
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setImportModalOpen(true)}>
+              <Upload className="w-4 h-4 mr-2" />
+              Import
             </Button>
-          </Link>
+            <Link href={ROUTES.ENTITIES.LYRICS_NEW}>
+              <Button>
+                <Plus className="w-4 h-4 mr-2" />
+                Create Lyrics
+              </Button>
+            </Link>
+          </div>
         }
       />
 
@@ -111,6 +119,15 @@ export default function LyricsPage() {
           </div>
         )}
       </div>
+
+      <ImportModal
+        open={importModalOpen}
+        onOpenChange={setImportModalOpen}
+        entityType="lyrics"
+        onImportSuccess={() => {
+          setImportModalOpen(false);
+        }}
+      />
     </div>
   );
 }

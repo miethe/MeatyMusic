@@ -69,4 +69,19 @@ export const personasApi = {
   delete: async (id: UUID): Promise<void> => {
     await apiClient.delete(`/personas/${id}`);
   },
+
+  /**
+   * Import a persona from JSON file
+   */
+  import: async (file: File): Promise<Persona> => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const { data } = await apiClient.post<Persona>('/personas/import', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return data;
+  },
 };

@@ -11,13 +11,15 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@meatymusic/ui';
 import { Card } from '@meatymusic/ui';
 import { Badge } from '@meatymusic/ui';
-import { Plus, Filter, User, Loader2 } from 'lucide-react';
+import { Plus, Filter, User, Loader2, Upload } from 'lucide-react';
 import { ROUTES } from '@/config/routes';
 import { usePersonas } from '@/hooks/api/usePersonas';
 import type { Persona } from '@/types/api/entities';
+import { ImportModal } from '@/components/import/ImportModal';
 
 export default function PersonasPage() {
   const [search, setSearch] = React.useState('');
+  const [importModalOpen, setImportModalOpen] = React.useState(false);
 
   // Fetch personas from API
   const { data, isLoading, error } = usePersonas({
@@ -33,12 +35,18 @@ export default function PersonasPage() {
         title="Personas"
         description="Manage artist personas and vocal characteristics"
         actions={
-          <Link href={ROUTES.ENTITIES.PERSONA_NEW}>
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              Create Persona
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setImportModalOpen(true)}>
+              <Upload className="w-4 h-4 mr-2" />
+              Import
             </Button>
-          </Link>
+            <Link href={ROUTES.ENTITIES.PERSONA_NEW}>
+              <Button>
+                <Plus className="w-4 h-4 mr-2" />
+                Create Persona
+              </Button>
+            </Link>
+          </div>
         }
       />
 
@@ -111,6 +119,15 @@ export default function PersonasPage() {
           </div>
         )}
       </div>
+
+      <ImportModal
+        open={importModalOpen}
+        onOpenChange={setImportModalOpen}
+        entityType="persona"
+        onImportSuccess={() => {
+          setImportModalOpen(false);
+        }}
+      />
     </div>
   );
 }

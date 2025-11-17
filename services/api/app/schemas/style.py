@@ -111,3 +111,5 @@ class StyleResponse(StyleBase):
     created_at: datetime
     updated_at: datetime
     deleted_at: Optional[datetime] = None
+    imported_at: Optional[datetime] = None
+    import_source_filename: Optional[str] = None
