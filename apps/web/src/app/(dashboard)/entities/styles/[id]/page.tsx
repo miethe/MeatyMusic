@@ -167,11 +167,21 @@ export default function StyleDetailPage() {
                     </dd>
                   </div>
                 )}
-                {style.tags && style.tags.length > 0 && (
+                {style.tags_positive && style.tags_positive.length > 0 && (
                   <div>
-                    <dt className="text-sm text-text-muted">Tags</dt>
+                    <dt className="text-sm text-text-muted">Positive Tags</dt>
                     <dd className="mt-1 flex flex-wrap gap-2">
-                      {style.tags.map((tag) => (
+                      {style.tags_positive.map((tag) => (
+                        <Badge key={tag} variant="secondary">{tag}</Badge>
+                      ))}
+                    </dd>
+                  </div>
+                )}
+                {style.tags_negative && style.tags_negative.length > 0 && (
+                  <div>
+                    <dt className="text-sm text-text-muted">Negative Tags</dt>
+                    <dd className="mt-1 flex flex-wrap gap-2">
+                      {style.tags_negative.map((tag) => (
                         <Badge key={tag} variant="outline">{tag}</Badge>
                       ))}
                     </dd>

@@ -69,4 +69,11 @@
 | Enhancement | Added missing STYLE_EDIT route for style editing page |
 | Fix | Added STYLE_EDIT route to routes configuration |
 | File | apps/web/src/config/routes.ts |
+| Commit | bf65e74 |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | TypeScript build error: Property 'tags' does not exist on type 'Style' |
+| Fix | Changed `style.tags` to `style.tags_positive` and `style.tags_negative` to match schema |
+| File | apps/web/src/app/(dashboard)/entities/styles/[id]/page.tsx |
 | Commit | Pending |
