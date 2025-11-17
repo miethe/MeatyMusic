@@ -202,4 +202,4 @@
 | Bug | Song card navigation broken - clicking song cards in /songs list had no effect, unable to navigate to detail page |
 | Fix | Added navigation handlers (onSongClick, onViewWorkflow, onEdit, onClone, onDelete) to SongList component, set interactive prop on Card component to enable cursor-pointer styling. Card component properly passes onClick through {...props} |
 | Files | apps/web/src/app/(dashboard)/songs/page.tsx, apps/web/src/components/songs/SongCard.tsx |
-| Commit | Pending |
+| Commit | 26f2156 |
