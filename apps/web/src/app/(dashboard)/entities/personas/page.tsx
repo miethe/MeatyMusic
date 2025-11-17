@@ -124,20 +124,20 @@ function PersonaCard({ persona }: { persona: Persona }) {
           {persona.vocal_range && (
             <Badge variant="secondary">{persona.vocal_range}</Badge>
           )}
-          {persona.gender && (
-            <Badge variant="outline">{persona.gender}</Badge>
+          {persona.voice && (
+            <Badge variant="outline">{persona.voice}</Badge>
           )}
         </div>
-        {persona.delivery_styles && persona.delivery_styles.length > 0 && (
+        {persona.delivery && persona.delivery.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-2">
-            {persona.delivery_styles.slice(0, 3).map((style) => (
+            {persona.delivery.slice(0, 3).map((style) => (
               <Badge key={style} variant="outline" className="text-xs">
                 {style}
               </Badge>
             ))}
-            {persona.delivery_styles.length > 3 && (
+            {persona.delivery.length > 3 && (
               <Badge variant="outline" className="text-xs">
-                +{persona.delivery_styles.length - 3} more
+                +{persona.delivery.length - 3} more
               </Badge>
             )}
           </div>

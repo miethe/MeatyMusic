@@ -1,17 +1,20 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { BlueprintBase, BlueprintCreate } from '@/types/api/entities';
+import { BlueprintBase, BlueprintCreate, Blueprint } from '@/types/api/entities';
 import { ChipSelector } from './common/ChipSelector';
 import { RangeSlider } from './common/RangeSlider';
 import { EntityPreviewPanel, ValidationError } from './common/EntityPreviewPanel';
+import { LibrarySelector } from './common/LibrarySelector';
 import { Save, X } from 'lucide-react';
+import { useBlueprints } from '@/hooks/api/useBlueprints';
 
 export interface BlueprintEditorProps {
   initialValue?: Partial<BlueprintBase>;
   onSave: (blueprint: BlueprintCreate) => void;
   onCancel: () => void;
   className?: string;
+  showLibrarySelector?: boolean;
 }
 
 const GENRE_OPTIONS = [
@@ -30,6 +33,7 @@ export function BlueprintEditor({
   onSave,
   onCancel,
   className = '',
+  showLibrarySelector = false,
 }: BlueprintEditorProps) {
   const [formData, setFormData] = useState<Partial<BlueprintBase>>({
     genre: '',
@@ -60,6 +64,9 @@ export function BlueprintEditor({
 
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
   const [showPreview, setShowPreview] = useState(true);
+
+  // Fetch library blueprints for selection
+  const { data: blueprintsData } = useBlueprints();
 
   useEffect(() => {
     validateForm();
@@ -134,6 +141,13 @@ export function BlueprintEditor({
     }));
   };
 
+  const handleLibrarySelect = (blueprint: Blueprint) => {
+    // Remove id and timestamps from library item
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { id, created_at, updated_at, ...blueprintData } = blueprint;
+    setFormData(blueprintData);
+  };
+
   return (
     <div className={`flex flex-col h-full ${className}`}>
       <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-border-secondary bg-background-secondary">
@@ -167,6 +181,36 @@ export function BlueprintEditor({
 
       <div className="flex-1 flex overflow-hidden">
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          {showLibrarySelector && (
+            <>
+              <LibrarySelector
+                items={blueprintsData?.items || []}
+                onSelect={handleLibrarySelect}
+                renderItem={(blueprint) => (
+                  <div>
+                    <div className="font-semibold text-text-primary">{blueprint.genre}</div>
+                    <div className="text-xs text-text-tertiary mt-1">
+                      v{blueprint.version}
+                      {blueprint.rules?.tempo_bpm && ` • ${blueprint.rules.tempo_bpm[0]}-${blueprint.rules.tempo_bpm[1]} BPM`}
+                      {blueprint.rules?.required_sections && blueprint.rules.required_sections.length > 0 &&
+                        ` • ${blueprint.rules.required_sections.length} required sections`}
+                    </div>
+                  </div>
+                )}
+                getItemKey={(blueprint) => blueprint.id}
+                getItemSearchText={(blueprint) => `${blueprint.genre} ${blueprint.version}`}
+                emptyMessage="No blueprints in library. Create your first blueprint below."
+                label="Add from Library"
+              />
+
+              <div className="flex items-center gap-4 text-sm text-text-tertiary">
+                <div className="flex-1 h-px bg-border-secondary" />
+                <span>Or create new:</span>
+                <div className="flex-1 h-px bg-border-secondary" />
+              </div>
+            </>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-text-primary mb-2">

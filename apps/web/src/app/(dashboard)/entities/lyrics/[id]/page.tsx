@@ -85,12 +85,17 @@ export default function LyricsDetailPage() {
     );
   }
 
-  const totalLines = lyrics.sections?.reduce((sum, section) => sum + (section.line_count || 0), 0) || 0;
+  const totalLines = lyrics.sections?.reduce((sum: number, section) => sum + ((section.line_count as number) || 0), 0) || 0;
+
+  // Generate title from themes or use generic title
+  const title = lyrics.themes && lyrics.themes.length > 0
+    ? `Lyrics: ${lyrics.themes.slice(0, 2).join(', ')}${lyrics.themes.length > 2 ? '...' : ''}`
+    : 'Lyrics';
 
   return (
     <div className="min-h-screen">
       <PageHeader
-        title={lyrics.name}
+        title={title}
         description="Lyrics specification details"
         actions={
           <>
@@ -153,20 +158,20 @@ export default function LyricsDetailPage() {
                   {lyrics.sections.map((section, idx) => (
                     <div key={idx} className="border border-border-default rounded-lg p-4">
                       <div className="flex items-center justify-between mb-2">
-                        <Badge variant="secondary">{section.type}</Badge>
-                        {section.line_count && (
+                        <Badge variant="secondary">{String(section.type || 'Section')}</Badge>
+                        {typeof section.line_count === 'number' && (
                           <span className="text-sm text-text-muted">{section.line_count} lines</span>
                         )}
                       </div>
-                      {section.rhyme_scheme && (
+                      {typeof section.rhyme_scheme === 'string' && (
                         <div className="mt-2">
                           <span className="text-xs text-text-muted">Rhyme: </span>
                           <span className="text-sm text-text-primary font-mono">{section.rhyme_scheme}</span>
                         </div>
                       )}
-                      {section.content && (
+                      {typeof section.content === 'string' && (
                         <div className="mt-3 text-sm text-text-secondary whitespace-pre-wrap font-serif">
-                          {section.content}
+                          {String(section.content)}
                         </div>
                       )}
                     </div>

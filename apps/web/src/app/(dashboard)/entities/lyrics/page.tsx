@@ -116,12 +116,17 @@ export default function LyricsPage() {
 }
 
 function LyricsCard({ lyrics }: { lyrics: Lyrics }) {
-  const totalLines = lyrics.sections?.reduce((sum, section) => sum + (section.line_count || 0), 0) || 0;
+  const totalLines = lyrics.sections?.reduce((sum: number, section) => sum + ((section.line_count as number) || 0), 0) || 0;
+
+  // Generate title from themes or use generic title
+  const title = lyrics.themes && lyrics.themes.length > 0
+    ? `Lyrics: ${lyrics.themes.slice(0, 2).join(', ')}${lyrics.themes.length > 2 ? '...' : ''}`
+    : 'Lyrics';
 
   return (
     <Link href={ROUTES.ENTITIES.LYRICS_DETAIL(lyrics.id)}>
       <Card className="bg-bg-surface border-border-default shadow-elevation-1 hover:shadow-elevation-2 hover:border-border-accent p-6 transition-all duration-ui cursor-pointer">
-        <h3 className="text-lg font-semibold text-text-primary mb-2">{lyrics.name}</h3>
+        <h3 className="text-lg font-semibold text-text-primary mb-2">{title}</h3>
         <div className="flex flex-wrap gap-2 mb-4">
           {lyrics.sections && lyrics.sections.length > 0 && (
             <Badge variant="secondary">{lyrics.sections.length} sections</Badge>
@@ -137,7 +142,7 @@ function LyricsCard({ lyrics }: { lyrics: Lyrics }) {
           <div className="flex flex-wrap gap-1 mt-2">
             {lyrics.sections.slice(0, 3).map((section, idx) => (
               <Badge key={idx} variant="outline" className="text-xs">
-                {section.type}
+                {String(section.type || 'Section')}
               </Badge>
             ))}
             {lyrics.sections.length > 3 && (

@@ -11,7 +11,7 @@ import { Save, X } from 'lucide-react';
 import { useLyricsList } from '@/hooks/api/useLyrics';
 
 export interface LyricsEditorProps {
-  songId: string;
+  songId?: string;
   initialValue?: Partial<LyricsBase>;
   onSave: (lyrics: LyricsCreate) => void;
   onCancel: () => void;

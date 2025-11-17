@@ -10,7 +10,7 @@ import { Save, X } from 'lucide-react';
 import { useProducerNotesList } from '@/hooks/api/useProducerNotes';
 
 export interface ProducerNotesEditorProps {
-  songId: string;
+  songId?: string;
   initialValue?: Partial<ProducerNotesBase>;
   onSave: (notes: ProducerNotesCreate) => void;
   onCancel: () => void;
