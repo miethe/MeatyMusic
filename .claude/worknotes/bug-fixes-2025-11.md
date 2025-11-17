@@ -77,3 +77,16 @@
 | Fix | Changed `style.tags` to `style.tags_positive` and `style.tags_negative` to match schema |
 | File | apps/web/src/app/(dashboard)/entities/styles/[id]/page.tsx |
 | Commit | 82a9fba |
+| Aspect | Value |
+|--------|-------|
+| Bug | All entity pages (Lyrics, Personas, ProducerNotes, Blueprints) had placeholder code not wired to API |
+| Fix | Wired all entity list/create/detail pages to existing Editor components and API hooks, added loading/error/empty states |
+| Files | All pages under entities/lyrics/, entities/personas/, entities/producer-notes/, entities/blueprints/ (12 files total) |
+| Commit | Pending |
+
+| Aspect | Value |
+|--------|-------|
+| Enhancement | Added missing edit routes for all entities |
+| Fix | Added LYRICS_EDIT, PERSONA_EDIT, PRODUCER_NOTE_EDIT, BLUEPRINT_EDIT routes |
+| File | apps/web/src/config/routes.ts |
+| Commit | Pending |

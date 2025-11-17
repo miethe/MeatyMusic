@@ -37,18 +37,22 @@ export const ROUTES = {
     LYRICS: '/entities/lyrics',
     LYRICS_NEW: '/entities/lyrics/new',
     LYRICS_DETAIL: (id: string) => `/entities/lyrics/${id}`,
+    LYRICS_EDIT: (id: string) => `/entities/lyrics/${id}/edit`,
 
     PERSONAS: '/entities/personas',
     PERSONA_NEW: '/entities/personas/new',
     PERSONA_DETAIL: (id: string) => `/entities/personas/${id}`,
+    PERSONA_EDIT: (id: string) => `/entities/personas/${id}/edit`,
 
     PRODUCER_NOTES: '/entities/producer-notes',
     PRODUCER_NOTE_NEW: '/entities/producer-notes/new',
     PRODUCER_NOTE_DETAIL: (id: string) => `/entities/producer-notes/${id}`,
+    PRODUCER_NOTE_EDIT: (id: string) => `/entities/producer-notes/${id}/edit`,
 
     BLUEPRINTS: '/entities/blueprints',
     BLUEPRINT_NEW: '/entities/blueprints/new',
     BLUEPRINT_DETAIL: (id: string) => `/entities/blueprints/${id}`,
+    BLUEPRINT_EDIT: (id: string) => `/entities/blueprints/${id}/edit`,
 
     SOURCES: '/entities/sources',
     SOURCE_NEW: '/entities/sources/new',

@@ -1,6 +1,6 @@
 /**
- * Create Lyrics Page
- * Form for creating a new lyrics entity
+ * Create Blueprint Page
+ * Form for creating a new blueprint entity
  */
 
 'use client';
@@ -8,38 +8,38 @@
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { LyricsEditor } from '@/components/entities/LyricsEditor';
-import { useCreateLyrics } from '@/hooks/api/useLyrics';
+import { BlueprintEditor } from '@/components/entities/BlueprintEditor';
+import { useCreateBlueprint } from '@/hooks/api/useBlueprints';
 import { ROUTES } from '@/config/routes';
-import type { LyricsCreate } from '@/types/api/entities';
+import type { BlueprintCreate } from '@/types/api/entities';
 
-export default function NewLyricsPage() {
+export default function NewBlueprintPage() {
   const router = useRouter();
-  const createLyrics = useCreateLyrics();
+  const createBlueprint = useCreateBlueprint();
 
-  const handleSave = async (lyrics: LyricsCreate) => {
+  const handleSave = async (blueprint: BlueprintCreate) => {
     try {
-      const created = await createLyrics.mutateAsync(lyrics);
-      router.push(ROUTES.ENTITIES.LYRICS_DETAIL(created.id));
+      const created = await createBlueprint.mutateAsync(blueprint);
+      router.push(ROUTES.ENTITIES.BLUEPRINT_DETAIL(created.id));
     } catch (error) {
       // Error is handled by React Query and displayed via toast
-      console.error('Failed to create lyrics:', error);
+      console.error('Failed to create blueprint:', error);
     }
   };
 
   const handleCancel = () => {
-    router.push(ROUTES.ENTITIES.LYRICS);
+    router.push(ROUTES.ENTITIES.BLUEPRINTS);
   };
 
   return (
     <div className="min-h-screen">
       <PageHeader
-        title="Create Lyrics"
-        description="Define new lyric specifications"
+        title="Create Blueprint"
+        description="Define genre-specific composition rules and evaluation rubric"
       />
 
       <div className="container mx-auto px-4 py-8 max-w-5xl animate-fade-in">
-        <LyricsEditor
+        <BlueprintEditor
           initialValue={{}}
           onSave={handleSave}
           onCancel={handleCancel}
