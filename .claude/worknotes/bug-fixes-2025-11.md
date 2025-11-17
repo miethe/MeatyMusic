@@ -90,3 +90,39 @@
 | Fix | Added LYRICS_EDIT, PERSONA_EDIT, PRODUCER_NOTE_EDIT, BLUEPRINT_EDIT routes |
 | File | apps/web/src/config/routes.ts |
 | Commit | Pending |
+
+## 2025-11-17
+| Aspect | Value |
+|--------|-------|
+| Bug | TypeScript error: BlueprintEditor missing showLibrarySelector prop |
+| Fix | Added showLibrarySelector prop with full library selection functionality (consistent with other editors) |
+| File | apps/web/src/components/entities/BlueprintEditor.tsx |
+| Commit | f5a53d4 |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | TypeScript error: Reduce operator type mismatch with Record<string, unknown> in Lyrics pages |
+| Fix | Added explicit type annotations (sum: number) and type guards (typeof) for section properties |
+| Files | apps/web/src/app/(dashboard)/entities/lyrics/[id]/page.tsx, apps/web/src/app/(dashboard)/entities/lyrics/page.tsx |
+| Commit | f5a53d4 |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | TypeScript error: Property 'name' does not exist on type 'Lyrics' |
+| Fix | Generated title from themes array instead of non-existent lyrics.name |
+| Files | apps/web/src/app/(dashboard)/entities/lyrics/[id]/page.tsx, apps/web/src/app/(dashboard)/entities/lyrics/page.tsx |
+| Commit | f5a53d4 |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | TypeScript error: LyricsEditor & ProducerNotesEditor require songId but /new pages don't provide it |
+| Fix | Made songId prop optional (songId?: string) to allow standalone entity creation |
+| Files | apps/web/src/components/entities/LyricsEditor.tsx, apps/web/src/components/entities/ProducerNotesEditor.tsx |
+| Commit | f5a53d4 |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | TypeScript error: Property 'gender' and 'delivery_styles' do not exist on type 'Persona' |
+| Fix | Replaced persona.gender with persona.voice and persona.delivery_styles with persona.delivery |
+| File | apps/web/src/app/(dashboard)/entities/personas/page.tsx |
+| Commit | f5a53d4 |
