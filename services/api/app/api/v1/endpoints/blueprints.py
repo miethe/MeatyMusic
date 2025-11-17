@@ -119,7 +119,7 @@ async def list_blueprints(
     cursor_uuid = UUID(cursor) if cursor else None
 
     # Fetch one extra to determine if there's a next page
-    blueprints = await repo.list(limit=limit + 1, offset=cursor_uuid)
+    blueprints = repo.list(limit=limit + 1, offset=cursor_uuid)
 
     has_next = len(blueprints) > limit
     items = blueprints[:limit]
@@ -339,7 +339,7 @@ async def search_blueprints_by_tags(
     Returns:
         List of blueprints containing any of the specified tags
     """
-    blueprints = await repo.search_by_tags(tags)
+    blueprints = repo.search_by_tags(tags)
     return [BlueprintResponse.model_validate(bp) for bp in blueprints]
 
 

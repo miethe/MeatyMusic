@@ -95,7 +95,7 @@ async def list_personas(
         Paginated list of personas
     """
     cursor_uuid = UUID(cursor) if cursor else None
-    personas = await repo.list(limit=limit + 1, offset=cursor_uuid)
+    personas = repo.list(limit=limit + 1, offset=cursor_uuid)
 
     has_next = len(personas) > limit
     items = personas[:limit]

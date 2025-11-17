@@ -55,7 +55,7 @@ async def create_workflow_run(
         HTTPException: If run creation fails
     """
     try:
-        run = await repo.create(run_data.model_dump())
+        run = repo.create(run_data.model_dump())
         return WorkflowRunResponse.model_validate(run)
     except ValueError as e:
         raise HTTPException(
@@ -86,7 +86,7 @@ async def list_workflow_runs(
         Paginated list of workflow runs
     """
     cursor_uuid = UUID(cursor) if cursor else None
-    runs = await repo.list(limit=limit + 1, offset=cursor_uuid)
+    runs = repo.list(limit=limit + 1, offset=cursor_uuid)
 
     has_next = len(runs) > limit
     items = runs[:limit]
@@ -130,7 +130,7 @@ async def get_workflow_run(
     Raises:
         HTTPException: If run not found
     """
-    run = await repo.get_by_id(run_id)
+    run = repo.get_by_id(run_id)
     if not run:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -167,14 +167,14 @@ async def update_workflow_run(
     Raises:
         HTTPException: If run not found
     """
-    existing = await repo.get_by_id(run_id)
+    existing = repo.get_by_id(run_id)
     if not existing:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Workflow run {run_id} not found",
         )
 
-    updated = await repo.update(
+    updated = repo.update(
         run_id,
         run_data.model_dump(exclude_unset=True),
     )
@@ -204,14 +204,14 @@ async def delete_workflow_run(
     Raises:
         HTTPException: If run not found
     """
-    existing = await repo.get_by_id(run_id)
+    existing = repo.get_by_id(run_id)
     if not existing:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Workflow run {run_id} not found",
         )
 
-    await repo.delete(run_id)
+    repo.delete(run_id)
 
 
 @router.get(
@@ -254,7 +254,7 @@ async def get_runs_by_song(
     Returns:
         List of workflow runs for the song
     """
-    runs = await repo.get_by_song_id(song_id)
+    runs = repo.get_by_song_id(song_id)
     return [WorkflowRunResponse.model_validate(r) for r in runs]
 
 

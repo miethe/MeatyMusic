@@ -20,6 +20,8 @@ class PersonaRepository(BaseRepository[Persona]):
     security context is set.
     """
 
+    model_class = Persona  # Type annotation for generic list operations
+
     def get_by_name(self, name: str) -> Optional[Persona]:
         """Get persona by name with security filtering.
 

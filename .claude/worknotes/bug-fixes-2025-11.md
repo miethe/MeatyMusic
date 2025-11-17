@@ -133,3 +133,33 @@
 | Fix | Updated infra/.env.docker: enabled DEV_AUTH_BYPASS_ENABLED=true, set secret and user ID, fixed ports (8000/3000 instead of 8030/3030). Docker restart doesn't reload .env - required full down/up cycle |
 | File | infra/.env.docker |
 | Commit | Pending |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | Song creation failed with psycopg2.errors.NumericValueOutOfRange: integer out of range (global_seed=1763319120112) |
+| Fix | Changed songs.global_seed from INTEGER (32-bit) to BIGINT (64-bit) in Song model and database migration |
+| Files | services/api/app/models/song.py, services/api/alembic/versions/20251117_1430_698242fd277f_fix_songs_global_seed_bigint.py |
+| Commit | 764d196 |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | GET /songs failed with ValueError: badly formed hexadecimal UUID string - DEV_AUTH_BYPASS_USER_ID had invalid default |
+| Fix | Fixed config default from "dev-user-00000000..." to valid UUID "00000000-0000-0000-0000-000000000000", added error handling in dependencies.py |
+| Files | services/api/app/core/config.py:261, services/api/app/core/dependencies.py:90,412 |
+| Commit | 824e9b9 |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | /styles endpoint failed with AttributeError: 'StyleRepository' object has no attribute 'list' - BaseRepository missing list() method |
+| Fix | Added list() method to BaseRepository with limit/offset pagination, added model_class attribute to all entity repositories (Style, Persona, Blueprint, ProducerNotes, WorkflowRun) |
+| Files | services/api/app/repositories/base.py:310-365, services/api/app/repositories/style_repo.py:23, persona_repo.py, blueprint_repo.py, producer_notes_repo.py, workflow_run_repo.py |
+| Commit | Pending |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | Endpoint handlers using 'await' on synchronous repository methods causing runtime errors |
+| Fix | Removed 'await' from all repository method calls across 5 endpoint files (styles, personas, blueprints, producer_notes, workflow_runs). Repository methods are sync; only service methods are async |
+| Files | services/api/app/api/v1/endpoints/styles.py, personas.py, blueprints.py, producer_notes.py, workflow_runs.py |
+| Commit | Pending |
+
+**Note**: Docker daemon not running - services need restart to test fixes. Code changes validated syntactically.

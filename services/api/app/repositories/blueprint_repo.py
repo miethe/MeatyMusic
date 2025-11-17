@@ -20,6 +20,8 @@ class BlueprintRepository(BaseRepository[Blueprint]):
     security context is set.
     """
 
+    model_class = Blueprint  # Type annotation for generic list operations
+
     def get_by_genre(self, genre: str) -> List[Blueprint]:
         """Get all blueprints for a specific genre with security filtering.
 

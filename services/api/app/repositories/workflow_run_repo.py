@@ -20,6 +20,8 @@ class WorkflowRunRepository(BaseRepository[WorkflowRun]):
     security context is set.
     """
 
+    model_class = WorkflowRun  # Type annotation for generic list operations
+
     def get_active_runs(self) -> List[WorkflowRun]:
         """Get all active (running) workflow runs with security filtering.
 

@@ -21,6 +21,8 @@ class ProducerNotesRepository(BaseRepository[ProducerNotes]):
     security context is set.
     """
 
+    model_class = ProducerNotes  # Type annotation for generic list operations
+
     def get_by_song_id(self, song_id: UUID) -> List[ProducerNotes]:
         """Get all producer notes for a specific song.
 

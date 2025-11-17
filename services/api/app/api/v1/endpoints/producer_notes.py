@@ -87,7 +87,7 @@ async def list_producer_notes(
         Paginated list of producer notes
     """
     cursor_uuid = UUID(cursor) if cursor else None
-    notes_list = await repo.list(limit=limit + 1, offset=cursor_uuid)
+    notes_list = repo.list(limit=limit + 1, offset=cursor_uuid)
 
     has_next = len(notes_list) > limit
     items = notes_list[:limit]

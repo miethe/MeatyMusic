@@ -20,6 +20,8 @@ class StyleRepository(BaseRepository[Style]):
     security context is set.
     """
 
+    model_class = Style  # Type annotation for generic list operations
+
     def get_by_genre(self, genre: str) -> List[Style]:
         """Get all styles for a specific genre with security filtering.
 

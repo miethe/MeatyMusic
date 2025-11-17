@@ -307,6 +307,63 @@ class BaseRepository(Generic[T]):
             )
         return entity
 
+    def list(
+        self,
+        limit: int = 50,
+        offset: Optional[UUID] = None,
+        model_class: Optional[Type[T]] = None
+    ) -> List[T]:
+        """List entities with simple limit/offset pagination.
+
+        This is a simplified list method for basic pagination needs.
+        For advanced pagination with cursors, use list_paginated().
+
+        Args:
+            limit: Maximum number of items to return (default: 50)
+            offset: Optional UUID offset for pagination
+            model_class: The SQLAlchemy model class to query (uses self.model_class if not provided)
+
+        Returns:
+            List of entities
+
+        Raises:
+            ForbiddenError: If security context is missing or invalid
+        """
+        # Use self.model_class if available, otherwise require explicit parameter
+        if model_class is None:
+            if hasattr(self, 'model_class') and self.model_class is not None:
+                model_class = self.model_class
+            else:
+                raise ValueError("model_class must be provided or set as class attribute")
+
+        try:
+            with self._transaction_context():
+                query = self.db.query(model_class).filter(
+                    model_class.deleted_at.is_(None)
+                )
+
+                # Apply security filtering
+                guard = self.get_unified_guard(model_class)
+                if guard:
+                    query = guard.filter_query(query)
+
+                # Apply offset if provided
+                if offset is not None:
+                    query = query.filter(model_class.id > offset)
+
+                # Order by ID for consistent pagination
+                query = query.order_by(model_class.id)
+
+                # Limit results
+                return query.limit(limit).all()
+
+        except Exception as e:
+            from app.core.security import SecurityContextError, SecurityFilterError
+            if isinstance(e, (SecurityContextError, SecurityFilterError)):
+                raise self._handle_security_error(e, "list", model_class)
+            else:
+                raise
+
     def list_paginated(
         self,
         model_class: Type[T],
