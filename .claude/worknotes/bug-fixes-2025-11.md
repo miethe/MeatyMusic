@@ -153,13 +153,20 @@
 | Bug | /styles endpoint failed with AttributeError: 'StyleRepository' object has no attribute 'list' - BaseRepository missing list() method |
 | Fix | Added list() method to BaseRepository with limit/offset pagination, added model_class attribute to all entity repositories (Style, Persona, Blueprint, ProducerNotes, WorkflowRun) |
 | Files | services/api/app/repositories/base.py:310-365, services/api/app/repositories/style_repo.py:23, persona_repo.py, blueprint_repo.py, producer_notes_repo.py, workflow_run_repo.py |
-| Commit | Pending |
+| Commit | 5379b4f |
 
 | Aspect | Value |
 |--------|-------|
 | Bug | Endpoint handlers using 'await' on synchronous repository methods causing runtime errors |
 | Fix | Removed 'await' from all repository method calls across 5 endpoint files (styles, personas, blueprints, producer_notes, workflow_runs). Repository methods are sync; only service methods are async |
 | Files | services/api/app/api/v1/endpoints/styles.py, personas.py, blueprints.py, producer_notes.py, workflow_runs.py |
-| Commit | Pending |
+| Commit | 5379b4f |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | Song creation failed with 400: "Song has no blueprint reference" - SDS compiler requires blueprint_id but schema allows it to be optional |
+| Fix | Made SDS compilation conditional on blueprint_id presence. Allows incremental song building where entities are added progressively. SDS compilation deferred until blueprint is provided |
+| File | services/api/app/api/v1/endpoints/songs.py:108-179 |
+| Commit | 00f534e |
 
 **Note**: Docker daemon not running - services need restart to test fixes. Code changes validated syntactically.
