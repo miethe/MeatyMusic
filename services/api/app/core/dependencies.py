@@ -87,7 +87,19 @@ async def get_security_context(
     if token == "DEV_BYPASS_TOKEN":
         from app.models.tenant import TenantORM
 
-        dev_user_id = UUID(settings.DEV_AUTH_BYPASS_USER_ID)
+        try:
+            dev_user_id = UUID(settings.DEV_AUTH_BYPASS_USER_ID)
+        except ValueError as e:
+            logger.error(
+                "invalid_dev_bypass_user_id",
+                value=settings.DEV_AUTH_BYPASS_USER_ID,
+                error=str(e),
+                msg="DEV_AUTH_BYPASS_USER_ID must be a valid UUID format"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Invalid DEV_AUTH_BYPASS_USER_ID configuration: {str(e)}"
+            )
         dev_tenant_id = UUID("00000000-0000-0000-0000-000000000001")
 
         # Ensure default tenant exists
@@ -397,7 +409,19 @@ async def get_current_user_with_context_async(
         if token == "DEV_BYPASS_TOKEN":
             from app.models.tenant import TenantORM
 
-            dev_user_id = UUID(settings.DEV_AUTH_BYPASS_USER_ID)
+            try:
+                dev_user_id = UUID(settings.DEV_AUTH_BYPASS_USER_ID)
+            except ValueError as e:
+                logger.error(
+                    "invalid_dev_bypass_user_id",
+                    value=settings.DEV_AUTH_BYPASS_USER_ID,
+                    error=str(e),
+                    msg="DEV_AUTH_BYPASS_USER_ID must be a valid UUID format"
+                )
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=f"Invalid DEV_AUTH_BYPASS_USER_ID configuration: {str(e)}"
+                )
             dev_tenant_id = UUID("00000000-0000-0000-0000-000000000001")
 
             # Ensure default tenant exists

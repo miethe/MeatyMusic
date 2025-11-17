@@ -258,7 +258,7 @@ class Settings(BaseSettings):
     # Development-only auth bypass for MCP/agent testing
     DEV_AUTH_BYPASS_ENABLED: bool = False
     DEV_AUTH_BYPASS_SECRET: str | None = None
-    DEV_AUTH_BYPASS_USER_ID: str = "dev-user-00000000-0000-0000-0000-000000000000"
+    DEV_AUTH_BYPASS_USER_ID: str = "00000000-0000-0000-0000-000000000000"
 
     OBS: ObservabilitySettings = ObservabilitySettings()
     CACHE: CacheSettings = CacheSettings()
