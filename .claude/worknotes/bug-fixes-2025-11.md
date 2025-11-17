@@ -126,3 +126,10 @@
 | Fix | Replaced persona.gender with persona.voice and persona.delivery_styles with persona.delivery |
 | File | apps/web/src/app/(dashboard)/entities/personas/page.tsx |
 | Commit | f5a53d4 |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | All API endpoints returning 401 Unauthorized - DEV_AUTH_BYPASS not working in Docker |
+| Fix | Updated infra/.env.docker: enabled DEV_AUTH_BYPASS_ENABLED=true, set secret and user ID, fixed ports (8000/3000 instead of 8030/3030). Docker restart doesn't reload .env - required full down/up cycle |
+| File | infra/.env.docker |
+| Commit | Pending |
