@@ -68,12 +68,8 @@ services:
       REDIS_URL: redis://redis:6379/0
       REDIS_MAX_CONNECTIONS: 50
 
-      # Clerk Authentication
-      CLERK_WEBHOOK_SECRET: ${CLERK_WEBHOOK_SECRET}
-      CLERK_SECRET_KEY: ${CLERK_SECRET_KEY}
-      CLERK_JWKS_URL: ${CLERK_JWKS_URL}
-      CLERK_JWT_ISSUER: ${CLERK_JWT_ISSUER}
-      CLERK_JWKS_CACHE_TTL: ${CLERK_JWKS_CACHE_TTL:-3600}
+      # Authentication - Dev mode only (no Clerk for MVP)
+      # TODO: Add production JWT authentication here when needed
 
       # Environment
       ENVIRONMENT: ${ENVIRONMENT:-development}
@@ -115,7 +111,6 @@ services:
       dockerfile: ./apps/web/Dockerfile
       args:
         NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000}
-        NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
     container_name: meatymusic-web
     restart: unless-stopped
     ports:
@@ -124,15 +119,8 @@ services:
       # API Configuration
       NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://api:8000}
 
-      # Clerk Authentication
-      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
-      CLERK_SECRET_KEY: ${CLERK_SECRET_KEY}
-
-      # Clerk Routes
-      NEXT_PUBLIC_CLERK_SIGN_IN_URL: /sign-in
-      NEXT_PUBLIC_CLERK_SIGN_UP_URL: /sign-up
-      NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: /dashboard
-      NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: /dashboard
+      # Authentication - Dev mode only (no Clerk for MVP)
+      # TODO: Add production authentication configuration here when needed
 
       # Environment
       NODE_ENV: ${NODE_ENV:-production}

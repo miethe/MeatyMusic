@@ -1,4 +1,14 @@
-"""Security-aware FastAPI dependencies for dual context authentication."""
+"""Security-aware FastAPI dependencies for dual context authentication.
+
+SIMPLIFIED FOR MVP: This version uses ONLY dev bypass authentication.
+Production JWT/Clerk authentication has been removed to unblock MVP development.
+
+TODO (Future): Add production authentication here:
+  1. Restore JWT token validation (Clerk, Auth0, or custom)
+  2. Add proper JWKS verification
+  3. Implement user/tenant extraction from JWT claims
+  4. Add proper error handling for invalid tokens
+"""
 from __future__ import annotations
 
 from typing import Annotated, Optional
@@ -6,7 +16,6 @@ from uuid import UUID
 
 import structlog
 from fastapi import Depends, HTTPException, Request, status
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -15,29 +24,25 @@ from app.core.database import get_db_session
 # from app.core.async_database import get_async_db_session  # Not used - commented to avoid asyncpg dependency
 from app.core.security import SecurityContext, RepositoryFactory
 from app.core.security.exceptions import SecurityContextError
-from app.core.auth import JWTContextExtractor
-from app.auth.providers.base import AuthContext, AuthProvider
-from app.auth.deps import get_auth_provider
 from app.models.user import UserORM
-from app.auth.jwks import verify_token
 
 logger = structlog.get_logger(__name__)
-security = HTTPBearer(auto_error=False)
 
 
 async def get_current_user_token(
     request: Request,
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
 ) -> str:
-    """Extract JWT token from Authorization header.
+    """Extract authentication token from request.
 
-    Supports development auth bypass via X-Dev-Auth-Bypass header.
+    MVP SIMPLIFIED: Only supports development auth bypass via X-Dev-Auth-Bypass header.
+
+    TODO (Future): Add JWT Bearer token extraction from Authorization header
 
     Returns:
-        Raw JWT token string, or DEV_BYPASS_TOKEN marker for dev bypass
+        DEV_BYPASS_TOKEN marker for dev bypass
 
     Raises:
-        HTTPException: If no token is provided and dev bypass is not active
+        HTTPException: If dev bypass header is missing or invalid
     """
     # Development bypass check (secure by environment validation in settings)
     if settings.DEV_AUTH_BYPASS_ENABLED:
@@ -46,17 +51,15 @@ async def get_current_user_token(
             logger.warning(
                 "dev_bypass_token_extracted",
                 path=request.url.path,
-                msg="⚠️  Development auth bypass token provided"
+                msg="⚠️  Development auth bypass active"
             )
             return "DEV_BYPASS_TOKEN"
 
-    if not credentials:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authenticated"
-        )
-
-    return credentials.credentials
+    # No JWT validation in MVP - require dev bypass
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Authentication required. Use X-Dev-Auth-Bypass header in development mode."
+    )
 
 
 async def get_security_context(
@@ -64,25 +67,25 @@ async def get_security_context(
     token: Annotated[str, Depends(get_current_user_token)],
     db: Session = Depends(get_db_session)
 ) -> SecurityContext:
-    """FastAPI dependency providing security context from JWT.
+    """FastAPI dependency providing security context.
 
-    Extracts both user and tenant contexts from Clerk JWT tokens, with graceful
-    degradation when tenant context is unavailable.
+    MVP SIMPLIFIED: Only supports development auth bypass mode.
+    Creates/reuses default tenant and dev user.
 
-    Supports development auth bypass mode.
+    TODO (Future): Add JWT token validation and user/tenant extraction from claims
 
     Args:
         request: FastAPI request object
-        token: JWT token from Authorization header, or DEV_BYPASS_TOKEN marker
+        token: DEV_BYPASS_TOKEN marker (only option in MVP)
         db: Database session
 
     Returns:
-        SecurityContext with extracted user/tenant information
+        SecurityContext with dev user/tenant information
 
     Raises:
-        HTTPException: If token is invalid or user context cannot be extracted
+        HTTPException: If authentication fails
     """
-    # Handle development bypass
+    # MVP: Only dev bypass is supported
     if token == "DEV_BYPASS_TOKEN":
         from app.models.tenant import TenantORM
 
@@ -139,7 +142,7 @@ async def get_security_context(
             user_id=dev_user_id,
             tenant_id=dev_tenant_id,
             permissions=set(),
-            scope="tenant",  # Changed from "user" to "tenant" since we now have tenant context
+            scope="tenant",
             metadata={"dev_bypass": True}
         )
 
@@ -153,80 +156,62 @@ async def get_security_context(
 
         return security_context
 
-    try:
-        # Create JWT context extractor
-        extractor = JWTContextExtractor(
-            issuer=settings.CLERK_JWT_ISSUER,
-            audience=None  # Clerk doesn't require audience validation
-        )
+    # TODO (Future): Add production JWT validation here
+    # Example implementation:
+    # try:
+    #     extractor = JWTContextExtractor(issuer=settings.JWT_ISSUER, audience=settings.JWT_AUDIENCE)
+    #     security_context = extractor.extract_security_context(token, db)
+    #     logger.info("Security context extracted", user_id=str(security_context.user_id))
+    #     return security_context
+    # except Exception as e:
+    #     logger.error("JWT validation failed", error=str(e))
+    #     raise HTTPException(status_code=401, detail="Invalid token")
 
-        # Extract security context from JWT with enhanced error handling
-        security_context = extractor.extract_security_context(token, db)
-
-        logger.info(
-            "Security context extracted via dependency",
-            user_id=str(security_context.user_id) if security_context.user_id else None,
-            tenant_id=str(security_context.tenant_id) if security_context.tenant_id else None,
-            scope=security_context.scope,
-            request_id=getattr(request.state, 'request_id', None)
-        )
-
-        return security_context
-
-    except HTTPException as e:
-        # Log the authentication failure with request context
-        logger.warning(
-            "Authentication failed in security context dependency",
-            status_code=e.status_code,
-            detail=e.detail,
-            request_id=getattr(request.state, 'request_id', None),
-            path=request.url.path,
-            method=request.method
-        )
-        raise
-    except Exception as e:
-        # Log unexpected errors and convert to proper HTTP exception
-        logger.error(
-            "Unexpected error in security context dependency",
-            error=str(e),
-            error_type=type(e).__name__,
-            request_id=getattr(request.state, 'request_id', None),
-            path=request.url.path,
-            method=request.method
-        )
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Internal authentication error"
-        )
+    raise HTTPException(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        detail="Production authentication not yet implemented"
+    )
 
 
 async def get_security_context_optional(
     request: Request,
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
     db: Session = Depends(get_db_session)
 ) -> Optional[SecurityContext]:
     """Optional security context dependency that doesn't raise on missing auth.
 
+    MVP SIMPLIFIED: Only supports dev bypass. Returns None if bypass header not present.
+
+    TODO (Future): Add optional JWT token validation
+
     Args:
         request: FastAPI request object
-        credentials: Optional authorization credentials
         db: Database session
 
     Returns:
-        SecurityContext if valid token provided, None otherwise
+        SecurityContext if dev bypass active, None otherwise
     """
-    if not credentials:
-        return None
+    # Check for dev bypass
+    if settings.DEV_AUTH_BYPASS_ENABLED:
+        bypass_header = request.headers.get("X-Dev-Auth-Bypass")
+        if bypass_header == settings.DEV_AUTH_BYPASS_SECRET:
+            try:
+                token = await get_current_user_token(request)
+                return await get_security_context(request, token, db)
+            except HTTPException:
+                logger.debug("Dev bypass header present but invalid")
+                return None
 
-    try:
-        extractor = JWTContextExtractor(
-            issuer=settings.CLERK_JWT_ISSUER,
-            audience=None  # Clerk doesn't require audience validation
-        )
-        return extractor.extract_security_context(credentials.credentials, db)
-    except HTTPException:
-        logger.debug("Invalid token in optional security context")
-        return None
+    # TODO (Future): Add JWT token validation
+    # Example:
+    # try:
+    #     token = request.headers.get("Authorization", "").replace("Bearer ", "")
+    #     if token:
+    #         extractor = JWTContextExtractor(issuer=settings.JWT_ISSUER)
+    #         return extractor.extract_security_context(token, db)
+    # except Exception:
+    #     pass
+
+    return None
 
 
 async def get_user_context(
@@ -306,36 +291,35 @@ def require_permission(permission: str):
 # Legacy compatibility: provide get_current_user that returns UserORM
 async def get_current_user_with_context(
     security_context: Annotated[SecurityContext, Depends(get_user_context)],
-    db: Annotated[Session, Depends(get_db_session)],
-    provider: Annotated[AuthProvider, Depends(get_auth_provider)]
+    db: Annotated[Session, Depends(get_db_session)]
 ) -> tuple[UserORM, SecurityContext]:
     """Get current user ORM object along with security context.
 
     This dependency provides both the UserORM (for backward compatibility)
     and the SecurityContext for new security-aware code.
 
+    MVP SIMPLIFIED: Directly queries user by ID from security context.
+
+    TODO (Future): Add AuthProvider integration for user resolution
+
     Args:
         security_context: Validated security context
         db: Database session
-        provider: Authentication provider
 
     Returns:
         Tuple of (UserORM, SecurityContext)
-    """
-    # Create a minimal AuthContext for the provider
-    auth_context = AuthContext(
-        subject=str(security_context.user_id),
-        email=None,  # We don't have email in SecurityContext
-        name=None,   # We don't have name in SecurityContext
-        avatar_url=None,  # We don't have avatar in SecurityContext
-        user_id=str(security_context.user_id),
-        tenant_id=str(security_context.tenant_id) if security_context.tenant_id else None,
-        permissions=security_context.permissions,
-        scope=security_context.scope
-    )
 
-    # Resolve user through provider
-    user = provider.resolve_user(db, auth_context)
+    Raises:
+        HTTPException: If user not found
+    """
+    # Directly query user by ID from security context
+    user = db.query(UserORM).filter(UserORM.id == security_context.user_id).first()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User {security_context.user_id} not found"
+        )
 
     return user, security_context
 
@@ -385,8 +369,7 @@ async def get_repository_factory(
 
 async def get_current_user_with_context_async(
     request: Request,
-    token: Annotated[str, Depends(get_current_user_token)],
-    provider: Annotated[AuthProvider, Depends(get_auth_provider)]
+    token: Annotated[str, Depends(get_current_user_token)]
 ) -> tuple[UserORM, SecurityContext]:
     """Get current user ORM object along with security context (async-compatible version).
 
@@ -395,14 +378,13 @@ async def get_current_user_with_context_async(
     database session internally only for the authentication lookup, keeping
     the dependency chain fully async-compatible.
 
-    This version bypasses the nested sync dependencies by directly extracting
-    the security context and user information without requiring a sync Session
-    in the dependency chain.
+    MVP SIMPLIFIED: Only supports dev bypass authentication.
+
+    TODO (Future): Add JWT token validation and user resolution
 
     Args:
         request: FastAPI request object
-        token: JWT token from Authorization header
-        provider: Authentication provider
+        token: DEV_BYPASS_TOKEN marker (only option in MVP)
 
     Returns:
         Tuple of (UserORM, SecurityContext)
@@ -415,7 +397,7 @@ async def get_current_user_with_context_async(
 
     # Use context manager for proper session handling
     with SessionLocal() as db:
-        # Handle development bypass
+        # MVP: Only dev bypass is supported
         if token == "DEV_BYPASS_TOKEN":
             from app.models.tenant import TenantORM
 
@@ -472,7 +454,7 @@ async def get_current_user_with_context_async(
                 user_id=dev_user_id,
                 tenant_id=dev_tenant_id,
                 permissions=set(),
-                scope="tenant",  # Changed from "user" to "tenant" since we now have tenant context
+                scope="tenant",
                 metadata={"dev_bypass": True}
             )
 
@@ -486,72 +468,21 @@ async def get_current_user_with_context_async(
 
             return user, security_context
 
-        try:
-            # Create JWT context extractor
-            extractor = JWTContextExtractor(
-                issuer=settings.CLERK_JWT_ISSUER,
-                audience=None  # Clerk doesn't require audience validation
-            )
+        # TODO (Future): Add production JWT validation here
+        # Example:
+        # try:
+        #     extractor = JWTContextExtractor(issuer=settings.JWT_ISSUER)
+        #     security_context = extractor.extract_security_context(token, db)
+        #     security_context.requires_user_context()
+        #     user = db.query(UserORM).filter(UserORM.id == security_context.user_id).first()
+        #     if not user:
+        #         raise HTTPException(status_code=404, detail="User not found")
+        #     return user, security_context
+        # except Exception as e:
+        #     logger.error("Authentication failed", error=str(e))
+        #     raise HTTPException(status_code=401, detail="Invalid token")
 
-            # Extract security context from JWT with enhanced error handling
-            security_context = extractor.extract_security_context(token, db)
-
-            # Validate that we have user context
-            try:
-                security_context.requires_user_context()
-            except SecurityContextError as e:
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    detail=f"User context required: {str(e)}"
-                )
-
-            logger.info(
-                "Security context extracted via async dependency",
-                user_id=str(security_context.user_id) if security_context.user_id else None,
-                tenant_id=str(security_context.tenant_id) if security_context.tenant_id else None,
-                scope=security_context.scope,
-                request_id=getattr(request.state, 'request_id', None)
-            )
-
-            # Create a minimal AuthContext for the provider
-            auth_context = AuthContext(
-                subject=str(security_context.user_id),
-                email=None,  # We don't have email in SecurityContext
-                name=None,   # We don't have name in SecurityContext
-                avatar_url=None,  # We don't have avatar in SecurityContext
-                user_id=str(security_context.user_id),
-                tenant_id=str(security_context.tenant_id) if security_context.tenant_id else None,
-                permissions=security_context.permissions,
-                scope=security_context.scope
-            )
-
-            # Resolve user through provider (synchronous operation)
-            user = provider.resolve_user(db, auth_context)
-
-            return user, security_context
-
-        except HTTPException as e:
-            # Log the authentication failure with request context
-            logger.warning(
-                "Authentication failed in async security context dependency",
-                status_code=e.status_code,
-                detail=e.detail,
-                request_id=getattr(request.state, 'request_id', None),
-                path=request.url.path,
-                method=request.method
-            )
-            raise
-        except Exception as e:
-            # Log unexpected errors and convert to proper HTTP exception
-            logger.error(
-                "Unexpected error in async security context dependency",
-                error=str(e),
-                error_type=type(e).__name__,
-                request_id=getattr(request.state, 'request_id', None),
-                path=request.url.path,
-                method=request.method
-            )
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Internal authentication error"
-            )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Production authentication not yet implemented"
+        )

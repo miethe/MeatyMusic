@@ -28,9 +28,22 @@
 - **Bug**: Build context paths using `../` instead of `./` relative to project root
 - **Fix**: Updated all context and volume paths in `docker-compose.yml`
 
+## Option 1: Simplify to Dev-Only Authentication (Implemented)
+
+### 7. Removed Clerk/JWT Dependencies
+- **Why**: No frontend auth UI implemented, Clerk values were placeholders
+- **Fix**:
+  - Removed all Clerk imports and JWT validation from `app/core/dependencies.py`
+  - Kept only dev bypass authentication mechanism
+  - Removed Clerk environment variables from `docker-compose.yml`
+  - Simplified `.env` to remove Clerk configuration
+  - Added TODO comments for future production JWT auth
+- **Result**: Clean dev-only authentication system, ~70 lines of code removed
+
 ## Validation
 - ✅ GET /api/v1/songs returns 200 with empty list
 - ✅ Dev auth bypass working with X-Dev-Auth-Bypass header
 - ✅ Swagger UI accessible at http://localhost:8000/docs
 - ✅ Database UUID types correct
 - ✅ Tenant and user creation working
+- ✅ Simplified authentication (no Clerk dependencies)
