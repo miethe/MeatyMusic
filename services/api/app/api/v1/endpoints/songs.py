@@ -104,72 +104,79 @@ async def create_song(
         )
         song = repo.create(Song, song_dict)
 
-        # Step 2: Compile SDS from entity references
-        logger.info("sds.compile_start", song_id=str(song.id))
-        try:
-            sds = sds_compiler.compile_sds(song.id, validate=True)
-        except ValueError as e:
-            logger.warning(
-                "sds.compile_failed",
-                song_id=str(song.id),
-                error=str(e),
-            )
-            # Rollback song creation
-            repo.delete(Song, song.id)
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"SDS compilation failed: {str(e)}",
-            )
+        # Step 2: Compile SDS from entity references (only if blueprint_id is provided)
+        if song.blueprint_id:
+            logger.info("sds.compile_start", song_id=str(song.id))
+            try:
+                sds = sds_compiler.compile_sds(song.id, validate=True)
+            except ValueError as e:
+                logger.warning(
+                    "sds.compile_failed",
+                    song_id=str(song.id),
+                    error=str(e),
+                )
+                # Rollback song creation
+                repo.delete(Song, song.id)
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"SDS compilation failed: {str(e)}",
+                )
 
-        # Step 3: Validate against blueprint constraints
-        logger.info("sds.blueprint_validation_start", song_id=str(song.id))
-        is_valid, errors = await blueprint_validator.validate_sds_against_blueprint(
-            sds, str(song.blueprint_id)
-        )
-        if not is_valid:
-            logger.warning(
-                "sds.blueprint_validation_failed",
-                song_id=str(song.id),
-                errors=errors,
+            # Step 3: Validate against blueprint constraints
+            logger.info("sds.blueprint_validation_start", song_id=str(song.id))
+            is_valid, errors = await blueprint_validator.validate_sds_against_blueprint(
+                sds, str(song.blueprint_id)
             )
-            # Rollback song creation
-            repo.delete(Song, song.id)
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Blueprint validation failed: {'; '.join(errors)}",
-            )
+            if not is_valid:
+                logger.warning(
+                    "sds.blueprint_validation_failed",
+                    song_id=str(song.id),
+                    errors=errors,
+                )
+                # Rollback song creation
+                repo.delete(Song, song.id)
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Blueprint validation failed: {'; '.join(errors)}",
+                )
 
-        # Step 4: Validate cross-entity consistency
-        logger.info("sds.cross_entity_validation_start", song_id=str(song.id))
-        is_valid, errors = cross_entity_validator.validate_sds_consistency(sds)
-        if not is_valid:
-            logger.warning(
-                "sds.cross_entity_validation_failed",
-                song_id=str(song.id),
-                errors=errors,
-            )
-            # Rollback song creation
-            repo.delete(Song, song.id)
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Cross-entity validation failed: {'; '.join(errors)}",
-            )
+            # Step 4: Validate cross-entity consistency
+            logger.info("sds.cross_entity_validation_start", song_id=str(song.id))
+            is_valid, errors = cross_entity_validator.validate_sds_consistency(sds)
+            if not is_valid:
+                logger.warning(
+                    "sds.cross_entity_validation_failed",
+                    song_id=str(song.id),
+                    errors=errors,
+                )
+                # Rollback song creation
+                repo.delete(Song, song.id)
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Cross-entity validation failed: {'; '.join(errors)}",
+                )
 
-        # Step 5: Store compiled SDS in song metadata
-        logger.info("sds.store_start", song_id=str(song.id))
-        update_dict = {
-            "extra_metadata": {
-                **(song.extra_metadata or {}),
-                "compiled_sds": sds,
+            # Step 5: Store compiled SDS in song metadata
+            logger.info("sds.store_start", song_id=str(song.id))
+            update_dict = {
+                "extra_metadata": {
+                    **(song.extra_metadata or {}),
+                    "compiled_sds": sds,
+                }
             }
-        }
-        song = repo.update(Song, song.id, update_dict)
+            song = repo.update(Song, song.id, update_dict)
 
-        logger.info(
-            "song.create_success",
-            song_id=str(song.id),
-            sds_hash=sds.get("_computed_hash", "unknown"),
-        )
+            logger.info(
+                "song.create_success",
+                song_id=str(song.id),
+                sds_hash=sds.get("_computed_hash", "unknown"),
+            )
+        else:
+            logger.info(
+                "song.created_without_sds",
+                song_id=str(song.id),
+                reason="No blueprint_id provided - SDS compilation deferred",
+            )
 
         return SongResponse.model_validate(song)
 
