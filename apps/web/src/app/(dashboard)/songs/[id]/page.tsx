@@ -17,6 +17,7 @@ import { useSong, useDeleteSong, useSDS } from '@/hooks/api';
 import { songsApi } from '@/lib/api/songs';
 import { useUIStore } from '@/stores';
 import { EntityDetailSection } from '@/components/songs/EntityDetailSection';
+import { JsonViewer } from '@/components/common/JsonViewer';
 import { PersonaKind } from '@/types/api/entities';
 import {
   Edit,
@@ -27,7 +28,6 @@ import {
   Loader2,
   Download,
   AlertCircle,
-  FileText,
 } from 'lucide-react';
 import { ROUTES } from '@/config/routes';
 
@@ -399,26 +399,15 @@ export default function SongDetailPage() {
 
               {sdsData && !isSdsLoading && !sdsError && (
                 <div className="space-y-4">
-                  {/* Placeholder for JsonViewer component (Task SDS-PREVIEW-010) */}
-                  {/* Once JsonViewer is implemented, replace this with: */}
-                  {/* <JsonViewer data={sdsData} collapsed={1} theme="dark" enableClipboard={true} /> */}
-
-                  <div className="bg-muted/30 border-2 border-muted rounded-lg p-6">
-                    <div className="flex items-center gap-2 mb-4 text-muted-foreground">
-                      <FileText className="w-5 h-5" />
-                      <span className="text-sm font-medium">
-                        JSON Viewer Placeholder (awaiting Task SDS-PREVIEW-010)
-                      </span>
-                    </div>
-                    <pre className="bg-black/50 text-green-400 p-4 rounded-lg overflow-auto max-h-96 text-xs font-mono">
-                      {JSON.stringify(sdsData, null, 2)}
-                    </pre>
-                    <div className="mt-4 text-xs text-muted-foreground">
-                      This is a temporary placeholder. Once the JsonViewer component is implemented,
-                      this will be replaced with an interactive JSON viewer with syntax highlighting,
-                      collapsible sections, and clipboard support.
-                    </div>
-                  </div>
+                  {/* JSON Viewer with syntax highlighting and collapsible sections */}
+                  <JsonViewer
+                    data={sdsData}
+                    collapsed={1}
+                    theme="dark"
+                    showLineNumbers={true}
+                    enableClipboard={true}
+                    maxHeight="600px"
+                  />
 
                   {/* SDS Metadata Summary */}
                   <div className="grid md:grid-cols-3 gap-4 mt-6">

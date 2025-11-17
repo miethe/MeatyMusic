@@ -536,11 +536,16 @@ class TestCompileSdsEntityCombinations(TestSDSCompilerWithDefaults):
         ]
 
         for has_style, has_lyrics, has_producer, desc in combinations:
-            # Set up entities based on combination
-            entities = minimal_entities.copy()
-            entities["style"] = create_mock_style() if has_style else None
-            entities["lyrics"] = create_mock_lyrics() if has_lyrics else None
-            entities["producer_notes"] = create_mock_producer() if has_producer else None
+            # Set up entities based on combination (create fresh dict each time)
+            entities = {
+                "song": sample_song,
+                "style": create_mock_style() if has_style else None,
+                "lyrics": create_mock_lyrics() if has_lyrics else None,
+                "producer_notes": create_mock_producer() if has_producer else None,
+                "persona": None,
+                "blueprint": minimal_entities["blueprint"],
+                "sources": []
+            }
 
             mock_song_repo.get_with_all_entities_for_sds.return_value = entities
             mock_validation_service.validate_sds.return_value = (True, [])

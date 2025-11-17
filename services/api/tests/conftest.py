@@ -9,7 +9,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from app.db.base import Base
+from app.models.base import BaseModel as Base
 
 # Set minimal test environment variables required for Settings validation
 os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
