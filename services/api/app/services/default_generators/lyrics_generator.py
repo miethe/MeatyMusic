@@ -76,7 +76,7 @@ class LyricsDefaultGenerator:
             >>> blueprint = {"genre": "Pop", "required_sections": ["Verse", "Chorus"]}
             >>> lyrics = generator.generate_default_lyrics(blueprint)
             >>> assert lyrics["language"] == "en"
-            >>> assert lyrics["pov"] == "first-person"
+            >>> assert lyrics["pov"] == "1st"
             >>> assert "Verse" in lyrics["section_order"]
             >>> assert "Chorus" in lyrics["section_order"]
         """
@@ -99,20 +99,18 @@ class LyricsDefaultGenerator:
         # Generate complete lyrics with defaults
         lyrics = {
             "language": partial.get("language", "en"),
-            "pov": partial.get("pov", "first-person"),
+            "pov": partial.get("pov", "1st"),  # Schema enum: "1st"|"2nd"|"3rd"
             "tense": partial.get("tense", "present"),
             "themes": partial.get("themes", []),
             "rhyme_scheme": partial.get("rhyme_scheme", "AABB"),
             "meter": partial.get("meter", "4/4 pop"),
             "syllables_per_line": partial.get("syllables_per_line", 8),
-            "hook_strategy": partial.get("hook_strategy", "repetition"),
-            "repetition_rules": self._get_repetition_rules(partial.get("repetition_rules")),
-            "imagery_density": partial.get("imagery_density", 5),  # 0-10 scale
-            "reading_level": partial.get("reading_level", 80),  # 0-100 scale
+            "hook_strategy": partial.get("hook_strategy", "melodic"),  # Schema enum: "melodic"|"lyrical"|"call-response"|"chant"
+            "repetition_policy": partial.get("repetition_policy", "moderate"),  # Schema enum: "sparse"|"moderate"|"hook-heavy"
+            "imagery_density": partial.get("imagery_density", 0.5),  # Schema: 0-1 float
+            "reading_level": partial.get("reading_level", "grade-8"),  # Schema: string
             "section_order": self._get_section_order(blueprint, partial.get("section_order")),
-            "sections": partial.get("sections", []),  # Empty by default - user should provide
             "constraints": self._get_constraints(blueprint, partial.get("constraints")),
-            "explicit_allowed": partial.get("explicit_allowed", False),
             "source_citations": partial.get("source_citations", []),
         }
 
@@ -125,33 +123,6 @@ class LyricsDefaultGenerator:
         )
 
         return lyrics
-
-    def _get_repetition_rules(
-        self,
-        partial_repetition_rules: Optional[Dict[str, Any]]
-    ) -> Dict[str, Any]:
-        """Get repetition rules with defaults.
-
-        Args:
-            partial_repetition_rules: Optional user-provided repetition rules
-
-        Returns:
-            Complete repetition rules dictionary
-        """
-        if partial_repetition_rules:
-            # Merge with defaults
-            defaults = {
-                "hook_count": 3,
-                "allow_verbatim": True,
-                "max_repeat": 4
-            }
-            return {**defaults, **partial_repetition_rules}
-
-        return {
-            "hook_count": 3,
-            "allow_verbatim": True,
-            "max_repeat": 4
-        }
 
     def _get_section_order(
         self,

@@ -11,7 +11,6 @@ meet all acceptance criteria including:
 """
 
 import sys
-from typing import Dict, Any
 
 # Add app to path
 sys.path.insert(0, '/home/user/MeatyMusic/services/api')

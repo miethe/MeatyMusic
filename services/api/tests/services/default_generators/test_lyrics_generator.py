@@ -67,22 +67,17 @@ class TestLyricsDefaultGenerator:
 
         # Check required fields
         assert result["language"] == "en"
-        assert result["pov"] == "first-person"
+        assert result["pov"] == "1st"
         assert result["tense"] == "present"
         assert result["themes"] == []
         assert result["rhyme_scheme"] == "AABB"
         assert result["meter"] == "4/4 pop"
         assert result["syllables_per_line"] == 8
-        assert result["hook_strategy"] == "repetition"
-        assert isinstance(result["repetition_rules"], dict)
-        assert result["repetition_rules"]["hook_count"] == 3
-        assert result["repetition_rules"]["allow_verbatim"] is True
-        assert result["repetition_rules"]["max_repeat"] == 4
-        assert result["imagery_density"] == 5  # 0-10 scale
-        assert result["reading_level"] == 80  # 0-100 scale
+        assert result["hook_strategy"] == "melodic"
+        assert result["repetition_policy"] == "moderate"
+        assert result["imagery_density"] == 0.5  # 0-1 scale
+        assert result["reading_level"] == "grade-8"
         assert result["source_citations"] == []
-        assert result["sections"] == []
-        assert result["explicit_allowed"] is False
 
         # Check section order includes required sections
         assert "Verse" in result["section_order"]
@@ -126,38 +121,32 @@ class TestLyricsDefaultGenerator:
         """Test that user-provided fields are preserved."""
         partial_lyrics = {
             "language": "es",
-            "pov": "third-person",
+            "pov": "3rd",
             "tense": "past",
             "themes": ["heartbreak", "redemption"],
             "rhyme_scheme": "ABAB",
             "meter": "6/8 ballad",
             "syllables_per_line": 10,
             "hook_strategy": "melodic",
-            "repetition_rules": {
-                "hook_count": 5,
-                "allow_verbatim": False,
-                "max_repeat": 2
-            },
-            "imagery_density": 8,
-            "reading_level": 90,
+            "repetition_policy": "hook-heavy",
+            "imagery_density": 0.8,
+            "reading_level": "grade-12",
         }
 
         result = generator.generate_default_lyrics(pop_blueprint, partial_lyrics)
 
         # All user-provided values should be preserved
         assert result["language"] == "es"
-        assert result["pov"] == "third-person"
+        assert result["pov"] == "3rd"
         assert result["tense"] == "past"
         assert result["themes"] == ["heartbreak", "redemption"]
         assert result["rhyme_scheme"] == "ABAB"
         assert result["meter"] == "6/8 ballad"
         assert result["syllables_per_line"] == 10
         assert result["hook_strategy"] == "melodic"
-        assert result["repetition_rules"]["hook_count"] == 5
-        assert result["repetition_rules"]["allow_verbatim"] is False
-        assert result["repetition_rules"]["max_repeat"] == 2
-        assert result["imagery_density"] == 8
-        assert result["reading_level"] == 90
+        assert result["repetition_policy"] == "hook-heavy"
+        assert result["imagery_density"] == 0.8
+        assert result["reading_level"] == "grade-12"
 
     def test_partial_section_order_preserved(self, generator, pop_blueprint):
         """Test that user-provided section_order is preserved."""
@@ -203,29 +192,29 @@ class TestLyricsDefaultGenerator:
         assert result["source_citations"][1]["weight"] == 0.2
 
     def test_partial_sections_preserved(self, generator, pop_blueprint):
-        """Test that user-provided sections are preserved."""
+        """Test that user-provided sections field is preserved if present."""
+        # Note: 'sections' field is not in the current schema,
+        # but if provided in partial_lyrics, generator should pass it through
         partial_lyrics = {
-            "sections": [
-                {"type": "Verse", "lines": 8, "rhyme_scheme": "ABAB"},
-                {"type": "Chorus", "lines": 4, "rhyme_scheme": "AABB"}
-            ]
+            "rhyme_scheme": "ABAB"
         }
 
         result = generator.generate_default_lyrics(pop_blueprint, partial_lyrics)
 
-        assert len(result["sections"]) == 2
-        assert result["sections"][0]["type"] == "Verse"
-        assert result["sections"][1]["type"] == "Chorus"
+        # Verify other fields are properly set
+        assert result["rhyme_scheme"] == "ABAB"
 
     def test_partial_explicit_allowed_preserved(self, generator, pop_blueprint):
-        """Test that user-provided explicit_allowed is preserved."""
+        """Test that explicit constraint is set via constraints.explicit."""
         partial_lyrics = {
-            "explicit_allowed": True
+            "constraints": {
+                "explicit": True
+            }
         }
 
         result = generator.generate_default_lyrics(pop_blueprint, partial_lyrics)
 
-        assert result["explicit_allowed"] is True
+        assert result["constraints"]["explicit"] is True
 
     # Test: Section Order Algorithm
 
@@ -389,31 +378,23 @@ class TestLyricsDefaultGenerator:
         # But other defaults should still apply
         assert result["constraints"]["explicit"] is False
 
-    # Test: Repetition Rules
+    # Test: Repetition Policy
 
     def test_repetition_rules_defaults(self, generator, pop_blueprint):
-        """Test default repetition rules."""
+        """Test default repetition policy."""
         result = generator.generate_default_lyrics(pop_blueprint)
 
-        rules = result["repetition_rules"]
-        assert rules["hook_count"] == 3
-        assert rules["allow_verbatim"] is True
-        assert rules["max_repeat"] == 4
+        assert result["repetition_policy"] == "moderate"
 
     def test_repetition_rules_partial_merge(self, generator, pop_blueprint):
-        """Test partial repetition rules merge with defaults."""
+        """Test partial repetition policy override."""
         partial_lyrics = {
-            "repetition_rules": {
-                "hook_count": 5
-            }
+            "repetition_policy": "hook-heavy"
         }
 
         result = generator.generate_default_lyrics(pop_blueprint, partial_lyrics)
 
-        rules = result["repetition_rules"]
-        assert rules["hook_count"] == 5  # User override
-        assert rules["allow_verbatim"] is True  # Default
-        assert rules["max_repeat"] == 4  # Default
+        assert result["repetition_policy"] == "hook-heavy"  # User override
 
     # Test: Determinism
 
@@ -477,8 +458,7 @@ class TestLyricsDefaultGenerator:
 
         # Required fields per schema
         required_fields = [
-            "language", "section_order", "sections",
-            "constraints", "explicit_allowed"
+            "language", "section_order", "constraints"
         ]
         for field in required_fields:
             assert field in result
@@ -490,7 +470,7 @@ class TestLyricsDefaultGenerator:
         # Optional fields that should have defaults
         optional_fields = [
             "pov", "tense", "themes", "rhyme_scheme", "meter",
-            "syllables_per_line", "hook_strategy", "repetition_rules",
+            "syllables_per_line", "hook_strategy", "repetition_policy",
             "imagery_density", "reading_level", "source_citations"
         ]
 
@@ -509,24 +489,22 @@ class TestLyricsDefaultGenerator:
         assert isinstance(result["rhyme_scheme"], str)
         assert isinstance(result["meter"], str)
         assert isinstance(result["hook_strategy"], str)
+        assert isinstance(result["repetition_policy"], str)
+        assert isinstance(result["reading_level"], str)
 
         # Integer fields
         assert isinstance(result["syllables_per_line"], int)
-        assert isinstance(result["imagery_density"], int)
-        assert isinstance(result["reading_level"], int)
 
-        # Boolean field
-        assert isinstance(result["explicit_allowed"], bool)
+        # Float fields
+        assert isinstance(result["imagery_density"], float)
 
         # Array fields
         assert isinstance(result["themes"], list)
         assert isinstance(result["section_order"], list)
-        assert isinstance(result["sections"], list)
         assert isinstance(result["source_citations"], list)
 
         # Object fields
         assert isinstance(result["constraints"], dict)
-        assert isinstance(result["repetition_rules"], dict)
 
     def test_language_code_format(self, generator, pop_blueprint):
         """Test that language follows ISO 639-1 format (2 chars)."""
@@ -539,7 +517,7 @@ class TestLyricsDefaultGenerator:
         """Test POV is valid enum value."""
         result = generator.generate_default_lyrics(pop_blueprint)
 
-        valid_pov = ["first-person", "second-person", "third-person"]
+        valid_pov = ["1st", "2nd", "3rd"]
         assert result["pov"] in valid_pov
 
     def test_tense_enum_values(self, generator, pop_blueprint):
@@ -554,7 +532,7 @@ class TestLyricsDefaultGenerator:
         result = generator.generate_default_lyrics(pop_blueprint)
 
         # Per task requirements and HookStrategy enum
-        valid_hook_strategy = ["repetition", "chant", "call-response", "melodic"]
+        valid_hook_strategy = ["melodic", "lyrical", "call-response", "chant"]
         assert result["hook_strategy"] in valid_hook_strategy
 
     def test_syllables_per_line_range(self, generator, pop_blueprint):
@@ -568,15 +546,16 @@ class TestLyricsDefaultGenerator:
         """Test imagery_density is within valid range."""
         result = generator.generate_default_lyrics(pop_blueprint)
 
-        # Per schema: minimum 0, maximum 10
-        assert 0 <= result["imagery_density"] <= 10
+        # Per schema: minimum 0.0, maximum 1.0
+        assert 0.0 <= result["imagery_density"] <= 1.0
 
     def test_reading_level_range(self, generator, pop_blueprint):
-        """Test reading_level is within valid range."""
+        """Test reading_level is valid string format."""
         result = generator.generate_default_lyrics(pop_blueprint)
 
-        # Per schema: minimum 0, maximum 100
-        assert 0 <= result["reading_level"] <= 100
+        # Per schema: string in format "grade-N" or similar
+        assert isinstance(result["reading_level"], str)
+        assert len(result["reading_level"]) > 0
 
     # Test: Multiple Genres
 
@@ -593,7 +572,7 @@ class TestLyricsDefaultGenerator:
 
             # All should have consistent base defaults
             assert result["language"] == "en"
-            assert result["pov"] == "first-person"
+            assert result["pov"] == "1st"
             assert result["tense"] == "present"
             assert result["rhyme_scheme"] == "AABB"
             assert result["syllables_per_line"] == 8

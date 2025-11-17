@@ -443,7 +443,7 @@ describe('EntityDetailSection', () => {
 
   describe('Responsive Layout', () => {
     it('should render properly in grid layout (component renders correctly)', () => {
-      const { container } = render(
+      render(
         <div className="grid md:grid-cols-2 gap-6">
           <EntityDetailSection
             entityType="style"
@@ -547,7 +547,7 @@ describe('EntityDetailSection', () => {
 
   describe('Accessibility', () => {
     it('should have accessible buttons with descriptive text', () => {
-      const { container } = render(
+      render(
         <EntityDetailSection
           entityType="style"
           entityId="style-123"
