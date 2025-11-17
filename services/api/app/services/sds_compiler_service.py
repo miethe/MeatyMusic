@@ -245,14 +245,15 @@ class SDSCompilerService:
 
                 # ProducerNotes generator needs style and lyrics
                 # Convert to dict format if they're ORM models
+                # Check if is_default is explicitly True (not a Mock)
                 style_for_producer = (
                     entities["style"]._data
-                    if hasattr(entities["style"], "_data")
+                    if getattr(entities["style"], "is_default", None) is True
                     else self._style_to_dict(entities["style"])
                 )
                 lyrics_for_producer = (
                     entities["lyrics"]._data
-                    if hasattr(entities["lyrics"], "_data")
+                    if getattr(entities["lyrics"], "is_default", None) is True
                     else self._lyrics_to_dict(entities["lyrics"])
                 )
 
@@ -372,7 +373,8 @@ class SDSCompilerService:
             Style dictionary in SDS format
         """
         # If this is a GeneratedEntity with pre-formatted data, return it directly
-        if hasattr(style, "_data") and hasattr(style, "is_default"):
+        # Check if is_default is explicitly True (not a Mock or other truthy value)
+        if getattr(style, "is_default", None) is True and hasattr(style, "_data"):
             return style._data
 
         # Otherwise, convert ORM model to SDS format
@@ -456,7 +458,8 @@ class SDSCompilerService:
             Lyrics dictionary in SDS format
         """
         # If this is a GeneratedEntity with pre-formatted data, return it directly
-        if hasattr(lyrics, "_data") and hasattr(lyrics, "is_default"):
+        # Check if is_default is explicitly True (not a Mock or other truthy value)
+        if getattr(lyrics, "is_default", None) is True and hasattr(lyrics, "_data"):
             return lyrics._data
 
         # Otherwise, convert ORM model to SDS format
@@ -521,7 +524,8 @@ class SDSCompilerService:
             ProducerNotes dictionary in SDS format
         """
         # If this is a GeneratedEntity with pre-formatted data, return it directly
-        if hasattr(producer_notes, "_data") and hasattr(producer_notes, "is_default"):
+        # Check if is_default is explicitly True (not a Mock or other truthy value)
+        if getattr(producer_notes, "is_default", None) is True and hasattr(producer_notes, "_data"):
             return producer_notes._data
 
         # Otherwise, convert ORM model to SDS format

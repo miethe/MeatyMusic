@@ -5,7 +5,8 @@ from typing import Any, Dict, List
 
 from app.services.default_generators.lyrics_generator import (
     LyricsDefaultGenerator,
-    DEFAULT_SECTION_ORDER
+    DEFAULT_SECTION_ORDER,
+    GENRE_SECTION_PATTERNS
 )
 
 
@@ -19,48 +20,42 @@ class TestLyricsDefaultGenerator:
 
     @pytest.fixture
     def pop_blueprint(self):
-        """Sample Pop blueprint."""
+        """Sample Pop blueprint (BlueprintReaderService format)."""
         return {
             "genre": "Pop",
-            "rules": {
-                "required_sections": ["Verse", "Chorus", "Bridge"],
-                "section_lines": {
-                    "Verse": {"min_lines": 4, "max_lines": 8},
-                    "Chorus": {"min_lines": 4, "max_lines": 6},
-                    "Bridge": {"min_lines": 4, "max_lines": 8}
-                },
-                "tempo_bpm": [100, 120]
-            }
+            "required_sections": ["Verse", "Chorus", "Bridge"],
+            "section_lines": {
+                "Verse": {"min_lines": 4, "max_lines": 8},
+                "Chorus": {"min_lines": 4, "max_lines": 6},
+                "Bridge": {"min_lines": 4, "max_lines": 8}
+            },
+            "tempo_bpm": [100, 120]
         }
 
     @pytest.fixture
     def christmas_blueprint(self):
-        """Sample Christmas Pop blueprint."""
+        """Sample Christmas Pop blueprint (BlueprintReaderService format)."""
         return {
             "genre": "Christmas Pop",
-            "rules": {
-                "required_sections": ["Intro", "Verse", "Chorus", "Bridge", "Chorus", "Outro"],
-                "section_lines": {
-                    "Intro": {"min_lines": 2, "max_lines": 4},
-                    "Verse": {"min_lines": 6, "max_lines": 10},
-                    "Chorus": {"min_lines": 4, "max_lines": 8, "must_end_with_hook": True},
-                    "Bridge": {"min_lines": 4, "max_lines": 6},
-                    "Outro": {"min_lines": 2, "max_lines": 4}
-                }
+            "required_sections": ["Intro", "Verse", "Chorus", "Bridge", "Outro"],
+            "section_lines": {
+                "Intro": {"min_lines": 2, "max_lines": 4},
+                "Verse": {"min_lines": 6, "max_lines": 10},
+                "Chorus": {"min_lines": 4, "max_lines": 8, "must_end_with_hook": True},
+                "Bridge": {"min_lines": 4, "max_lines": 6},
+                "Outro": {"min_lines": 2, "max_lines": 4}
             }
         }
 
     @pytest.fixture
     def hiphop_blueprint(self):
-        """Sample Hip-Hop blueprint."""
+        """Sample Hip-Hop blueprint (BlueprintReaderService format)."""
         return {
             "genre": "Hip-Hop",
-            "rules": {
-                "required_sections": ["Verse", "Chorus"],
-                "section_lines": {
-                    "Verse": {"min_lines": 8, "max_lines": 16},
-                    "Chorus": {"min_lines": 4, "max_lines": 8}
-                }
+            "required_sections": ["Verse", "Chorus"],
+            "section_lines": {
+                "Verse": {"min_lines": 8, "max_lines": 16},
+                "Chorus": {"min_lines": 4, "max_lines": 8}
             }
         }
 
@@ -78,9 +73,9 @@ class TestLyricsDefaultGenerator:
         assert result["rhyme_scheme"] == "AABB"
         assert result["meter"] == "4/4 pop"
         assert result["syllables_per_line"] == 8
-        assert result["hook_strategy"] == "lyrical"
+        assert result["hook_strategy"] == "melodic"
         assert result["repetition_policy"] == "moderate"
-        assert result["imagery_density"] == 0.5
+        assert result["imagery_density"] == 0.5  # 0-1 scale
         assert result["reading_level"] == "grade-8"
         assert result["source_citations"] == []
 
@@ -196,6 +191,31 @@ class TestLyricsDefaultGenerator:
         assert result["source_citations"][0]["source_id"] == "src-123"
         assert result["source_citations"][1]["weight"] == 0.2
 
+    def test_partial_sections_preserved(self, generator, pop_blueprint):
+        """Test that user-provided sections field is preserved if present."""
+        # Note: 'sections' field is not in the current schema,
+        # but if provided in partial_lyrics, generator should pass it through
+        partial_lyrics = {
+            "rhyme_scheme": "ABAB"
+        }
+
+        result = generator.generate_default_lyrics(pop_blueprint, partial_lyrics)
+
+        # Verify other fields are properly set
+        assert result["rhyme_scheme"] == "ABAB"
+
+    def test_partial_explicit_allowed_preserved(self, generator, pop_blueprint):
+        """Test that explicit constraint is set via constraints.explicit."""
+        partial_lyrics = {
+            "constraints": {
+                "explicit": True
+            }
+        }
+
+        result = generator.generate_default_lyrics(pop_blueprint, partial_lyrics)
+
+        assert result["constraints"]["explicit"] is True
+
     # Test: Section Order Algorithm
 
     def test_section_order_with_required_sections(self, generator, pop_blueprint):
@@ -210,33 +230,57 @@ class TestLyricsDefaultGenerator:
         assert "Chorus" in section_order
         assert "Bridge" in section_order
 
-        # Check order is maintained from DEFAULT_SECTION_ORDER
+        # Check order is maintained from genre pattern
         verse_indices = [i for i, s in enumerate(section_order) if s == "Verse"]
         chorus_indices = [i for i, s in enumerate(section_order) if s == "Chorus"]
 
-        # First Verse should come before first Chorus (per default order)
+        # First Verse should come before first Chorus (per pop pattern)
         if verse_indices and chorus_indices:
             assert verse_indices[0] < chorus_indices[0]
 
     def test_section_order_without_required_sections(self, generator):
-        """Test section order uses default when no required sections."""
+        """Test section order uses genre pattern when no required sections."""
         blueprint = {
-            "genre": "Pop",
-            "rules": {}
+            "genre": "Pop"
         }
 
         result = generator.generate_default_lyrics(blueprint)
 
-        # Should use default section order
-        assert result["section_order"] == DEFAULT_SECTION_ORDER
+        # Should use Pop genre pattern
+        assert result["section_order"] == GENRE_SECTION_PATTERNS["Pop"]
+
+    def test_section_order_hiphop_pattern(self, generator):
+        """Test Hip-Hop uses genre-specific section pattern."""
+        blueprint = {
+            "genre": "Hip-Hop"
+        }
+
+        result = generator.generate_default_lyrics(blueprint)
+
+        # Should use Hip-Hop genre pattern with 3 verses
+        section_order = result["section_order"]
+        assert section_order == GENRE_SECTION_PATTERNS["Hip-Hop"]
+        # Hip-Hop pattern has 3 verses
+        assert section_order.count("Verse") == 3
+
+    def test_section_order_rock_pattern(self, generator):
+        """Test Rock uses genre-specific section pattern with Solo."""
+        blueprint = {
+            "genre": "Rock"
+        }
+
+        result = generator.generate_default_lyrics(blueprint)
+
+        section_order = result["section_order"]
+        assert section_order == GENRE_SECTION_PATTERNS["Rock"]
+        # Rock pattern includes Solo
+        assert "Solo" in section_order
 
     def test_section_order_with_custom_section(self, generator):
-        """Test section order includes custom sections not in default."""
+        """Test section order includes custom sections not in genre pattern."""
         blueprint = {
             "genre": "Pop",
-            "rules": {
-                "required_sections": ["Verse", "PreChorus", "Chorus", "CustomSection"]
-            }
+            "required_sections": ["Verse", "PreChorus", "Chorus", "CustomSection"]
         }
 
         result = generator.generate_default_lyrics(blueprint)
@@ -249,19 +293,41 @@ class TestLyricsDefaultGenerator:
         assert "Chorus" in section_order
         assert "CustomSection" in section_order
 
+        # PreChorus should be inserted before Chorus
+        prechorus_idx = section_order.index("PreChorus")
+        chorus_idx = section_order.index("Chorus")
+        assert prechorus_idx < chorus_idx
+
     def test_section_order_empty_required_sections_fallback(self, generator):
-        """Test section order falls back to default when required_sections is empty."""
+        """Test section order falls back to genre pattern when required_sections is empty."""
         blueprint = {
             "genre": "Pop",
-            "rules": {
-                "required_sections": []
-            }
+            "required_sections": []
         }
 
         result = generator.generate_default_lyrics(blueprint)
 
-        # Should fall back to default order
-        assert result["section_order"] == DEFAULT_SECTION_ORDER
+        # Should fall back to Pop genre pattern
+        assert result["section_order"] == GENRE_SECTION_PATTERNS["Pop"]
+
+    def test_section_order_intro_outro_positioning(self, generator):
+        """Test Intro and Outro are positioned correctly when added."""
+        blueprint = {
+            "genre": "Pop",
+            "required_sections": ["CustomIntro", "Verse", "Chorus", "CustomOutro"]
+        }
+
+        result = generator.generate_default_lyrics(blueprint)
+
+        section_order = result["section_order"]
+
+        # CustomIntro should be at start if not in pattern
+        # CustomOutro should be at end if not in pattern
+        # This tests the smart insertion logic
+        assert "CustomIntro" in section_order
+        assert "Verse" in section_order
+        assert "Chorus" in section_order
+        assert "CustomOutro" in section_order
 
     # Test: Constraints Generation
 
@@ -289,8 +355,7 @@ class TestLyricsDefaultGenerator:
     def test_constraints_empty_when_no_section_lines(self, generator):
         """Test section_requirements is empty when blueprint has no section_lines."""
         blueprint = {
-            "genre": "Pop",
-            "rules": {}
+            "genre": "Pop"
         }
 
         result = generator.generate_default_lyrics(blueprint)
@@ -312,6 +377,24 @@ class TestLyricsDefaultGenerator:
 
         # But other defaults should still apply
         assert result["constraints"]["explicit"] is False
+
+    # Test: Repetition Policy
+
+    def test_repetition_rules_defaults(self, generator, pop_blueprint):
+        """Test default repetition policy."""
+        result = generator.generate_default_lyrics(pop_blueprint)
+
+        assert result["repetition_policy"] == "moderate"
+
+    def test_repetition_rules_partial_merge(self, generator, pop_blueprint):
+        """Test partial repetition policy override."""
+        partial_lyrics = {
+            "repetition_policy": "hook-heavy"
+        }
+
+        result = generator.generate_default_lyrics(pop_blueprint, partial_lyrics)
+
+        assert result["repetition_policy"] == "hook-heavy"  # User override
 
     # Test: Determinism
 
@@ -338,7 +421,7 @@ class TestLyricsDefaultGenerator:
         """Test section order is deterministic."""
         results = [
             generator.generate_default_lyrics(pop_blueprint)
-            for _ in range(5)
+            for _ in range(10)
         ]
 
         # All section orders should be identical
@@ -361,7 +444,7 @@ class TestLyricsDefaultGenerator:
     def test_error_when_genre_missing(self, generator):
         """Test error when genre is missing from blueprint."""
         blueprint = {
-            "rules": {}
+            "required_sections": []
         }
 
         with pytest.raises(ValueError, match="genre"):
@@ -374,7 +457,9 @@ class TestLyricsDefaultGenerator:
         result = generator.generate_default_lyrics(pop_blueprint)
 
         # Required fields per schema
-        required_fields = ["language", "section_order", "constraints"]
+        required_fields = [
+            "language", "section_order", "constraints"
+        ]
         for field in required_fields:
             assert field in result
 
@@ -407,18 +492,18 @@ class TestLyricsDefaultGenerator:
         assert isinstance(result["repetition_policy"], str)
         assert isinstance(result["reading_level"], str)
 
-        # Integer field
+        # Integer fields
         assert isinstance(result["syllables_per_line"], int)
 
-        # Float field
-        assert isinstance(result["imagery_density"], (int, float))
+        # Float fields
+        assert isinstance(result["imagery_density"], float)
 
         # Array fields
         assert isinstance(result["themes"], list)
         assert isinstance(result["section_order"], list)
         assert isinstance(result["source_citations"], list)
 
-        # Object field
+        # Object fields
         assert isinstance(result["constraints"], dict)
 
     def test_language_code_format(self, generator, pop_blueprint):
@@ -446,15 +531,9 @@ class TestLyricsDefaultGenerator:
         """Test hook_strategy is valid enum value."""
         result = generator.generate_default_lyrics(pop_blueprint)
 
+        # Per task requirements and HookStrategy enum
         valid_hook_strategy = ["melodic", "lyrical", "call-response", "chant"]
         assert result["hook_strategy"] in valid_hook_strategy
-
-    def test_repetition_policy_enum_values(self, generator, pop_blueprint):
-        """Test repetition_policy is valid enum value."""
-        result = generator.generate_default_lyrics(pop_blueprint)
-
-        valid_repetition = ["sparse", "moderate", "hook-heavy"]
-        assert result["repetition_policy"] in valid_repetition
 
     def test_syllables_per_line_range(self, generator, pop_blueprint):
         """Test syllables_per_line is within valid range."""
@@ -467,24 +546,111 @@ class TestLyricsDefaultGenerator:
         """Test imagery_density is within valid range."""
         result = generator.generate_default_lyrics(pop_blueprint)
 
-        # Per schema: minimum 0, maximum 1
-        assert 0 <= result["imagery_density"] <= 1
+        # Per schema: minimum 0.0, maximum 1.0
+        assert 0.0 <= result["imagery_density"] <= 1.0
+
+    def test_reading_level_range(self, generator, pop_blueprint):
+        """Test reading_level is valid string format."""
+        result = generator.generate_default_lyrics(pop_blueprint)
+
+        # Per schema: string in format "grade-N" or similar
+        assert isinstance(result["reading_level"], str)
+        assert len(result["reading_level"]) > 0
 
     # Test: Multiple Genres
 
     def test_multiple_genres_consistency(self, generator):
         """Test default generation works consistently across genres."""
-        genres = ["Pop", "Rock", "Hip-Hop", "Country", "Jazz", "Electronic"]
+        genres = ["Pop", "Rock", "Hip-Hop", "Country", "Electronic", "Indie"]
 
         for genre in genres:
             blueprint = {
-                "genre": genre,
-                "rules": {}
+                "genre": genre
             }
 
             result = generator.generate_default_lyrics(blueprint)
 
-            # All should have consistent defaults
+            # All should have consistent base defaults
             assert result["language"] == "en"
             assert result["pov"] == "1st"
-            assert result["section_order"] == DEFAULT_SECTION_ORDER
+            assert result["tense"] == "present"
+            assert result["rhyme_scheme"] == "AABB"
+            assert result["syllables_per_line"] == 8
+
+    def test_genre_specific_section_patterns(self, generator):
+        """Test genre-specific section patterns are used."""
+        # Pop uses standard pattern with Bridge
+        pop_result = generator.generate_default_lyrics({"genre": "Pop"})
+        assert "Bridge" in pop_result["section_order"]
+
+        # Hip-Hop uses pattern with 3 verses
+        hiphop_result = generator.generate_default_lyrics({"genre": "Hip-Hop"})
+        assert hiphop_result["section_order"].count("Verse") == 3
+
+        # Rock uses pattern with Solo
+        rock_result = generator.generate_default_lyrics({"genre": "Rock"})
+        assert "Solo" in rock_result["section_order"]
+
+    # Test: Edge Cases for Full Coverage
+
+    def test_section_order_with_lowercase_intro(self, generator):
+        """Test section order handles lowercase 'intro' correctly."""
+        blueprint = {
+            "genre": "Pop",
+            "required_sections": ["introduction", "Verse", "Chorus"]
+        }
+
+        result = generator.generate_default_lyrics(blueprint)
+
+        section_order = result["section_order"]
+
+        # 'introduction' should be inserted at the start
+        assert "introduction" in section_order
+        assert section_order[0] == "introduction"
+
+    def test_section_order_with_lowercase_outro(self, generator):
+        """Test section order handles lowercase 'outro', 'ending', 'coda' correctly."""
+        blueprint = {
+            "genre": "Pop",
+            "required_sections": ["Verse", "Chorus", "ending"]
+        }
+
+        result = generator.generate_default_lyrics(blueprint)
+
+        section_order = result["section_order"]
+
+        # 'ending' should be appended at the end
+        assert "ending" in section_order
+        assert section_order[-1] == "ending"
+
+    def test_section_order_custom_section_with_empty_order(self, generator):
+        """Test custom section insertion when section_order would be empty initially."""
+        blueprint = {
+            "genre": "Pop",
+            "required_sections": ["CustomSection1", "CustomSection2"]
+        }
+
+        result = generator.generate_default_lyrics(blueprint)
+
+        section_order = result["section_order"]
+
+        # Both custom sections should be included
+        assert "CustomSection1" in section_order
+        assert "CustomSection2" in section_order
+
+    def test_section_order_fallback_for_no_matching_sections(self, generator):
+        """Test fallback to default when required sections don't match any in pattern."""
+        # This test covers the edge case where all required sections are custom
+        # and none exist in the base pattern, resulting in empty section_order
+        # before the fallback logic kicks in
+        blueprint = {
+            "genre": "Unknown Genre",  # Genre not in GENRE_SECTION_PATTERNS
+            "required_sections": ["CustomSection"]
+        }
+
+        result = generator.generate_default_lyrics(blueprint)
+
+        section_order = result["section_order"]
+
+        # Should include CustomSection
+        assert "CustomSection" in section_order

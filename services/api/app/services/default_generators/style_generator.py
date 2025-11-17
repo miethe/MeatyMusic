@@ -68,8 +68,18 @@ class StyleDefaultGenerator:
         Fills missing fields using blueprint rules and genre-specific defaults.
         Preserves user-provided fields if present in partial_style.
 
+        This generator works with BlueprintReaderService output structure where
+        fields are at the top level (not nested under "rules").
+
         Args:
-            blueprint: Blueprint dictionary containing genre rules and defaults
+            blueprint: Blueprint dictionary from BlueprintReaderService containing:
+                - genre: Genre name (required)
+                - tempo_bpm: [min, max] BPM range (optional)
+                - default_mood: List of mood descriptors (optional)
+                - default_energy: Energy level string (optional)
+                - instrumentation: List of instruments (optional)
+                - tags: Dict of categorized tags {vibe, texture, production} (optional)
+                - recommended_key: Recommended key for genre (optional)
             partial_style: Optional partial Style data from user
 
         Returns:
@@ -80,7 +90,7 @@ class StyleDefaultGenerator:
 
         Example:
             >>> generator = StyleDefaultGenerator()
-            >>> blueprint = {"genre": "Pop", "rules": {"tempo_bpm": [100, 120]}}
+            >>> blueprint = {"genre": "Pop", "tempo_bpm": [100, 120]}
             >>> style = generator.generate_default_style(blueprint)
             >>> assert style["genre_detail"]["primary"] == "Pop"
             >>> assert style["tempo_bpm"] == [100, 120]
@@ -92,26 +102,27 @@ class StyleDefaultGenerator:
         if not genre:
             raise ValueError("Blueprint must contain 'genre' field")
 
-        rules = blueprint.get("rules", {})
         partial = partial_style or {}
 
         logger.debug(
             "style.generate_defaults",
             genre=genre,
-            has_partial=bool(partial_style)
+            has_partial=bool(partial_style),
+            blueprint_has_tempo=bool(blueprint.get("tempo_bpm")),
+            blueprint_has_mood=bool(blueprint.get("default_mood"))
         )
 
         # Generate complete style with defaults
         style = {
             "genre_detail": self._get_genre_detail(genre, partial.get("genre_detail")),
-            "tempo_bpm": self._get_tempo_bpm(rules, partial.get("tempo_bpm")),
-            "time_signature": partial.get("time_signature", "4/4"),
-            "key": self._get_key(genre, partial.get("key")),
-            "mood": self._get_mood(genre, rules, partial.get("mood")),
-            "energy": self._get_energy(rules, partial),
-            "instrumentation": self._get_instrumentation(rules, partial.get("instrumentation")),
+            "tempo_bpm": self._get_tempo_bpm(blueprint, partial.get("tempo_bpm")),
+            "time_signature": partial.get("time_signature", blueprint.get("time_signature", "4/4")),
+            "key": self._get_key(genre, blueprint, partial.get("key")),
+            "mood": self._get_mood(genre, blueprint, partial.get("mood")),
+            "energy": self._get_energy(blueprint, partial),
+            "instrumentation": self._get_instrumentation(blueprint, partial.get("instrumentation")),
             "vocal_profile": partial.get("vocal_profile", "unspecified"),
-            "tags": partial.get("tags", []),
+            "tags": self._get_tags(blueprint, partial.get("tags")),
             "negative_tags": partial.get("negative_tags", []),
         }
 
@@ -119,7 +130,8 @@ class StyleDefaultGenerator:
             "style.defaults_generated",
             genre=genre,
             tempo_bpm=style["tempo_bpm"],
-            energy=style["energy"]
+            energy=style["energy"],
+            tags_count=len(style["tags"])
         )
 
         return style
@@ -153,13 +165,13 @@ class StyleDefaultGenerator:
 
     def _get_tempo_bpm(
         self,
-        rules: Dict[str, Any],
+        blueprint: Dict[str, Any],
         partial_tempo: Optional[int | List[int]]
     ) -> int | List[int]:
-        """Get tempo BPM from blueprint rules or partial input.
+        """Get tempo BPM from blueprint or partial input.
 
         Args:
-            rules: Blueprint rules dictionary
+            blueprint: Blueprint dictionary from BlueprintReaderService
             partial_tempo: Optional user-provided tempo
 
         Returns:
@@ -168,18 +180,29 @@ class StyleDefaultGenerator:
         if partial_tempo is not None:
             return partial_tempo
 
-        # Use blueprint tempo range if available
-        tempo_range = rules.get("tempo_bpm")
+        # Use blueprint tempo range if available (BlueprintReaderService format)
+        tempo_range = blueprint.get("tempo_bpm")
         if tempo_range:
             # If it's already a range, return it
             if isinstance(tempo_range, list) and len(tempo_range) == 2:
                 return tempo_range
-            # If it's a dict with min/max, convert to list
+            # If it's a dict with min/max, convert to list (backward compat)
             elif isinstance(tempo_range, dict):
                 min_bpm = tempo_range.get("min", 100)
                 max_bpm = tempo_range.get("max", 120)
                 return [min_bpm, max_bpm]
             # If it's a single value, create a small range
+            elif isinstance(tempo_range, int):
+                return [tempo_range - 5, tempo_range + 5]
+
+        # Try legacy "rules" structure for backward compatibility
+        rules = blueprint.get("rules", {})
+        if rules and "tempo_bpm" in rules:
+            tempo_range = rules["tempo_bpm"]
+            if isinstance(tempo_range, list) and len(tempo_range) == 2:
+                return tempo_range
+            elif isinstance(tempo_range, dict):
+                return [tempo_range.get("min", 100), tempo_range.get("max", 120)]
             elif isinstance(tempo_range, int):
                 return [tempo_range - 5, tempo_range + 5]
 
@@ -189,21 +212,36 @@ class StyleDefaultGenerator:
     def _get_key(
         self,
         genre: str,
+        blueprint: Dict[str, Any],
         partial_key: Optional[Dict[str, Any]]
     ) -> Dict[str, str | List[str]]:
         """Get musical key with genre-appropriate default.
 
         Args:
             genre: Genre name for default key selection
+            blueprint: Blueprint dictionary with recommended_key
             partial_key: Optional user-provided key
 
         Returns:
             Complete key dictionary
         """
         if partial_key:
+            # Use blueprint recommended key as fallback if partial doesn't have primary
+            default_key = (
+                blueprint.get("recommended_key") or
+                GENRE_KEY_MAP.get(genre, "C major")
+            )
             return {
-                "primary": partial_key.get("primary", GENRE_KEY_MAP.get(genre, "C major")),
+                "primary": partial_key.get("primary", default_key),
                 "modulations": partial_key.get("modulations", []),
+            }
+
+        # Use blueprint recommended key, fall back to genre map
+        recommended_key = blueprint.get("recommended_key")
+        if recommended_key:
+            return {
+                "primary": recommended_key,
+                "modulations": [],
             }
 
         return {
@@ -214,36 +252,44 @@ class StyleDefaultGenerator:
     def _get_mood(
         self,
         genre: str,
-        rules: Dict[str, Any],
+        blueprint: Dict[str, Any],
         partial_mood: Optional[List[str]]
     ) -> List[str]:
         """Get mood descriptors from genre defaults or blueprint.
 
         Args:
             genre: Genre name for default mood
-            rules: Blueprint rules (may contain mood suggestions)
+            blueprint: Blueprint dictionary with default_mood
             partial_mood: Optional user-provided mood
 
         Returns:
-            List of mood descriptors
+            List of mood descriptors (max 2 per requirements)
         """
         if partial_mood:
             return partial_mood
 
-        # Try to get mood from blueprint rules
-        blueprint_mood = rules.get("mood")
-        if blueprint_mood and isinstance(blueprint_mood, list):
-            return blueprint_mood
+        # Try to get mood from blueprint (BlueprintReaderService format)
+        blueprint_mood = blueprint.get("default_mood")
+        if blueprint_mood and isinstance(blueprint_mood, list) and len(blueprint_mood) > 0:
+            # Limit to max 2 mood descriptors per requirements
+            return blueprint_mood[:2]
+
+        # Try legacy "rules" structure for backward compatibility
+        rules = blueprint.get("rules", {})
+        if rules:
+            rules_mood = rules.get("mood")
+            if rules_mood and isinstance(rules_mood, list) and len(rules_mood) > 0:
+                return rules_mood[:2]
 
         # Use genre-specific default
         return GENRE_MOOD_MAP.get(genre, ["neutral"])
 
     def _get_energy(
         self,
-        rules: Dict[str, Any],
+        blueprint: Dict[str, Any],
         partial: Dict[str, Any]
     ) -> str:
-        """Derive energy level from tempo or use explicit value.
+        """Derive energy level from blueprint, tempo, or use explicit value.
 
         Energy derivation rules (from PRD Section 9):
         - < 90 BPM: "low"
@@ -251,19 +297,35 @@ class StyleDefaultGenerator:
         - 120-140 BPM: "high"
         - > 140 BPM: "anthemic"
 
+        Priority:
+        1. Explicit user-provided energy
+        2. Blueprint default_energy
+        3. Derived from tempo
+        4. Default to "medium"
+
         Args:
-            rules: Blueprint rules containing tempo info
+            blueprint: Blueprint dictionary with default_energy and tempo_bpm
             partial: Partial style data (may contain energy or tempo)
 
         Returns:
             Energy level string
         """
-        # Use explicit energy if provided
+        # Use explicit energy if provided by user
         if partial.get("energy"):
             return partial["energy"]
 
-        # Derive from tempo
-        tempo = partial.get("tempo_bpm") or rules.get("tempo_bpm")
+        # Use blueprint default_energy if available (BlueprintReaderService format)
+        blueprint_energy = blueprint.get("default_energy")
+        if blueprint_energy and isinstance(blueprint_energy, str):
+            return blueprint_energy
+
+        # Derive from tempo (partial or blueprint)
+        tempo = partial.get("tempo_bpm") or blueprint.get("tempo_bpm")
+
+        # Try legacy rules structure for backward compatibility
+        if not tempo:
+            rules = blueprint.get("rules", {})
+            tempo = rules.get("tempo_bpm")
 
         if tempo:
             # Get average BPM for range
@@ -293,7 +355,7 @@ class StyleDefaultGenerator:
 
     def _get_instrumentation(
         self,
-        rules: Dict[str, Any],
+        blueprint: Dict[str, Any],
         partial_instrumentation: Optional[List[str]]
     ) -> List[str]:
         """Get instrumentation list from blueprint or user input.
@@ -301,7 +363,7 @@ class StyleDefaultGenerator:
         Limits to max 3 items per schema validation rules.
 
         Args:
-            rules: Blueprint rules (may contain default instrumentation)
+            blueprint: Blueprint dictionary with instrumentation
             partial_instrumentation: Optional user-provided instrumentation
 
         Returns:
@@ -311,10 +373,73 @@ class StyleDefaultGenerator:
             # Limit to 3 items
             return partial_instrumentation[:3]
 
-        # Try to get from blueprint rules
-        blueprint_instrumentation = rules.get("instrumentation")
+        # Try to get from blueprint (BlueprintReaderService format)
+        blueprint_instrumentation = blueprint.get("instrumentation")
         if blueprint_instrumentation and isinstance(blueprint_instrumentation, list):
             return blueprint_instrumentation[:3]
+
+        # Try legacy "rules" structure for backward compatibility
+        rules = blueprint.get("rules", {})
+        if rules:
+            rules_instrumentation = rules.get("instrumentation")
+            if rules_instrumentation and isinstance(rules_instrumentation, list):
+                return rules_instrumentation[:3]
+
+        # Default: empty array (user should specify)
+        return []
+
+    def _get_tags(
+        self,
+        blueprint: Dict[str, Any],
+        partial_tags: Optional[List[str]]
+    ) -> List[str]:
+        """Get tags from blueprint or user input, flattening categorized tags.
+
+        BlueprintReaderService returns tags as categorized dict:
+        {'vibe': [...], 'texture': [...], 'production': [...]}
+
+        This method flattens them into a single list for the Style entity.
+
+        Args:
+            blueprint: Blueprint dictionary with categorized tags
+            partial_tags: Optional user-provided tags
+
+        Returns:
+            List of flattened tags
+        """
+        if partial_tags:
+            return partial_tags
+
+        # Try to get from blueprint (BlueprintReaderService format with categorized tags)
+        blueprint_tags = blueprint.get("tags")
+        if blueprint_tags:
+            # If it's a dict (categorized), flatten into single list
+            if isinstance(blueprint_tags, dict):
+                flattened_tags = []
+                # Process in deterministic order for reproducibility
+                for category in sorted(blueprint_tags.keys()):
+                    category_tags = blueprint_tags[category]
+                    if isinstance(category_tags, list):
+                        flattened_tags.extend(category_tags)
+                return flattened_tags
+            # If it's already a list, return as-is
+            elif isinstance(blueprint_tags, list):
+                return blueprint_tags
+
+        # Try legacy "rules" structure for backward compatibility
+        rules = blueprint.get("rules", {})
+        if rules:
+            rules_tags = rules.get("tags")
+            if rules_tags:
+                if isinstance(rules_tags, dict):
+                    flattened_tags = []
+                    for category in sorted(rules_tags.keys()):
+                        category_tags = rules_tags[category]
+                        if isinstance(category_tags, list):
+                            flattened_tags.extend(category_tags)
+                    return flattened_tags
+                elif isinstance(rules_tags, list):
+                    return rules_tags
 
         # Default: empty array (user should specify)
         return []

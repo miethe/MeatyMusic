@@ -7,6 +7,7 @@ from app.services.persona_service import PersonaService
 from app.services.lyrics_service import LyricsService
 from app.services.producer_notes_service import ProducerNotesService
 from app.services.blueprint_service import BlueprintService
+from app.services.blueprint_reader import BlueprintReaderService
 from app.services.source_service import SourceService
 from app.services.validation_service import ValidationService
 from app.services.workflow_run_service import WorkflowRunService
@@ -24,6 +25,7 @@ __all__ = [
     "LyricsService",
     "ProducerNotesService",
     "BlueprintService",
+    "BlueprintReaderService",
     "SourceService",
     "ValidationService",
     "WorkflowRunService",
