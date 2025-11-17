@@ -4,7 +4,7 @@ This module defines the Song and WorkflowRun SQLAlchemy ORM models that
 capture song metadata, SDS version, global seed, and workflow execution state.
 """
 
-from sqlalchemy import Column, String, Integer, Index, ForeignKey, CheckConstraint
+from sqlalchemy import Column, String, Integer, BigInteger, Index, ForeignKey, CheckConstraint
 from sqlalchemy.dialects.postgresql import UUID as SA_UUID, JSONB
 from sqlalchemy.orm import relationship
 
@@ -48,7 +48,7 @@ class Song(BaseModel):
 
     # Determinism seed
     global_seed = Column(
-        Integer,
+        BigInteger,
         nullable=False,
         comment="Global seed for deterministic generation (non-negative integer)"
     )
