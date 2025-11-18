@@ -166,7 +166,7 @@ class SkillOutput(BaseModel):
     artifact_hash: Optional[str] = Field(
         None,
         description="SHA-256 hash of primary output artifact for provenance tracking",
-        pattern=r"^(sha256:)?[a-f0-9]{64}$"
+        pattern=r"^sha256:[a-f0-9]{64}$"
     )
     metrics: Dict[str, float] = Field(
         default_factory=dict,

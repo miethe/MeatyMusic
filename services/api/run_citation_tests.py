@@ -5,9 +5,9 @@ Simple test runner for citation tests without pytest infrastructure.
 import sys
 import traceback
 from typing import Callable, List, Tuple
-
+from pathlib import Path
 # Add app to path
-sys.path.insert(0, '/home/user/MeatyMusic/services/api')
+sys.path.insert(0, str(Path(__file__).parent))
 
 from app.core.citations import (
     CitationRecord,

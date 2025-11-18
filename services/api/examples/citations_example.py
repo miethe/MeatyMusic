@@ -14,9 +14,9 @@ with the same SDS and seed.
 import json
 import sys
 from typing import List, Dict, Any
-
+from pathlib import Path
 # Add app to path
-sys.path.insert(0, '/home/user/MeatyMusic/services/api')
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from app.core.citations import (
     CitationRecord,

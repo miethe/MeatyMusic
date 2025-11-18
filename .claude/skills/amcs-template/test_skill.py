@@ -11,7 +11,7 @@ Tests cover:
 import pytest
 from uuid import uuid4
 
-from app.skills.{skill_module} import {skill_function}
+from app.skills.my_skill_module import my_skill_function
 from app.workflows.skill import WorkflowContext
 
 

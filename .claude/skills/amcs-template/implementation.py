@@ -39,40 +39,40 @@ logger = structlog.get_logger(__name__)
     # outputs_schema={SkillName}OutputSchema,  # TODO: Uncomment if using schemas
     deterministic=True,  # TODO: Set to False only if non-deterministic (e.g., RENDER)
 )
-async def {function_name}(
+async def run_skill(
     inputs: Dict[str, Any],
     context: WorkflowContext,
 ) -> Dict[str, Any]:
-    """{ONE_SENTENCE_PURPOSE}.
+    """Run the AMCS skill.
 
-    This function implements the {SKILL_NAME} workflow skill. It {DESCRIPTION}.
+    This function implements the AMCS workflow skill. It performs the required action.
 
     Args:
         inputs: Dictionary containing:
-            - {input_1}: {description}
-            - {input_2}: {description}
+            - input_1: Description of input_1
+            - input_2: Description of input_2
         context: Workflow context with seed and run metadata
 
     Returns:
         Dictionary containing:
-            - {output_name}: {description}
+            - output_name: Description of output_name
 
     Raises:
-        ValueError: If {ERROR_CONDITION}
-        SkillExecutionError: If {ERROR_CONDITION}
+        ValueError: If an input is invalid
+        SkillExecutionError: If the skill fails to execute
     """
 
     # ========================================================================
     # TODO 3: Extract Inputs
     # ========================================================================
-    {input_var_1} = inputs["{input_key_1}"]
-    {input_var_2} = inputs.get("{input_key_2}", {default_value})
+    input_var_1 = inputs["input_key_1"]
+    input_var_2 = inputs.get("input_key_2", None)
 
     logger.info(
-        "{skill_name}.{action}.start",
+        "amcs.skill_name.action.start",
         run_id=str(context.run_id),
         seed=context.seed,
-        {log_field}={input_var_1}.get("{field}", "unknown"),
+        log_field=input_var_1 if hasattr(input_var_1, "get") else "unknown",
     )
 
     # ========================================================================

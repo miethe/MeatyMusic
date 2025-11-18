@@ -25,7 +25,7 @@ Usage:
 
 Key Features:
 - Seed constants (TEST_SEED, TEST_SEED_PLAN, etc.) for reproducible tests
-- assert_deterministic() verifies e99% reproducibility across N runs
+- assert_deterministic() verifies ≥99% reproducibility across N runs
 - assert_event_emitted() validates workflow event presence
 - assert_artifact_hash_valid() checks SHA-256 hash format
 - Common fixtures via pytest (sample_sds, sample_blueprints, sample_sources)
