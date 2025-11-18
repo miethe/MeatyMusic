@@ -11,15 +11,17 @@
 
 | Item | Status | Notes |
 |------|--------|-------|
-| **Branch** | `claude/execute-amcs-workflow-v1-01Stc5w8dwWxBLyyrzrovmFe` | ✅ Phase 0 complete |
-| **Last Commit** | Pending (Phase 0 infrastructure) | All 6 tasks complete |
-| **Current Phase** | Phase 0 ✅ COMPLETE | Phase 1 READY TO START |
-| **Current Task** | Ready for PLAN skill | Infrastructure ready |
+| **Branch** | `claude/amcs-workflow-phase-2-01CtEpECGNhhxF7qn14Tiuok` | ✅ Phases 0-2 complete |
+| **Last Commit** | Pending (Phase 2 STYLE skill) | Ready to commit |
+| **Current Phase** | Phase 2 ✅ COMPLETE | Phase 3 READY TO START |
+| **Current Task** | Ready for LYRICS skill | STYLE skill complete |
 | **Skill Template** | ✅ `.claude/skills/amcs-template/` | 10 files, <15min workflow |
 | **Determinism Framework** | ✅ `app/core/determinism.py` | 75 tests passing |
 | **Event Framework** | ✅ `app/core/workflow_events.py` | Context manager ready |
 | **Citation Framework** | ✅ `app/core/citations.py` | Pinned retrieval |
 | **Test Infrastructure** | ✅ SkillTestCase + fixtures | 10 SDSs + 5 blueprints |
+| **PLAN Skill** | ✅ Phase 1 complete | 11/11 tests passing |
+| **STYLE Skill** | ✅ Phase 2 complete | 32/32 tests passing, 100% determinism |
 
 ---
 
@@ -118,9 +120,39 @@ Event emission standardization; metrics (hook_density, singability, rhyme_tightn
 - **PII & Influences**: Policy guards must catch "style of <living artist>" before public release
 
 ### Known Issues
-- None yet - to be populated during implementation
+- None identified through Phase 2
 
-**Last Learnings Update**: 2025-11-18 (none yet)
+### Phase 2 Learnings (2025-11-18)
+
+**Tag Conflict Resolution**:
+- First-seen-wins algorithm works well for determinism
+- 15 predefined conflicts cover most common cases
+- Visual matrix in docs helps developers understand conflicts
+- Warnings provide clear reasoning for removed tags
+
+**Tempo Validation**:
+- Smart clamping handles 3 input formats gracefully
+- Genre-specific ranges from blueprints enforced correctly
+- Warning generation helps users understand adjustments
+
+**Testing Insights**:
+- 32 tests provide comprehensive coverage (7 categories)
+- Determinism tests with 10 runs verify reproducibility
+- Test execution time <3s keeps feedback loop fast
+- Edge case testing critical for robustness
+
+**Documentation Best Practices**:
+- README + IMPLEMENTATION_SUMMARY provides dual depth levels
+- Visual conflict matrix table helps quick reference
+- Genre-specific examples (5 genres) aid understanding
+- Troubleshooting guide reduces common issues
+
+**Performance**:
+- 1.7ms average execution meets <10ms target
+- Conflict detection O(n²) acceptable for small tag sets
+- No bottlenecks identified
+
+**Last Learnings Update**: 2025-11-18 (Phase 2 complete)
 
 ---
 
