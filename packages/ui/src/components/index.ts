@@ -109,7 +109,7 @@ export {
 } from './Dialog';
 
 // Legacy exports for backward compatibility
-export { Card } from '../card';
+// Card is now exported from './Card' on line 10
 export { ErrorLayout } from '../error-layout';
 export {
   ErrorFallback,

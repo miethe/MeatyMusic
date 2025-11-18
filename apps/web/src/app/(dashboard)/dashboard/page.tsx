@@ -44,13 +44,13 @@ export default function DashboardPage() {
     isLoading: songsLoading,
     error: songsError,
     refetch: refetchSongs
-  } = useSongs({ limit: 5, sort: 'created_at:desc' });
+  } = useSongs({ limit: 5 });
 
   const {
     data: workflowsData,
     isLoading: workflowsLoading,
     refetch: refetchWorkflows
-  } = useWorkflowRuns({ limit: 10, sort: 'created_at:desc' });
+  } = useWorkflowRuns({ limit: 10 });
 
   // Entity counts for stats
   const { data: stylesData } = useStyles();
