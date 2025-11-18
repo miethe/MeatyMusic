@@ -217,3 +217,18 @@
 | Fix | Removed duplicate legacy Card export, added CardProps type export to Card/index.ts. SongCard now uses advanced Card component with interactive prop support |
 | Files | packages/ui/src/components/index.ts:112, packages/ui/src/components/Card/index.ts:2 |
 | Commit | 9964177 |
+
+## 2025-11-18
+| Aspect | Value |
+|--------|-------|
+| Bug | 404 error: workflow runs API endpoint not found - frontend calling /api/v1/workflows/runs but backend serves /api/v1/workflow-runs |
+| Fix | Updated frontend API endpoint paths from '/workflows/runs' to '/workflow-runs' (hyphen instead of slash) to match backend routing |
+| File | apps/web/src/config/api.ts:45-50 |
+| Commit | b892466 |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | 404 error: song edit page not found - /songs/{id}/edit route defined but page component missing |
+| Fix | Created song edit page component with form for updating song properties (title, description, genre, mood, global_seed) |
+| File | apps/web/src/app/(dashboard)/songs/[id]/edit/page.tsx |
+| Commit | b892466 |

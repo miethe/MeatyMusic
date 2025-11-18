@@ -22,7 +22,7 @@ export default function EditSongPage() {
   const songId = params.id as string;
 
   const { data: song, isLoading, error } = useSong(songId);
-  const updateSong = useUpdateSong();
+  const updateSong = useUpdateSong(songId);
   const { addToast } = useUIStore();
 
   const [formData, setFormData] = React.useState({
@@ -38,9 +38,9 @@ export default function EditSongPage() {
     if (song) {
       setFormData({
         title: song.title || '',
-        description: song.extra_metadata?.description || '',
-        genre: song.extra_metadata?.genre || '',
-        mood: song.extra_metadata?.mood || [],
+        description: (song.extra_metadata?.description as string) || '',
+        genre: (song.extra_metadata?.genre as string) || '',
+        mood: (song.extra_metadata?.mood as string[]) || [],
         global_seed: song.global_seed || 0,
       });
     }
@@ -65,8 +65,7 @@ export default function EditSongPage() {
         },
       };
 
-      await updateSong.mutateAsync({ id: songId, data: updateData });
-      addToast('Song updated successfully', 'success');
+      await updateSong.mutateAsync(updateData);
       router.push(ROUTES.SONG_DETAIL(songId));
     } catch (error) {
       console.error('Failed to update song:', error);
