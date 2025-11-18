@@ -1,0 +1,18 @@
+{
+  "engine": "suno",
+  "version": "v3",
+  "limits": {
+    "style_max_chars": 1000,
+    "prompt_max_chars": 3000,
+    "title_max_chars": 100,
+    "max_duration_seconds": 240,
+    "max_tags": 20,
+    "max_sections": 10
+  },
+  "constraints": {
+    "one_tag_per_category": true,
+    "conflict_matrix_enforced": true,
+    "priority_truncation": true
+  },
+  "notes": "Suno v3 enforces 3000 char total prompt limit. Tags must be non-conflicting and limited to one per category."
+}

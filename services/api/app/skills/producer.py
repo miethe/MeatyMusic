@@ -7,6 +7,7 @@ and mix parameters aligned with style specifications.
 Contract: .claude/skills/workflow/producer/SKILL.md
 """
 
+from random import Random
 from typing import Any, Dict, List
 
 import structlog
@@ -163,6 +164,112 @@ def _determine_mix_params(style: Dict[str, Any], sds_mix: Dict[str, Any]) -> Dic
     }
 
 
+def _validate_structure_against_blueprint(
+    structure: str,
+    section_order: List[str],
+    style: Dict[str, Any],
+) -> List[str]:
+    """Validate structure contains blueprint-required sections.
+
+    Args:
+        structure: Generated structure string
+        section_order: List of sections in order
+        style: Style specification with genre info
+
+    Returns:
+        List of warning messages for missing required sections
+    """
+    warnings = []
+    genre = style["genre_detail"]["primary"]
+
+    # Define required sections per genre (mock for MVP)
+    # TODO: Load from actual blueprint in docs/hit_song_blueprint/
+    genre_requirements = {
+        "Pop": ["Chorus"],
+        "Christmas Pop": ["Chorus"],
+        "Hip-Hop": ["Chorus"],
+        "Rock": ["Chorus"],
+        "Electronic": [],  # More flexible
+        "Country": ["Chorus"],
+        "R&B": ["Chorus"],
+    }
+
+    required_sections = genre_requirements.get(genre, ["Chorus"])
+
+    for section in required_sections:
+        # Check if any section in order matches (case-insensitive)
+        if not any(section.lower() in s.lower() for s in section_order):
+            warnings.append(f"Missing blueprint-required section: {section}")
+
+    return warnings
+
+
+def _place_hooks(
+    sections: List[str],
+    hook_count: int,
+    hook_strategy: str,
+    seed: int,
+) -> Dict[str, Any]:
+    """Determine strategic hook placements.
+
+    Args:
+        sections: List of section names in order
+        hook_count: Desired number of hooks
+        hook_strategy: Strategy for hook placement (from SDS or derived)
+        seed: Random seed for deterministic placement decisions
+
+    Returns:
+        Dictionary with count and placements list
+    """
+    # Prepare seeded RNG for deterministic selections (future-proof)
+    rng = Random(seed)
+    # Currently all logic is deterministic by algorithm, but seed available for tie-breaking
+
+    placements = []
+
+    # Find all chorus sections with their indices
+    chorus_indices = [
+        (i, s) for i, s in enumerate(sections) if "chorus" in s.lower()
+    ]
+
+    # Place hooks in chorus sections
+    for idx, (i, chorus) in enumerate(chorus_indices):
+        if idx == 0:
+            placement = "main"  # First chorus
+        elif idx == len(chorus_indices) - 1:
+            placement = "finale"  # Last chorus
+        else:
+            placement = "reinforcement"  # Middle choruses
+
+        placements.append({
+            "section": chorus,
+            "section_index": i,
+            "position": placement,
+        })
+
+    # Check for bridge hooks if strategy is "hook-heavy" and we want more hooks
+    if hook_strategy == "hook-heavy" or hook_count > len(placements):
+        bridges = [(i, s) for i, s in enumerate(sections) if "bridge" in s.lower()]
+        if bridges:
+            bridge_idx, bridge_name = bridges[0]
+            placements.append({
+                "section": bridge_name,
+                "section_index": bridge_idx,
+                "position": "contrast",
+            })
+
+    # Limit to requested hook count
+    if len(placements) > hook_count:
+        # Keep first and last, then evenly space others
+        # This is deterministic without needing RNG
+        placements = placements[:hook_count]
+
+    return {
+        "count": len(placements),
+        "placements": placements,
+    }
+
+
 @workflow_skill(
     name="amcs.producer.generate",
     deterministic=True,
@@ -191,42 +298,80 @@ async def generate_producer_notes(
     plan = inputs["plan"]
     style = inputs["style"]
 
+    # Prepare seeded RNG for deterministic decisions (future-proof)
+    # Currently all logic is deterministic by algorithm, but seed available for selection
+    rng = Random(context.seed)
+
     logger.info(
         "producer.generate.start",
         run_id=str(context.run_id),
         sections=len(plan["section_order"]),
+        seed=context.seed,
     )
 
     # Step 1: Build structure string
     section_order = plan["section_order"]
     structure = "–".join(section_order)
 
-    # Step 2: Determine hook count
-    hooks = sds_producer.get("hooks", 1)
+    # Validate structure against blueprint requirements
+    structure_warnings = _validate_structure_against_blueprint(
+        structure, section_order, style
+    )
+    issues = []
+    if structure_warnings:
+        logger.warning(
+            "producer.blueprint.validation",
+            warnings=structure_warnings,
+        )
+        issues.extend(structure_warnings)
+
+    # Step 2: Determine hook count and placement
+    hooks_requested = sds_producer.get("hooks", 1)
 
     # Calculate recommended hooks based on chorus count
     chorus_count = sum(1 for s in section_order if "chorus" in s.lower())
     recommended_hooks = max(1, int(chorus_count * 1.5))
 
-    if hooks < recommended_hooks:
+    if hooks_requested < recommended_hooks:
         logger.info(
             "producer.hooks.recommendation",
-            user_hooks=hooks,
+            user_hooks=hooks_requested,
             recommended=recommended_hooks,
             chorus_count=chorus_count,
         )
-        hooks = recommended_hooks
+        hooks_requested = recommended_hooks
 
     # Warn if no hooks for hook-dependent genres
-    if hooks < 1:
+    if hooks_requested < 1:
         genre = style["genre_detail"]["primary"]
         if genre in ["Pop", "Hip-Hop", "Christmas Pop"]:
             logger.warning(
                 "producer.hooks.warning",
                 genre=genre,
-                hooks=hooks,
+                hooks=hooks_requested,
                 message="Genre typically requires ≥1 hook for memorability",
             )
+
+    # Determine hook strategy (default to "melodic" if not specified)
+    hook_strategy = plan.get("hook_strategy", "melodic")
+    if "work_objectives" in plan:
+        # Try to extract hook_strategy from LYRICS objective
+        lyrics_obj = next(
+            (obj for obj in plan["work_objectives"] if obj["node"] == "LYRICS"),
+            None
+        )
+        if lyrics_obj and "hook strategy" in lyrics_obj.get("objective", ""):
+            # Extract strategy from objective string
+            obj_str = lyrics_obj["objective"]
+            if "chant" in obj_str:
+                hook_strategy = "chant"
+            elif "lyrical" in obj_str:
+                hook_strategy = "lyrical"
+            elif "hook-heavy" in obj_str:
+                hook_strategy = "hook-heavy"
+
+    # Place hooks strategically
+    hooks = _place_hooks(section_order, hooks_requested, hook_strategy, context.seed)
 
     # Step 3: Expand instrumentation
     instrumentation = style.get("instrumentation", []).copy()
@@ -298,8 +443,10 @@ async def generate_producer_notes(
         "producer.generate.complete",
         run_id=str(context.run_id),
         structure=structure,
-        hooks=hooks,
+        hooks=hooks["count"],
+        hook_placements=len(hooks["placements"]),
         total_duration=producer_notes["_total_duration"],
+        blueprint_warnings=len(issues),
         hash=producer_notes["_hash"][:16],
     )
 

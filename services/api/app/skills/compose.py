@@ -7,7 +7,10 @@ character limits, tag formatting, and policy constraints.
 Contract: .claude/skills/workflow/compose/SKILL.md
 """
 
+import json
 import re
+from pathlib import Path
+from random import Random
 from typing import Any, Dict, List, Set, Tuple
 
 import structlog
@@ -16,6 +19,59 @@ from app.workflows.skill import WorkflowContext, compute_hash, workflow_skill
 
 logger = structlog.get_logger(__name__)
 
+
+def _load_conflict_matrix() -> List[Dict[str, Any]]:
+    """Load tag conflict matrix from file.
+
+    Returns:
+        List of conflict entries with 'tag' and 'Tags' (conflicting tags)
+    """
+    # Path: /home/user/MeatyMusic/services/api/app/skills/compose.py
+    # Go up to /home/user/MeatyMusic/
+    matrix_path = Path(__file__).parent.parent.parent.parent.parent / "taxonomies" / "conflict_matrix.json"
+
+    if not matrix_path.exists():
+        logger.warning("conflict_matrix.json not found, using empty matrix", path=str(matrix_path))
+        return []
+
+    try:
+        with open(matrix_path, "r") as f:
+            return json.load(f)
+    except Exception as e:
+        logger.error("Failed to load conflict matrix", error=str(e))
+        return []
+
+
+def _load_engine_limits(engine: str = "suno") -> Dict[str, int]:
+    """Load engine-specific character limits.
+
+    Args:
+        engine: Engine name (suno, udio, default)
+
+    Returns:
+        Dict with style_max and prompt_max limits
+    """
+    # Path: /home/user/MeatyMusic/services/api/app/skills/compose.py
+    # Go up to /home/user/MeatyMusic/
+    limits_path = Path(__file__).parent.parent.parent.parent.parent / "limits" / "engine_limits.json"
+
+    if not limits_path.exists():
+        logger.warning("engine_limits.json not found, using defaults", path=str(limits_path))
+        return {"style_max": 1000, "prompt_max": 3000}
+
+    try:
+        with open(limits_path, "r") as f:
+            all_limits = json.load(f)
+
+        return all_limits.get(engine, all_limits.get("default", {"style_max": 1000, "prompt_max": 3000}))
+    except Exception as e:
+        logger.error("Failed to load engine limits", error=str(e))
+        return {"style_max": 1000, "prompt_max": 3000}
+
+
+# Load conflict matrix and engine limits at module level
+CONFLICT_MATRIX = _load_conflict_matrix()
+ENGINE_LIMITS = _load_engine_limits()
 
 # Mock living artist list (TODO: Load from comprehensive database)
 LIVING_ARTISTS = {
@@ -38,6 +94,197 @@ ARTIST_TO_GENRE = {
     "post malone": "melodic hip-hop",
     "the weeknd": "contemporary R&B",
 }
+
+
+def _parse_prompt_sections(prompt_text: str) -> Dict[str, str]:
+    """Parse prompt into named sections.
+
+    Args:
+        prompt_text: Complete prompt text
+
+    Returns:
+        Dictionary mapping section names to their text content
+    """
+    sections = {}
+    lines = prompt_text.split("\n")
+    current_section = "Header"
+    current_text = []
+
+    for i, line in enumerate(lines):
+        stripped = line.strip()
+
+        # Check for section headers like "Title:", "Influences:", "Lyrics:", etc.
+        # Also handle inline headers like "Title: Song Name"
+        is_section_header = False
+        section_name = None
+
+        if ":" in stripped and len(stripped) < 100:
+            # Check if this looks like a section header
+            potential_header = stripped.split(":")[0]
+            if potential_header in ["Title", "Genre/Style", "Influences", "Structure", "Vocal",
+                                     "Hooks", "Lyrics", "Production Notes", "Arrangement", "Mix"]:
+                section_name = potential_header
+                is_section_header = True
+
+                # Save previous section
+                if current_text:
+                    sections[current_section] = "\n".join(current_text)
+
+                # Start new section with the rest of the line (if any)
+                rest_of_line = ":".join(stripped.split(":")[1:]).strip()
+                current_section = section_name
+                current_text = [rest_of_line] if rest_of_line else []
+                continue
+
+        # Regular line - add to current section
+        current_text.append(line)
+
+    # Save last section
+    if current_text:
+        sections[current_section] = "\n".join(current_text)
+
+    return sections
+
+
+def enforce_char_limit(
+    prompt_text: str,
+    limit: int,
+    priority_sections: List[str],
+) -> Tuple[str, List[str]]:
+    """Enforce character limit with priority-based truncation.
+
+    Args:
+        prompt_text: Full prompt text
+        limit: Max characters allowed
+        priority_sections: Sections in priority order (highest first)
+            Example: ["Title", "Style Tags", "Structure", "Chorus", "Verses", "Bridge", "Production"]
+
+    Returns:
+        Tuple of (truncated_text, warnings)
+    """
+    if len(prompt_text) <= limit:
+        return prompt_text, []
+
+    warnings = []
+
+    # Edge case: very low limit
+    if limit < 500:
+        warnings.append(f"WARNING: Character limit {limit} is very low, quality may suffer")
+
+    # Parse prompt into sections
+    sections = _parse_prompt_sections(prompt_text)
+
+    # Build priority map (lower index = higher priority)
+    priority_map = {section: i for i, section in enumerate(priority_sections)}
+
+    # Sort sections by priority (ascending - keep highest priority)
+    sorted_sections = sorted(
+        sections.items(),
+        key=lambda x: priority_map.get(x[0], 999)  # Unknown sections lowest priority
+    )
+
+    # Build truncated text by including sections until limit reached
+    truncated_parts = []
+    total_length = 0
+
+    for section_name, section_text in sorted_sections:
+        section_with_header = f"{section_name}:\n{section_text}" if section_name != "Header" else section_text
+        section_length = len(section_with_header) + 2  # +2 for double newline
+
+        if total_length + section_length <= limit:
+            truncated_parts.append(section_with_header)
+            total_length += section_length
+        else:
+            warnings.append(f"Removed {section_name} to fit {limit} char limit")
+
+    return "\n\n".join(truncated_parts), warnings
+
+
+def format_style_tags(
+    style: Dict[str, Any],
+    conflict_matrix: List[Dict[str, Any]],
+    seed: int,
+) -> List[str]:
+    """Format style tags with category enforcement and conflict resolution.
+
+    Args:
+        style: Style object with tags
+        conflict_matrix: Loaded conflict matrix from file
+        seed: Seed for deterministic tag selection
+
+    Returns:
+        Alphabetically sorted list of non-conflicting tags (one per category)
+    """
+    rng = Random(seed)
+
+    # Define tag categories
+    CATEGORIES = {
+        "era": ["vintage", "retro", "modern", "futuristic", "nostalgic"],
+        "genre": ["pop", "rock", "electronic", "hiphop", "country", "rnb", "indie", "alternative"],
+        "energy": ["energetic", "chill", "anthemic", "minimal", "high-energy", "low-energy", "uptempo", "downtempo"],
+        "instrumentation": ["acoustic", "electronic", "full band", "stripped", "synth-heavy", "organic", "industrial"],
+        "rhythm": ["driving", "syncopated", "laid-back", "fast", "slow"],
+        "vocal": ["whisper", "powerful", "harmonized", "intimate", "aggressive", "stadium"],
+        "production": ["dry", "lush", "lo-fi", "hi-fi", "polished", "raw", "gritty", "pristine"],
+        "arrangement": ["minimal", "maximal", "sparse", "dense", "wall-of-sound"],
+        "tonality": ["major", "minor", "dark", "uplifting"],
+    }
+
+    # Collect all tags from style
+    all_tags = []
+
+    # Add genre tags
+    if "genre_detail" in style:
+        genre_detail = style["genre_detail"]
+        if "primary" in genre_detail:
+            all_tags.append(genre_detail["primary"])
+        if "subgenres" in genre_detail:
+            all_tags.extend(genre_detail["subgenres"])
+        if "fusions" in genre_detail:
+            all_tags.extend(genre_detail["fusions"])
+
+    # Add other fields
+    for field in ["tags", "mood", "instrumentation", "vocal_profile", "energy"]:
+        if field in style and style[field]:
+            if isinstance(style[field], list):
+                all_tags.extend(style[field])
+            else:
+                all_tags.append(style[field])
+
+    # Bucket tags by category
+    categorized = {cat: [] for cat in CATEGORIES}
+    uncategorized = []
+
+    for tag in all_tags:
+        tag_lower = tag.lower()
+        found_category = False
+
+        for cat, cat_tags in CATEGORIES.items():
+            if any(cat_tag in tag_lower for cat_tag in cat_tags):
+                categorized[cat].append(tag)
+                found_category = True
+                break
+
+        if not found_category:
+            uncategorized.append(tag)
+
+    # Select one tag per category (seed-based if multiple)
+    selected_tags = []
+    for cat, tags in categorized.items():
+        if tags:
+            selected = rng.choice(tags) if len(tags) > 1 else tags[0]
+            selected_tags.append(selected)
+
+    # Add uncategorized tags (up to 5)
+    if uncategorized:
+        rng.shuffle(uncategorized)
+        selected_tags.extend(uncategorized[:5])
+
+    # Resolve conflicts using matrix
+    resolved, _ = _resolve_tag_conflicts(selected_tags, conflict_matrix, rng)
+
+    # Return alphabetically sorted
+    return sorted(resolved, key=str.lower)
 
 
 def _normalize_living_artists(text: str, policy_strict: bool = True) -> Tuple[str, List[str]]:
@@ -82,46 +329,56 @@ def _normalize_living_artists(text: str, policy_strict: bool = True) -> Tuple[st
 
 def _resolve_tag_conflicts(
     all_tags: List[str],
+    conflict_matrix: List[Dict[str, Any]],
+    rng: Random,
 ) -> Tuple[List[str], List[Tuple[str, str]]]:
-    """Resolve tag conflicts by removing conflicting pairs.
+    """Resolve tag conflicts using loaded conflict matrix.
 
     Args:
         all_tags: List of all tags from style and sections
+        conflict_matrix: Loaded conflict matrix from file
+        rng: Random instance for deterministic conflict resolution
 
     Returns:
         Tuple of (resolved_tags, list_of_conflicts)
     """
-    # Simple conflict detection (TODO: Use taxonomies/tag_conflict_matrix.json)
-    conflicts = [
-        ("whisper", "anthemic"),
-        ("dry", "lush"),
-        ("intimate", "anthemic"),
-        ("minimal", "full instrumentation"),
-    ]
-
     resolved_tags = all_tags.copy()
     detected_conflicts = []
 
-    for tag1_pattern, tag2_pattern in conflicts:
-        # Find matching tags
-        matching_tag1 = None
-        matching_tag2 = None
+    for conflict_entry in conflict_matrix:
+        primary_tag = conflict_entry.get("tag", "").lower()
+        conflicting_tags = [t.lower() for t in conflict_entry.get("Tags", [])]
 
-        for tag in resolved_tags:
-            if tag1_pattern.lower() in tag.lower():
-                matching_tag1 = tag
-            if tag2_pattern.lower() in tag.lower():
-                matching_tag2 = tag
+        # Rebuild lowercase map each iteration to reflect removals
+        tag_lower_map = {tag.lower(): tag for tag in resolved_tags}
 
-        # If both present, drop the second one
-        if matching_tag1 and matching_tag2:
-            resolved_tags.remove(matching_tag2)
-            detected_conflicts.append((matching_tag1, matching_tag2))
-            logger.warning(
-                "compose.tag_conflict",
-                kept=matching_tag1,
-                dropped=matching_tag2,
-            )
+        # Check if primary tag exists (in current resolved list)
+        if primary_tag not in tag_lower_map:
+            continue
+
+        # Check if any conflicting tags exist (in current resolved list)
+        found_conflicts = [t for t in conflicting_tags if t in tag_lower_map]
+
+        if found_conflicts:
+            # Deterministically choose which tag to keep (seed-based)
+            all_conflicting = [primary_tag] + found_conflicts
+            # Make a copy for shuffling to avoid modifying original
+            shuffle_list = all_conflicting.copy()
+            rng.shuffle(shuffle_list)  # Shuffle with seed
+            keep_tag = shuffle_list[0]
+
+            # Remove all others
+            for tag_lower in all_conflicting:
+                if tag_lower != keep_tag:
+                    original_tag = tag_lower_map.get(tag_lower)
+                    if original_tag and original_tag in resolved_tags:
+                        resolved_tags.remove(original_tag)
+                        detected_conflicts.append((tag_lower_map[keep_tag], original_tag))
+                        logger.warning(
+                            "compose.tag_conflict",
+                            kept=tag_lower_map[keep_tag],
+                            dropped=original_tag,
+                        )
 
     return resolved_tags, detected_conflicts
 
@@ -225,15 +482,19 @@ async def compose_prompt(
     producer_notes = inputs["producer_notes"]
     sds = inputs.get("sds", {})
 
+    # Initialize Random with seed for determinism
+    rng = Random(context.seed)
+
     logger.info(
         "compose.generate.start",
         run_id=str(context.run_id),
+        seed=context.seed,
     )
 
-    # Extract limits
+    # Extract limits (use from SDS or fallback to engine defaults)
     prompt_controls = sds.get("prompt_controls", {})
-    style_max = prompt_controls.get("max_style_chars", 1000)
-    prompt_max = prompt_controls.get("max_prompt_chars", 5000)
+    style_max = prompt_controls.get("max_style_chars", ENGINE_LIMITS.get("style_max", 1000))
+    prompt_max = prompt_controls.get("max_prompt_chars", ENGINE_LIMITS.get("prompt_max", 3000))
     policy_strict = True  # TODO: Get from feature flags
 
     issues = []
@@ -242,39 +503,37 @@ async def compose_prompt(
     title = sds.get("title", "Untitled")
     genre = style["genre_detail"]["primary"]
     tempo = style["tempo_bpm"]
-    mood_list = style["mood"][:2]  # First 2 moods
+    mood_list = style.get("mood", [])[:2]  # First 2 moods
 
     meta_header = f"""Title: {title}
 Genre/Style: {genre} | BPM: {tempo} | Mood: {', '.join(mood_list)}"""
 
-    # Step 2: Assemble style tags
-    style_tags = []
+    # Step 2: Format style tags using new function with category enforcement and conflict resolution
+    # First, collect all original tags to compare
+    all_original_tags = []
+    if "genre_detail" in style:
+        genre_detail = style["genre_detail"]
+        if "primary" in genre_detail:
+            all_original_tags.append(genre_detail["primary"])
+        if "subgenres" in genre_detail:
+            all_original_tags.extend(genre_detail["subgenres"])
+        if "fusions" in genre_detail:
+            all_original_tags.extend(genre_detail["fusions"])
 
-    # Add genre, subgenres, fusions
-    style_tags.append(genre)
-    style_tags.extend(style["genre_detail"].get("subgenres", []))
-    style_tags.extend(style["genre_detail"].get("fusions", []))
+    for field in ["tags", "mood", "instrumentation", "vocal_profile", "energy"]:
+        if field in style and style[field]:
+            if isinstance(style[field], list):
+                all_original_tags.extend(style[field])
+            else:
+                all_original_tags.append(style[field])
 
-    # Add energy
-    if style.get("energy"):
-        style_tags.append(style["energy"])
+    # Format tags with conflict resolution
+    style_tags = format_style_tags(style, CONFLICT_MATRIX, context.seed)
 
-    # Add instrumentation (max 3)
-    instrumentation = style.get("instrumentation", [])[:3]
-    style_tags.extend(instrumentation)
-
-    # Add other tags
-    style_tags.extend(style.get("tags", []))
-
-    # Add vocal profile
-    if style.get("vocal_profile"):
-        style_tags.append(style["vocal_profile"])
-
-    # Resolve tag conflicts
-    style_tags, conflicts = _resolve_tag_conflicts(style_tags)
-
-    for conflict in conflicts:
-        issues.append(f"Dropped '{conflict[1]}' due to conflict with '{conflict[0]}'")
+    # Report tag reductions (conflicts or category enforcement)
+    tags_removed = len(all_original_tags) - len(style_tags)
+    if tags_removed > 0:
+        issues.append(f"Reduced {tags_removed} tags due to conflicts or category enforcement")
 
     # Format influences section
     influences_text = f"Influences: {', '.join(style_tags)}"
@@ -339,11 +598,32 @@ Hooks: {producer_notes['hooks']}"""
 
 {production_notes}"""
 
-    # Step 7: Enforce character limits
-    complete_prompt, limit_issues = _enforce_character_limits(
-        complete_prompt, influences_text, style_max, prompt_max
+    # Step 7: Enforce character limits with priority-based truncation
+    priority_sections = [
+        "Header",  # Title, genre, tempo
+        "Influences",  # Style tags
+        "Structure",  # Song structure
+        "Chorus",  # Hook sections
+        "Verse",  # Verses
+        "Bridge",  # Bridge
+        "Production Notes",  # Production guidance
+    ]
+
+    complete_prompt, limit_warnings = enforce_char_limit(
+        complete_prompt, prompt_max, priority_sections
     )
-    issues.extend(limit_issues)
+    issues.extend(limit_warnings)
+
+    # Also check style section separately
+    if len(influences_text) > style_max:
+        exceeded = len(influences_text) - style_max
+        issues.append(f"Style section exceeded {style_max} chars by {exceeded}")
+        logger.warning(
+            "compose.style_limit_exceeded",
+            actual=len(influences_text),
+            limit=style_max,
+            exceeded=exceeded,
+        )
 
     # Step 8: Build composed prompt object
     composed_prompt = {
