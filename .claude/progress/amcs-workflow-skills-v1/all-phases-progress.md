@@ -457,7 +457,7 @@ Implement the STYLE skill — generates genre-appropriate style specifications w
 - [x] Genre examples comprehensive (5 genres documented)
 - [x] Ready for Phase 3 (LYRICS)
 
-**Commit**: TBD - Phase 2 - STYLE skill complete with tests
+**Commit**: de9058a - feat(amcs): Phase 2 - STYLE skill complete with tests and documentation
 
 ---
 
