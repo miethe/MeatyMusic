@@ -94,11 +94,11 @@ describe('ChipSelector', () => {
       />
     );
 
-    const input = screen.getByPlaceholderText('Type to add...');
-    fireEvent.change(input, { target: { value: 'tag3' } });
-    fireEvent.keyDown(input, { key: 'Enter' });
+    // When max chips is reached, placeholder changes to "Max chips reached"
+    const input = screen.getByPlaceholderText('Max chips reached');
+    expect(input).toBeDisabled();
 
-    expect(mockOnChange).not.toHaveBeenCalled();
+    // Verify the warning message is shown
     expect(screen.getByText(/Maximum 2 chips allowed/i)).toBeInTheDocument();
   });
 
