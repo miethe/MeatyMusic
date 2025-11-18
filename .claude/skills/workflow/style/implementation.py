@@ -24,7 +24,7 @@ logger = structlog.get_logger(__name__)
 # ============================================================================
 
 # Path to conflict matrix (absolute path per project requirements)
-CONFLICT_MATRIX_PATH = Path("/home/user/MeatyMusic/taxonomies/conflict_matrix.json")
+CONFLICT_MATRIX_PATH = Path(os.getenv("CONFLICT_MATRIX_PATH", "taxonomies/conflict_matrix.json"))
 
 # Maximum instrumentation items (per blueprint specification)
 MAX_INSTRUMENTATION_ITEMS = 3
