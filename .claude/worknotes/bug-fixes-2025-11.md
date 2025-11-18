@@ -203,3 +203,17 @@
 | Fix | Added navigation handlers (onSongClick, onViewWorkflow, onEdit, onClone, onDelete) to SongList component, set interactive prop on Card component to enable cursor-pointer styling. Card component properly passes onClick through {...props} |
 | Files | apps/web/src/app/(dashboard)/songs/page.tsx, apps/web/src/components/songs/SongCard.tsx |
 | Commit | 26f2156 |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | TypeScript error: 'sort' does not exist in type 'SongFilters' or 'WorkflowRunFilters' |
+| Fix | Removed unsupported sort parameters from useSongs and useWorkflowRuns calls - backend defaults to created_at desc |
+| File | apps/web/src/app/(dashboard)/dashboard/page.tsx:47,53 |
+| Commit | 9964177 |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | TypeScript error: Property 'interactive' does not exist on type 'CardProps' - wrong Card component exported |
+| Fix | Removed duplicate legacy Card export, added CardProps type export to Card/index.ts. SongCard now uses advanced Card component with interactive prop support |
+| Files | packages/ui/src/components/index.ts:112, packages/ui/src/components/Card/index.ts:2 |
+| Commit | 9964177 |
