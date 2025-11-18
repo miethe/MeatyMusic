@@ -1,0 +1,8 @@
+[[deployed]]
+artifact_name = "notebooklm-skill"
+artifact_type = "skill"
+from_collection = "default"
+deployed_at = "2025-11-18T14:53:26.507420"
+artifact_path = "skills/notebooklm-skill"
+collection_sha = "9e838aa807f329b02fe6c667571c8f180e4c5f1d753ca812452e13f2539b06e7"
+local_modifications = false
