@@ -1,0 +1,242 @@
+[
+  {
+    "id": "sds-pop-001",
+    "title": "Summer Nights",
+    "genre": "pop",
+    "targetLength": "3:30",
+    "style": {
+      "bpm": 120,
+      "key": "C Major",
+      "mood": ["upbeat", "nostalgic", "energetic"],
+      "instrumentation": ["synth", "drums", "bass", "guitar"],
+      "tags": ["melodic", "catchy", "radio-friendly"]
+    },
+    "constraints": {
+      "explicit": false,
+      "sectionOrder": ["Intro", "Verse 1", "Chorus", "Verse 2", "Chorus", "Bridge", "Chorus", "Outro"],
+      "targetDuration": 210
+    },
+    "persona": {
+      "vocalRange": "tenor",
+      "vocalStyle": "powerful",
+      "influences": ["Max Martin production", "synth-pop"]
+    },
+    "seed": 42
+  },
+  {
+    "id": "sds-rock-001",
+    "title": "Breaking Chains",
+    "genre": "rock",
+    "targetLength": "4:00",
+    "style": {
+      "bpm": 140,
+      "key": "E Minor",
+      "mood": ["energetic", "rebellious", "intense"],
+      "instrumentation": ["electric guitar", "bass", "drums", "vocals"],
+      "tags": ["anthemic", "driving", "guitar-driven"]
+    },
+    "constraints": {
+      "explicit": false,
+      "sectionOrder": ["Intro", "Verse 1", "Pre-Chorus", "Chorus", "Verse 2", "Pre-Chorus", "Chorus", "Guitar Solo", "Bridge", "Chorus", "Outro"],
+      "targetDuration": 240
+    },
+    "persona": {
+      "vocalRange": "baritone",
+      "vocalStyle": "raspy",
+      "influences": ["classic rock", "hard rock"]
+    },
+    "seed": 43
+  },
+  {
+    "id": "sds-hiphop-001",
+    "title": "City Lights",
+    "genre": "hip-hop",
+    "targetLength": "3:00",
+    "style": {
+      "bpm": 95,
+      "key": "G Minor",
+      "mood": ["reflective", "urban", "confident"],
+      "instrumentation": ["808 bass", "hi-hats", "snare", "synth pad"],
+      "tags": ["trap-influenced", "melodic", "storytelling"]
+    },
+    "constraints": {
+      "explicit": true,
+      "sectionOrder": ["Intro", "Verse 1", "Hook", "Verse 2", "Hook", "Verse 3", "Hook", "Outro"],
+      "targetDuration": 180
+    },
+    "persona": {
+      "vocalRange": "mid",
+      "vocalStyle": "rhythmic",
+      "influences": ["trap", "conscious hip-hop"]
+    },
+    "seed": 44
+  },
+  {
+    "id": "sds-country-001",
+    "title": "Dusty Roads",
+    "genre": "country",
+    "targetLength": "3:45",
+    "style": {
+      "bpm": 100,
+      "key": "D Major",
+      "mood": ["nostalgic", "heartfelt", "storytelling"],
+      "instrumentation": ["acoustic guitar", "fiddle", "steel guitar", "drums", "bass"],
+      "tags": ["traditional", "authentic", "narrative"]
+    },
+    "constraints": {
+      "explicit": false,
+      "sectionOrder": ["Intro", "Verse 1", "Chorus", "Verse 2", "Chorus", "Bridge", "Chorus", "Outro"],
+      "targetDuration": 225
+    },
+    "persona": {
+      "vocalRange": "baritone",
+      "vocalStyle": "twangy",
+      "influences": ["traditional country", "Americana"]
+    },
+    "seed": 45
+  },
+  {
+    "id": "sds-rnb-001",
+    "title": "Velvet Dreams",
+    "genre": "rnb",
+    "targetLength": "3:20",
+    "style": {
+      "bpm": 85,
+      "key": "F# Minor",
+      "mood": ["sultry", "smooth", "romantic"],
+      "instrumentation": ["rhodes", "bass", "drums", "strings"],
+      "tags": ["neo-soul", "smooth", "emotional"]
+    },
+    "constraints": {
+      "explicit": false,
+      "sectionOrder": ["Intro", "Verse 1", "Pre-Chorus", "Chorus", "Verse 2", "Pre-Chorus", "Chorus", "Bridge", "Chorus", "Outro"],
+      "targetDuration": 200
+    },
+    "persona": {
+      "vocalRange": "alto",
+      "vocalStyle": "smooth",
+      "influences": ["neo-soul", "contemporary R&B"]
+    },
+    "seed": 46
+  },
+  {
+    "id": "sds-electronic-001",
+    "title": "Neon Pulse",
+    "genre": "electronic",
+    "targetLength": "3:15",
+    "style": {
+      "bpm": 128,
+      "key": "A Minor",
+      "mood": ["euphoric", "energetic", "futuristic"],
+      "instrumentation": ["synthesizer", "808", "pad", "lead synth"],
+      "tags": ["progressive", "build-drop", "festival"]
+    },
+    "constraints": {
+      "explicit": false,
+      "sectionOrder": ["Intro", "Build", "Drop", "Breakdown", "Build", "Drop", "Outro"],
+      "targetDuration": 195
+    },
+    "persona": {
+      "vocalRange": "tenor",
+      "vocalStyle": "processed",
+      "influences": ["progressive house", "EDM"]
+    },
+    "seed": 47
+  },
+  {
+    "id": "sds-indie-001",
+    "title": "Coffee Shop Conversations",
+    "genre": "indie-alternative",
+    "targetLength": "3:25",
+    "style": {
+      "bpm": 110,
+      "key": "G Major",
+      "mood": ["introspective", "melancholic", "authentic"],
+      "instrumentation": ["acoustic guitar", "piano", "light drums", "bass"],
+      "tags": ["lo-fi", "intimate", "storytelling"]
+    },
+    "constraints": {
+      "explicit": false,
+      "sectionOrder": ["Intro", "Verse 1", "Chorus", "Verse 2", "Chorus", "Bridge", "Chorus", "Outro"],
+      "targetDuration": 205
+    },
+    "persona": {
+      "vocalRange": "tenor",
+      "vocalStyle": "soft",
+      "influences": ["indie folk", "alternative"]
+    },
+    "seed": 48
+  },
+  {
+    "id": "sds-christmas-001",
+    "title": "Winter Wonderland Wishes",
+    "genre": "christmas",
+    "targetLength": "3:10",
+    "style": {
+      "bpm": 105,
+      "key": "C Major",
+      "mood": ["joyful", "nostalgic", "festive"],
+      "instrumentation": ["bells", "piano", "strings", "choir"],
+      "tags": ["traditional", "family-friendly", "warm"]
+    },
+    "constraints": {
+      "explicit": false,
+      "sectionOrder": ["Intro", "Verse 1", "Chorus", "Verse 2", "Chorus", "Bridge", "Chorus", "Outro"],
+      "targetDuration": 190
+    },
+    "persona": {
+      "vocalRange": "soprano",
+      "vocalStyle": "bright",
+      "influences": ["classic Christmas", "modern holiday"]
+    },
+    "seed": 49
+  },
+  {
+    "id": "sds-ccm-001",
+    "title": "Light in the Darkness",
+    "genre": "ccm",
+    "targetLength": "4:15",
+    "style": {
+      "bpm": 75,
+      "key": "E Major",
+      "mood": ["uplifting", "worshipful", "hopeful"],
+      "instrumentation": ["piano", "acoustic guitar", "drums", "strings", "pad"],
+      "tags": ["worship", "anthemic", "inspirational"]
+    },
+    "constraints": {
+      "explicit": false,
+      "sectionOrder": ["Intro", "Verse 1", "Chorus", "Verse 2", "Chorus", "Bridge", "Chorus", "Chorus", "Outro"],
+      "targetDuration": 255
+    },
+    "persona": {
+      "vocalRange": "tenor",
+      "vocalStyle": "powerful",
+      "influences": ["contemporary worship", "CCM"]
+    },
+    "seed": 50
+  },
+  {
+    "id": "sds-kpop-001",
+    "title": "Digital Heart",
+    "genre": "kpop",
+    "targetLength": "3:25",
+    "style": {
+      "bpm": 135,
+      "key": "B Minor",
+      "mood": ["energetic", "catchy", "polished"],
+      "instrumentation": ["synth", "808", "vocal layers", "brass stabs"],
+      "tags": ["dance-pop", "hook-heavy", "production-intensive"]
+    },
+    "constraints": {
+      "explicit": false,
+      "sectionOrder": ["Intro", "Verse 1", "Pre-Chorus", "Chorus", "Rap Verse", "Pre-Chorus", "Chorus", "Bridge", "Dance Break", "Chorus", "Outro"],
+      "targetDuration": 205
+    },
+    "persona": {
+      "vocalRange": "mixed",
+      "vocalStyle": "versatile",
+      "influences": ["K-pop production", "dance-pop"]
+    },
+    "seed": 51
+  }
+]

@@ -1,0 +1,83 @@
+{
+  "genre": "rnb",
+  "version": "1.0",
+  "rules": {
+    "tempo_bpm": {
+      "min": 60,
+      "max": 130,
+      "sweet_spot": [75, 100]
+    },
+    "key_preferences": ["F# Minor", "C# Minor", "D Major", "A Major", "E Minor"],
+    "required_sections": ["Verse", "Chorus"],
+    "recommended_sections": ["Intro", "Verse 1", "Pre-Chorus", "Chorus", "Verse 2", "Pre-Chorus", "Chorus", "Bridge", "Chorus", "Outro"],
+    "section_lines": {
+      "Verse": {"min": 8, "max": 16, "target": 12},
+      "Chorus": {"min": 4, "max": 8, "target": 6},
+      "Bridge": {"min": 4, "max": 8, "target": 6},
+      "Pre-Chorus": {"min": 2, "max": 4, "target": 3}
+    },
+    "rhyme_schemes": {
+      "Verse": ["ABAB", "AABB", "ABCB", "free"],
+      "Chorus": ["AABB", "ABAB"],
+      "Bridge": ["free", "AABB"]
+    },
+    "target_duration": {
+      "min": 150,
+      "max": 300,
+      "radio_target": 210
+    },
+    "banned_terms": [],
+    "profanity_allowed": false
+  },
+  "style_tags": {
+    "allowed": [
+      "smooth", "sultry", "neo-soul", "contemporary", "emotional",
+      "romantic", "groovy", "soulful", "vocal-focused", "melodic",
+      "alternative-rnb", "trap-soul", "classic-soul"
+    ],
+    "conflict_matrix": {
+      "aggressive": ["smooth", "sultry", "gentle"],
+      "upbeat": ["melancholic", "slow-burn"],
+      "minimal": ["layered", "production-intensive"]
+    }
+  },
+  "production_patterns": {
+    "Intro": "Atmospheric, establish groove and mood",
+    "Verse": "Groove-focused, vocal runs, emotional delivery",
+    "Pre-Chorus": "Build tension, vocal intensity increase",
+    "Chorus": "Vocal showcase, melodic hooks, fuller arrangement",
+    "Bridge": "Emotional peak or intimate moment, vocal adlibs",
+    "Outro": "Vocal runs, gradual fade or resolution"
+  },
+  "eval_rubric": {
+    "metrics": {
+      "hook_density": {
+        "weight": 0.25,
+        "threshold": 0.75,
+        "description": "Melodic hooks and chorus memorability"
+      },
+      "vocal_showcase": {
+        "weight": 0.30,
+        "threshold": 0.80,
+        "description": "Opportunities for vocal runs, melisma, emotional delivery"
+      },
+      "groove_quality": {
+        "weight": 0.20,
+        "threshold": 0.75,
+        "description": "Rhythmic pocket, flow with beat"
+      },
+      "emotional_depth": {
+        "weight": 0.15,
+        "threshold": 0.70,
+        "description": "Emotional authenticity and vulnerability"
+      },
+      "section_completeness": {
+        "weight": 0.10,
+        "threshold": 0.90,
+        "description": "All sections present with proper structure"
+      }
+    },
+    "pass_threshold": 0.75,
+    "target_threshold": 0.85
+  }
+}

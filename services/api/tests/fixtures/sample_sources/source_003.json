@@ -1,0 +1,62 @@
+{
+  "id": "source-nature-metaphors-003",
+  "title": "Nature Metaphors and Imagery",
+  "type": "curated",
+  "description": "Natural imagery and metaphors for songwriting",
+  "chunks": [
+    {
+      "text": "Like a river flowing to the sea, I find my way back to you naturally",
+      "hash": "sha256:b0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d",
+      "metadata": {
+        "theme": "journey",
+        "imagery": "river, sea, flow",
+        "emotion": "inevitable"
+      }
+    },
+    {
+      "text": "Storms may rage and winds may blow, but our love's a shelter from the cold",
+      "hash": "sha256:c1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e",
+      "metadata": {
+        "theme": "resilience",
+        "imagery": "storm, wind, shelter",
+        "emotion": "protective"
+      }
+    },
+    {
+      "text": "Mountains high and valleys low, through it all our story grows",
+      "hash": "sha256:d2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f",
+      "metadata": {
+        "theme": "perseverance",
+        "imagery": "mountains, valleys",
+        "emotion": "determined"
+      }
+    },
+    {
+      "text": "Seeds we planted years ago, now a garden starts to show",
+      "hash": "sha256:e3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a",
+      "metadata": {
+        "theme": "growth",
+        "imagery": "seeds, garden, plants",
+        "emotion": "nurturing"
+      }
+    },
+    {
+      "text": "Autumn leaves are falling down, golden memories all around",
+      "hash": "sha256:f4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b",
+      "metadata": {
+        "theme": "nostalgia",
+        "imagery": "autumn, leaves, golden",
+        "emotion": "wistful"
+      }
+    },
+    {
+      "text": "Wild and free like ocean waves, crashing on the shore",
+      "hash": "sha256:a5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c",
+      "metadata": {
+        "theme": "freedom",
+        "imagery": "ocean, waves, shore",
+        "emotion": "liberated"
+      }
+    }
+  ]
+}

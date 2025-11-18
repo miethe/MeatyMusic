@@ -1,0 +1,108 @@
+{
+  "_comment": "Sample output for {SKILL_NAME} skill",
+  "_usage": "Replace placeholders with actual output structure matching your skill's contract",
+
+  "{output_key}": {
+    "_comment": "Main output object",
+
+    "{field_1}": "example_value",
+    "{field_2}": 123,
+    "{field_3}": ["item1", "item2"],
+    "{nested_object}": {
+      "sub_field_1": "value",
+      "sub_field_2": true
+    },
+
+    "_hash": "a1b2c3d4e5f6789012345678901234567890abcdef123456789012345678901234",
+    "_metadata": {
+      "_comment": "Metadata automatically added by @workflow_skill decorator"
+    }
+  },
+
+  "_metadata": {
+    "skill_name": "amcs.{skill_name}.{action}",
+    "duration_ms": 250,
+    "input_hash": "fedcba0987654321fedcba0987654321fedcba0987654321fedcba0987654321",
+    "output_hash": "a1b2c3d4e5f6789012345678901234567890abcdef123456789012345678901234",
+    "seed": 42,
+    "model_params": {
+      "temperature": 0.2,
+      "top_p": 0.9,
+      "seed": 42
+    }
+  },
+
+  "_examples": {
+    "plan_output": {
+      "plan": {
+        "section_order": ["Intro", "Verse", "Chorus", "Verse", "Chorus", "Bridge", "Chorus"],
+        "target_word_counts": {
+          "Intro": 30,
+          "Verse": 96,
+          "Chorus": 54,
+          "Bridge": 72
+        },
+        "evaluation_targets": {
+          "hook_density": 0.7,
+          "singability": 0.8,
+          "rhyme_tightness": 0.75,
+          "section_completeness": 0.9,
+          "profanity_score": 0.0,
+          "total": 0.8
+        },
+        "work_objectives": [
+          {
+            "node": "STYLE",
+            "objective": "Generate Pop style with tempo 120, key C major",
+            "dependencies": []
+          }
+        ],
+        "_hash": "abc123..."
+      }
+    },
+
+    "style_output": {
+      "style": {
+        "genre_detail": {
+          "primary": "Pop",
+          "subgenres": [],
+          "fusions": []
+        },
+        "tempo_bpm": 120,
+        "key": {
+          "primary": "C major",
+          "modulations": []
+        },
+        "mood": ["upbeat"],
+        "energy": "high",
+        "instrumentation": ["guitar", "drums"],
+        "vocal_profile": "female lead",
+        "tags": ["modern"],
+        "negative_tags": [],
+        "_hash": "def456..."
+      }
+    },
+
+    "validate_output": {
+      "scores": {
+        "total": 0.92,
+        "hook_density": 0.85,
+        "singability": 0.95,
+        "rhyme_tightness": 0.90,
+        "section_completeness": 1.0,
+        "profanity_score": 1.0
+      },
+      "issues": [],
+      "pass": true,
+      "_hash": "ghi789..."
+    }
+  },
+
+  "_todo": [
+    "Replace {output_key} with your skill's output key",
+    "Update fields to match your output schema",
+    "Add all required fields from your contract",
+    "Update _hash with actual SHA-256 format",
+    "Remove this _todo array before using"
+  ]
+}

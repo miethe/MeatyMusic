@@ -1,0 +1,81 @@
+{
+  "genre": "country",
+  "version": "1.0",
+  "rules": {
+    "tempo_bpm": {
+      "min": 80,
+      "max": 140,
+      "sweet_spot": [90, 120]
+    },
+    "key_preferences": ["G Major", "D Major", "A Major", "C Major", "E Major"],
+    "required_sections": ["Verse", "Chorus"],
+    "recommended_sections": ["Intro", "Verse 1", "Chorus", "Verse 2", "Chorus", "Bridge", "Chorus", "Outro"],
+    "section_lines": {
+      "Verse": {"min": 8, "max": 16, "target": 12},
+      "Chorus": {"min": 4, "max": 8, "target": 6},
+      "Bridge": {"min": 4, "max": 8, "target": 6}
+    },
+    "rhyme_schemes": {
+      "Verse": ["ABAB", "AABB", "ABCB"],
+      "Chorus": ["AABB", "ABAB"],
+      "Bridge": ["AABB", "free"]
+    },
+    "target_duration": {
+      "min": 150,
+      "max": 300,
+      "radio_target": 225
+    },
+    "banned_terms": [],
+    "profanity_allowed": false
+  },
+  "style_tags": {
+    "allowed": [
+      "traditional", "modern-country", "storytelling", "heartfelt", "authentic",
+      "twangy", "Americana", "narrative", "nostalgic", "rustic",
+      "bro-country", "outlaw", "honky-tonk"
+    ],
+    "conflict_matrix": {
+      "modern": ["traditional", "classic"],
+      "urban": ["rustic", "rural"],
+      "polished": ["raw", "honky-tonk"]
+    }
+  },
+  "production_patterns": {
+    "Intro": "Acoustic guitar or fiddle establishing mood",
+    "Verse": "Storytelling focus, clear vocals, supportive instrumentation",
+    "Chorus": "Fuller arrangement, singalong quality, emotional peak",
+    "Bridge": "Emotional or narrative shift, often stripped back",
+    "Outro": "Resolution, often instrumental callback"
+  },
+  "eval_rubric": {
+    "metrics": {
+      "hook_density": {
+        "weight": 0.25,
+        "threshold": 0.75,
+        "description": "Chorus memorability and repetition"
+      },
+      "singability": {
+        "weight": 0.25,
+        "threshold": 0.80,
+        "description": "Ease of singing along, country phrasing"
+      },
+      "narrative_quality": {
+        "weight": 0.25,
+        "threshold": 0.75,
+        "description": "Story coherence, imagery, emotional arc"
+      },
+      "rhyme_tightness": {
+        "weight": 0.15,
+        "threshold": 0.70,
+        "description": "Rhyme scheme consistency"
+      },
+      "section_completeness": {
+        "weight": 0.10,
+        "threshold": 0.90,
+        "description": "All sections present with proper structure"
+      }
+    },
+    "pass_threshold": 0.75,
+    "target_threshold": 0.85
+  }
+}

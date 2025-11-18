@@ -1,0 +1,85 @@
+{
+  "genre": "pop",
+  "version": "1.0",
+  "rules": {
+    "tempo_bpm": {
+      "min": 80,
+      "max": 140,
+      "sweet_spot": [100, 130]
+    },
+    "key_preferences": ["C Major", "G Major", "D Major", "A Major", "F Major"],
+    "required_sections": ["Verse", "Chorus"],
+    "recommended_sections": ["Intro", "Verse 1", "Chorus", "Verse 2", "Chorus", "Bridge", "Chorus", "Outro"],
+    "section_lines": {
+      "Verse": {"min": 8, "max": 16, "target": 12},
+      "Chorus": {"min": 4, "max": 8, "target": 6},
+      "Bridge": {"min": 4, "max": 8, "target": 6},
+      "Pre-Chorus": {"min": 2, "max": 4, "target": 3}
+    },
+    "rhyme_schemes": {
+      "Verse": ["AABB", "ABAB", "ABCB"],
+      "Chorus": ["AABB", "ABAB"],
+      "Bridge": ["AABB", "ABAB", "free"]
+    },
+    "target_duration": {
+      "min": 150,
+      "max": 270,
+      "radio_target": 210
+    },
+    "banned_terms": [],
+    "profanity_allowed": false
+  },
+  "style_tags": {
+    "allowed": [
+      "upbeat", "catchy", "melodic", "energetic", "radio-friendly",
+      "dance-pop", "synth-pop", "power-pop", "hook-heavy",
+      "polished", "commercial", "bright", "optimistic"
+    ],
+    "conflict_matrix": {
+      "melancholic": ["upbeat", "energetic", "optimistic"],
+      "dark": ["bright", "optimistic"],
+      "minimal": ["polished", "production-intensive"],
+      "lo-fi": ["polished", "commercial"]
+    }
+  },
+  "production_patterns": {
+    "Intro": "Minimal instrumentation, establish key and mood",
+    "Verse": "Build from sparse to fuller, keep vocals clear",
+    "Pre-Chorus": "Energy lift, introduce new elements",
+    "Chorus": "Full mix, layered vocals, maximum energy",
+    "Bridge": "Dynamic contrast, strip back or build tension",
+    "Outro": "Gradually fade or strong ending"
+  },
+  "eval_rubric": {
+    "metrics": {
+      "hook_density": {
+        "weight": 0.30,
+        "threshold": 0.75,
+        "description": "Frequency and memorability of hooks/chorus repetitions"
+      },
+      "singability": {
+        "weight": 0.25,
+        "threshold": 0.80,
+        "description": "Ease of singing along, syllable flow, vowel placement"
+      },
+      "rhyme_tightness": {
+        "weight": 0.20,
+        "threshold": 0.70,
+        "description": "Quality and consistency of rhyme scheme"
+      },
+      "section_completeness": {
+        "weight": 0.15,
+        "threshold": 0.90,
+        "description": "All required sections present with target line counts"
+      },
+      "profanity_score": {
+        "weight": 0.10,
+        "threshold": 0.00,
+        "description": "Profanity detection (0.0 = clean, 1.0 = explicit)",
+        "invert": true
+      }
+    },
+    "pass_threshold": 0.75,
+    "target_threshold": 0.85
+  }
+}

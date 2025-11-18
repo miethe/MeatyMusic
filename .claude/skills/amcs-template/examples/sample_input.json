@@ -1,0 +1,93 @@
+{
+  "_comment": "Sample input for {SKILL_NAME} skill",
+  "_usage": "Replace placeholders with actual data matching your skill's input contract",
+
+  "sds": {
+    "title": "Example Song Title",
+    "blueprint_ref": {
+      "genre": "Pop",
+      "version": "2025.11"
+    },
+    "style": {
+      "genre_detail": {
+        "primary": "Pop",
+        "subgenres": [],
+        "fusions": []
+      },
+      "tempo_bpm": 120,
+      "time_signature": "4/4",
+      "key": {
+        "primary": "C major",
+        "modulations": []
+      },
+      "mood": ["upbeat", "energetic"],
+      "energy": "high",
+      "instrumentation": ["guitar", "drums", "synth"],
+      "vocal_profile": "female lead",
+      "tags": ["modern", "radio-friendly"],
+      "negative_tags": []
+    },
+    "lyrics": {
+      "language": "en",
+      "pov": "1st",
+      "tense": "present",
+      "themes": ["love", "empowerment"],
+      "rhyme_scheme": "ABAB",
+      "meter": "4/4",
+      "syllables_per_line": 8,
+      "hook_strategy": "lyrical",
+      "section_order": ["Intro", "Verse", "PreChorus", "Chorus", "Verse", "Chorus", "Bridge", "Chorus"],
+      "constraints": {
+        "explicit": false,
+        "max_lines": 80,
+        "section_requirements": {
+          "Chorus": {
+            "min_lines": 6,
+            "max_lines": 10,
+            "must_end_with_hook": true
+          }
+        }
+      },
+      "source_citations": []
+    },
+    "producer_notes": {
+      "structure": "",
+      "hooks": 2,
+      "instrumentation": [],
+      "section_meta": {
+        "Intro": {
+          "tags": ["ambient"],
+          "target_duration_sec": 10
+        },
+        "Chorus": {
+          "tags": ["anthemic", "full-mix"],
+          "target_duration_sec": 25
+        }
+      },
+      "mix": {
+        "lufs": -12.0,
+        "space": "normal",
+        "stereo_width": "wide"
+      }
+    },
+    "constraints": {
+      "duration_sec": 180
+    },
+    "prompt_controls": {
+      "max_style_chars": 1000,
+      "max_prompt_chars": 5000
+    },
+    "render": {
+      "engine": "none"
+    }
+  },
+
+  "seed": 42,
+
+  "_todo": [
+    "Replace 'sds' with your actual input structure",
+    "Add any additional inputs required by your skill",
+    "Update seed value if needed",
+    "Remove this _todo array before using"
+  ]
+}

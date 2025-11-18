@@ -1,0 +1,53 @@
+{
+  "id": "source-love-themes-001",
+  "title": "Love Song Themes Collection",
+  "type": "curated",
+  "description": "Common themes and imagery for love songs",
+  "chunks": [
+    {
+      "text": "Hearts intertwined under moonlight, dancing shadows on the wall",
+      "hash": "sha256:7f3a8c9d4e1b2f6a5c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b",
+      "metadata": {
+        "theme": "romance",
+        "imagery": "moonlight, dancing",
+        "emotion": "tender"
+      }
+    },
+    {
+      "text": "Every moment with you feels like forever, time stands still when you're near",
+      "hash": "sha256:8a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1",
+      "metadata": {
+        "theme": "timelessness",
+        "imagery": "time, forever",
+        "emotion": "romantic"
+      }
+    },
+    {
+      "text": "Summer nights and city lights, your hand in mine feels so right",
+      "hash": "sha256:9b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2",
+      "metadata": {
+        "theme": "nostalgia",
+        "imagery": "summer, city, lights",
+        "emotion": "nostalgic"
+      }
+    },
+    {
+      "text": "Your smile lights up the darkest days, sunshine breaking through the gray",
+      "hash": "sha256:a3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c",
+      "metadata": {
+        "theme": "hope",
+        "imagery": "light, sunshine, darkness",
+        "emotion": "uplifting"
+      }
+    },
+    {
+      "text": "We were young and wild and free, chasing dreams beneath the stars",
+      "hash": "sha256:b4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d",
+      "metadata": {
+        "theme": "youth",
+        "imagery": "stars, dreams",
+        "emotion": "nostalgic"
+      }
+    }
+  ]
+}

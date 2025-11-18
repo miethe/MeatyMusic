@@ -1,0 +1,81 @@
+{
+  "genre": "hip-hop",
+  "version": "1.0",
+  "rules": {
+    "tempo_bpm": {
+      "min": 70,
+      "max": 160,
+      "sweet_spot": [85, 140]
+    },
+    "key_preferences": ["G Minor", "C Minor", "D Minor", "A Minor", "E Minor"],
+    "required_sections": ["Verse", "Hook"],
+    "recommended_sections": ["Intro", "Verse 1", "Hook", "Verse 2", "Hook", "Verse 3", "Hook", "Outro"],
+    "section_lines": {
+      "Verse": {"min": 12, "max": 24, "target": 16},
+      "Hook": {"min": 2, "max": 8, "target": 4},
+      "Bridge": {"min": 4, "max": 8, "target": 6}
+    },
+    "rhyme_schemes": {
+      "Verse": ["AABB", "ABAB", "AAAA", "multisyllabic"],
+      "Hook": ["AABB", "ABAB", "repetitive"],
+      "Bridge": ["free", "AABB"]
+    },
+    "target_duration": {
+      "min": 120,
+      "max": 300,
+      "radio_target": 180
+    },
+    "banned_terms": [],
+    "profanity_allowed": true
+  },
+  "style_tags": {
+    "allowed": [
+      "trap", "boom-bap", "melodic", "storytelling", "conscious",
+      "gangsta", "lyrical", "rhythmic", "flow-heavy", "wordplay",
+      "urban", "street", "confident", "reflective"
+    ],
+    "conflict_matrix": {
+      "minimalist": ["production-intensive", "layered"],
+      "aggressive": ["smooth", "mellow"],
+      "conscious": ["party", "club"]
+    }
+  },
+  "production_patterns": {
+    "Intro": "Beat intro, atmospheric elements",
+    "Verse": "Main beat, clear vocals, space for flow",
+    "Hook": "Melodic element, repetitive structure, catchiest part",
+    "Bridge": "Beat switch or breakdown, dynamic change",
+    "Outro": "Beat fade or vocal tag"
+  },
+  "eval_rubric": {
+    "metrics": {
+      "hook_density": {
+        "weight": 0.25,
+        "threshold": 0.70,
+        "description": "Hook memorability and repetition"
+      },
+      "flow_quality": {
+        "weight": 0.30,
+        "threshold": 0.75,
+        "description": "Rhythmic consistency, syllable flow, pocket"
+      },
+      "rhyme_tightness": {
+        "weight": 0.25,
+        "threshold": 0.80,
+        "description": "Rhyme scheme complexity and consistency"
+      },
+      "section_completeness": {
+        "weight": 0.10,
+        "threshold": 0.85,
+        "description": "All sections present with proper structure"
+      },
+      "wordplay_density": {
+        "weight": 0.10,
+        "threshold": 0.65,
+        "description": "Metaphors, double entendres, clever lines"
+      }
+    },
+    "pass_threshold": 0.72,
+    "target_threshold": 0.82
+  }
+}
