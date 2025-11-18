@@ -42,10 +42,10 @@ export const API_ENDPOINTS = {
   BLUEPRINT_DETAIL: (id: string) => `/blueprints/${id}`,
 
   // Workflow endpoints
-  WORKFLOW_RUNS: '/workflows/runs',
-  WORKFLOW_RUN_DETAIL: (id: string) => `/workflows/runs/${id}`,
+  WORKFLOW_RUNS: '/workflow-runs',
+  WORKFLOW_RUN_DETAIL: (id: string) => `/workflow-runs/${id}`,
   WORKFLOW_EXECUTE: '/workflows/execute',
-  WORKFLOW_RUN_PROGRESS: (id: string) => `/workflows/runs/${id}/progress`,
-  WORKFLOW_RUN_SUMMARY: (id: string) => `/workflows/runs/${id}/summary`,
-  WORKFLOW_RUN_CANCEL: (id: string) => `/workflows/runs/${id}/cancel`,
+  WORKFLOW_RUN_PROGRESS: (id: string) => `/workflow-runs/${id}/progress`,
+  WORKFLOW_RUN_SUMMARY: (id: string) => `/workflow-runs/${id}/summary`,
+  WORKFLOW_RUN_CANCEL: (id: string) => `/workflow-runs/${id}/cancel`,
 } as const;
