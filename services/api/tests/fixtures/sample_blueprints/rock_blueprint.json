@@ -1,0 +1,90 @@
+{
+  "genre": "rock",
+  "version": "1.0",
+  "rules": {
+    "tempo_bpm": {
+      "min": 100,
+      "max": 180,
+      "sweet_spot": [120, 160]
+    },
+    "key_preferences": ["E Minor", "A Minor", "D Minor", "G Major", "C Major"],
+    "required_sections": ["Verse", "Chorus"],
+    "recommended_sections": ["Intro", "Verse 1", "Pre-Chorus", "Chorus", "Verse 2", "Pre-Chorus", "Chorus", "Guitar Solo", "Bridge", "Chorus", "Outro"],
+    "section_lines": {
+      "Verse": {"min": 8, "max": 16, "target": 12},
+      "Chorus": {"min": 4, "max": 12, "target": 8},
+      "Bridge": {"min": 4, "max": 8, "target": 6},
+      "Pre-Chorus": {"min": 2, "max": 6, "target": 4}
+    },
+    "rhyme_schemes": {
+      "Verse": ["AABB", "ABAB", "ABCB", "free"],
+      "Chorus": ["AABB", "ABAB", "free"],
+      "Bridge": ["free", "AABB"]
+    },
+    "target_duration": {
+      "min": 180,
+      "max": 360,
+      "radio_target": 240
+    },
+    "banned_terms": [],
+    "profanity_allowed": false
+  },
+  "style_tags": {
+    "allowed": [
+      "energetic", "driving", "anthemic", "powerful", "guitar-driven",
+      "hard", "rebellious", "intense", "raw", "gritty",
+      "classic", "alternative", "indie-rock"
+    ],
+    "conflict_matrix": {
+      "soft": ["hard", "intense", "powerful"],
+      "polished": ["raw", "gritty", "lo-fi"],
+      "minimal": ["anthemic", "powerful"]
+    }
+  },
+  "production_patterns": {
+    "Intro": "Guitar riff or drum pattern establishing energy",
+    "Verse": "Controlled energy, build tension",
+    "Pre-Chorus": "Escalate energy, transition to chorus",
+    "Chorus": "Full band, maximum energy, anthemic feel",
+    "Guitar Solo": "Feature lead guitar, maintain energy",
+    "Bridge": "Dynamic shift, often stripped back or different feel",
+    "Outro": "Strong ending or fade with main riff"
+  },
+  "eval_rubric": {
+    "metrics": {
+      "hook_density": {
+        "weight": 0.25,
+        "threshold": 0.70,
+        "description": "Memorable riffs and chorus hooks"
+      },
+      "singability": {
+        "weight": 0.20,
+        "threshold": 0.75,
+        "description": "Anthem quality, group sing-along potential"
+      },
+      "rhyme_tightness": {
+        "weight": 0.15,
+        "threshold": 0.65,
+        "description": "Rhyme scheme consistency"
+      },
+      "section_completeness": {
+        "weight": 0.20,
+        "threshold": 0.85,
+        "description": "All sections present with proper structure"
+      },
+      "energy_consistency": {
+        "weight": 0.10,
+        "threshold": 0.80,
+        "description": "Maintains driving energy throughout"
+      },
+      "profanity_score": {
+        "weight": 0.10,
+        "threshold": 0.00,
+        "description": "Profanity detection",
+        "invert": true
+      }
+    },
+    "pass_threshold": 0.70,
+    "target_threshold": 0.80
+  }
+}

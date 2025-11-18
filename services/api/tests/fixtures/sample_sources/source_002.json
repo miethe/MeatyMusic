@@ -1,0 +1,53 @@
+{
+  "id": "source-urban-imagery-002",
+  "title": "Urban and Street Imagery",
+  "type": "curated",
+  "description": "Urban themes and city life imagery for contemporary songs",
+  "chunks": [
+    {
+      "text": "Concrete jungle where dreams are made, neon signs illuminate the way",
+      "hash": "sha256:c5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e",
+      "metadata": {
+        "theme": "urban",
+        "imagery": "concrete, neon, city",
+        "emotion": "ambitious"
+      }
+    },
+    {
+      "text": "Late nights on empty streets, streetlights casting amber glow",
+      "hash": "sha256:d6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f",
+      "metadata": {
+        "theme": "solitude",
+        "imagery": "streets, lights, night",
+        "emotion": "reflective"
+      }
+    },
+    {
+      "text": "Skyline silhouettes against the dawn, city waking up as I move on",
+      "hash": "sha256:e7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a",
+      "metadata": {
+        "theme": "transition",
+        "imagery": "skyline, dawn, city",
+        "emotion": "hopeful"
+      }
+    },
+    {
+      "text": "Block to block, corner store memories, where I came from made me",
+      "hash": "sha256:f8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b",
+      "metadata": {
+        "theme": "roots",
+        "imagery": "block, corner, store",
+        "emotion": "proud"
+      }
+    },
+    {
+      "text": "Rain washing over city streets, reflections in the puddles at my feet",
+      "hash": "sha256:a9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c",
+      "metadata": {
+        "theme": "atmosphere",
+        "imagery": "rain, streets, reflections",
+        "emotion": "melancholic"
+      }
+    }
+  ]
+}
