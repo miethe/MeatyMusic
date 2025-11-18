@@ -47,6 +47,7 @@ import functools
 import hashlib
 import json
 import random
+import sys
 import warnings
 from datetime import datetime
 from typing import Any, Callable, Dict, List, Optional, Sequence, TypeVar, Union
@@ -506,40 +507,28 @@ def determinism_safe(func: Callable) -> Callable:
     """
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        # Store original datetime methods to detect violations
-        original_now = datetime.now
-        original_utcnow = datetime.utcnow
-
         violation_detected = False
         violation_messages = []
+        previous_profile = sys.getprofile()
 
-        def now_violation(*args, **kwargs):
+        def profile_func(frame, event, arg):
             nonlocal violation_detected
-            violation_detected = True
-            msg = (
-                f"{func.__name__} called datetime.now() - "
-                f"use input timestamps for determinism"
-            )
-            violation_messages.append(msg)
-            warnings.warn(msg, UserWarning, stacklevel=2)
-            return original_now(*args, **kwargs)
 
-        def utcnow_violation(*args, **kwargs):
-            nonlocal violation_detected
-            violation_detected = True
-            msg = (
-                f"{func.__name__} called datetime.utcnow() - "
-                f"use input timestamps for determinism"
-            )
-            violation_messages.append(msg)
-            warnings.warn(msg, UserWarning, stacklevel=2)
-            return original_utcnow(*args, **kwargs)
+            if event == "c_call" and arg in (datetime.now, datetime.utcnow):
+                violation_detected = True
+                msg = (
+                    f"{func.__name__} called "
+                    f"{'datetime.now()' if arg is datetime.now else 'datetime.utcnow()'} - "
+                    f"use input timestamps for determinism"
+                )
+                violation_messages.append(msg)
+                warnings.warn(msg, UserWarning, stacklevel=3)
 
-        # Monkey-patch datetime methods to detect violations
-        datetime.now = now_violation
-        datetime.utcnow = utcnow_violation
+            if previous_profile:
+                previous_profile(frame, event, arg)
 
         try:
+            sys.setprofile(profile_func)
             result = func(*args, **kwargs)
             if violation_detected:
                 warnings.warn(
@@ -550,9 +539,7 @@ def determinism_safe(func: Callable) -> Callable:
                 )
             return result
         finally:
-            # Restore originals
-            datetime.now = original_now
-            datetime.utcnow = original_utcnow
+            sys.setprofile(previous_profile)
 
     return wrapper
 
