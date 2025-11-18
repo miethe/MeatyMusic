@@ -232,3 +232,10 @@
 | Fix | Created song edit page component with form for updating song properties (title, description, genre, mood, global_seed) |
 | File | apps/web/src/app/(dashboard)/songs/[id]/edit/page.tsx |
 | Commit | b892466 |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | TypeScript error: useUpdateSong() expects 1 argument but got 0; extra_metadata fields have unknown type |
+| Fix | Pass songId to useUpdateSong(songId) hook, update mutateAsync to only pass data, add type assertions for extra_metadata fields |
+| File | apps/web/src/app/(dashboard)/songs/[id]/edit/page.tsx:25,41-44,68 |
+| Commit | 8666155 |
