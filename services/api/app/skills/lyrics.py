@@ -160,16 +160,16 @@ def _normalize_artist_references(
     cleaned = text
 
     # Patterns: "style of Taylor Swift", "sounds like Drake", "inspired by Beyonce"
-    # Note: Don't use re.IGNORECASE for the artist name part to ensure we only match capitalized names
+    # Updated: Use case-insensitive matching for artist names
     patterns = [
-        r"(?i:style\s+of)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)",
-        r"(?i:sounds?\s+like)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)",
-        r"(?i:inspired\s+by)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)",
-        r"(?i:reminds?\s+(?:me\s+)?of)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)",
+        r"style\s+of\s+([A-Za-z]+(?:\s+[A-Za-z]+)*)",
+        r"sounds?\s+like\s+([A-Za-z]+(?:\s+[A-Za-z]+)*)",
+        r"inspired\s+by\s+([A-Za-z]+(?:\s+[A-Za-z]+)*)",
+        r"reminds?\s+(?:me\s+)?of\s+([A-Za-z]+(?:\s+[A-Za-z]+)*)",
     ]
 
     for pattern_str in patterns:
-        pattern = re.compile(pattern_str)  # Don't use IGNORECASE - we want exact capitalization for names
+        pattern = re.compile(pattern_str, re.IGNORECASE)
         for match in pattern.finditer(cleaned):
             artist = match.group(1).lower()
             if artist in LIVING_ARTISTS:
