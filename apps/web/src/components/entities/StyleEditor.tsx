@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { StyleBase, StyleCreate, Style } from '@/types/api/entities';
-import { ChipSelector } from './common/ChipSelector';
+import { ChipSelector } from '@meatymusic/ui';
 import { RangeSlider } from './common/RangeSlider';
 import { EntityPreviewPanel, ValidationError } from './common/EntityPreviewPanel';
 import { LibrarySelector } from './common/LibrarySelector';
@@ -292,10 +292,11 @@ export function StyleEditor({
 
           <ChipSelector
             label="Subgenres"
-            value={formData.sub_genres || []}
+            selected={formData.sub_genres || []}
             onChange={(value) => updateField('sub_genres', value)}
-            suggestions={GENRE_OPTIONS.map((g) => g.toLowerCase())}
-            maxChips={3}
+            options={GENRE_OPTIONS.map((g) => ({ value: g.toLowerCase(), label: g }))}
+            maxSelections={3}
+            allowCreate
             placeholder="Add subgenres..."
             helpText="Maximum 3 subgenres recommended"
           />
@@ -328,20 +329,22 @@ export function StyleEditor({
 
           <ChipSelector
             label="Mood"
-            value={formData.mood || []}
+            selected={formData.mood || []}
             onChange={(value) => updateField('mood', value)}
-            suggestions={MOOD_OPTIONS}
-            maxChips={5}
+            options={MOOD_OPTIONS.map((m) => ({ value: m, label: m.charAt(0).toUpperCase() + m.slice(1) }))}
+            maxSelections={5}
+            allowCreate
             placeholder="Add mood tags..."
             helpText="Describe the emotional tone"
           />
 
           <ChipSelector
             label="Instrumentation"
-            value={formData.instrumentation || []}
+            selected={formData.instrumentation || []}
             onChange={(value) => updateField('instrumentation', value)}
-            suggestions={INSTRUMENTATION_OPTIONS}
-            maxChips={5}
+            options={INSTRUMENTATION_OPTIONS.map((i) => ({ value: i, label: i.charAt(0).toUpperCase() + i.slice(1) }))}
+            maxSelections={5}
+            allowCreate
             warning={
               (formData.instrumentation?.length || 0) > 3
                 ? 'More than 3 instruments may dilute the mix'
@@ -354,18 +357,20 @@ export function StyleEditor({
           <div className="space-y-4">
             <ChipSelector
               label="Positive Tags"
-              value={formData.tags_positive || []}
+              selected={formData.tags_positive || []}
               onChange={(value) => updateField('tags_positive', value)}
-              suggestions={[]}
+              options={[]}
+              allowCreate
               placeholder="Add style tags..."
               helpText="Tags to include in the composition"
             />
 
             <ChipSelector
               label="Negative Tags"
-              value={formData.tags_negative || []}
+              selected={formData.tags_negative || []}
               onChange={(value) => updateField('tags_negative', value)}
-              suggestions={[]}
+              options={[]}
+              allowCreate
               placeholder="Add exclusion tags..."
               helpText="Tags to avoid or exclude"
             />

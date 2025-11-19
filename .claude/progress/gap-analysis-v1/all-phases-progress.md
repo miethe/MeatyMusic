@@ -14,8 +14,8 @@ Implementing critical gaps identified in MeatyMusic gap analysis to achieve MVP 
 | Phase | Priority | Title | Effort | Status | Completion |
 |-------|----------|-------|--------|--------|-----------|
 | 1 | P0 | Blueprint Seeder & Parser | 13 pts | ✅ COMPLETE | 100% |
-| 2 | P0 | MCP Server Integration | 13 pts | NOT STARTED | 0% |
-| 3 | P0 | Frontend Form Enhancements | 21 pts | NOT STARTED | 0% |
+| 2 | P0 | MCP Server Integration | 13 pts | ✅ COMPLETE | 100% |
+| 3 | P0 | Frontend Form Enhancements | 21 pts | ✅ COMPLETE | 100% |
 | 4 | P0 | Import Feature Completion | 13 pts | NOT STARTED | 0% |
 | 5 | P0 | Dark Mode Design System | 21 pts | NOT STARTED | 0% |
 | 6 | P1 | Frontend Filters & Search | 13 pts | NOT STARTED | 0% |
@@ -81,32 +81,35 @@ Implementing critical gaps identified in MeatyMusic gap analysis to achieve MVP 
 
 **Priority**: P0 - Blocking MVP
 **Effort**: 13 pts
-**Status**: NOT STARTED
-**Assigned Subagent(s)**: backend-architect, python-backend-engineer
+**Status**: ✅ COMPLETE
+**Assigned Subagent(s)**: backend-architect
 
 ### Completion Checklist
 
-- [ ] MCP-001: Create MCP Client Wrapper Service (5 pts)
+- [x] MCP-001: Create MCP Client Wrapper Service (5 pts)
       Implement basic MCP client
       Support search and get_context tools
-      Assigned Subagent(s): backend-architect, python-backend-engineer
+      Assigned Subagent(s): backend-architect
+      **Completed**: services/api/app/services/mcp_client_service.py (668 lines)
 
-- [ ] MCP-002: Integrate MCP in LYRICS Skill (5 pts)
+- [x] MCP-002: Integrate MCP in LYRICS Skill (5 pts)
       Add RAG retrieval with chunk hash tracking
       Implement pinned retrieval for determinism
-      Assigned Subagent(s): python-backend-engineer
+      Assigned Subagent(s): backend-architect
+      **Completed**: Modified lyrics.py with retrieve_from_mcp_sources() (+180 lines)
 
-- [ ] MCP-003: Add Scope Validation (3 pts)
+- [x] MCP-003: Add Scope Validation (3 pts)
       Validate source scopes against MCP server
       Track provenance hashes
-      Assigned Subagent(s): python-backend-engineer
+      Assigned Subagent(s): backend-architect
+      **Completed**: Scope validation + OpenTelemetry spans + 40+ tests
 
 ### Success Criteria
 
-- [ ] MCP client can call search and get_context tools
-- [ ] LYRICS skill uses MCP for RAG retrieval
-- [ ] Chunk hashes tracked for determinism
-- [ ] Scope validation enforced
+- [x] MCP client can call search and get_context tools
+- [x] LYRICS skill uses MCP for RAG retrieval
+- [x] Chunk hashes tracked for determinism
+- [x] Scope validation enforced
 
 ### Key Files
 
@@ -120,32 +123,35 @@ Implementing critical gaps identified in MeatyMusic gap analysis to achieve MVP 
 
 **Priority**: P0 - Blocking MVP
 **Effort**: 21 pts
-**Status**: NOT STARTED
-**Assigned Subagent(s)**: ui-engineer-enhanced, frontend-developer
+**Status**: ✅ COMPLETE
+**Assigned Subagent(s)**: ui-engineer-enhanced
 
 ### Completion Checklist
 
-- [ ] FORM-001: Create Multi-Select Chip Component (8 pts)
+- [x] FORM-001: Create Multi-Select Chip Component (8 pts)
       Reusable chip selector for mood, tags, instrumentation, delivery
       Add/remove chips, visual states
       Assigned Subagent(s): ui-engineer-enhanced
+      **Completed**: ChipSelector component with 12 Storybook stories + 27 tests
 
-- [ ] FORM-002: Lyrics Multi-Section Editor (8 pts)
+- [x] FORM-002: Lyrics Multi-Section Editor (8 pts)
       Collapsible panels for each section
       Section reordering
-      Assigned Subagent(s): ui-engineer-enhanced, frontend-developer
+      Assigned Subagent(s): ui-engineer-enhanced
+      **Completed**: Collapsible sections with drag-and-drop, status indicators
 
-- [ ] FORM-003: Producer Notes Per-Section Editor (5 pts)
+- [x] FORM-003: Producer Notes Per-Section Editor (5 pts)
       Section structure with tags/duration
       Structure template dropdown (ABAB, ABABCBB, etc.)
-      Assigned Subagent(s): frontend-developer
+      Assigned Subagent(s): ui-engineer-enhanced
+      **Completed**: 6 structure templates, duration budget calculator
 
 ### Success Criteria
 
-- [ ] Multi-select chip component in @meaty/ui package
-- [ ] Chip selector integrated in Style, Lyrics, Persona, Producer Notes forms
-- [ ] Lyrics editor has collapsible section panels
-- [ ] Producer notes has per-section editor with templates
+- [x] Multi-select chip component in @meaty/ui package
+- [x] Chip selector integrated in Style, Lyrics, Persona, Producer Notes forms
+- [x] Lyrics editor has collapsible section panels
+- [x] Producer notes has per-section editor with templates
 
 ### Key Files
 
@@ -652,6 +658,66 @@ Implementing critical gaps identified in MeatyMusic gap analysis to achieve MVP 
 - services/api/app/skills/validate.py
 
 **Next Steps:**
-- Commit Phase 1 implementation
-- Start Phase 2 (MCP Integration) and Phase 3 (Frontend Forms) in parallel
+- ✅ Committed Phase 1 implementation
+- ✅ Started Phase 2 (MCP Integration) and Phase 3 (Frontend Forms) in parallel
 - Continue with remaining P0 tasks
+
+---
+
+### 2025-11-19 - Session 2
+
+**Status**: P0 Implementation In Progress (3 of 5 complete)
+**Current Phase**: Phases 2-3 Complete, Starting Phases 4-5
+
+**Completed:**
+- ✅ **Phase 2: MCP Server Integration (13 pts)**
+  - Created mcp_client_service.py (668 lines) with search/get_context tools
+  - Modified lyrics.py with retrieve_from_mcp_sources() (+180 lines)
+  - Implemented deterministic hash pinning for RAG
+  - Added scope validation + OpenTelemetry spans
+  - Created 40+ comprehensive tests
+  - All 3 tasks complete, all success criteria met
+
+- ✅ **Phase 3: Frontend Form Enhancements (21 pts)**
+  - Created ChipSelector component in @meaty/ui (12 Storybook stories + 27 tests)
+  - Created collapsible lyrics editor with drag-and-drop
+  - Created producer notes editor with 6 structure templates
+  - Integrated ChipSelector in all entity forms
+  - All 3 tasks complete, all success criteria met
+
+**Subagents Used:**
+- @backend-architect - MCP client service, LYRICS skill integration
+- @ui-engineer-enhanced - ChipSelector component, form enhancements
+
+**Files Created (Phases 2-3):**
+Phase 2:
+- services/api/app/services/mcp_client_service.py
+- services/api/tests/test_services/test_mcp_client_service.py
+- services/api/tests/test_skills/test_lyrics_mcp_integration.py
+- services/api/docs/mcp_integration.md
+
+Phase 3:
+- packages/ui/src/components/ChipSelector/ (component + stories + tests)
+- apps/web/src/components/LyricsEditorEnhanced.tsx
+- apps/web/src/components/ProducerNotesEditorEnhanced.tsx
+- apps/web/src/components/common/CollapsibleSectionEditor.tsx
+- docs/implementation/phase3-frontend-form-enhancements.md
+
+**Files Modified (Phases 2-3):**
+Phase 2:
+- services/api/app/skills/lyrics.py
+
+Phase 3:
+- apps/web/src/app/(dashboard)/entities/lyrics/[id]/edit/page.tsx
+- apps/web/src/app/(dashboard)/entities/producer-notes/[id]/edit/page.tsx
+- apps/web/src/app/(dashboard)/entities/styles/[id]/edit/page.tsx
+- apps/web/src/app/(dashboard)/entities/personas/[id]/edit/page.tsx
+- packages/ui/src/components/index.ts
+
+**Commits:**
+- 173151f feat(api): implement blueprint seeder and parser system (Phase 1/P0)
+
+**Next Steps:**
+- Commit Phases 2-3 implementation
+- Start Phase 4 (Import Feature Completion) and Phase 5 (Dark Mode Design System)
+- Complete remaining P0 tasks

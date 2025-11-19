@@ -41,6 +41,7 @@ export * from './DatePicker';
 // Specialized Components
 export * from './Badge';
 export * from './Chip';
+export * from './ChipSelector';
 export * from './Toast';
 export * from './Skeleton';
 
