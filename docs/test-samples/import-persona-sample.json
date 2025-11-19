@@ -1,0 +1,30 @@
+{
+  "name": "Sarah Morgan",
+  "kind": "artist",
+  "description": "Contemporary pop vocalist with folk influences",
+  "vocal_range": {
+    "lowest_note": "G3",
+    "highest_note": "E5",
+    "comfortable_range": ["A3", "C5"]
+  },
+  "vocal_characteristics": [
+    "warm",
+    "emotive",
+    "clear articulation"
+  ],
+  "delivery_styles": [
+    "belting",
+    "breathy",
+    "conversational"
+  ],
+  "influences": [
+    "Taylor Swift",
+    "Joni Mitchell",
+    "Sara Bareilles"
+  ],
+  "public_release": false,
+  "metadata": {
+    "genre_specialties": ["pop", "folk", "indie"],
+    "experience_years": 8
+  }
+}
