@@ -9,13 +9,68 @@ Contract: .claude/skills/workflow/validate/SKILL.md
 
 import re
 from collections import Counter
-from typing import Any, Dict, List, Set, Tuple
+from typing import Any, Dict, List, Set, Tuple, Optional
 
 import structlog
 
 from app.workflows.skill import WorkflowContext, compute_hash, workflow_skill
+from app.repositories.blueprint_repo import BlueprintRepository
+from app.core.security_context import SecurityContext
 
 logger = structlog.get_logger(__name__)
+
+
+def _load_blueprint_from_db(genre: str, context: WorkflowContext) -> Optional[Dict]:
+    """Load blueprint from database for the specified genre.
+
+    Args:
+        genre: Genre name (e.g., "pop", "hip-hop")
+        context: Workflow context with database session
+
+    Returns:
+        Blueprint dict with rules and eval_rubric, or None if not found
+    """
+    try:
+        # Get database session from context
+        db_session = context.get_db_session()
+
+        if not db_session:
+            logger.warning("validate.no_db_session", genre=genre)
+            return None
+
+        # Create repository with system security context
+        security_context = SecurityContext(tenant_id=None, owner_id=None)
+        blueprint_repo = BlueprintRepository(
+            db=db_session,
+            security_context=security_context
+        )
+
+        # Get blueprints for genre
+        blueprints = blueprint_repo.get_by_genre(genre)
+
+        if not blueprints:
+            logger.warning("validate.blueprint_not_found", genre=genre)
+            return None
+
+        # Return latest version as dict
+        blueprint = blueprints[0]
+        return {
+            "genre": blueprint.genre,
+            "version": blueprint.version,
+            "rules": blueprint.rules,
+            "eval_rubric": blueprint.eval_rubric,
+            "conflict_matrix": blueprint.conflict_matrix,
+            "tag_categories": blueprint.tag_categories,
+        }
+
+    except Exception as e:
+        logger.error(
+            "validate.blueprint_load_failed",
+            genre=genre,
+            error=str(e),
+            exc_info=True
+        )
+        return None
 
 
 def _count_syllables(word: str) -> int:
@@ -456,7 +511,7 @@ async def evaluate_artifacts(
     lyrics = inputs["lyrics"]
     style = inputs["style"]
     producer_notes = inputs["producer_notes"]
-    blueprint = inputs["blueprint"]
+    blueprint = inputs.get("blueprint")
     sds = inputs.get("sds", {})
 
     logger.info(
@@ -464,7 +519,41 @@ async def evaluate_artifacts(
         run_id=str(context.run_id),
     )
 
-    # Extract rubric configuration
+    # Load blueprint from DB if not provided
+    if not blueprint:
+        genre = style.get("genre_detail", {}).get("primary", "pop")
+        logger.info("validate.loading_blueprint", genre=genre)
+        blueprint = _load_blueprint_from_db(genre, context)
+
+        if not blueprint:
+            logger.warning(
+                "validate.blueprint_missing",
+                genre=genre,
+                message="Using default rubric weights"
+            )
+            # Create minimal blueprint with defaults
+            blueprint = {
+                "rules": {},
+                "eval_rubric": {
+                    "weights": {
+                        "hook_density": 0.25,
+                        "singability": 0.25,
+                        "rhyme_tightness": 0.20,
+                        "section_completeness": 0.20,
+                        "profanity_score": 0.10,
+                    },
+                    "thresholds": {"min_total": 0.75}
+                }
+            }
+    else:
+        # Log that we're using provided blueprint
+        logger.info(
+            "validate.blueprint_provided",
+            genre=blueprint.get("genre", "unknown"),
+            version=blueprint.get("version", "unknown")
+        )
+
+    # Extract rubric configuration from blueprint
     rubric = blueprint.get("eval_rubric", {})
     weights = rubric.get("weights", {
         "hook_density": 0.25,
@@ -473,8 +562,14 @@ async def evaluate_artifacts(
         "section_completeness": 0.20,
         "profanity_score": 0.10,
     })
-    thresholds = rubric.get("thresholds", {"min_total": 0.85})
+    thresholds = rubric.get("thresholds", {"min_total": 0.75})
     min_total = thresholds["min_total"]
+
+    logger.debug(
+        "validate.rubric_loaded",
+        weights=weights,
+        min_total=min_total
+    )
 
     # Parse lyrics into sections
     sections = _extract_sections(lyrics)

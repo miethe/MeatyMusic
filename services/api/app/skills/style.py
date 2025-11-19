@@ -12,12 +12,14 @@ from typing import Any, Dict, List, Tuple
 import structlog
 
 from app.workflows.skill import WorkflowContext, compute_hash, workflow_skill
+from app.repositories.blueprint_repo import BlueprintRepository
+from app.core.security_context import SecurityContext
 
 logger = structlog.get_logger(__name__)
 
 
-# Mock blueprint tempo ranges (TODO: Load from docs/hit_song_blueprint/)
-BLUEPRINT_TEMPO_RANGES = {
+# Fallback tempo ranges if blueprint not found
+DEFAULT_TEMPO_RANGES = {
     "Pop": (100, 140),
     "Christmas Pop": (100, 140),
     "Hip-Hop": (60, 100),
@@ -28,8 +30,8 @@ BLUEPRINT_TEMPO_RANGES = {
     "Jazz": (80, 180),
 }
 
-# Mock tag conflict matrix (TODO: Load from taxonomies/tag_conflict_matrix.json)
-TAG_CONFLICTS = {
+# Fallback tag conflict matrix (TODO: Load from blueprints or taxonomies)
+DEFAULT_TAG_CONFLICTS = {
     ("whisper", "anthemic"),
     ("dry mix", "lush reverb"),
     ("1970s", "2020s modern production"),
@@ -38,24 +40,102 @@ TAG_CONFLICTS = {
 }
 
 
-def _check_tag_conflicts(tags: List[str]) -> List[Tuple[str, str]]:
-    """Check for conflicting tags."""
+def _load_blueprint(genre: str, context: WorkflowContext):
+    """Load blueprint from database for the specified genre.
+
+    Args:
+        genre: Genre name (e.g., "pop", "hip-hop")
+        context: Workflow context with database session
+
+    Returns:
+        Blueprint entity or None if not found
+    """
+    try:
+        # Get database session from context
+        db_session = context.get_db_session()
+
+        if not db_session:
+            logger.warning("style.no_db_session", genre=genre)
+            return None
+
+        # Create repository with system security context
+        security_context = SecurityContext(tenant_id=None, owner_id=None)
+        blueprint_repo = BlueprintRepository(
+            db=db_session,
+            security_context=security_context
+        )
+
+        # Get blueprints for genre
+        blueprints = blueprint_repo.get_by_genre(genre)
+
+        if not blueprints:
+            logger.warning("style.blueprint_not_found", genre=genre)
+            return None
+
+        # Return latest version (first in list)
+        return blueprints[0]
+
+    except Exception as e:
+        logger.error(
+            "style.blueprint_load_failed",
+            genre=genre,
+            error=str(e),
+            exc_info=True
+        )
+        return None
+
+
+def _check_tag_conflicts(tags: List[str], conflict_matrix: Dict = None) -> List[Tuple[str, str]]:
+    """Check for conflicting tags using blueprint conflict matrix.
+
+    Args:
+        tags: List of tags to check
+        conflict_matrix: Conflict matrix from blueprint (optional)
+
+    Returns:
+        List of conflicting tag pairs
+    """
+    # Use provided conflict matrix or fallback to defaults
+    if not conflict_matrix:
+        conflict_set = DEFAULT_TAG_CONFLICTS
+        conflicts = []
+        for i, tag1 in enumerate(tags):
+            for tag2 in tags[i + 1 :]:
+                # Normalize for comparison
+                t1_norm = tag1.lower()
+                t2_norm = tag2.lower()
+
+                # Check exact matches
+                if (t1_norm, t2_norm) in conflict_set or (t2_norm, t1_norm) in conflict_set:
+                    conflicts.append((tag1, tag2))
+
+                # Check substring matches
+                for conflict_pair in conflict_set:
+                    if (conflict_pair[0] in t1_norm and conflict_pair[1] in t2_norm) or (
+                        conflict_pair[1] in t1_norm and conflict_pair[0] in t2_norm
+                    ):
+                        conflicts.append((tag1, tag2))
+
+        return conflicts
+
+    # Use blueprint conflict matrix (dict format: {tag: [conflicting_tags]})
     conflicts = []
     for i, tag1 in enumerate(tags):
-        for tag2 in tags[i + 1 :]:
-            # Normalize for comparison
-            t1_norm = tag1.lower()
-            t2_norm = tag2.lower()
+        for tag2 in tags[i + 1:]:
+            t1_lower = tag1.lower()
+            t2_lower = tag2.lower()
 
-            # Check exact matches
-            if (t1_norm, t2_norm) in TAG_CONFLICTS or (t2_norm, t1_norm) in TAG_CONFLICTS:
-                conflicts.append((tag1, tag2))
+            # Check if tag1 has tag2 in its conflicts
+            if t1_lower in conflict_matrix:
+                conflicting = [c.lower() for c in conflict_matrix[t1_lower]]
+                if t2_lower in conflicting:
+                    conflicts.append((tag1, tag2))
+                    continue
 
-            # Check substring matches
-            for conflict_pair in TAG_CONFLICTS:
-                if (conflict_pair[0] in t1_norm and conflict_pair[1] in t2_norm) or (
-                    conflict_pair[1] in t1_norm and conflict_pair[0] in t2_norm
-                ):
+            # Check if tag2 has tag1 in its conflicts
+            if t2_lower in conflict_matrix:
+                conflicting = [c.lower() for c in conflict_matrix[t2_lower]]
+                if t1_lower in conflicting:
                     conflicts.append((tag1, tag2))
 
     return conflicts
@@ -149,24 +229,44 @@ async def generate_style(
     sds_style = inputs["sds_style"]
     plan = inputs.get("plan", {})
 
-    logger.info(
-        "style.generate.start",
-        run_id=str(context.run_id),
-        genre=sds_style["genre_detail"]["primary"],
-    )
-
     # Step 1: Validate and normalize genre
     primary_genre = sds_style["genre_detail"]["primary"]
     subgenres = sds_style["genre_detail"].get("subgenres", [])
     fusions = sds_style["genre_detail"].get("fusions", [])
 
-    # Step 2: Enforce tempo range
-    blueprint_range = BLUEPRINT_TEMPO_RANGES.get(primary_genre, (60, 180))
+    logger.info(
+        "style.generate.start",
+        run_id=str(context.run_id),
+        genre=primary_genre,
+    )
+
+    # Step 2: Load blueprint from database
+    blueprint = _load_blueprint(primary_genre, context)
+
+    # Extract tempo range from blueprint
+    if blueprint and blueprint.rules.get("tempo_bpm"):
+        tempo_range = blueprint.rules["tempo_bpm"]
+        blueprint_range = tuple(tempo_range)
+        logger.info(
+            "style.blueprint_tempo_loaded",
+            genre=primary_genre,
+            tempo_range=blueprint_range
+        )
+    else:
+        # Fallback to default tempo ranges
+        blueprint_range = DEFAULT_TEMPO_RANGES.get(primary_genre, (60, 180))
+        logger.warning(
+            "style.using_default_tempo",
+            genre=primary_genre,
+            tempo_range=blueprint_range
+        )
+
+    # Step 3: Enforce tempo range
     tempo_bpm = _validate_tempo_range(
         sds_style["tempo_bpm"], blueprint_range, sds_style.get("energy", "medium")
     )
 
-    # Step 3: Validate energy-tempo alignment
+    # Step 4: Validate energy-tempo alignment
     energy_issues = _validate_energy_tempo_alignment(
         sds_style.get("energy", "medium"), tempo_bpm
     )
@@ -174,7 +274,7 @@ async def generate_style(
         for issue in energy_issues:
             logger.warning("style.energy_mismatch", issue=issue)
 
-    # Step 4: Select and validate tags
+    # Step 5: Select and validate tags
     tags = sds_style.get("tags", [])
 
     # Limit instrumentation to 3
@@ -189,9 +289,15 @@ async def generate_style(
             kept=instrumentation,
         )
 
-    # Step 5: Resolve tag conflicts
+    # Step 6: Resolve tag conflicts using blueprint conflict matrix
     all_tags = tags + [f"Instr:{inst}" for inst in instrumentation]
-    conflicts = _check_tag_conflicts(all_tags)
+
+    # Get conflict matrix from blueprint
+    conflict_matrix = None
+    if blueprint and blueprint.conflict_matrix:
+        conflict_matrix = blueprint.conflict_matrix
+
+    conflicts = _check_tag_conflicts(all_tags, conflict_matrix)
     dropped_tags = []
 
     if conflicts:
@@ -205,7 +311,7 @@ async def generate_style(
     # Filter instrumentation tags back out
     final_tags = [t for t in all_tags if not t.startswith("Instr:")]
 
-    # Step 6: Assemble complete style
+    # Step 7: Assemble complete style
     style = {
         "genre_detail": {
             "primary": primary_genre,

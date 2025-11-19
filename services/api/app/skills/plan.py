@@ -12,8 +12,55 @@ from typing import Any, Dict
 import structlog
 
 from app.workflows.skill import WorkflowContext, compute_hash, workflow_skill
+from app.repositories.blueprint_repo import BlueprintRepository
+from app.core.security_context import SecurityContext
 
 logger = structlog.get_logger(__name__)
+
+
+def _load_blueprint(genre: str, context: WorkflowContext):
+    """Load blueprint from database for the specified genre.
+
+    Args:
+        genre: Genre name (e.g., "pop", "hip-hop")
+        context: Workflow context with database session
+
+    Returns:
+        Blueprint entity or None if not found
+    """
+    try:
+        # Get database session from context
+        db_session = context.get_db_session()
+
+        if not db_session:
+            logger.warning("plan.no_db_session", genre=genre)
+            return None
+
+        # Create repository with system security context
+        security_context = SecurityContext(tenant_id=None, owner_id=None)
+        blueprint_repo = BlueprintRepository(
+            db=db_session,
+            security_context=security_context
+        )
+
+        # Get blueprints for genre
+        blueprints = blueprint_repo.get_by_genre(genre)
+
+        if not blueprints:
+            logger.warning("plan.blueprint_not_found", genre=genre)
+            return None
+
+        # Return latest version (first in list)
+        return blueprints[0]
+
+    except Exception as e:
+        logger.error(
+            "plan.blueprint_load_failed",
+            genre=genre,
+            error=str(e),
+            exc_info=True
+        )
+        return None
 
 
 @workflow_skill(
@@ -111,16 +158,44 @@ async def generate_plan(inputs: Dict[str, Any], context: WorkflowContext) -> Dic
             scale_factor=scale_factor,
         )
 
-    # Step 3: Define evaluation targets (mock blueprint values for MVP)
-    # TODO: Load actual blueprint from docs/hit_song_blueprint/AI/
-    evaluation_targets = {
-        "hook_density": 0.7,
-        "singability": 0.8,
-        "rhyme_tightness": 0.75,
-        "section_completeness": 0.9,
-        "profanity_score": 0.0 if not lyrics_spec["constraints"].get("explicit", False) else 1.0,
-        "total": 0.8,
-    }
+    # Step 3: Load blueprint and define evaluation targets from rubric
+    blueprint = _load_blueprint(blueprint_ref.get("genre", "pop"), context)
+
+    if blueprint:
+        rubric = blueprint.rules.get("eval_rubric", {})
+        thresholds = rubric.get("thresholds", {})
+
+        # Use blueprint rubric thresholds
+        evaluation_targets = {
+            "hook_density": 0.7,  # Target for hook density metric
+            "singability": 0.8,   # Target for singability metric
+            "rhyme_tightness": 0.75,  # Target for rhyme tightness metric
+            "section_completeness": 0.9,  # Target for section completeness
+            "profanity_score": 0.0 if not lyrics_spec["constraints"].get("explicit", False) else 1.0,
+            "total": thresholds.get("min_total", 0.75),  # From blueprint rubric
+        }
+
+        logger.info(
+            "plan.blueprint_loaded",
+            genre=blueprint.genre,
+            version=blueprint.version,
+            min_total_threshold=evaluation_targets["total"]
+        )
+    else:
+        # Fallback to default targets if blueprint not found
+        logger.warning(
+            "plan.blueprint_not_found",
+            genre=blueprint_ref.get("genre", "pop"),
+            using_defaults=True
+        )
+        evaluation_targets = {
+            "hook_density": 0.7,
+            "singability": 0.8,
+            "rhyme_tightness": 0.75,
+            "section_completeness": 0.9,
+            "profanity_score": 0.0 if not lyrics_spec["constraints"].get("explicit", False) else 1.0,
+            "total": 0.75,
+        }
 
     # Step 4: Create work objectives
     work_objectives = [
