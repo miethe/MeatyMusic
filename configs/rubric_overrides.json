@@ -1,0 +1,115 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Rubric scoring configuration overrides for genre-specific tuning and A/B testing",
+  "overrides": {
+    "pop": {
+      "weights": {
+        "hook_density": 0.30,
+        "singability": 0.20,
+        "rhyme_tightness": 0.15,
+        "section_completeness": 0.15,
+        "profanity_score": 0.20
+      },
+      "thresholds": {
+        "min_total": 0.75,
+        "max_profanity": 0.10
+      }
+    },
+    "hip-hop": {
+      "weights": {
+        "hook_density": 0.25,
+        "singability": 0.15,
+        "rhyme_tightness": 0.30,
+        "section_completeness": 0.10,
+        "profanity_score": 0.20
+      },
+      "thresholds": {
+        "min_total": 0.70,
+        "max_profanity": 0.20
+      }
+    },
+    "country": {
+      "weights": {
+        "hook_density": 0.25,
+        "singability": 0.25,
+        "rhyme_tightness": 0.20,
+        "section_completeness": 0.15,
+        "profanity_score": 0.15
+      },
+      "thresholds": {
+        "min_total": 0.75,
+        "max_profanity": 0.05
+      }
+    },
+    "rock": {
+      "weights": {
+        "hook_density": 0.30,
+        "singability": 0.15,
+        "rhyme_tightness": 0.15,
+        "section_completeness": 0.20,
+        "profanity_score": 0.20
+      },
+      "thresholds": {
+        "min_total": 0.70,
+        "max_profanity": 0.15
+      }
+    }
+  },
+  "ab_tests": {
+    "experiment_1": {
+      "name": "Stricter Hook Density for Pop and Country",
+      "enabled": false,
+      "description": "Test if increasing hook density weight improves chart performance",
+      "genres": ["pop", "country"],
+      "overrides": {
+        "weights": {
+          "hook_density": 0.35
+        },
+        "thresholds": {
+          "min_total": 0.80
+        }
+      }
+    },
+    "experiment_2": {
+      "name": "Relaxed Profanity for Hip-Hop",
+      "enabled": false,
+      "description": "Test if allowing more explicit content in hip-hop improves authenticity scores",
+      "genres": ["hip-hop"],
+      "overrides": {
+        "thresholds": {
+          "max_profanity": 0.30
+        }
+      }
+    },
+    "experiment_3": {
+      "name": "Rhyme Focus for Lyric-Heavy Genres",
+      "enabled": false,
+      "description": "Increase rhyme weight for genres with strong lyrical traditions",
+      "genres": ["hip-hop", "country"],
+      "overrides": {
+        "weights": {
+          "rhyme_tightness": 0.35,
+          "hook_density": 0.20
+        }
+      }
+    }
+  },
+  "logging": {
+    "log_threshold_decisions": true,
+    "log_improvement_suggestions": true,
+    "log_config_source": true,
+    "log_ab_test_participation": true
+  },
+  "validation": {
+    "require_weights_sum_to_one": true,
+    "weight_sum_tolerance": 0.01,
+    "require_all_metrics": true,
+    "required_metrics": [
+      "hook_density",
+      "singability",
+      "rhyme_tightness",
+      "section_completeness",
+      "profanity_score"
+    ]
+  }
+}

@@ -1,0 +1,191 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Profanity Taxonomy",
+  "description": "Categorized profanity list with severity levels and variation patterns for content filtering in MeatyMusic AMCS",
+  "version": "1.0.0",
+  "last_updated": "2025-11-19",
+  "categories": {
+    "mild": [
+      "damn",
+      "hell",
+      "crap",
+      "suck",
+      "piss",
+      "ass",
+      "fart",
+      "poop",
+      "butt"
+    ],
+    "moderate": [
+      "bitch",
+      "bastard",
+      "whore",
+      "slut",
+      "dick",
+      "cock",
+      "pussy",
+      "douche",
+      "prick",
+      "jackass"
+    ],
+    "strong": [
+      "shit",
+      "fuck",
+      "motherfucker",
+      "asshole",
+      "goddamn",
+      "bullshit",
+      "fucking",
+      "fucked",
+      "shitty",
+      "clusterfuck"
+    ],
+    "extreme": [
+      "cunt",
+      "fuckface",
+      "shithead",
+      "cocksucker",
+      "motherfucking",
+      "shitfuck",
+      "asswipe",
+      "dipshit",
+      "dumbass",
+      "bitchass"
+    ]
+  },
+  "variations": {
+    "leetspeak_patterns": {
+      "a": ["4", "@", "∆"],
+      "e": ["3", "€", "£"],
+      "i": ["1", "!", "|"],
+      "o": ["0", "°", "ø"],
+      "s": ["5", "$", "§"],
+      "t": ["7", "+"],
+      "l": ["1", "|"],
+      "g": ["9", "6"],
+      "b": ["8"],
+      "u": ["v", "µ"],
+      "c": ["(", "<", "©"]
+    },
+    "common_substitutions": {
+      "asterisk_masking": {
+        "pattern": "\\w*\\*+\\w*",
+        "description": "Words with asterisks like f**k, sh*t"
+      },
+      "dash_masking": {
+        "pattern": "\\w*-+\\w*",
+        "description": "Words with dashes like f-ck, sh-t"
+      },
+      "underscore_masking": {
+        "pattern": "\\w*_+\\w*",
+        "description": "Words with underscores like f_ck, sh_t"
+      },
+      "space_separation": {
+        "pattern": "\\b[a-z]\\s+[a-z]\\s+[a-z]",
+        "description": "Spaced letters like 'f u c k', 'd a m n'"
+      },
+      "mixed_case": {
+        "pattern": "[a-zA-Z]*",
+        "description": "Mixed case variations like FuCk, DaMn"
+      }
+    }
+  },
+  "whitelist": {
+    "description": "Terms that may contain profanity substrings but are legitimate",
+    "terms": [
+      "assumption",
+      "assess",
+      "assassin",
+      "classic",
+      "classical",
+      "passion",
+      "compassion",
+      "grass",
+      "mass",
+      "bass",
+      "pass",
+      "class",
+      "glass",
+      "brass",
+      "harass",
+      "embarrass",
+      "Scunthorpe",
+      "shitake",
+      "cockpit",
+      "peacock",
+      "cockatoo",
+      "dickens",
+      "moby dick",
+      "dick clark",
+      "dick van dyke"
+    ]
+  },
+  "context_exceptions": {
+    "description": "Contexts where certain words may be acceptable",
+    "medical": [
+      "anus",
+      "penis",
+      "vagina",
+      "breast",
+      "buttocks"
+    ],
+    "religious": [
+      "hell",
+      "damn",
+      "goddamn"
+    ],
+    "technical": [
+      "cock",
+      "pussy",
+      "dick"
+    ]
+  },
+  "severity_weights": {
+    "description": "Numerical weights for computing profanity scores",
+    "mild": 0.25,
+    "moderate": 0.5,
+    "strong": 0.75,
+    "extreme": 1.0
+  },
+  "thresholds": {
+    "description": "Score thresholds for different explicit content modes",
+    "clean": {
+      "max_score": 0.0,
+      "max_mild_count": 0,
+      "max_moderate_count": 0,
+      "max_strong_count": 0,
+      "max_extreme_count": 0,
+      "description": "No profanity allowed"
+    },
+    "mild_allowed": {
+      "max_score": 0.3,
+      "max_mild_count": 3,
+      "max_moderate_count": 0,
+      "max_strong_count": 0,
+      "max_extreme_count": 0,
+      "description": "Only mild profanity allowed"
+    },
+    "moderate_allowed": {
+      "max_score": 0.6,
+      "max_mild_count": 5,
+      "max_moderate_count": 3,
+      "max_strong_count": 0,
+      "max_extreme_count": 0,
+      "description": "Mild and moderate profanity allowed"
+    },
+    "explicit": {
+      "max_score": 1.0,
+      "max_mild_count": -1,
+      "max_moderate_count": -1,
+      "max_strong_count": -1,
+      "max_extreme_count": -1,
+      "description": "All profanity allowed (value -1 means unlimited)"
+    }
+  },
+  "notes": {
+    "usage": "This taxonomy supports the ProfanityFilter service in app/services/policy_guards.py",
+    "extensibility": "New categories can be added as needed; update severity_weights and thresholds accordingly",
+    "determinism": "Word lists are alphabetically sorted for consistent detection across runs",
+    "localization": "Current version is English-only; future versions may include multi-language support"
+  }
+}

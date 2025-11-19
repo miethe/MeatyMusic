@@ -1,0 +1,236 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PII Patterns Taxonomy",
+  "description": "Patterns and rules for detecting and redacting Personally Identifiable Information (PII) in MeatyMusic AMCS",
+  "version": "1.0.0",
+  "last_updated": "2025-11-19",
+  "patterns": {
+    "email": {
+      "regex": "\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b",
+      "placeholder": "[EMAIL]",
+      "description": "RFC-compliant email addresses",
+      "confidence": 0.95,
+      "examples": [
+        "user@example.com",
+        "john.doe+tag@company.co.uk",
+        "test_user123@subdomain.example.org"
+      ]
+    },
+    "phone_us": {
+      "regex": "\\b(?:\\+?1[-. ]?)?\\(?([0-9]{3})\\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})\\b",
+      "placeholder": "[PHONE]",
+      "description": "US phone numbers in various formats",
+      "confidence": 0.9,
+      "examples": [
+        "555-123-4567",
+        "(555) 123-4567",
+        "+1-555-123-4567",
+        "5551234567",
+        "+1 (555) 123-4567"
+      ]
+    },
+    "phone_international": {
+      "regex": "\\+(?:[0-9] ?){6,14}[0-9]",
+      "placeholder": "[PHONE]",
+      "description": "International phone numbers with country code",
+      "confidence": 0.85,
+      "examples": [
+        "+44 20 7123 4567",
+        "+33 1 42 86 82 00",
+        "+81 3-1234-5678"
+      ]
+    },
+    "url": {
+      "regex": "https?://(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&/=]*)",
+      "placeholder": "[URL]",
+      "description": "HTTP and HTTPS URLs",
+      "confidence": 0.95,
+      "examples": [
+        "http://example.com",
+        "https://www.example.com/path?query=value",
+        "https://subdomain.example.co.uk/path/to/resource"
+      ]
+    },
+    "ssn": {
+      "regex": "\\b(?!000|666|9\\d{2})([0-8]\\d{2}|7([0-6]\\d))[-]?(?!00)\\d{2}[-]?(?!0000)\\d{4}\\b",
+      "placeholder": "[SSN]",
+      "description": "US Social Security Numbers",
+      "confidence": 0.98,
+      "examples": [
+        "123-45-6789",
+        "123456789"
+      ]
+    },
+    "credit_card": {
+      "regex": "\\b(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|6(?:011|5[0-9]{2})[0-9]{12}|(?:2131|1800|35\\d{3})\\d{11})\\b",
+      "placeholder": "[CREDIT_CARD]",
+      "description": "Credit card numbers (Visa, MasterCard, Amex, Discover, Diners, JCB)",
+      "confidence": 0.92,
+      "examples": [
+        "4111111111111111",
+        "5500000000000004",
+        "340000000000009"
+      ]
+    },
+    "street_address": {
+      "regex": "\\b\\d{1,6}\\s+(?:[A-Z][a-z]+\\s+){1,4}(?:Street|St|Avenue|Ave|Road|Rd|Boulevard|Blvd|Lane|Ln|Drive|Dr|Court|Ct|Circle|Cir|Way|Plaza|Parkway|Pkwy)\\.?\\b",
+      "placeholder": "[ADDRESS]",
+      "description": "US street addresses",
+      "confidence": 0.8,
+      "examples": [
+        "123 Main Street",
+        "456 Oak Avenue",
+        "789 Elm Dr.",
+        "1600 Pennsylvania Ave"
+      ]
+    },
+    "zip_code": {
+      "regex": "\\b\\d{5}(?:-\\d{4})?\\b",
+      "placeholder": "[ZIP]",
+      "description": "US ZIP codes",
+      "confidence": 0.7,
+      "examples": [
+        "12345",
+        "12345-6789"
+      ]
+    },
+    "ip_address": {
+      "regex": "\\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b",
+      "placeholder": "[IP_ADDRESS]",
+      "description": "IPv4 addresses",
+      "confidence": 0.85,
+      "examples": [
+        "192.168.1.1",
+        "10.0.0.1",
+        "172.16.254.1"
+      ]
+    }
+  },
+  "name_patterns": {
+    "common_titles": [
+      "Mr",
+      "Mrs",
+      "Ms",
+      "Miss",
+      "Dr",
+      "Prof",
+      "Professor",
+      "Sir",
+      "Madam",
+      "Lord",
+      "Lady",
+      "Rev",
+      "Reverend"
+    ],
+    "name_indicators": [
+      "my name is",
+      "I'm",
+      "I am",
+      "called",
+      "named",
+      "this is",
+      "signed",
+      "from",
+      "by",
+      "author"
+    ],
+    "pattern_templates": {
+      "title_name": {
+        "regex": "\\b(?:Mr|Mrs|Ms|Miss|Dr|Prof|Professor|Sir|Madam|Lord|Lady|Rev|Reverend)\\.?\\s+([A-Z][a-z]+(?:\\s+[A-Z][a-z]+){0,2})\\b",
+        "placeholder": "[NAME]",
+        "confidence": 0.85,
+        "description": "Title followed by name (e.g., Dr. Smith, Mrs. Johnson)"
+      },
+      "indicator_name": {
+        "regex": "\\b(?:my name is|I'm|I am|called|named)\\s+([A-Z][a-z]+(?:\\s+[A-Z][a-z]+){0,2})\\b",
+        "placeholder": "[NAME]",
+        "confidence": 0.9,
+        "description": "Name indicators followed by name"
+      },
+      "capitalized_name": {
+        "regex": "\\b([A-Z][a-z]{2,}\\s+[A-Z][a-z]{2,})\\b",
+        "placeholder": "[NAME]",
+        "confidence": 0.6,
+        "description": "Two consecutive capitalized words (potential name)"
+      }
+    }
+  },
+  "allowlist": {
+    "description": "Terms that should NOT be considered PII even if they match patterns",
+    "brands": [
+      "Taylor Swift",
+      "Elvis Presley",
+      "Michael Jackson",
+      "Madonna",
+      "Prince",
+      "Bob Dylan",
+      "David Bowie",
+      "Johnny Cash",
+      "Aretha Franklin",
+      "Frank Sinatra",
+      "Ray Charles",
+      "Stevie Wonder",
+      "Whitney Houston",
+      "Marvin Gaye",
+      "Bruce Springsteen",
+      "Paul McCartney",
+      "John Lennon",
+      "Freddie Mercury",
+      "Amy Winehouse",
+      "Kurt Cobain"
+    ],
+    "common_words": [
+      "John Doe",
+      "Jane Doe",
+      "John Smith",
+      "Jane Smith",
+      "Santa Claus",
+      "Easter Bunny",
+      "Tooth Fairy"
+    ],
+    "technical_terms": [
+      "Main Street",
+      "First Avenue",
+      "Second Street",
+      "Park Avenue",
+      "Wall Street",
+      "Broadway"
+    ],
+    "generic_emails": [
+      "info@",
+      "contact@",
+      "support@",
+      "admin@",
+      "noreply@",
+      "hello@"
+    ]
+  },
+  "validation": {
+    "min_confidence_threshold": 0.7,
+    "description": "Minimum confidence score to report a PII detection",
+    "require_context_check": true,
+    "description_context": "Check allowlist before reporting"
+  },
+  "redaction_options": {
+    "preserve_format": {
+      "description": "Preserve the format of redacted data for readability",
+      "enabled": true,
+      "examples": {
+        "phone": "555-123-4567 → [PHONE]",
+        "email": "user@example.com → [EMAIL]"
+      }
+    },
+    "hash_mode": {
+      "description": "Include hash of original value for verification",
+      "enabled": false,
+      "format": "[EMAIL:hash:abc123...]"
+    }
+  },
+  "notes": {
+    "usage": "This taxonomy supports the PIIDetector service in app/services/policy_guards.py",
+    "accuracy": "Pattern-based detection has limitations; NER integration recommended for production",
+    "privacy": "PII detection logs should not include the actual PII values, only positions and types",
+    "compliance": "Designed to support GDPR, CCPA, and other privacy regulations",
+    "determinism": "Patterns are applied in fixed order for consistent detection across runs"
+  }
+}

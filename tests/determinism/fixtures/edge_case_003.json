@@ -1,0 +1,93 @@
+{
+  "title": "Epic Journey",
+  "blueprint_ref": {
+    "genre": "Progressive",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "progressive rock",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": [
+      80,
+      100,
+      120,
+      140,
+      160
+    ],
+    "time_signature": "4/4",
+    "key": {
+      "primary": "D major",
+      "modulations": [
+        "E major",
+        "F# major",
+        "A major"
+      ]
+    },
+    "mood": [
+      "epic",
+      "complex"
+    ],
+    "energy": "high",
+    "instrumentation": [
+      "guitar",
+      "keys",
+      "bass",
+      "drums"
+    ],
+    "vocal_profile": "theatrical",
+    "tags": [
+      "complex",
+      "progressive"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "3rd",
+    "tense": "mixed",
+    "themes": [
+      "journey",
+      "transformation"
+    ],
+    "rhyme_scheme": "Complex",
+    "section_order": [
+      "section1",
+      "section2",
+      "section3",
+      "section4",
+      "section5",
+      "section6",
+      "section7",
+      "section8",
+      "section9",
+      "section10",
+      "section11",
+      "section12",
+      "section13",
+      "section14",
+      "section15",
+      "section16",
+      "section17",
+      "section18",
+      "section19",
+      "section20"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 100
+    }
+  },
+  "producer_notes": {
+    "structure": "Multi-section epic",
+    "hooks": 10
+  },
+  "sources": [],
+  "prompt_controls": {},
+  "render": {
+    "engine": "none"
+  },
+  "seed": 9200
+}

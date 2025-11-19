@@ -1,0 +1,92 @@
+{
+  "title": "Symphony of Colors",
+  "blueprint_ref": {
+    "genre": "Pop",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "pop",
+      "subgenres": [
+        "art-pop",
+        "orchestral-pop"
+      ],
+      "fusions": [
+        "classical"
+      ]
+    },
+    "tempo_bpm": [
+      90,
+      120,
+      140
+    ],
+    "time_signature": "4/4",
+    "key": {
+      "primary": "D major",
+      "modulations": [
+        "F major",
+        "A major"
+      ]
+    },
+    "mood": [
+      "dramatic",
+      "epic",
+      "emotional"
+    ],
+    "energy": "anthemic",
+    "instrumentation": [
+      "orchestra",
+      "synth",
+      "drums",
+      "strings",
+      "brass"
+    ],
+    "vocal_profile": "operatic",
+    "tags": [
+      "orchestral",
+      "dramatic",
+      "epic",
+      "layered"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "3rd",
+    "tense": "mixed",
+    "themes": [
+      "art",
+      "beauty",
+      "transformation"
+    ],
+    "rhyme_scheme": "Complex",
+    "section_order": [
+      "intro",
+      "verse1",
+      "pre-chorus1",
+      "chorus1",
+      "interlude1",
+      "verse2",
+      "pre-chorus2",
+      "chorus2",
+      "bridge",
+      "interlude2",
+      "final-chorus",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 60
+    }
+  },
+  "producer_notes": {
+    "structure": "Orchestral pop with multiple sections and tempo changes",
+    "hooks": 6
+  },
+  "sources": [],
+  "prompt_controls": {},
+  "render": {
+    "engine": "none"
+  },
+  "seed": 400
+}

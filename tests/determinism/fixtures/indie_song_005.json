@@ -1,0 +1,69 @@
+{
+  "title": "Indie Song 5",
+  "blueprint_ref": {
+    "genre": "Indie",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "indie",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 130,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "C major",
+      "modulations": []
+    },
+    "mood": [
+      "introspective",
+      "mellow"
+    ],
+    "energy": "medium",
+    "instrumentation": [
+      "guitar",
+      "keys",
+      "drums"
+    ],
+    "vocal_profile": "standard",
+    "tags": [
+      "authentic",
+      "introspective"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "present",
+    "themes": [
+      "indie",
+      "life",
+      "emotion"
+    ],
+    "rhyme_scheme": "ABAB",
+    "section_order": [
+      "verse1",
+      "chorus1",
+      "verse2",
+      "chorus2",
+      "bridge",
+      "chorus3"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 35
+    }
+  },
+  "producer_notes": {
+    "structure": "Standard",
+    "hooks": 6
+  },
+  "sources": [],
+  "prompt_controls": {},
+  "render": {
+    "engine": "none"
+  },
+  "seed": 7040
+}

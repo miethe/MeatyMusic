@@ -1,0 +1,60 @@
+{
+  "title": "Edge Case 5",
+  "blueprint_ref": {
+    "genre": "Experimental",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "experimental",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 135,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "C major",
+      "modulations": []
+    },
+    "mood": [
+      "experimental"
+    ],
+    "energy": "medium",
+    "instrumentation": [
+      "synth"
+    ],
+    "vocal_profile": "standard",
+    "tags": [
+      "experimental"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "present",
+    "themes": [
+      "abstract"
+    ],
+    "rhyme_scheme": "ABAB",
+    "section_order": [
+      "verse1",
+      "chorus1",
+      "verse2"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 25
+    }
+  },
+  "producer_notes": {
+    "structure": "Standard",
+    "hooks": 2
+  },
+  "sources": [],
+  "prompt_controls": {},
+  "render": {
+    "engine": "none"
+  },
+  "seed": 9500
+}

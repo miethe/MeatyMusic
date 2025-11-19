@@ -1,0 +1,337 @@
+{
+  "description": "Artist normalization taxonomy for detecting and normalizing living artist references in public releases",
+  "version": "1.0.0",
+  "updated": "2025-11-19",
+  "living_artists": {
+    "pop": [
+      {
+        "name": "Taylor Swift",
+        "aliases": ["T-Swift", "Taylor", "Swift", "Tay Tay"],
+        "generic_description": "pop-influenced with storytelling vocals and melodic hooks",
+        "style_tags": ["pop", "melodic", "storytelling", "emotional", "narrative-driven"]
+      },
+      {
+        "name": "Ariana Grande",
+        "aliases": ["Ari", "Grande", "Ariana"],
+        "generic_description": "pop with impressive vocal range and R&B influence",
+        "style_tags": ["pop", "rnb-influenced", "vocal-prowess", "contemporary"]
+      },
+      {
+        "name": "Ed Sheeran",
+        "aliases": ["Ed", "Sheeran"],
+        "generic_description": "pop with acoustic elements and heartfelt lyrics",
+        "style_tags": ["pop", "acoustic", "heartfelt", "melodic"]
+      },
+      {
+        "name": "Billie Eilish",
+        "aliases": ["Billie", "Eilish"],
+        "generic_description": "alternative pop with dark production and whispered vocals",
+        "style_tags": ["alt-pop", "dark", "atmospheric", "contemporary"]
+      },
+      {
+        "name": "Dua Lipa",
+        "aliases": ["Dua", "Lipa"],
+        "generic_description": "dance-pop with disco influences and powerful vocals",
+        "style_tags": ["dance-pop", "disco-influenced", "energetic", "powerful-vocals"]
+      }
+    ],
+    "rock": [
+      {
+        "name": "Foo Fighters",
+        "aliases": ["Foo", "Fighters", "Dave Grohl"],
+        "generic_description": "guitar-driven rock with powerful vocals and dynamic arrangements",
+        "style_tags": ["rock", "guitar-driven", "powerful", "energetic"]
+      },
+      {
+        "name": "Imagine Dragons",
+        "aliases": ["Imagine", "Dragons"],
+        "generic_description": "anthemic rock with electronic elements and soaring choruses",
+        "style_tags": ["rock", "anthemic", "electronic-elements", "stadium-rock"]
+      },
+      {
+        "name": "Arctic Monkeys",
+        "aliases": ["Arctic", "Monkeys"],
+        "generic_description": "indie rock with sharp lyrics and dynamic guitar work",
+        "style_tags": ["indie-rock", "guitar-driven", "lyrical", "energetic"]
+      },
+      {
+        "name": "Twenty One Pilots",
+        "aliases": ["TOP", "21 Pilots", "Twenty One", "Pilots"],
+        "generic_description": "alternative rock with hip-hop and electronic influences",
+        "style_tags": ["alt-rock", "hip-hop-influenced", "eclectic", "genre-blending"]
+      }
+    ],
+    "hip-hop": [
+      {
+        "name": "Kendrick Lamar",
+        "aliases": ["Kendrick", "Lamar", "K-Dot"],
+        "generic_description": "rhythmic hip-hop with lyrical depth and social commentary",
+        "style_tags": ["hip-hop", "lyrical", "conscious", "storytelling"]
+      },
+      {
+        "name": "Drake",
+        "aliases": ["Drizzy", "Aubrey"],
+        "generic_description": "melodic hip-hop with R&B fusion and introspective lyrics",
+        "style_tags": ["hip-hop", "rnb-fusion", "melodic", "introspective"]
+      },
+      {
+        "name": "Cardi B",
+        "aliases": ["Cardi", "Belcalis"],
+        "generic_description": "energetic hip-hop with bold personality and catchy hooks",
+        "style_tags": ["hip-hop", "energetic", "bold", "trap-influenced"]
+      },
+      {
+        "name": "Travis Scott",
+        "aliases": ["Travis", "Scott", "La Flame"],
+        "generic_description": "atmospheric hip-hop with psychedelic production and autotune",
+        "style_tags": ["hip-hop", "atmospheric", "psychedelic", "trap"]
+      },
+      {
+        "name": "Post Malone",
+        "aliases": ["Post", "Malone", "Posty"],
+        "generic_description": "melodic hip-hop with rock and pop influences",
+        "style_tags": ["hip-hop", "melodic", "genre-blending", "pop-influenced"]
+      }
+    ],
+    "country": [
+      {
+        "name": "Luke Combs",
+        "aliases": ["Luke", "Combs"],
+        "generic_description": "modern country with powerful vocals and relatable storytelling",
+        "style_tags": ["country", "powerful-vocals", "storytelling", "contemporary"]
+      },
+      {
+        "name": "Kacey Musgraves",
+        "aliases": ["Kacey", "Musgraves"],
+        "generic_description": "progressive country with pop sensibilities and introspective lyrics",
+        "style_tags": ["country", "progressive", "pop-influenced", "introspective"]
+      },
+      {
+        "name": "Morgan Wallen",
+        "aliases": ["Morgan", "Wallen"],
+        "generic_description": "contemporary country with rock influences and emotive vocals",
+        "style_tags": ["country", "rock-influenced", "emotive", "contemporary"]
+      },
+      {
+        "name": "Chris Stapleton",
+        "aliases": ["Chris", "Stapleton"],
+        "generic_description": "country with blues-rock influence and soulful vocals",
+        "style_tags": ["country", "blues-influenced", "soulful", "traditional-elements"]
+      }
+    ],
+    "electronic": [
+      {
+        "name": "The Chainsmokers",
+        "aliases": ["Chainsmokers"],
+        "generic_description": "electronic pop with anthemic builds and catchy melodies",
+        "style_tags": ["edm", "pop-influenced", "anthemic", "melodic"]
+      },
+      {
+        "name": "Calvin Harris",
+        "aliases": ["Calvin", "Harris"],
+        "generic_description": "electronic dance music with pop crossover appeal",
+        "style_tags": ["edm", "dance", "pop-crossover", "energetic"]
+      },
+      {
+        "name": "Marshmello",
+        "aliases": ["Mello"],
+        "generic_description": "future bass with melodic elements and pop collaborations",
+        "style_tags": ["future-bass", "melodic", "pop-friendly", "uplifting"]
+      },
+      {
+        "name": "Deadmau5",
+        "aliases": ["Deadmouse", "Joel Zimmerman"],
+        "generic_description": "progressive house with intricate production and atmospheric builds",
+        "style_tags": ["progressive-house", "atmospheric", "technical", "electronic"]
+      }
+    ],
+    "rnb": [
+      {
+        "name": "The Weeknd",
+        "aliases": ["Weeknd", "Abel"],
+        "generic_description": "alternative R&B with dark production and emotive vocals",
+        "style_tags": ["rnb", "alternative", "dark", "atmospheric"]
+      },
+      {
+        "name": "SZA",
+        "aliases": ["Solana"],
+        "generic_description": "contemporary R&B with neo-soul elements and vulnerable lyrics",
+        "style_tags": ["rnb", "neo-soul", "vulnerable", "contemporary"]
+      },
+      {
+        "name": "Bruno Mars",
+        "aliases": ["Bruno", "Mars"],
+        "generic_description": "retro-influenced R&B with funk and soul elements",
+        "style_tags": ["rnb", "funk", "soul", "retro-influenced"]
+      },
+      {
+        "name": "H.E.R.",
+        "aliases": ["HER"],
+        "generic_description": "soulful R&B with guitar-driven production and emotional depth",
+        "style_tags": ["rnb", "soulful", "guitar-elements", "emotive"]
+      }
+    ],
+    "indie": [
+      {
+        "name": "Tame Impala",
+        "aliases": ["Tame", "Impala", "Kevin Parker"],
+        "generic_description": "psychedelic indie rock with electronic elements and dreamy production",
+        "style_tags": ["indie-rock", "psychedelic", "electronic-elements", "dreamy"]
+      },
+      {
+        "name": "The 1975",
+        "aliases": ["1975"],
+        "generic_description": "indie pop with 80s influences and genre-bending production",
+        "style_tags": ["indie-pop", "80s-influenced", "eclectic", "experimental"]
+      },
+      {
+        "name": "Vampire Weekend",
+        "aliases": ["Vampire", "Weekend"],
+        "generic_description": "indie rock with world music influences and intricate arrangements",
+        "style_tags": ["indie-rock", "world-music-elements", "sophisticated", "melodic"]
+      }
+    ],
+    "latin": [
+      {
+        "name": "Bad Bunny",
+        "aliases": ["Bad", "Bunny", "Benito"],
+        "generic_description": "reggaeton with trap influences and genre-blending production",
+        "style_tags": ["reggaeton", "trap", "latin-urban", "innovative"]
+      },
+      {
+        "name": "J Balvin",
+        "aliases": ["Balvin", "Jose"],
+        "generic_description": "reggaeton with colorful production and international appeal",
+        "style_tags": ["reggaeton", "latin-pop", "vibrant", "crossover"]
+      },
+      {
+        "name": "Rosalia",
+        "aliases": ["Rosalía"],
+        "generic_description": "flamenco-influenced pop with urban production",
+        "style_tags": ["latin-pop", "flamenco-influenced", "urban", "innovative"]
+      }
+    ]
+  },
+  "generic_descriptions": {
+    "pop": "contemporary pop with melodic hooks and polished production",
+    "rock": "guitar-driven rock with powerful vocals and dynamic arrangements",
+    "hip-hop": "rhythmic hip-hop with lyrical flow and urban production",
+    "country": "modern country with storytelling lyrics and authentic instrumentation",
+    "electronic": "electronic music with energetic production and dance elements",
+    "rnb": "contemporary R&B with smooth vocals and soulful production",
+    "indie": "independent music with creative production and artistic expression",
+    "latin": "Latin music with rhythmic elements and cultural influences",
+    "alternative": "alternative music with genre-bending elements and creative freedom",
+    "folk": "folk-influenced music with acoustic elements and narrative lyrics",
+    "metal": "heavy guitar-driven music with intense energy and powerful vocals",
+    "jazz": "jazz-influenced music with improvisation and sophisticated harmony",
+    "classical": "classical influences with orchestral arrangements and refined composition"
+  },
+  "normalization_patterns": [
+    {
+      "pattern": "style of {artist}",
+      "replacement": "{generic_description}",
+      "context": "influence",
+      "examples": [
+        "style of Taylor Swift → pop-influenced with storytelling vocals and melodic hooks",
+        "style of Kendrick Lamar → rhythmic hip-hop with lyrical depth and social commentary"
+      ]
+    },
+    {
+      "pattern": "sounds like {artist}",
+      "replacement": "{generic_description}",
+      "context": "comparison",
+      "examples": [
+        "sounds like Billie Eilish → alternative pop with dark production and whispered vocals"
+      ]
+    },
+    {
+      "pattern": "in the vein of {artist}",
+      "replacement": "{genre}-influenced",
+      "context": "influence",
+      "examples": [
+        "in the vein of Foo Fighters → rock-influenced"
+      ]
+    },
+    {
+      "pattern": "similar to {artist}",
+      "replacement": "{generic_description}",
+      "context": "comparison",
+      "examples": [
+        "similar to Drake → melodic hip-hop with R&B fusion and introspective lyrics"
+      ]
+    },
+    {
+      "pattern": "like {artist}",
+      "replacement": "{generic_description}",
+      "context": "comparison",
+      "examples": [
+        "like Ed Sheeran → pop with acoustic elements and heartfelt lyrics"
+      ]
+    },
+    {
+      "pattern": "reminiscent of {artist}",
+      "replacement": "{genre}-influenced",
+      "context": "influence",
+      "examples": [
+        "reminiscent of Arctic Monkeys → indie-rock-influenced"
+      ]
+    },
+    {
+      "pattern": "{artist}-inspired",
+      "replacement": "{genre}-influenced",
+      "context": "influence",
+      "examples": [
+        "Travis Scott-inspired → hip-hop-influenced"
+      ]
+    },
+    {
+      "pattern": "{artist} vibes",
+      "replacement": "{generic_description}",
+      "context": "comparison",
+      "examples": [
+        "The Weeknd vibes → alternative R&B with dark production and emotive vocals"
+      ]
+    }
+  ],
+  "fuzzy_matching": {
+    "enabled": true,
+    "min_similarity_threshold": 0.85,
+    "description": "Use fuzzy matching to catch misspellings and variations of artist names",
+    "examples": [
+      "Tayler Swift → Taylor Swift",
+      "Drke → Drake",
+      "Billie Eilish → Billie Eilish (correct)"
+    ]
+  },
+  "policy_modes": {
+    "strict": {
+      "description": "No living artist references allowed in public releases",
+      "allow_artist_names": false,
+      "allow_generic_influences": true,
+      "auto_normalize": true,
+      "reject_on_violation": true
+    },
+    "warn": {
+      "description": "Warn about living artist references but allow with approval",
+      "allow_artist_names": false,
+      "allow_generic_influences": true,
+      "auto_normalize": true,
+      "reject_on_violation": false,
+      "require_approval": true
+    },
+    "permissive": {
+      "description": "Allow living artist references in non-public contexts",
+      "allow_artist_names": true,
+      "allow_generic_influences": true,
+      "auto_normalize": false,
+      "reject_on_violation": false
+    }
+  },
+  "audit_config": {
+    "log_overrides": true,
+    "require_reason": true,
+    "track_approvals": true,
+    "approval_levels": ["user", "admin", "system"]
+  }
+}

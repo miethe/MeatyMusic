@@ -1,0 +1,69 @@
+{
+  "title": "Electronic Song 4",
+  "blueprint_ref": {
+    "genre": "Electronic",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "electronic",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 135,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "A minor",
+      "modulations": []
+    },
+    "mood": [
+      "energetic",
+      "hypnotic"
+    ],
+    "energy": "medium",
+    "instrumentation": [
+      "synth",
+      "electronic drums",
+      "bass"
+    ],
+    "vocal_profile": "standard",
+    "tags": [
+      "synth-driven",
+      "atmospheric"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "present",
+    "themes": [
+      "electronic",
+      "life",
+      "emotion"
+    ],
+    "rhyme_scheme": "ABAB",
+    "section_order": [
+      "verse1",
+      "chorus1",
+      "verse2",
+      "chorus2",
+      "bridge",
+      "chorus3"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 35
+    }
+  },
+  "producer_notes": {
+    "structure": "Standard",
+    "hooks": 5
+  },
+  "sources": [],
+  "prompt_controls": {},
+  "render": {
+    "engine": "none"
+  },
+  "seed": 4030
+}

@@ -1,0 +1,65 @@
+{
+  "title": "Odd Rhythm",
+  "blueprint_ref": {
+    "genre": "Experimental",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "experimental",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 110,
+    "time_signature": "7/8",
+    "key": {
+      "primary": "F# minor",
+      "modulations": []
+    },
+    "mood": [
+      "unusual",
+      "complex"
+    ],
+    "energy": "medium",
+    "instrumentation": [
+      "drums",
+      "bass",
+      "synth"
+    ],
+    "vocal_profile": "spoken",
+    "tags": [
+      "experimental",
+      "rhythmic"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "present",
+    "themes": [
+      "rhythm",
+      "mathematics"
+    ],
+    "rhyme_scheme": "Free",
+    "section_order": [
+      "verse1",
+      "verse2",
+      "bridge"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 20
+    }
+  },
+  "producer_notes": {
+    "structure": "Experimental",
+    "hooks": 1
+  },
+  "sources": [],
+  "prompt_controls": {},
+  "render": {
+    "engine": "none"
+  },
+  "seed": 9300
+}

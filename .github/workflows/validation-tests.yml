@@ -1,0 +1,187 @@
+name: Validation Tests
+
+on:
+  push:
+    branches: [ main, develop, claude/** ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  validation-tests:
+    name: Run Validation Tests
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r services/api/requirements.txt
+          pip install pytest pytest-cov pytest-benchmark pytest-timeout
+
+      - name: Create required directories
+        run: |
+          mkdir -p taxonomies
+          mkdir -p schemas
+          mkdir -p tests/integration
+          mkdir -p tests/benchmarks
+
+      - name: Verify taxonomy files exist
+        run: |
+          if [ ! -f "taxonomies/conflict_matrix.json" ]; then
+            echo "Warning: conflict_matrix.json not found"
+          fi
+          if [ ! -f "taxonomies/profanity_list.json" ]; then
+            echo "Warning: profanity_list.json not found"
+          fi
+          if [ ! -f "taxonomies/pii_patterns.json" ]; then
+            echo "Warning: pii_patterns.json not found"
+          fi
+          if [ ! -f "taxonomies/artist_normalization.json" ]; then
+            echo "Warning: artist_normalization.json not found"
+          fi
+
+      - name: Run unit tests for validation services
+        run: |
+          cd services/api
+          pytest app/tests/test_services/ -v --cov=app/services --cov-report=xml --cov-report=term
+        timeout-minutes: 10
+
+      - name: Run integration tests
+        run: |
+          pytest tests/integration/test_e2e_validation.py -v --timeout=60
+        timeout-minutes: 15
+        continue-on-error: true
+
+      - name: Run performance benchmarks
+        run: |
+          pytest tests/benchmarks/test_validation_performance.py -v --benchmark-disable
+        timeout-minutes: 10
+        continue-on-error: true
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./services/api/coverage.xml
+          flags: validation-tests
+          name: validation-coverage
+        continue-on-error: true
+
+      - name: Generate test summary
+        if: always()
+        run: |
+          echo "## Validation Tests Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Python Version: ${{ matrix.python-version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+
+  integration-tests:
+    name: E2E Integration Tests
+    runs-on: ubuntu-latest
+    needs: validation-tests
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r services/api/requirements.txt
+          pip install pytest pytest-timeout
+
+      - name: Run E2E integration tests
+        run: |
+          pytest tests/integration/test_e2e_validation.py -v --timeout=120 -x
+        timeout-minutes: 20
+
+      - name: Generate integration test report
+        if: always()
+        run: |
+          echo "## Integration Tests Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Integration tests completed. Check logs for details." >> $GITHUB_STEP_SUMMARY
+
+  policy-validation:
+    name: Policy Guard Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r services/api/requirements.txt
+          pip install pytest
+
+      - name: Validate taxonomy files
+        run: |
+          python -c "import json; json.load(open('taxonomies/conflict_matrix.json'))" || echo "conflict_matrix.json missing or invalid"
+          python -c "import json; json.load(open('taxonomies/profanity_list.json'))" || echo "profanity_list.json missing or invalid"
+          python -c "import json; json.load(open('taxonomies/pii_patterns.json'))" || echo "pii_patterns.json missing or invalid"
+          python -c "import json; json.load(open('taxonomies/artist_normalization.json'))" || echo "artist_normalization.json missing or invalid"
+        continue-on-error: true
+
+      - name: Run policy guard tests
+        run: |
+          cd services/api
+          pytest tests/unit/services/test_policy_guards.py -v --timeout=60
+        timeout-minutes: 5
+        continue-on-error: true
+
+  quality-gates:
+    name: Quality Gate Checks
+    runs-on: ubuntu-latest
+    needs: [validation-tests, integration-tests]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Quality gate summary
+        run: |
+          echo "## Quality Gates" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Gate A (Rubric Pass Rate): Check validation test results" >> $GITHUB_STEP_SUMMARY
+          echo "- Gate B (Reproducibility): See determinism tests workflow" >> $GITHUB_STEP_SUMMARY
+          echo "- Gate C (Policy Violations): Check policy validation results" >> $GITHUB_STEP_SUMMARY
+          echo "- Gate D (Latency): See benchmark results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "All validation tests must pass for quality gate acceptance." >> $GITHUB_STEP_SUMMARY
