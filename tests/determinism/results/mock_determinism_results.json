@@ -1,0 +1,24 @@
+{
+  "tests": [
+    {
+      "name": "test_conflict_detection_determinism",
+      "replays": 10,
+      "identical_count": 10
+    },
+    {
+      "name": "test_profanity_detection_determinism",
+      "replays": 10,
+      "identical_count": 10
+    },
+    {
+      "name": "test_pii_detection_determinism",
+      "replays": 10,
+      "identical_count": 10
+    },
+    {
+      "name": "test_full_pipeline_reproducibility",
+      "replays": 10,
+      "identical_count": 10
+    }
+  ]
+}

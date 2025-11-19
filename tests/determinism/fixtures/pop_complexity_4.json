@@ -1,0 +1,87 @@
+{
+  "title": "Electric Dreams",
+  "blueprint_ref": {
+    "genre": "Pop",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "pop",
+      "subgenres": [
+        "synth-pop",
+        "electropop"
+      ],
+      "fusions": [
+        "electronic"
+      ]
+    },
+    "tempo_bpm": [
+      110,
+      140
+    ],
+    "time_signature": "4/4",
+    "key": {
+      "primary": "E major",
+      "modulations": [
+        "F# major"
+      ]
+    },
+    "mood": [
+      "dreamy",
+      "energetic",
+      "futuristic"
+    ],
+    "energy": "high",
+    "instrumentation": [
+      "synth",
+      "electronic drums",
+      "bass",
+      "pads"
+    ],
+    "vocal_profile": "layered",
+    "tags": [
+      "dreamy",
+      "futuristic",
+      "layered"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "2nd",
+    "tense": "future",
+    "themes": [
+      "technology",
+      "dreams",
+      "future"
+    ],
+    "rhyme_scheme": "AABC",
+    "section_order": [
+      "intro",
+      "verse1",
+      "pre-chorus1",
+      "chorus1",
+      "verse2",
+      "pre-chorus2",
+      "chorus2",
+      "bridge",
+      "breakdown",
+      "chorus3",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 50
+    }
+  },
+  "producer_notes": {
+    "structure": "Complex multi-section with tempo shift",
+    "hooks": 5
+  },
+  "sources": [],
+  "prompt_controls": {},
+  "render": {
+    "engine": "none"
+  },
+  "seed": 300
+}

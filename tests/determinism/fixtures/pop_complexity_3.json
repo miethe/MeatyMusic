@@ -1,0 +1,74 @@
+{
+  "title": "Fading Light",
+  "blueprint_ref": {
+    "genre": "Pop",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "pop",
+      "subgenres": [
+        "ballad"
+      ],
+      "fusions": []
+    },
+    "tempo_bpm": 72,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "A minor",
+      "modulations": [
+        "C major"
+      ]
+    },
+    "mood": [
+      "melancholic",
+      "emotional"
+    ],
+    "energy": "medium",
+    "instrumentation": [
+      "piano",
+      "strings",
+      "drums"
+    ],
+    "vocal_profile": "emotive",
+    "tags": [
+      "emotional",
+      "powerful"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "past",
+    "themes": [
+      "loss",
+      "memories",
+      "hope"
+    ],
+    "rhyme_scheme": "ABCB",
+    "section_order": [
+      "verse1",
+      "verse2",
+      "chorus1",
+      "verse3",
+      "chorus2",
+      "bridge",
+      "chorus3"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 35
+    }
+  },
+  "producer_notes": {
+    "structure": "Verse-Verse-Chorus-Verse-Chorus-Bridge-Chorus",
+    "hooks": 2
+  },
+  "sources": [],
+  "prompt_controls": {},
+  "render": {
+    "engine": "none"
+  },
+  "seed": 200
+}

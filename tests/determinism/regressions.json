@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2025-11-19T00:00:00Z",
+  "description": "Baseline of known reproducibility regressions. Tests will fail if new regressions are introduced beyond this baseline.",
+  "known_regressions": {},
+  "notes": [
+    "Empty baseline indicates all fixtures should be reproducible.",
+    "If a fixture consistently fails reproducibility tests, add it here with explanation.",
+    "Format: {\"fixture_name\": \"Description of known issue\"}"
+  ],
+  "target_reproducibility_rate": 0.99,
+  "acceptable_failures": 1,
+  "total_fixtures": 50
+}

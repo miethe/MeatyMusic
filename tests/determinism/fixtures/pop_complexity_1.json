@@ -1,0 +1,78 @@
+{
+  "title": "Summer Dreams",
+  "blueprint_ref": {
+    "genre": "Pop",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "pop",
+      "subgenres": [
+        "synth-pop"
+      ],
+      "fusions": []
+    },
+    "tempo_bpm": 120,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "C major",
+      "modulations": []
+    },
+    "mood": [
+      "upbeat",
+      "energetic"
+    ],
+    "energy": "high",
+    "instrumentation": [
+      "synth",
+      "drums",
+      "bass"
+    ],
+    "vocal_profile": "powerful",
+    "tags": [
+      "melodic",
+      "catchy"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "present",
+    "themes": [
+      "summer",
+      "dreams",
+      "love"
+    ],
+    "rhyme_scheme": "ABAB",
+    "section_order": [
+      "intro",
+      "verse1",
+      "chorus1",
+      "verse2",
+      "chorus2",
+      "bridge",
+      "chorus3",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 40
+    }
+  },
+  "producer_notes": {
+    "structure": "Intro-Verse-Chorus-Verse-Chorus-Bridge-Chorus-Outro",
+    "hooks": 3
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 42
+}

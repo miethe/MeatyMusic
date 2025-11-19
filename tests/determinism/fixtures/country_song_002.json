@@ -1,0 +1,69 @@
+{
+  "title": "Country Song 2",
+  "blueprint_ref": {
+    "genre": "Country",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "country",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 92,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "D major",
+      "modulations": []
+    },
+    "mood": [
+      "nostalgic",
+      "heartfelt"
+    ],
+    "energy": "medium",
+    "instrumentation": [
+      "acoustic guitar",
+      "banjo",
+      "fiddle"
+    ],
+    "vocal_profile": "standard",
+    "tags": [
+      "storytelling",
+      "twangy"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "present",
+    "themes": [
+      "country",
+      "life",
+      "emotion"
+    ],
+    "rhyme_scheme": "ABAB",
+    "section_order": [
+      "verse1",
+      "chorus1",
+      "verse2",
+      "chorus2",
+      "bridge",
+      "chorus3"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 35
+    }
+  },
+  "producer_notes": {
+    "structure": "Standard",
+    "hooks": 3
+  },
+  "sources": [],
+  "prompt_controls": {},
+  "render": {
+    "engine": "none"
+  },
+  "seed": 3010
+}
