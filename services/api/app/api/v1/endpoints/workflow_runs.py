@@ -12,6 +12,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from app.api.dependencies import get_workflow_run_repository, get_workflow_run_service
+from app.models.workflow_run import WorkflowRun
 from app.repositories import WorkflowRunRepository
 from app.services import WorkflowRunService
 from app.schemas import (
@@ -55,7 +56,7 @@ async def create_workflow_run(
         HTTPException: If run creation fails
     """
     try:
-        run = repo.create(run_data.model_dump())
+        run = repo.create(WorkflowRun, run_data.model_dump())
         return WorkflowRunResponse.model_validate(run)
     except ValueError as e:
         raise HTTPException(

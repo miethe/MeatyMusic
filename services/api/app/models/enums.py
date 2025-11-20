@@ -17,8 +17,8 @@ class UserRole(str, enum.Enum):
         ADMIN: Administrator with elevated privileges
     """
 
-    USER = "user"
-    ADMIN = "admin"
+    USER = "USER"
+    ADMIN = "ADMIN"
 
     def __str__(self) -> str:
         """Return string value of the enum."""
@@ -38,7 +38,7 @@ class UserRole(str, enum.Enum):
             ValueError: If value is not a valid role
         """
         try:
-            return cls(value.lower())
+            return cls(value.upper())
         except ValueError:
             valid_roles = ", ".join([r.value for r in cls])
             raise ValueError(

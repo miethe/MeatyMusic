@@ -76,7 +76,7 @@ async def create_style(
             )
 
     try:
-        style = repo.create(style_dict)
+        style = repo.create(Style, style_dict)
         return StyleResponse.model_validate(style)
     except ValueError as e:
         raise HTTPException(
@@ -161,7 +161,7 @@ async def import_style(
 
     # Create style
     try:
-        style = repo.create(style_dict)
+        style = repo.create(Style, style_dict)
         return StyleResponse.model_validate(style)
     except ValueError as e:
         raise HTTPException(

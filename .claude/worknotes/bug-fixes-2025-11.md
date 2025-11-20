@@ -268,3 +268,11 @@
 | Fix | Added ProfanityCheckResult and ProfanityViolation to schema package exports (both import block and __all__ list). Types were defined in common.py but not exported from __init__.py |
 | File | services/api/app/schemas/__init__.py:20-21,111-112 |
 | Commit | e8941c0 |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | TypeError: BaseRepository.create() missing required positional argument 'data' - styles and workflow_runs endpoints failed |
+| Fix | Added model_class as first parameter to repo.create() calls: styles.py (lines 79, 164), workflow_runs.py (line 58). Added WorkflowRun model import to workflow_runs.py. BaseRepository.create() requires explicit model_class for type safety (unlike list() which falls back to self.model_class) |
+| Files | services/api/app/api/v1/endpoints/styles.py:79,164, workflow_runs.py:15,58 |
+| Commit | Pending |
+| Note | Missing unit tests - no endpoint tests exist to catch signature mismatches. Create tests/api/v1/endpoints/test_{styles,workflow_runs}_endpoints.py |

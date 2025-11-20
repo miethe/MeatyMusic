@@ -22,14 +22,14 @@ depends_on = None
 def upgrade():
     """Add role column to users table."""
 
-    # Add role column with default value 'user'
+    # Add role column with default value 'USER' (uppercase to match enum)
     op.add_column(
         'users',
         sa.Column(
             'role',
             sa.String(length=20),
             nullable=False,
-            server_default='user'
+            server_default='USER'
         )
     )
 
