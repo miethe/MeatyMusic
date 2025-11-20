@@ -25,6 +25,7 @@ from app.core.database import get_db_session
 from app.core.security import SecurityContext, RepositoryFactory
 from app.core.security.exceptions import SecurityContextError
 from app.models.user import UserORM
+from app.models.enums import UserRole
 
 logger = structlog.get_logger(__name__)
 
@@ -141,7 +142,8 @@ async def get_security_context(
                 email="dev@meatymusic.local",
                 username="dev_bypass_user",
                 is_active=True,
-                email_verified=True
+                email_verified=True,
+                role=UserRole.ADMIN  # Dev bypass user is admin by default
             )
             db.add(user)
             db.commit()
@@ -294,6 +296,75 @@ def require_permission(permission: str):
         return security_context
 
     return check_permission
+
+
+async def require_admin(
+    security_context: Annotated[SecurityContext, Depends(get_security_context)],
+    db: Annotated[Session, Depends(get_db_session)]
+) -> SecurityContext:
+    """Dependency that requires admin role.
+
+    Checks if the authenticated user has admin role and raises 403 if not.
+    Integrates with telemetry for observability and structured logging.
+
+    Args:
+        security_context: Validated security context
+        db: Database session
+
+    Returns:
+        SecurityContext if user is admin
+
+    Raises:
+        HTTPException: 403 Forbidden if user is not admin or not found
+
+    Example:
+        ```python
+        @router.post("/admin-only")
+        async def admin_endpoint(
+            admin_context: SecurityContext = Depends(require_admin)
+        ):
+            # Only admin users can access this endpoint
+            pass
+        ```
+    """
+    # Get user from database
+    user = db.query(UserORM).filter(UserORM.id == security_context.user_id).first()
+
+    if not user:
+        logger.warning(
+            "rbac_user_not_found",
+            user_id=str(security_context.user_id),
+            msg="User not found during admin check"
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User not found"
+        )
+
+    # Check if user has admin role
+    if user.role != UserRole.ADMIN:
+        logger.warning(
+            "rbac_admin_access_denied",
+            user_id=str(user.id),
+            user_email=user.email,
+            user_role=user.role.value,
+            msg="Non-admin user attempted to access admin-only endpoint"
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin privileges required for this operation"
+        )
+
+    # Log successful admin access for audit trail
+    logger.info(
+        "rbac_admin_access_granted",
+        user_id=str(user.id),
+        user_email=user.email,
+        user_role=user.role.value,
+        msg="Admin user granted access to protected endpoint"
+    )
+
+    return security_context
 
 
 # Legacy compatibility: provide get_current_user that returns UserORM
@@ -463,7 +534,8 @@ async def get_current_user_with_context_async(
                     email="dev@meatymusic.local",
                     username="dev_bypass_user",
                     is_active=True,
-                    email_verified=True
+                    email_verified=True,
+                    role=UserRole.ADMIN  # Dev bypass user is admin by default
                 )
                 db.add(user)
                 db.commit()

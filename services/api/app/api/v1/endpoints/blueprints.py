@@ -6,26 +6,34 @@ for the music creation workflow.
 
 from __future__ import annotations
 
+import io
 import json
 from datetime import datetime, timezone
 from typing import Dict, List, Optional, Tuple
 from uuid import UUID
 
 from fastapi import APIRouter, Body, Depends, File, HTTPException, Query, UploadFile, status
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, ValidationError
 
-from app.api.dependencies import get_blueprint_repository, get_blueprint_service
+from app.api.dependencies import get_blueprint_repository, get_blueprint_service, get_bulk_operations_service
+from app.core.dependencies import require_admin
+from app.core.security import SecurityContext
 from app.errors import BadRequestError, NotFoundError
+from app.models.blueprint import Blueprint
 from app.repositories import BlueprintRepository
 from app.schemas import (
     BlueprintCreate,
     BlueprintResponse,
     BlueprintUpdate,
+    BulkDeleteRequest,
+    BulkDeleteResponse,
+    BulkExportRequest,
     ErrorResponse,
     PageInfo,
     PaginatedResponse,
 )
-from app.services import BlueprintService
+from app.services import BlueprintService, BulkOperationsService
 
 router = APIRouter(prefix="/blueprints", tags=["Blueprints"])
 
@@ -64,15 +72,17 @@ class RubricValidationResponse(BaseModel):
     response_model=BlueprintResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Create a new blueprint",
-    description="Create a new blueprint with genre rules and evaluation rubric",
+    description="Create a new blueprint with genre rules and evaluation rubric (Admin only)",
     responses={
         201: {"description": "Blueprint created successfully"},
         400: {"model": ErrorResponse, "description": "Invalid blueprint data"},
+        403: {"model": ErrorResponse, "description": "Admin privileges required"},
     },
 )
 async def create_blueprint(
     blueprint_data: BlueprintCreate,
     service: BlueprintService = Depends(get_blueprint_service),
+    admin_context: SecurityContext = Depends(require_admin),
 ) -> BlueprintResponse:
     """Create a new blueprint.
 
@@ -101,15 +111,17 @@ async def create_blueprint(
     response_model=BlueprintResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Import blueprint from JSON file",
-    description="Import a blueprint definition from an uploaded JSON file",
+    description="Import a blueprint definition from an uploaded JSON file (Admin only)",
     responses={
         201: {"description": "Blueprint imported successfully"},
         400: {"model": ErrorResponse, "description": "Invalid JSON or validation error"},
+        403: {"model": ErrorResponse, "description": "Admin privileges required"},
     },
 )
 async def import_blueprint(
     file: UploadFile = File(..., description="JSON file containing blueprint definition"),
     service: BlueprintService = Depends(get_blueprint_service),
+    admin_context: SecurityContext = Depends(require_admin),
 ) -> BlueprintResponse:
     """Import a blueprint from a JSON file.
 
@@ -299,17 +311,19 @@ async def get_blueprint(
     "/{blueprint_id}",
     response_model=BlueprintResponse,
     summary="Update a blueprint",
-    description="Update an existing blueprint's fields",
+    description="Update an existing blueprint's fields (Admin only)",
     responses={
         200: {"description": "Blueprint updated successfully"},
         404: {"model": ErrorResponse, "description": "Blueprint not found"},
         400: {"model": ErrorResponse, "description": "Invalid blueprint data"},
+        403: {"model": ErrorResponse, "description": "Admin privileges required"},
     },
 )
 async def update_blueprint(
     blueprint_id: UUID,
     blueprint_data: BlueprintUpdate,
     service: BlueprintService = Depends(get_blueprint_service),
+    admin_context: SecurityContext = Depends(require_admin),
 ) -> BlueprintResponse:
     """Update a blueprint.
 
@@ -343,15 +357,17 @@ async def update_blueprint(
     "/{blueprint_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Delete a blueprint",
-    description="Soft delete a blueprint (marks as deleted)",
+    description="Soft delete a blueprint (marks as deleted) (Admin only)",
     responses={
         204: {"description": "Blueprint deleted successfully"},
         404: {"model": ErrorResponse, "description": "Blueprint not found"},
+        403: {"model": ErrorResponse, "description": "Admin privileges required"},
     },
 )
 async def delete_blueprint(
     blueprint_id: UUID,
     service: BlueprintService = Depends(get_blueprint_service),
+    admin_context: SecurityContext = Depends(require_admin),
 ) -> None:
     """Delete a blueprint (soft delete).
 
@@ -538,3 +554,158 @@ async def get_conflict_matrix(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e),
         )
+
+
+@router.post(
+    "/bulk-delete",
+    response_model=BulkDeleteResponse,
+    summary="Bulk delete blueprints (Admin only)",
+    description="Delete multiple blueprints by IDs",
+    responses={
+        200: {"description": "Bulk delete completed (check response for failures)"},
+        400: {"model": ErrorResponse, "description": "Invalid request"},
+        403: {"model": ErrorResponse, "description": "Admin privileges required"},
+    },
+)
+async def bulk_delete_blueprints(
+    request: BulkDeleteRequest,
+    service: BlueprintService = Depends(get_blueprint_service),
+    bulk_ops: BulkOperationsService = Depends(get_bulk_operations_service),
+    admin_context: SecurityContext = Depends(require_admin),
+) -> BulkDeleteResponse:
+    """Bulk delete blueprints by IDs (Admin only).
+
+    Args:
+        request: Request containing list of blueprint IDs to delete
+        service: Blueprint service instance
+        bulk_ops: Bulk operations service instance
+        admin_context: Admin security context
+
+    Returns:
+        Response with deleted_count, failed_ids, and errors
+    """
+    result = await bulk_ops.bulk_delete_entities(
+        model_class=Blueprint,
+        repository=service.blueprint_repo,
+        entity_ids=request.ids,
+        entity_type_name="blueprint",
+    )
+    return BulkDeleteResponse(**result)
+
+
+@router.post(
+    "/bulk-export",
+    response_class=StreamingResponse,
+    summary="Bulk export blueprints as ZIP (Admin only)",
+    description="Export multiple blueprints as a ZIP file containing JSON files",
+    responses={
+        200: {
+            "description": "ZIP file with exported blueprints",
+            "content": {"application/zip": {}},
+        },
+        400: {"model": ErrorResponse, "description": "No blueprints found or all exports failed"},
+        403: {"model": ErrorResponse, "description": "Admin privileges required"},
+    },
+)
+async def bulk_export_blueprints(
+    request: BulkExportRequest,
+    service: BlueprintService = Depends(get_blueprint_service),
+    bulk_ops: BulkOperationsService = Depends(get_bulk_operations_service),
+    admin_context: SecurityContext = Depends(require_admin),
+) -> StreamingResponse:
+    """Bulk export blueprints as ZIP file (Admin only).
+
+    Args:
+        request: Request containing list of blueprint IDs to export
+        service: Blueprint service instance
+        bulk_ops: Bulk operations service instance
+        admin_context: Admin security context
+
+    Returns:
+        StreamingResponse with ZIP file download
+
+    Raises:
+        HTTPException: If no blueprints found or all exports fail
+    """
+    try:
+        zip_buffer = await bulk_ops.bulk_export_entities_zip(
+            model_class=Blueprint,
+            repository=service.blueprint_repo,
+            entity_ids=request.ids,
+            entity_type_name="blueprint",
+            response_schema=BlueprintResponse,
+        )
+
+        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        filename = f"blueprints-bulk-export-{timestamp}.zip"
+
+        return StreamingResponse(
+            zip_buffer,
+            media_type="application/zip",
+            headers={
+                "Content-Disposition": f'attachment; filename="{filename}"',
+            },
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
+
+
+@router.get(
+    "/{blueprint_id}/export",
+    response_class=StreamingResponse,
+    summary="Export blueprint as JSON file (Admin only)",
+    description="Download a single blueprint as a formatted JSON file",
+    responses={
+        200: {
+            "description": "Blueprint exported successfully as JSON file",
+            "content": {"application/json": {}},
+        },
+        404: {"model": ErrorResponse, "description": "Blueprint not found"},
+        403: {"model": ErrorResponse, "description": "Admin privileges required"},
+    },
+)
+async def export_blueprint(
+    blueprint_id: UUID,
+    service: BlueprintService = Depends(get_blueprint_service),
+    bulk_ops: BulkOperationsService = Depends(get_bulk_operations_service),
+    admin_context: SecurityContext = Depends(require_admin),
+) -> StreamingResponse:
+    """Export a single blueprint as JSON file (Admin only).
+
+    Args:
+        blueprint_id: Blueprint UUID
+        service: Blueprint service instance
+        bulk_ops: Bulk operations service instance
+        admin_context: Admin security context
+
+    Returns:
+        StreamingResponse with JSON file download
+
+    Raises:
+        HTTPException: If blueprint not found
+    """
+    blueprint = service.get_blueprint_by_id(blueprint_id)
+    if not blueprint:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Blueprint {blueprint_id} not found",
+        )
+
+    export_data = await bulk_ops.export_single_entity(
+        entity=blueprint,
+        entity_type_name="blueprint",
+        response_schema=BlueprintResponse,
+    )
+
+    json_content = json.dumps(export_data["content"], indent=2, ensure_ascii=False)
+
+    return StreamingResponse(
+        io.BytesIO(json_content.encode("utf-8")),
+        media_type="application/json; charset=utf-8",
+        headers={
+            "Content-Disposition": f'attachment; filename="{export_data["filename"]}"',
+        },
+    )
