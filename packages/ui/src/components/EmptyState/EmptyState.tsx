@@ -121,7 +121,7 @@ const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
 
         {action && (
           <Button
-            variant={action.variant || "default"}
+            variant={action.variant || "primary"}
             onClick={action.onClick}
           >
             {action.label}

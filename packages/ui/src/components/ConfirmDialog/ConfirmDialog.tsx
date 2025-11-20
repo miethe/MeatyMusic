@@ -88,7 +88,7 @@ export const ConfirmDialog = React.forwardRef<HTMLDivElement, ConfirmDialogProps
         case "warning":
           return "warning";
         default:
-          return "default";
+          return "primary";
       }
     };
 

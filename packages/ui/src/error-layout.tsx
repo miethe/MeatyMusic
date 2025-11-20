@@ -9,7 +9,7 @@ export interface ErrorLayoutProps {
   actions?: Array<{
     label: string;
     onClick: () => void;
-    variant?: 'default' | 'secondary' | 'ghost' | 'outline' | 'link' | 'destructive' | 'premium';
+    variant?: 'primary' | 'secondary' | 'ghost' | 'outline' | 'link' | 'destructive';
   }>;
   showStatusCode?: boolean;
   illustration?: React.ReactNode;
@@ -78,7 +78,7 @@ export const ErrorLayout: React.FC<ErrorLayoutProps> = ({
             {actions.map((action, index) => (
               <Button
                 key={index}
-                variant={action.variant || 'default'}
+                variant={action.variant || 'primary'}
                 size="lg"
                 onClick={action.onClick}
                 className="min-w-[120px]"

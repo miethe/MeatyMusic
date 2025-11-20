@@ -145,7 +145,7 @@ const BulkActions = React.forwardRef<HTMLDivElement, BulkActionsProps>(
                     variant={action.variant || "outline"}
                     onClick={action.onClick}
                     disabled={action.disabled}
-                    size="default"
+                    size="md"
                   >
                     {Icon && <Icon className="h-4 w-4 mr-2" />}
                     {action.label}

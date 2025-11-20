@@ -111,7 +111,7 @@ export const DatePicker = React.forwardRef<HTMLButtonElement, DatePickerProps>(
           <Button
             ref={ref}
             variant="outline"
-            size={size === 'md' ? 'default' : size}
+            size={size}
             disabled={disabled}
             className={cn(
               'justify-start text-left font-normal',

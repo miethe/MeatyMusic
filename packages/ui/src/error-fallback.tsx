@@ -9,7 +9,7 @@ export interface ErrorFallbackProps {
   actions?: Array<{
     label: string;
     onClick: () => void;
-    variant?: 'default' | 'secondary' | 'ghost' | 'outline' | 'link' | 'destructive' | 'premium';
+    variant?: 'primary' | 'secondary' | 'ghost' | 'outline' | 'link' | 'destructive';
   }>;//TODO: Use ButtonVariant Type
   icon?: React.ReactNode;
   className?: string;
@@ -30,7 +30,7 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
     ...(retry ? [{
       label: 'Try Again',
       onClick: retry,
-      variant: 'default' as const,
+      variant: 'primary' as const,
     }] : []),
     {
       label: 'Reload Page',

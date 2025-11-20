@@ -114,7 +114,7 @@ export const SessionWarning: React.FC<SessionWarningProps> = ({
               onClick={onRefresh}
               disabled={isRefreshing}
               size="sm"
-              variant="default"
+              variant="primary"
               className="flex-1"
             >
               {isRefreshing ? 'Refreshing...' : 'Refresh Session'}

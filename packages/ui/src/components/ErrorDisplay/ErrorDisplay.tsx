@@ -203,7 +203,7 @@ const ErrorDisplay = React.forwardRef<HTMLDivElement, ErrorDisplayProps>(
             {retry && (
               <Button
                 variant="outline"
-                size={isInline ? "sm" : "default"}
+                size={isInline ? "sm" : "md"}
                 onClick={retry}
               >
                 Try Again
@@ -212,7 +212,7 @@ const ErrorDisplay = React.forwardRef<HTMLDivElement, ErrorDisplayProps>(
             {onDismiss && isFullPage && (
               <Button
                 variant="ghost"
-                size={isInline ? "sm" : "default"}
+                size={isInline ? "sm" : "md"}
                 onClick={onDismiss}
               >
                 Dismiss
