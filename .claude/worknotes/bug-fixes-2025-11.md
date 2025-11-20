@@ -247,3 +247,17 @@
 | Fix | Replaced invalid types: size="default"→"md", variant="default"→"primary", variant="premium"→"primary" across 8 UI components. Updated type interfaces to only allow valid variants |
 | Files | BulkActions.tsx, ConfirmDialog.tsx, DatePicker.tsx, EmptyState.tsx, ErrorDisplay.tsx, error-fallback.tsx, error-layout.tsx, session-warning.tsx |
 | Commit | d1dfed5 |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | TypeScript error: Module '@/types/api' has no exported member 'ProfanityCheckResult' - type defined but not exported from barrel |
+| Fix | Added ProfanityViolation and ProfanityCheckResult to type exports in index.ts. Types were defined in entities.ts but missing from central barrel export |
+| File | apps/web/src/types/api/index.ts:25-26 |
+| Commit | Pending |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | TypeScript error: Axios headers type incompatible with getFilenameFromHeaders - expected Record<string, string> but got complex axios header type |
+| Fix | Updated function signature to accept Record<string, string \| string[] \| undefined> \| any for axios compatibility |
+| File | apps/web/src/lib/api/utils.ts:30 |
+| Commit | Pending |

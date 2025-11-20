@@ -27,7 +27,7 @@ export function downloadBlob(blob: Blob, filename: string): void {
  * Extract filename from Content-Disposition header
  */
 export function getFilenameFromHeaders(
-  headers: Record<string, string>,
+  headers: Record<string, string | string[] | undefined> | any,
   defaultFilename: string
 ): string {
   const contentDisposition = headers['content-disposition'];

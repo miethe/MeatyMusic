@@ -314,7 +314,7 @@ export function StyleEditor({
             unit=" BPM"
             presets={BPM_PRESETS}
             required
-            helperText="Select a single value or range for tempo flexibility"
+            helpText="Select a single value or range for tempo flexibility"
           />
 
           <RangeSlider
@@ -324,7 +324,7 @@ export function StyleEditor({
             value={formData.energy_level || 5}
             onChange={(value) => updateField('energy_level', typeof value === 'number' ? value : value[0])}
             allowRange={false}
-            helperText="1 = Low, 10 = Anthemic"
+            helpText="1 = Low, 10 = Anthemic"
           />
 
           <ChipSelector

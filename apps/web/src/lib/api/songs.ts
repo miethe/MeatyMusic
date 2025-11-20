@@ -25,6 +25,9 @@ export interface SongFilters {
   blueprint_id?: UUID; // Filter by blueprint
   created_after?: string; // ISO date
   created_before?: string; // ISO date
+  hasStyle?: boolean; // Filter by presence of style
+  hasLyrics?: boolean; // Filter by presence of lyrics
+  hasPersona?: boolean; // Filter by presence of persona
   limit?: number; // Page size
   cursor?: string; // Cursor for pagination
 }

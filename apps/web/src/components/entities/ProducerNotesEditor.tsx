@@ -228,7 +228,7 @@ export function ProducerNotesEditor({
             onChange={setSections}
             sectionTypes={STRUCTURE_TYPES}
             showDuration
-            helperText="Define the production arrangement flow"
+            helpText="Define the production arrangement flow"
           />
 
           <div>
@@ -254,7 +254,7 @@ export function ProducerNotesEditor({
             onChange={(value) => updateField('instrumentation', value)}
             suggestions={INSTRUMENTATION_OPTIONS}
             placeholder="Add production elements..."
-            helperText="Production elements beyond the style spec"
+            helpText="Production elements beyond the style spec"
           />
 
           <div className="space-y-4 p-4 rounded-lg bg-background-tertiary border border-border-secondary">

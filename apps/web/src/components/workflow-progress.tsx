@@ -16,7 +16,7 @@
 
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-import { Progress } from '@meatymusic/ui';
+// Progress component not used in this implementation
 import { WorkflowNode, WorkflowRunStatus } from '@/types/api';
 import type { WorkflowProgress as WorkflowProgressType } from '@/types/api';
 

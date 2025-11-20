@@ -22,6 +22,8 @@ export type {
   ErrorResponse,
   PageInfo,
   PaginatedResponse,
+  ProfanityViolation,
+  ProfanityCheckResult,
   // Song types
   SongBase,
   SongCreate,

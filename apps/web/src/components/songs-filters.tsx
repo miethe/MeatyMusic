@@ -7,11 +7,6 @@
 
 import * as React from 'react';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
   Button,
   DatePicker,
   Label,
@@ -52,6 +47,9 @@ export function SongsFilters({ filters, onFiltersChange, onClear }: SongsFilters
     if (filters.status && filters.status.length > 0) count++;
     if (filters.created_after) count++;
     if (filters.created_before) count++;
+    if (filters.style_id) count++;
+    if (filters.persona_id) count++;
+    if (filters.blueprint_id) count++;
     if (filters.hasStyle) count++;
     if (filters.hasLyrics) count++;
     if (filters.hasPersona) count++;

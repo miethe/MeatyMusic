@@ -270,7 +270,7 @@ export function LyricsEditorEnhanced({
             label="Rhyme Scheme"
             value={formData.rhyme_scheme || ''}
             onChange={(value) => updateField('rhyme_scheme', value)}
-            helperText="Define the rhyme pattern for verses and sections"
+            helpText="Define the rhyme pattern for verses and sections"
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

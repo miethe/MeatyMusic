@@ -16,7 +16,7 @@
 
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-import { Card, CardContent, CardHeader, CardTitle } from '@meatymusic/ui';
+import { Card } from '@meatymusic/ui';
 import type { ValidationScores } from '@/types/api';
 
 export interface WorkflowMetricsProps {
@@ -83,7 +83,6 @@ const METRICS: MetricConfig[] = [
  * Get color classes based on score value and threshold
  */
 const getScoreColors = (value: number, threshold: number, maxValue: number) => {
-  const percentage = (value / maxValue) * 100;
 
   if (value < maxValue * 0.5) {
     return {

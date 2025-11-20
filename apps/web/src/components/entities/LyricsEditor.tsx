@@ -275,7 +275,7 @@ export function LyricsEditor({
             sectionTypes={SECTION_TYPES}
             showLines
             required
-            helperText="Define the order and structure of lyric sections. At least one Chorus is required."
+            helpText="Define the order and structure of lyric sections. At least one Chorus is required."
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -313,7 +313,7 @@ export function LyricsEditor({
             label="Rhyme Scheme"
             value={formData.rhyme_scheme || ''}
             onChange={(value) => updateField('rhyme_scheme', value)}
-            helperText="Define the rhyme pattern for verses and sections"
+            helpText="Define the rhyme pattern for verses and sections"
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -392,7 +392,7 @@ export function LyricsEditor({
             onChange={(value) => updateField('themes', value)}
             suggestions={THEME_OPTIONS}
             placeholder="Add themes..."
-            helperText="Thematic elements to explore in the lyrics"
+            helpText="Thematic elements to explore in the lyrics"
           />
 
           <div>
