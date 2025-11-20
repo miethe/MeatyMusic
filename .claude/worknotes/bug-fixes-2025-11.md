@@ -274,5 +274,5 @@
 | Bug | TypeError: BaseRepository.create() missing required positional argument 'data' - styles and workflow_runs endpoints failed |
 | Fix | Added model_class as first parameter to repo.create() calls: styles.py (lines 79, 164), workflow_runs.py (line 58). Added WorkflowRun model import to workflow_runs.py. BaseRepository.create() requires explicit model_class for type safety (unlike list() which falls back to self.model_class) |
 | Files | services/api/app/api/v1/endpoints/styles.py:79,164, workflow_runs.py:15,58 |
-| Commit | Pending |
+| Commit | 22cf903 |
 | Note | Missing unit tests - no endpoint tests exist to catch signature mismatches. Create tests/api/v1/endpoints/test_{styles,workflow_runs}_endpoints.py |
