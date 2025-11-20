@@ -6,10 +6,13 @@ for lyric generation and context.
 
 from __future__ import annotations
 
+import json
+from datetime import datetime, timezone
 from typing import List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
+from pydantic import ValidationError
 
 from app.api.dependencies import get_source_service
 from app.services import SourceService
@@ -65,6 +68,90 @@ async def create_source(
 
         source = await service.create_source(
             data=source_data,
+            owner_id=owner_id,
+            tenant_id=tenant_id
+        )
+        return source
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
+
+
+@router.post(
+    "/import",
+    response_model=SourceResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Import source from JSON file",
+    description="Import a source definition from an uploaded JSON file",
+    responses={
+        201: {"description": "Source imported successfully"},
+        400: {"model": ErrorResponse, "description": "Invalid JSON or validation error"},
+    },
+)
+async def import_source(
+    file: UploadFile = File(..., description="JSON file containing source definition"),
+    service: SourceService = Depends(get_source_service),
+) -> SourceResponse:
+    """Import a source from a JSON file.
+
+    Args:
+        file: Uploaded JSON file with source data
+        service: Source service instance
+
+    Returns:
+        Created source with import metadata
+
+    Raises:
+        HTTPException: If file is not JSON or validation fails
+    """
+    # Validate file type
+    if not file.filename or not file.filename.endswith('.json'):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Only JSON files are supported. File must have .json extension",
+        )
+
+    # Read and parse JSON
+    try:
+        content = await file.read()
+        data = json.loads(content)
+    except json.JSONDecodeError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid JSON format: {str(e)}",
+        )
+
+    # Validate against schema
+    try:
+        source_data = SourceCreate.model_validate(data)
+    except ValidationError as e:
+        errors = [
+            {"field": ".".join(str(loc) for loc in err["loc"]), "message": err["msg"]}
+            for err in e.errors()
+        ]
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "Validation failed", "errors": errors},
+        )
+
+    # Add import metadata
+    source_dict = source_data.model_dump()
+    source_dict["imported_at"] = datetime.now(timezone.utc)
+    source_dict["import_source_filename"] = file.filename
+
+    # Create source via service
+    try:
+        # TODO: Get owner_id and tenant_id from auth context
+        # For now, using placeholder UUIDs
+        from uuid import uuid4
+        owner_id = uuid4()
+        tenant_id = uuid4()
+
+        source_data_with_import = SourceCreate.model_validate(source_dict)
+        source = await service.create_source(
+            data=source_data_with_import,
             owner_id=owner_id,
             tenant_id=tenant_id
         )

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { PersonaBase, PersonaCreate, PersonaKind, Persona } from '@/types/api/entities';
-import { ChipSelector } from './common/ChipSelector';
+import { ChipSelector } from '@meatymusic/ui';
 import { EntityPreviewPanel, ValidationError } from './common/EntityPreviewPanel';
 import { LibrarySelector } from './common/LibrarySelector';
 import { Save, X } from 'lucide-react';
@@ -263,18 +263,20 @@ export function PersonaEditor({
 
           <ChipSelector
             label="Delivery Styles"
-            value={formData.delivery || []}
+            selected={formData.delivery || []}
             onChange={(value) => updateField('delivery', value)}
-            suggestions={DELIVERY_OPTIONS}
+            options={DELIVERY_OPTIONS.map((d) => ({ value: d, label: d.charAt(0).toUpperCase() + d.slice(1) }))}
+            allowCreate
             placeholder="Add delivery styles..."
             helpText="How the persona delivers vocals"
           />
 
           <ChipSelector
             label="Influences"
-            value={formData.influences || []}
+            selected={formData.influences || []}
             onChange={(value) => updateField('influences', value)}
-            suggestions={[]}
+            options={[]}
+            allowCreate
             placeholder="Add influences..."
             warning={
               formData.policy?.public_release && (formData.influences?.length || 0) > 0

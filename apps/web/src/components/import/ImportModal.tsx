@@ -27,7 +27,7 @@ import { ImportPreview, type ValidationError } from './ImportPreview';
 import { apiClient } from '@/lib/api/client';
 import { toast } from 'sonner';
 
-export type EntityType = 'style' | 'lyrics' | 'persona' | 'producerNotes' | 'blueprint';
+export type EntityType = 'style' | 'lyrics' | 'persona' | 'producerNotes' | 'blueprint' | 'source';
 
 export interface ImportModalProps {
   /** Whether the modal is open */
@@ -51,6 +51,7 @@ const ENTITY_METADATA: Record<EntityType, { label: string; endpoint: string }> =
   persona: { label: 'Persona', endpoint: '/personas/import' },
   producerNotes: { label: 'Producer Notes', endpoint: '/producer-notes/import' },
   blueprint: { label: 'Blueprint', endpoint: '/blueprints/import' },
+  source: { label: 'Source', endpoint: '/sources/import' },
 };
 
 /**

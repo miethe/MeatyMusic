@@ -9,10 +9,16 @@ Contract: .claude/skills/workflow/lyrics/SKILL.md
 
 import hashlib
 import re
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import structlog
 
+from app.services.mcp_client_service import (
+    get_mcp_client_service,
+    MCPServerNotFoundError,
+    MCPToolNotSupportedError,
+    MCPConnectionError,
+)
 from app.skills.llm_client import get_llm_client
 from app.workflows.skill import WorkflowContext, compute_hash, workflow_skill
 
@@ -841,6 +847,221 @@ def pinned_retrieve(
     return result
 
 
+async def retrieve_from_mcp_sources(
+    sources: List[Dict[str, Any]],
+    query: str,
+    previous_citation_hashes: List[str],
+    top_k: int,
+    seed: int,
+) -> tuple[List[Dict[str, Any]], List[str]]:
+    """Retrieve chunks from MCP sources with deterministic hash pinning.
+
+    This function integrates with MCPClientService to retrieve source material
+    for lyrics generation. It maintains determinism through chunk hash tracking:
+    - First run: Retrieve chunks from MCP and store their hashes
+    - Subsequent runs: Use pinned hashes to retrieve exact same chunks
+
+    Args:
+        sources: List of Source entities with mcp_server_id and scopes
+        query: Search query for retrieval
+        previous_citation_hashes: Chunk hashes from previous runs (for pinning)
+        top_k: Number of chunks to retrieve
+        seed: Seed for deterministic selection
+
+    Returns:
+        Tuple of (citations, chunk_hashes):
+            - citations: List of chunks with {chunk_hash, text, source_id, metadata, weight}
+            - chunk_hashes: List of chunk hashes for future pinning
+
+    Example:
+        ```python
+        sources = [
+            {
+                "id": "source-uuid",
+                "mcp_server_id": "local-knowledge",
+                "scopes": ["lyrics", "themes"],
+                "weight": 0.8
+            }
+        ]
+        citations, hashes = await retrieve_from_mcp_sources(
+            sources=sources,
+            query="love and dreams",
+            previous_citation_hashes=[],
+            top_k=5,
+            seed=42,
+        )
+        ```
+    """
+    logger.info(
+        "mcp_retrieval.start",
+        num_sources=len(sources),
+        query_length=len(query),
+        has_previous_hashes=len(previous_citation_hashes) > 0,
+        top_k=top_k,
+        seed=seed,
+    )
+
+    mcp_client = get_mcp_client_service()
+    all_citations = []
+    retrieval_errors = []
+
+    # Phase 1: If we have previous hashes, retrieve those exact chunks
+    if previous_citation_hashes:
+        logger.info(
+            "mcp_retrieval.pinned_mode",
+            num_hashes=len(previous_citation_hashes),
+        )
+
+        # Group hashes by source (extract from previous run metadata)
+        # For simplicity, try all sources for each hash
+        retrieved_hashes = set()
+
+        for source in sources:
+            mcp_server_id = source.get("mcp_server_id")
+            if not mcp_server_id:
+                logger.warning(
+                    "mcp_retrieval.missing_server_id",
+                    source_id=source.get("id", "unknown"),
+                )
+                continue
+
+            # Try to retrieve each hash from this source
+            for chunk_hash in previous_citation_hashes:
+                if chunk_hash in retrieved_hashes:
+                    continue
+
+                try:
+                    chunk = await mcp_client.get_context(
+                        server_id=mcp_server_id,
+                        chunk_hash=chunk_hash,
+                    )
+
+                    if chunk:
+                        # Enrich with source weight
+                        chunk["weight"] = source.get("weight", 0.5)
+                        all_citations.append(chunk)
+                        retrieved_hashes.add(chunk_hash)
+
+                        logger.debug(
+                            "mcp_retrieval.hash_retrieved",
+                            chunk_hash=chunk_hash[:16],
+                            server_id=mcp_server_id,
+                        )
+
+                except (MCPServerNotFoundError, MCPToolNotSupportedError, MCPConnectionError) as e:
+                    error_msg = f"MCP error for {mcp_server_id}: {e}"
+                    retrieval_errors.append(error_msg)
+                    logger.error(
+                        "mcp_retrieval.hash_error",
+                        chunk_hash=chunk_hash[:16],
+                        server_id=mcp_server_id,
+                        error=str(e),
+                    )
+
+        logger.info(
+            "mcp_retrieval.pinned_complete",
+            requested=len(previous_citation_hashes),
+            retrieved=len(all_citations),
+            missing=len(previous_citation_hashes) - len(all_citations),
+        )
+
+    # Phase 2: Fill remaining slots with new searches (if needed)
+    remaining_slots = top_k - len(all_citations)
+
+    if remaining_slots > 0:
+        logger.info(
+            "mcp_retrieval.search_mode",
+            remaining_slots=remaining_slots,
+        )
+
+        for source in sources:
+            if remaining_slots <= 0:
+                break
+
+            mcp_server_id = source.get("mcp_server_id")
+            scopes = source.get("scopes", [])
+            source_weight = source.get("weight", 0.5)
+
+            if not mcp_server_id:
+                continue
+
+            try:
+                # Validate scopes first
+                scope_validation = await mcp_client.validate_scopes(
+                    server_id=mcp_server_id,
+                    requested_scopes=scopes,
+                )
+
+                if not scope_validation["valid"]:
+                    logger.warning(
+                        "mcp_retrieval.invalid_scopes",
+                        server_id=mcp_server_id,
+                        invalid_scopes=scope_validation["invalid_scopes"],
+                    )
+                    # Continue with valid scopes only
+                    scopes = scope_validation["available_scopes"]
+
+                # Search for chunks
+                chunks = await mcp_client.search(
+                    server_id=mcp_server_id,
+                    query=query,
+                    scopes=scopes,
+                    top_k=remaining_slots,
+                    seed=seed,
+                )
+
+                # Filter out already retrieved chunks
+                existing_hashes = {c["chunk_hash"] for c in all_citations}
+                new_chunks = [
+                    c for c in chunks if c["chunk_hash"] not in existing_hashes
+                ]
+
+                # Update weight from source
+                for chunk in new_chunks:
+                    chunk["weight"] = source_weight
+
+                all_citations.extend(new_chunks)
+                remaining_slots -= len(new_chunks)
+
+                logger.info(
+                    "mcp_retrieval.search_complete",
+                    server_id=mcp_server_id,
+                    retrieved=len(new_chunks),
+                    remaining_slots=remaining_slots,
+                )
+
+            except (MCPServerNotFoundError, MCPToolNotSupportedError, MCPConnectionError) as e:
+                error_msg = f"MCP error for {mcp_server_id}: {e}"
+                retrieval_errors.append(error_msg)
+                logger.error(
+                    "mcp_retrieval.search_error",
+                    server_id=mcp_server_id,
+                    error=str(e),
+                )
+
+    # Limit to top_k (in case we retrieved more)
+    final_citations = all_citations[:top_k]
+
+    # Extract chunk hashes for future pinning
+    chunk_hashes = [c["chunk_hash"] for c in final_citations]
+
+    if retrieval_errors:
+        logger.warning(
+            "mcp_retrieval.errors",
+            error_count=len(retrieval_errors),
+            errors=retrieval_errors[:5],  # Log first 5 errors
+        )
+
+    logger.info(
+        "mcp_retrieval.complete",
+        total_citations=len(final_citations),
+        unique_hashes=len(set(chunk_hashes)),
+        had_errors=len(retrieval_errors) > 0,
+    )
+
+    return final_citations, chunk_hashes
+
+
 @workflow_skill(
     name="amcs.lyrics.generate",
     deterministic=True,
@@ -883,12 +1104,13 @@ async def generate_lyrics(
 
     # Step 1: Prepare source retrieval (if sources provided)
     citations = []
+    citation_hashes = []
     source_context = ""
 
     if sources:
-        # Retrieve chunks using pinned retrieval for determinism
+        # Retrieve chunks using MCP with deterministic hash pinning
         # If this is a re-run, use citation_hashes from previous run
-        # Otherwise, perform lexicographic selection
+        # Otherwise, perform new MCP search
         previous_citation_hashes = inputs.get("citation_hashes", [])
 
         logger.info(
@@ -897,27 +1119,37 @@ async def generate_lyrics(
             has_previous_hashes=len(previous_citation_hashes) > 0,
         )
 
-        # Use pinned retrieval to get chunks deterministically
-        chunks = pinned_retrieve(
-            query=f"Lyrics context for {sds_lyrics.get('themes', ['song'])}",
-            sources=sources,
-            required_chunk_hashes=previous_citation_hashes,
-            top_k=inputs.get("source_top_k", 5),  # Default to 5 chunks
-            seed=context.seed + 1,  # Offset from main seed
-        )
+        # Use MCP retrieval with hash pinning for determinism
+        try:
+            citations, citation_hashes = await retrieve_from_mcp_sources(
+                sources=sources,
+                query=f"Lyrics context for {sds_lyrics.get('themes', ['song'])}",
+                previous_citation_hashes=previous_citation_hashes,
+                top_k=inputs.get("source_top_k", 5),  # Default to 5 chunks
+                seed=context.seed + 1,  # Offset from main seed
+            )
 
-        citations = chunks
+            # Build source context for prompt
+            if citations:
+                source_texts = [f"- {chunk['text']}" for chunk in citations]
+                source_context = "\n\nRelevant source material:\n" + "\n".join(source_texts)
 
-        # Build source context for prompt
-        if chunks:
-            source_texts = [f"- {chunk['text']}" for chunk in chunks]
-            source_context = "\n\nRelevant source material:\n" + "\n".join(source_texts)
+            logger.info(
+                "lyrics.sources.retrieved",
+                num_chunks=len(citations),
+                citation_hashes=[c[:16] for c in citation_hashes],
+            )
 
-        logger.info(
-            "lyrics.sources.retrieved",
-            num_chunks=len(chunks),
-            citation_hashes=[c["chunk_hash"][:16] for c in chunks],
-        )
+        except Exception as e:
+            # Log error but continue without sources
+            logger.error(
+                "lyrics.sources.error",
+                error=str(e),
+                error_type=type(e).__name__,
+            )
+            # Continue with empty citations - lyrics can still be generated
+            citations = []
+            citation_hashes = []
 
     # Step 2: Generate section-by-section
     section_order = plan["section_order"]
@@ -1077,6 +1309,7 @@ Generate {min_lines} to {max_lines} lines now."""
     return {
         "lyrics": complete_lyrics,
         "citations": citations,
+        "citation_hashes": citation_hashes,  # For deterministic re-runs
         "metrics": metrics,
         "issues": all_issues,  # Rhyme/syllable issues for validation
         "_hash": lyrics_hash,

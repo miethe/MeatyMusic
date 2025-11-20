@@ -9,22 +9,31 @@ import Link from 'next/link';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@meatymusic/ui';
 import { Card } from '@meatymusic/ui';
-import { Plus, Database } from 'lucide-react';
+import { Plus, Database, Upload } from 'lucide-react';
 import { ROUTES } from '@/config/routes';
+import { ImportModal } from '@/components/import/ImportModal';
 
 export default function SourcesPage() {
+  const [importModalOpen, setImportModalOpen] = React.useState(false);
+
   return (
     <div className="min-h-screen">
       <PageHeader
         title="Sources"
         description="Manage external knowledge sources and references"
         actions={
-          <Link href={ROUTES.ENTITIES.SOURCE_NEW}>
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              Add Source
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setImportModalOpen(true)}>
+              <Upload className="w-4 h-4 mr-2" />
+              Import
             </Button>
-          </Link>
+            <Link href={ROUTES.ENTITIES.SOURCE_NEW}>
+              <Button>
+                <Plus className="w-4 h-4 mr-2" />
+                Add Source
+              </Button>
+            </Link>
+          </div>
         }
       />
 
@@ -43,6 +52,15 @@ export default function SourcesPage() {
           </Link>
         </Card>
       </div>
+
+      <ImportModal
+        open={importModalOpen}
+        onOpenChange={setImportModalOpen}
+        entityType="source"
+        onImportSuccess={() => {
+          setImportModalOpen(false);
+        }}
+      />
     </div>
   );
 }

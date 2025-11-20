@@ -1,6 +1,7 @@
 /**
  * Styles List Page
  * Display all style entities with filters
+ * Updated to use MeatyMusic Design System
  */
 
 'use client';
@@ -11,7 +12,8 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@meatymusic/ui';
 import { Card } from '@meatymusic/ui';
 import { Badge } from '@meatymusic/ui';
-import { Plus, Filter, Palette, Loader2, Upload } from 'lucide-react';
+import { Input } from '@meatymusic/ui';
+import { Plus, Filter, Palette, Loader2, Upload, Music, Clock, Key } from 'lucide-react';
 import { ROUTES } from '@/config/routes';
 import { useStyles } from '@/hooks/api/useStyles';
 import type { Style } from '@/types/api/entities';
@@ -37,12 +39,12 @@ export default function StylesPage() {
         actions={
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => setImportModalOpen(true)}>
-              <Upload className="w-4 h-4 mr-2" />
+              <Upload className="w-4 h-4" />
               Import
             </Button>
             <Link href={ROUTES.ENTITIES.STYLE_NEW}>
-              <Button>
-                <Plus className="w-4 h-4 mr-2" />
+              <Button variant="primary">
+                <Plus className="w-4 h-4" />
                 Create Style
               </Button>
             </Link>
@@ -54,59 +56,63 @@ export default function StylesPage() {
         {/* Filters */}
         <div className="mb-6 flex items-center gap-4 animate-fade-in">
           <div className="flex-1">
-            <input
+            <Input
               type="search"
-              placeholder="Search styles..."
-              className="w-full px-4 py-2 rounded-lg border border-border-default bg-bg-elevated text-text-primary placeholder:text-text-muted focus:border-border-accent focus:ring-2 focus:ring-primary/20 transition-all duration-ui"
+              placeholder="Search styles by name, genre, or mood..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              icon={<Palette className="w-4 h-4" />}
             />
           </div>
           <Button variant="outline">
-            <Filter className="w-4 h-4 mr-2" />
+            <Filter className="w-4 h-4" />
             Filters
           </Button>
         </div>
 
         {/* Loading State */}
         {isLoading && (
-          <Card className="bg-bg-surface border-border-default shadow-elevation-1 p-12 text-center animate-fade-in">
-            <Loader2 className="w-16 h-16 mx-auto text-text-muted mb-4 animate-spin" />
-            <p className="text-text-secondary">Loading styles...</p>
+          <Card variant="default" padding="lg" className="text-center animate-fade-in">
+            <Loader2 className="w-16 h-16 mx-auto text-[var(--mm-color-text-tertiary)] mb-4 animate-spin" />
+            <p className="text-[var(--mm-color-text-secondary)] text-sm">Loading styles...</p>
           </Card>
         )}
 
         {/* Error State */}
         {error && (
-          <Card className="bg-bg-surface border-border-default shadow-elevation-1 p-12 text-center animate-fade-in">
-            <div className="text-destructive mb-4">
+          <Card variant="default" padding="lg" className="text-center animate-fade-in border-[var(--mm-color-error-500)]">
+            <div className="text-[var(--mm-color-error-500)] mb-4">
               <p className="font-medium">Failed to load styles</p>
-              <p className="text-sm text-text-secondary mt-2">{error.message}</p>
+              <p className="text-sm text-[var(--mm-color-text-secondary)] mt-2">{error.message}</p>
             </div>
           </Card>
         )}
 
         {/* Empty State */}
         {!isLoading && !error && styles.length === 0 && (
-          <Card className="bg-bg-surface border-border-default shadow-elevation-1 p-12 text-center animate-fade-in">
-            <Palette className="w-16 h-16 mx-auto text-text-muted mb-4" />
-            <h3 className="text-lg font-medium text-text-primary mb-2">
-              {search ? 'No styles found' : 'No styles yet'}
-            </h3>
-            <p className="text-text-secondary mb-6">
-              {search
-                ? 'Try adjusting your search terms'
-                : 'Create your first style specification to define the musical characteristics of your songs'
-              }
-            </p>
-            {!search && (
-              <Link href={ROUTES.ENTITIES.STYLE_NEW}>
-                <Button className="bg-gradient-primary shadow-accent-glow hover:shadow-accent-glow-lg transition-all duration-ui">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create First Style
-                </Button>
-              </Link>
-            )}
+          <Card variant="gradient" padding="lg" className="text-center animate-fade-in">
+            <div className="max-w-md mx-auto">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--mm-color-panel)] mb-4">
+                <Palette className="w-8 h-8 text-[var(--mm-color-primary)]" />
+              </div>
+              <h3 className="text-lg font-semibold text-[var(--mm-color-text-primary)] mb-2">
+                {search ? 'No styles found' : 'No styles yet'}
+              </h3>
+              <p className="text-[var(--mm-color-text-secondary)] mb-6 text-sm">
+                {search
+                  ? 'Try adjusting your search terms or clearing filters'
+                  : 'Create your first style specification to define the musical characteristics of your songs'
+                }
+              </p>
+              {!search && (
+                <Link href={ROUTES.ENTITIES.STYLE_NEW}>
+                  <Button variant="primary" size="lg">
+                    <Plus className="w-4 h-4" />
+                    Create First Style
+                  </Button>
+                </Link>
+              )}
+            </div>
           </Card>
         )}
 
@@ -135,29 +141,82 @@ export default function StylesPage() {
 function StyleCard({ style }: { style: Style }) {
   return (
     <Link href={ROUTES.ENTITIES.STYLE_DETAIL(style.id)}>
-      <Card className="bg-bg-surface border-border-default shadow-elevation-1 hover:shadow-elevation-2 hover:border-border-accent p-6 transition-all duration-ui cursor-pointer">
-        <h3 className="text-lg font-semibold text-text-primary mb-2">{style.name}</h3>
-        <div className="flex flex-wrap gap-2 mb-4">
-          {style.genre && <Badge variant="secondary">{style.genre}</Badge>}
-          {style.bpm_min && style.bpm_max && (
-            <Badge variant="outline">{style.bpm_min}-{style.bpm_max} BPM</Badge>
-          )}
-          {style.key && <Badge variant="outline">{style.key}</Badge>}
-        </div>
-        {style.mood && style.mood.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-2">
-            {style.mood.slice(0, 3).map((moodItem) => (
-              <Badge key={moodItem} variant="outline" className="text-xs">
-                {moodItem}
-              </Badge>
-            ))}
-            {style.mood.length > 3 && (
-              <Badge variant="outline" className="text-xs">
-                +{style.mood.length - 3} more
+      <Card
+        variant="elevated"
+        padding="md"
+        interactive
+        className="h-full"
+      >
+        {/* Header */}
+        <div className="mb-4">
+          <div className="flex items-start justify-between mb-2">
+            <h3 className="text-lg font-semibold text-[var(--mm-color-text-primary)] group-hover:text-[var(--mm-color-primary)] transition-colors">
+              {style.name}
+            </h3>
+            {style.genre && (
+              <Badge variant="secondary" size="sm">
+                <Music className="w-3 h-3" />
+                {style.genre}
               </Badge>
             )}
           </div>
-        )}
+        </div>
+
+        {/* Details */}
+        <div className="space-y-3">
+          {/* BPM and Key */}
+          <div className="flex flex-wrap gap-2">
+            {style.bpm_min && style.bpm_max && (
+              <Badge variant="outline" size="sm">
+                <Clock className="w-3 h-3" />
+                {style.bpm_min}-{style.bpm_max} BPM
+              </Badge>
+            )}
+            {style.key && (
+              <Badge variant="outline" size="sm">
+                <Key className="w-3 h-3" />
+                {style.key}
+              </Badge>
+            )}
+          </div>
+
+          {/* Mood Tags */}
+          {style.mood && style.mood.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {style.mood.slice(0, 4).map((moodItem) => (
+                <Badge
+                  key={moodItem}
+                  variant="outline"
+                  size="sm"
+                  className="text-xs"
+                >
+                  {moodItem}
+                </Badge>
+              ))}
+              {style.mood.length > 4 && (
+                <Badge
+                  variant="secondary"
+                  size="sm"
+                  className="text-xs"
+                >
+                  +{style.mood.length - 4}
+                </Badge>
+              )}
+            </div>
+          )}
+
+          {/* Energy Level */}
+          {style.energy && (
+            <div className="pt-2 border-t border-[var(--mm-color-border-subtle)]">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-[var(--mm-color-text-tertiary)]">Energy</span>
+                <span className="text-[var(--mm-color-text-secondary)] font-medium">
+                  {style.energy}
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
       </Card>
     </Link>
   );

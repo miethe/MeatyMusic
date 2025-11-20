@@ -3,22 +3,40 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../../lib/utils";
 
 const cardVariants = cva(
-  "rounded-md text-text-base transition-all duration-[var(--mp-motion-duration-ui)]",
+  "rounded-lg text-[var(--mm-color-text-primary)] transition-all duration-[var(--mm-duration-fast)]",
   {
     variants: {
       variant: {
-        elevated: "bg-surface border border-border shadow-elev2 hover:shadow-elev3 hover:border-[var(--mp-color-primary)]/20 hover:-translate-y-0.5 active:shadow-elev2 active:translate-y-0",
-        bordered: "bg-surface border border-border shadow-elev1 hover:shadow-elev2 hover:border-[var(--mp-color-primary)]/30",
-        ghost: "bg-transparent border-0 shadow-none hover:bg-[var(--mp-color-panel)]/50",
-        interactive: "bg-surface border border-border shadow-elev1 cursor-pointer hover:shadow-elev2 hover:border-[var(--mp-color-primary)] hover:-translate-y-1 active:shadow-elev1 active:translate-y-0 transition-all duration-[var(--mp-motion-duration-ui)]",
+        // Default: Basic card with subtle border
+        default:
+          "bg-[var(--mm-color-surface)] border border-[var(--mm-color-border-default)] shadow-[var(--mm-shadow-1)]",
+        // Elevated: Card with shadow (level 2)
+        elevated:
+          "bg-[var(--mm-color-surface)] border border-[var(--mm-color-border-default)] shadow-[var(--mm-shadow-2)] hover:shadow-[var(--mm-shadow-3)] hover:border-[var(--mm-color-border-accent)]/30 hover:-translate-y-0.5 active:shadow-[var(--mm-shadow-2)] active:translate-y-0",
+        // Gradient: Card with subtle gradient background
+        gradient:
+          "bg-gradient-to-br from-[var(--mm-color-surface)] to-[var(--mm-color-panel)] border border-[var(--mm-color-border-default)] shadow-[var(--mm-shadow-1)] hover:shadow-[var(--mm-shadow-2)] hover:border-[var(--mm-color-border-strong)]",
+        // Ghost variant for minimal styling
+        ghost:
+          "bg-transparent border-0 shadow-none hover:bg-[var(--mm-color-panel)]/50",
+        // Interactive variant for clickable cards
+        interactive:
+          "bg-[var(--mm-color-surface)] border border-[var(--mm-color-border-default)] shadow-[var(--mm-shadow-1)] cursor-pointer hover:shadow-[var(--mm-shadow-2)] hover:border-[var(--mm-color-border-accent)] hover:-translate-y-1 active:shadow-[var(--mm-shadow-1)] active:translate-y-0 transition-all duration-[var(--mm-duration-fast)]",
+      },
+      padding: {
+        none: "p-0",
+        sm: "p-4",
+        md: "p-6",
+        lg: "p-8",
       },
       focusable: {
-        true: "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--mp-color-ring)] focus-visible:ring-offset-2",
+        true: "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--mm-color-ring)] focus-visible:ring-offset-2",
         false: "",
       }
     },
     defaultVariants: {
-      variant: "elevated",
+      variant: "default",
+      padding: "md",
       focusable: false,
     },
   }
@@ -41,7 +59,7 @@ export interface CardProps
 }
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className, variant, focusable, interactive, ...props }, ref) => {
+  ({ className, variant, padding, focusable, interactive, ...props }, ref) => {
     // If interactive is true, use interactive variant
     const effectiveVariant = interactive ? "interactive" : variant;
     const effectiveFocusable = interactive ? true : focusable;
@@ -50,7 +68,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
       <div
         ref={ref}
         className={cn(
-          cardVariants({ variant: effectiveVariant, focusable: effectiveFocusable }),
+          cardVariants({ variant: effectiveVariant, padding, focusable: effectiveFocusable }),
           "group",
           className
         )}
@@ -70,8 +88,8 @@ const CardHeader = React.forwardRef<
     ref={ref}
     className={cn(
       "flex flex-col space-y-1.5 p-6",
-      "border-b border-[var(--mp-color-border)]/50 transition-colors duration-[var(--mp-motion-duration-ui)]",
-      "group-hover:border-[var(--mp-color-border)]/80",
+      "border-b border-[var(--mm-color-border-default)]/50 transition-colors duration-[var(--mm-duration-fast)]",
+      "group-hover:border-[var(--mm-color-border-default)]/80",
       className
     )}
     {...props}
@@ -86,9 +104,9 @@ const CardTitle = React.forwardRef<
   <h3
     ref={ref}
     className={cn(
-      "text-2xl font-semibold leading-none tracking-tight text-text-strong",
-      "transition-colors duration-[var(--mp-motion-duration-ui)]",
-      "group-hover:text-[var(--mp-color-primary)]",
+      "text-2xl font-semibold leading-none tracking-tight text-[var(--mm-color-text-primary)]",
+      "transition-colors duration-[var(--mm-duration-fast)]",
+      "group-hover:text-[var(--mm-color-primary)]",
       className
     )}
     {...props}
@@ -103,8 +121,8 @@ const CardDescription = React.forwardRef<
   <p
     ref={ref}
     className={cn(
-      "text-sm text-text-muted",
-      "transition-opacity duration-[var(--mp-motion-duration-ui)]",
+      "text-sm text-[var(--mm-color-text-tertiary)]",
+      "transition-opacity duration-[var(--mm-duration-fast)]",
       "group-hover:opacity-90",
       className
     )}
@@ -129,8 +147,8 @@ const CardFooter = React.forwardRef<
     ref={ref}
     className={cn(
       "flex items-center p-6 pt-0",
-      "border-t border-[var(--mp-color-border)]/0 transition-colors duration-[var(--mp-motion-duration-ui)]",
-      "group-hover:border-[var(--mp-color-border)]/30",
+      "border-t border-[var(--mm-color-border-default)]/0 transition-colors duration-[var(--mm-duration-fast)]",
+      "group-hover:border-[var(--mm-color-border-default)]/30",
       className
     )}
     {...props}

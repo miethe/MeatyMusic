@@ -1,0 +1,18 @@
+{
+  "name": "Upbeat Pop Rock",
+  "description": "Energetic pop-rock style with driving rhythms and catchy hooks",
+  "genre": "pop-rock",
+  "bpm_min": 120,
+  "bpm_max": 140,
+  "key": "C",
+  "mood": ["energetic", "uplifting", "confident"],
+  "energy_level": 8,
+  "instrumentation": {
+    "primary": ["electric guitar", "bass", "drums", "synth"],
+    "secondary": ["piano", "strings"]
+  },
+  "tags": ["anthemic", "driving", "melodic"],
+  "constraints": {
+    "avoid_tags": ["whisper", "ambient", "minimal"]
+  }
+}

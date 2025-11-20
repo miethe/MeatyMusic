@@ -1,0 +1,12 @@
+{
+  "name": "Music Theory Reference",
+  "description": "Comprehensive music theory knowledge base for lyric and composition guidance",
+  "kind": "file",
+  "uri": "file:///data/sources/music-theory.txt",
+  "mcp_scope": "knowledge",
+  "active": true,
+  "metadata": {
+    "topics": ["harmony", "melody", "rhythm", "structure"],
+    "source_type": "educational"
+  }
+}
