@@ -1,0 +1,80 @@
+{
+  "id": "synthetic-indie_alternative-089",
+  "title": "Indie Alternative Song 89",
+  "blueprint_ref": {
+    "genre": "Indie Alternative",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "indie_alternative",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 114,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "C major",
+      "modulations": []
+    },
+    "mood": [
+      "mellow",
+      "introspective"
+    ],
+    "energy": "medium",
+    "instrumentation": [
+      "synth",
+      "keys",
+      "guitar",
+      "drums",
+      "bass"
+    ],
+    "vocal_profile": "conversational",
+    "tags": [
+      "introspective",
+      "atmospheric"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "2nd",
+    "tense": "future",
+    "themes": [
+      "indie_alternative",
+      "life"
+    ],
+    "rhyme_scheme": "AAAA",
+    "section_order": [
+      "intro",
+      "verse1",
+      "pre-chorus1",
+      "chorus1",
+      "verse2",
+      "pre-chorus2",
+      "chorus2",
+      "bridge",
+      "chorus3",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 70
+    }
+  },
+  "producer_notes": {
+    "structure": "Complex",
+    "hooks": 5
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 8942
+}

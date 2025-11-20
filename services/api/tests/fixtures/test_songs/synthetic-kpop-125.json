@@ -1,0 +1,78 @@
+{
+  "id": "synthetic-kpop-125",
+  "title": "Kpop Song 125",
+  "blueprint_ref": {
+    "genre": "Kpop",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "kpop",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 122,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "D major",
+      "modulations": []
+    },
+    "mood": [
+      "powerful",
+      "bright"
+    ],
+    "energy": "low",
+    "instrumentation": [
+      "keys",
+      "bass",
+      "samples"
+    ],
+    "vocal_profile": "powerful",
+    "tags": [
+      "energetic",
+      "polished"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "present",
+    "themes": [
+      "kpop",
+      "life"
+    ],
+    "rhyme_scheme": "AAAA",
+    "section_order": [
+      "intro",
+      "verse1",
+      "pre-chorus1",
+      "chorus1",
+      "verse2",
+      "pre-chorus2",
+      "chorus2",
+      "bridge",
+      "chorus3",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": true,
+      "max_lines": 50
+    }
+  },
+  "producer_notes": {
+    "structure": "Complex",
+    "hooks": 5
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 12542
+}

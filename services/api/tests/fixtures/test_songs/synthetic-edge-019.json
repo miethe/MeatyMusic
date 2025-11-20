@@ -1,0 +1,69 @@
+{
+  "id": "synthetic-edge-019",
+  "title": "Odd Rhythm",
+  "blueprint_ref": {
+    "genre": "Indie Alternative",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "experimental",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 110,
+    "time_signature": "7/8",
+    "key": {
+      "primary": "F# minor",
+      "modulations": []
+    },
+    "mood": [
+      "unusual",
+      "complex",
+      "mathematical"
+    ],
+    "energy": "medium",
+    "instrumentation": [
+      "drums",
+      "bass",
+      "synth"
+    ],
+    "vocal_profile": "spoken",
+    "tags": [
+      "experimental",
+      "rhythmic",
+      "unusual"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "present",
+    "themes": [
+      "rhythm",
+      "mathematics",
+      "patterns"
+    ],
+    "rhyme_scheme": "Free",
+    "section_order": [
+      "verse1",
+      "verse2",
+      "bridge"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 20
+    }
+  },
+  "producer_notes": {
+    "structure": "Experimental",
+    "hooks": 1
+  },
+  "sources": [],
+  "prompt_controls": {},
+  "render": {
+    "engine": "none"
+  },
+  "seed": 90061
+}

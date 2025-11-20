@@ -1,0 +1,76 @@
+{
+  "id": "synthetic-hiphop-003",
+  "title": "Hiphop Song 3",
+  "blueprint_ref": {
+    "genre": "Hiphop",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "hiphop",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 73,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "D minor",
+      "modulations": []
+    },
+    "mood": [
+      "confident",
+      "dark"
+    ],
+    "energy": "low",
+    "instrumentation": [
+      "beats",
+      "synth",
+      "samples",
+      "808s"
+    ],
+    "vocal_profile": "melodic rap",
+    "tags": [
+      "groovy",
+      "lyrical",
+      "bass-heavy",
+      "rhythmic"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "2nd",
+    "tense": "past",
+    "themes": [
+      "hiphop",
+      "memories"
+    ],
+    "rhyme_scheme": "AAAA",
+    "section_order": [
+      "verse1",
+      "chorus1",
+      "verse2",
+      "chorus2",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 25
+    }
+  },
+  "producer_notes": {
+    "structure": "Simple",
+    "hooks": 3
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 342
+}

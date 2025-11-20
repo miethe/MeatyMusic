@@ -1,14 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { LyricsBase, LyricsCreate, POV, Tense, HookStrategy, Lyrics } from '@/types/api/entities';
+import { LyricsBase, LyricsCreate, POV, Tense, HookStrategy, Lyrics, ProfanityCheckResult } from '@/types/api/entities';
 import { ChipSelector } from './common/ChipSelector';
 import { SectionEditor, Section } from './common/SectionEditor';
 import { RhymeSchemeInput } from './common/RhymeSchemeInput';
 import { EntityPreviewPanel, ValidationError } from './common/EntityPreviewPanel';
 import { LibrarySelector } from './common/LibrarySelector';
-import { Save, X } from 'lucide-react';
-import { useLyricsList } from '@/hooks/api/useLyrics';
+import { ProfanityWarnings } from '../lyrics/ProfanityWarnings';
+import { Save, X, Shield } from 'lucide-react';
+import { useLyricsList, useCheckProfanity } from '@/hooks/api/useLyrics';
 
 export interface LyricsEditorProps {
   songId?: string;
@@ -70,9 +71,13 @@ export function LyricsEditor({
   const [sections, setSections] = useState<Section[]>([]);
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
   const [showPreview, setShowPreview] = useState(true);
+  const [profanityResult, setProfanityResult] = useState<ProfanityCheckResult | null>(null);
 
   // Fetch library lyrics for selection
   const { data: lyricsData } = useLyricsList();
+
+  // Profanity check mutation
+  const checkProfanity = useCheckProfanity();
 
   useEffect(() => {
     if (initialValue.sections) {
@@ -89,6 +94,38 @@ export function LyricsEditor({
   useEffect(() => {
     validateForm();
   }, [formData, sections]);
+
+  // Check profanity when sections change
+  useEffect(() => {
+    if (sections.length === 0) {
+      setProfanityResult(null);
+      return;
+    }
+
+    // Debounce profanity check
+    const timer = setTimeout(() => {
+      const sectionData = sections.map((s) => ({
+        type: s.type,
+        lines: Array.isArray(s.metadata?.lines)
+          ? s.metadata.lines
+          : Array(s.lines || 4).fill(''), // Placeholder for empty lines
+      }));
+
+      checkProfanity.mutate(
+        {
+          sections: sectionData,
+          explicit_allowed: formData.explicit_allowed,
+        },
+        {
+          onSuccess: (result) => {
+            setProfanityResult(result);
+          },
+        }
+      );
+    }, 1000); // Wait 1 second after last change
+
+    return () => clearTimeout(timer);
+  }, [sections, formData.explicit_allowed]);
 
   const validateForm = () => {
     const errors: ValidationError[] = [];
@@ -395,6 +432,19 @@ export function LyricsEditor({
             >
               Allow Explicit Content
             </label>
+          </div>
+
+          {/* Profanity Warnings */}
+          <div className="rounded-lg border border-border-secondary bg-background-secondary p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Shield className="h-4 w-4 text-accent-secondary" />
+              <h3 className="text-sm font-semibold text-text-primary">Content Filter</h3>
+            </div>
+            <ProfanityWarnings
+              result={profanityResult}
+              isLoading={checkProfanity.isPending}
+              explicitAllowed={formData.explicit_allowed}
+            />
           </div>
         </div>
 

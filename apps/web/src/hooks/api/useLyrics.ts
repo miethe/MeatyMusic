@@ -7,7 +7,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { lyricsApi } from '@/lib/api';
 import { queryKeys, getStaleTime } from '@/lib/query/config';
 import { useUIStore } from '@/stores';
-import type { Lyrics, LyricsCreate, LyricsUpdate, UUID } from '@/types/api';
+import type { Lyrics, LyricsCreate, LyricsUpdate, UUID, ProfanityCheckResult } from '@/types/api';
 import type { LyricsFilters } from '@/lib/api/lyrics';
 
 export function useLyricsList(filters?: LyricsFilters) {
@@ -101,5 +101,17 @@ export function useImportLyrics() {
     onError: (error: any) => {
       addToast(error?.message || 'Failed to import lyrics', 'error');
     },
+  });
+}
+
+export function useCheckProfanity() {
+  return useMutation({
+    mutationFn: ({
+      sections,
+      explicit_allowed,
+    }: {
+      sections: Array<{ type: string; lines: string[] }>;
+      explicit_allowed?: boolean;
+    }): Promise<ProfanityCheckResult> => lyricsApi.checkProfanity(sections, explicit_allowed),
   });
 }

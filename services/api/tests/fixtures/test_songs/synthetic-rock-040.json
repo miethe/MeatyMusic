@@ -1,0 +1,81 @@
+{
+  "id": "synthetic-rock-040",
+  "title": "Rock Song 40",
+  "blueprint_ref": {
+    "genre": "Rock",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "rock",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 152,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "E major",
+      "modulations": []
+    },
+    "mood": [
+      "energetic",
+      "rebellious"
+    ],
+    "energy": "low",
+    "instrumentation": [
+      "vocals",
+      "electric guitar",
+      "drums",
+      "bass"
+    ],
+    "vocal_profile": "belting",
+    "tags": [
+      "anthemic",
+      "raw",
+      "powerful",
+      "guitar-driven"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "future",
+    "themes": [
+      "rock",
+      "memories"
+    ],
+    "rhyme_scheme": "Free",
+    "section_order": [
+      "intro",
+      "verse1",
+      "pre-chorus1",
+      "chorus1",
+      "verse2",
+      "pre-chorus2",
+      "chorus2",
+      "bridge",
+      "chorus3",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 50
+    }
+  },
+  "producer_notes": {
+    "structure": "Complex",
+    "hooks": 6
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 4042
+}

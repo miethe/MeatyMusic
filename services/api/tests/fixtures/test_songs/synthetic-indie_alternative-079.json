@@ -1,0 +1,76 @@
+{
+  "id": "synthetic-indie_alternative-079",
+  "title": "Indie Alternative Song 79",
+  "blueprint_ref": {
+    "genre": "Indie Alternative",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "indie_alternative",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 122,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "A minor",
+      "modulations": []
+    },
+    "mood": [
+      "melancholic",
+      "authentic",
+      "dreamy"
+    ],
+    "energy": "high",
+    "instrumentation": [
+      "guitar",
+      "keys",
+      "bass",
+      "drums",
+      "synth"
+    ],
+    "vocal_profile": "intimate",
+    "tags": [
+      "lo-fi",
+      "introspective"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "2nd",
+    "tense": "future",
+    "themes": [
+      "indie_alternative",
+      "emotion"
+    ],
+    "rhyme_scheme": "AABB",
+    "section_order": [
+      "verse1",
+      "chorus1",
+      "verse2",
+      "chorus2",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 35
+    }
+  },
+  "producer_notes": {
+    "structure": "Simple",
+    "hooks": 5
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 7942
+}

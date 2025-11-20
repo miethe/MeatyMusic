@@ -1,0 +1,69 @@
+{
+  "id": "synthetic-edge-196",
+  "title": "Glacial Movement",
+  "blueprint_ref": {
+    "genre": "Electronic",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "ambient",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 40,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "C minor",
+      "modulations": []
+    },
+    "mood": [
+      "ethereal",
+      "slow",
+      "atmospheric"
+    ],
+    "energy": "low",
+    "instrumentation": [
+      "pads",
+      "drones",
+      "ambient"
+    ],
+    "vocal_profile": "whisper",
+    "tags": [
+      "ambient",
+      "slow",
+      "atmospheric"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "present",
+    "themes": [
+      "time",
+      "space",
+      "meditation"
+    ],
+    "rhyme_scheme": "Free",
+    "section_order": [
+      "verse1",
+      "verse2",
+      "verse3"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 20
+    }
+  },
+  "producer_notes": {
+    "structure": "Minimal",
+    "hooks": 0
+  },
+  "sources": [],
+  "prompt_controls": {},
+  "render": {
+    "engine": "none"
+  },
+  "seed": 90238
+}
