@@ -12,7 +12,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from app.api.dependencies import get_workflow_run_repository, get_workflow_run_service
-from app.models.workflow_run import WorkflowRun
+from app.models.song import WorkflowRun
 from app.repositories import WorkflowRunRepository
 from app.services import WorkflowRunService
 from app.schemas import (
