@@ -6,21 +6,28 @@ for song production.
 
 from __future__ import annotations
 
+import io
 import json
 from datetime import datetime, timezone
 from typing import Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
+from fastapi.responses import StreamingResponse
 from pydantic import ValidationError
 
 from app.api.dependencies import (
     get_producer_notes_repository,
     get_producer_notes_service,
+    get_bulk_operations_service,
 )
+from app.models.producer_notes import ProducerNotes
 from app.repositories import ProducerNotesRepository
-from app.services import ProducerNotesService
+from app.services import ProducerNotesService, BulkOperationsService
 from app.schemas import (
+    BulkDeleteRequest,
+    BulkDeleteResponse,
+    BulkExportRequest,
     ErrorResponse,
     PageInfo,
     PaginatedResponse,
@@ -315,3 +322,151 @@ async def get_by_song_id(
         List of producer notes versions for the song, ordered by created_at descending
     """
     return await service.get_by_song_id(song_id)
+
+
+@router.post(
+    "/bulk-delete",
+    response_model=BulkDeleteResponse,
+    summary="Bulk delete producer notes",
+    description="Delete multiple producer notes by IDs",
+    responses={
+        200: {"description": "Bulk delete completed (check response for failures)"},
+        400: {"model": ErrorResponse, "description": "Invalid request"},
+    },
+)
+async def bulk_delete_producer_notes(
+    request: BulkDeleteRequest,
+    service: ProducerNotesService = Depends(get_producer_notes_service),
+    bulk_ops: BulkOperationsService = Depends(get_bulk_operations_service),
+) -> BulkDeleteResponse:
+    """Bulk delete producer notes by IDs.
+
+    Args:
+        request: Request containing list of producer notes IDs to delete
+        service: ProducerNotes service instance
+        bulk_ops: Bulk operations service instance
+
+    Returns:
+        Response with deleted_count, failed_ids, and errors
+    """
+    result = await bulk_ops.bulk_delete_entities(
+        model_class=ProducerNotes,
+        repository=service.repo,
+        entity_ids=request.ids,
+        entity_type_name="producer-notes",
+    )
+    return BulkDeleteResponse(**result)
+
+
+@router.post(
+    "/bulk-export",
+    response_class=StreamingResponse,
+    summary="Bulk export producer notes as ZIP",
+    description="Export multiple producer notes as a ZIP file containing JSON files",
+    responses={
+        200: {
+            "description": "ZIP file with exported producer notes",
+            "content": {"application/zip": {}},
+        },
+        400: {"model": ErrorResponse, "description": "No producer notes found or all exports failed"},
+    },
+)
+async def bulk_export_producer_notes(
+    request: BulkExportRequest,
+    service: ProducerNotesService = Depends(get_producer_notes_service),
+    bulk_ops: BulkOperationsService = Depends(get_bulk_operations_service),
+) -> StreamingResponse:
+    """Bulk export producer notes as ZIP file.
+
+    Args:
+        request: Request containing list of producer notes IDs to export
+        service: ProducerNotes service instance
+        bulk_ops: Bulk operations service instance
+
+    Returns:
+        StreamingResponse with ZIP file download
+
+    Raises:
+        HTTPException: If no producer notes found or all exports fail
+    """
+    try:
+        zip_buffer = await bulk_ops.bulk_export_entities_zip(
+            model_class=ProducerNotes,
+            repository=service.repo,
+            entity_ids=request.ids,
+            entity_type_name="producer-notes",
+            response_schema=ProducerNotesResponse,
+        )
+
+        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        filename = f"producer-notes-bulk-export-{timestamp}.zip"
+
+        return StreamingResponse(
+            zip_buffer,
+            media_type="application/zip",
+            headers={
+                "Content-Disposition": f'attachment; filename="{filename}"',
+            },
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
+
+
+@router.get(
+    "/{notes_id}/export",
+    response_class=StreamingResponse,
+    summary="Export producer notes as JSON file",
+    description="Download a single producer notes as a formatted JSON file",
+    responses={
+        200: {
+            "description": "Producer notes exported successfully as JSON file",
+            "content": {"application/json": {}},
+        },
+        404: {"model": ErrorResponse, "description": "Producer notes not found"},
+    },
+)
+async def export_producer_notes(
+    notes_id: UUID,
+    service: ProducerNotesService = Depends(get_producer_notes_service),
+    bulk_ops: BulkOperationsService = Depends(get_bulk_operations_service),
+) -> StreamingResponse:
+    """Export a single producer notes as JSON file.
+
+    Args:
+        notes_id: ProducerNotes UUID
+        service: ProducerNotes service instance
+        bulk_ops: Bulk operations service instance
+
+    Returns:
+        StreamingResponse with JSON file download
+
+    Raises:
+        HTTPException: If producer notes not found
+    """
+    notes = await service.get_producer_notes(notes_id)
+    if not notes:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Producer notes {notes_id} not found",
+        )
+
+    # Get model for export
+    notes_model = service.repo.get_by_id(notes_id)
+    export_data = await bulk_ops.export_single_entity(
+        entity=notes_model,
+        entity_type_name="producer-notes",
+        response_schema=ProducerNotesResponse,
+    )
+
+    json_content = json.dumps(export_data["content"], indent=2, ensure_ascii=False)
+
+    return StreamingResponse(
+        io.BytesIO(json_content.encode("utf-8")),
+        media_type="application/json; charset=utf-8",
+        headers={
+            "Content-Disposition": f'attachment; filename="{export_data["filename"]}"',
+        },
+    )

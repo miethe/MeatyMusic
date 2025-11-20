@@ -10,6 +10,9 @@ from app.schemas.blueprint import (
 
 # Common schemas
 from app.schemas.common import (
+    BulkDeleteRequest,
+    BulkDeleteResponse,
+    BulkExportRequest,
     ErrorResponse,
     NodeOutputUpdate,
     PageInfo,
@@ -96,6 +99,9 @@ __all__ = [
     "BlueprintResponse",
     "BlueprintUpdate",
     # Common
+    "BulkDeleteRequest",
+    "BulkDeleteResponse",
+    "BulkExportRequest",
     "ErrorResponse",
     "NodeOutputUpdate",
     "PageInfo",

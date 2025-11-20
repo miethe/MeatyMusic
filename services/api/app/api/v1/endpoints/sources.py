@@ -6,17 +6,25 @@ for lyric generation and context.
 
 from __future__ import annotations
 
+import io
 import json
 from datetime import datetime, timezone
 from typing import List, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
+from fastapi.responses import StreamingResponse
 from pydantic import ValidationError
 
-from app.api.dependencies import get_source_service
-from app.services import SourceService
+from app.api.dependencies import get_source_service, get_bulk_operations_service
+from app.core.dependencies import require_admin
+from app.core.security import SecurityContext
+from app.models.source import Source
+from app.services import SourceService, BulkOperationsService
 from app.schemas import (
+    BulkDeleteRequest,
+    BulkDeleteResponse,
+    BulkExportRequest,
     Chunk,
     ChunkWithHash,
     ErrorResponse,
@@ -491,3 +499,161 @@ async def discover_mcp_servers(
     """
     servers = await service.discover_mcp_servers()
     return servers
+
+
+@router.post(
+    "/bulk-delete",
+    response_model=BulkDeleteResponse,
+    summary="Bulk delete sources (Admin only)",
+    description="Delete multiple sources by IDs",
+    responses={
+        200: {"description": "Bulk delete completed (check response for failures)"},
+        400: {"model": ErrorResponse, "description": "Invalid request"},
+        403: {"model": ErrorResponse, "description": "Admin privileges required"},
+    },
+)
+async def bulk_delete_sources(
+    request: BulkDeleteRequest,
+    service: SourceService = Depends(get_source_service),
+    bulk_ops: BulkOperationsService = Depends(get_bulk_operations_service),
+    admin_context: SecurityContext = Depends(require_admin),
+) -> BulkDeleteResponse:
+    """Bulk delete sources by IDs (Admin only).
+
+    Args:
+        request: Request containing list of source IDs to delete
+        service: Source service instance
+        bulk_ops: Bulk operations service instance
+        admin_context: Admin security context
+
+    Returns:
+        Response with deleted_count, failed_ids, and errors
+    """
+    result = await bulk_ops.bulk_delete_entities(
+        model_class=Source,
+        repository=service.repo,
+        entity_ids=request.ids,
+        entity_type_name="source",
+    )
+    return BulkDeleteResponse(**result)
+
+
+@router.post(
+    "/bulk-export",
+    response_class=StreamingResponse,
+    summary="Bulk export sources as ZIP (Admin only)",
+    description="Export multiple sources as a ZIP file containing JSON files",
+    responses={
+        200: {
+            "description": "ZIP file with exported sources",
+            "content": {"application/zip": {}},
+        },
+        400: {"model": ErrorResponse, "description": "No sources found or all exports failed"},
+        403: {"model": ErrorResponse, "description": "Admin privileges required"},
+    },
+)
+async def bulk_export_sources(
+    request: BulkExportRequest,
+    service: SourceService = Depends(get_source_service),
+    bulk_ops: BulkOperationsService = Depends(get_bulk_operations_service),
+    admin_context: SecurityContext = Depends(require_admin),
+) -> StreamingResponse:
+    """Bulk export sources as ZIP file (Admin only).
+
+    Args:
+        request: Request containing list of source IDs to export
+        service: Source service instance
+        bulk_ops: Bulk operations service instance
+        admin_context: Admin security context
+
+    Returns:
+        StreamingResponse with ZIP file download
+
+    Raises:
+        HTTPException: If no sources found or all exports fail
+    """
+    try:
+        zip_buffer = await bulk_ops.bulk_export_entities_zip(
+            model_class=Source,
+            repository=service.repo,
+            entity_ids=request.ids,
+            entity_type_name="source",
+            response_schema=SourceResponse,
+        )
+
+        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        filename = f"sources-bulk-export-{timestamp}.zip"
+
+        return StreamingResponse(
+            zip_buffer,
+            media_type="application/zip",
+            headers={
+                "Content-Disposition": f'attachment; filename="{filename}"',
+            },
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
+
+
+@router.get(
+    "/{source_id}/export",
+    response_class=StreamingResponse,
+    summary="Export source as JSON file (Admin only)",
+    description="Download a single source as a formatted JSON file",
+    responses={
+        200: {
+            "description": "Source exported successfully as JSON file",
+            "content": {"application/json": {}},
+        },
+        404: {"model": ErrorResponse, "description": "Source not found"},
+        403: {"model": ErrorResponse, "description": "Admin privileges required"},
+    },
+)
+async def export_source(
+    source_id: UUID,
+    service: SourceService = Depends(get_source_service),
+    bulk_ops: BulkOperationsService = Depends(get_bulk_operations_service),
+    admin_context: SecurityContext = Depends(require_admin),
+) -> StreamingResponse:
+    """Export a single source as JSON file (Admin only).
+
+    Args:
+        source_id: Source UUID
+        service: Source service instance
+        bulk_ops: Bulk operations service instance
+        admin_context: Admin security context
+
+    Returns:
+        StreamingResponse with JSON file download
+
+    Raises:
+        HTTPException: If source not found
+    """
+    try:
+        source_response = await service.get_source(source_id)
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Source {source_id} not found",
+        )
+
+    # Get model for export
+    source_model = service.repo.get_by_id(source_id)
+    export_data = await bulk_ops.export_single_entity(
+        entity=source_model,
+        entity_type_name="source",
+        response_schema=SourceResponse,
+    )
+
+    json_content = json.dumps(export_data["content"], indent=2, ensure_ascii=False)
+
+    return StreamingResponse(
+        io.BytesIO(json_content.encode("utf-8")),
+        media_type="application/json; charset=utf-8",
+        headers={
+            "Content-Disposition": f'attachment; filename="{export_data["filename"]}"',
+        },
+    )

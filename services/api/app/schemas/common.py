@@ -56,10 +56,33 @@ class NodeOutputUpdate(BaseModel):
     error: Optional[str] = Field(None, description="Error message if node failed")
 
 
+class BulkDeleteRequest(BaseModel):
+    """Request model for bulk delete operations."""
+
+    ids: List[UUID] = Field(..., description="List of entity IDs to delete", min_length=1)
+
+
+class BulkDeleteResponse(BaseModel):
+    """Response model for bulk delete operations."""
+
+    deleted_count: int = Field(..., description="Number of successfully deleted entities")
+    failed_ids: List[UUID] = Field(default_factory=list, description="IDs that failed to delete")
+    errors: List[str] = Field(default_factory=list, description="Error messages for failed deletions")
+
+
+class BulkExportRequest(BaseModel):
+    """Request model for bulk export operations."""
+
+    ids: List[UUID] = Field(..., description="List of entity IDs to export", min_length=1)
+
+
 __all__ = [
     "ErrorResponse",
     "PageInfo",
     "PaginatedResponse",
     "StatusUpdateRequest",
     "NodeOutputUpdate",
+    "BulkDeleteRequest",
+    "BulkDeleteResponse",
+    "BulkExportRequest",
 ]

@@ -6,19 +6,25 @@ influences, and style preferences.
 
 from __future__ import annotations
 
+import io
 import json
 from datetime import datetime, timezone
 from typing import List, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
+from fastapi.responses import StreamingResponse
 from pydantic import ValidationError
 
-from app.api.dependencies import get_persona_repository, get_persona_service
+from app.api.dependencies import get_persona_repository, get_persona_service, get_bulk_operations_service
 from app.errors import BadRequestError, NotFoundError
+from app.models.persona import Persona
 from app.repositories import PersonaRepository
-from app.services import PersonaService
+from app.services import PersonaService, BulkOperationsService
 from app.schemas import (
+    BulkDeleteRequest,
+    BulkDeleteResponse,
+    BulkExportRequest,
     ErrorResponse,
     PageInfo,
     PaginatedResponse,
@@ -360,3 +366,151 @@ async def search_personas_by_influences(
         List of personas with any of the specified influences
     """
     return await service.search_by_influences(influences)
+
+
+@router.post(
+    "/bulk-delete",
+    response_model=BulkDeleteResponse,
+    summary="Bulk delete personas",
+    description="Delete multiple personas by IDs",
+    responses={
+        200: {"description": "Bulk delete completed (check response for failures)"},
+        400: {"model": ErrorResponse, "description": "Invalid request"},
+    },
+)
+async def bulk_delete_personas(
+    request: BulkDeleteRequest,
+    service: PersonaService = Depends(get_persona_service),
+    bulk_ops: BulkOperationsService = Depends(get_bulk_operations_service),
+) -> BulkDeleteResponse:
+    """Bulk delete personas by IDs.
+
+    Args:
+        request: Request containing list of persona IDs to delete
+        service: Persona service instance
+        bulk_ops: Bulk operations service instance
+
+    Returns:
+        Response with deleted_count, failed_ids, and errors
+    """
+    result = await bulk_ops.bulk_delete_entities(
+        model_class=Persona,
+        repository=service.repo,
+        entity_ids=request.ids,
+        entity_type_name="persona",
+    )
+    return BulkDeleteResponse(**result)
+
+
+@router.post(
+    "/bulk-export",
+    response_class=StreamingResponse,
+    summary="Bulk export personas as ZIP",
+    description="Export multiple personas as a ZIP file containing JSON files",
+    responses={
+        200: {
+            "description": "ZIP file with exported personas",
+            "content": {"application/zip": {}},
+        },
+        400: {"model": ErrorResponse, "description": "No personas found or all exports failed"},
+    },
+)
+async def bulk_export_personas(
+    request: BulkExportRequest,
+    service: PersonaService = Depends(get_persona_service),
+    bulk_ops: BulkOperationsService = Depends(get_bulk_operations_service),
+) -> StreamingResponse:
+    """Bulk export personas as ZIP file.
+
+    Args:
+        request: Request containing list of persona IDs to export
+        service: Persona service instance
+        bulk_ops: Bulk operations service instance
+
+    Returns:
+        StreamingResponse with ZIP file download
+
+    Raises:
+        HTTPException: If no personas found or all exports fail
+    """
+    try:
+        zip_buffer = await bulk_ops.bulk_export_entities_zip(
+            model_class=Persona,
+            repository=service.repo,
+            entity_ids=request.ids,
+            entity_type_name="persona",
+            response_schema=PersonaResponse,
+        )
+
+        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        filename = f"personas-bulk-export-{timestamp}.zip"
+
+        return StreamingResponse(
+            zip_buffer,
+            media_type="application/zip",
+            headers={
+                "Content-Disposition": f'attachment; filename="{filename}"',
+            },
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
+
+
+@router.get(
+    "/{persona_id}/export",
+    response_class=StreamingResponse,
+    summary="Export persona as JSON file",
+    description="Download a single persona as a formatted JSON file",
+    responses={
+        200: {
+            "description": "Persona exported successfully as JSON file",
+            "content": {"application/json": {}},
+        },
+        404: {"model": ErrorResponse, "description": "Persona not found"},
+    },
+)
+async def export_persona(
+    persona_id: UUID,
+    service: PersonaService = Depends(get_persona_service),
+    bulk_ops: BulkOperationsService = Depends(get_bulk_operations_service),
+) -> StreamingResponse:
+    """Export a single persona as JSON file.
+
+    Args:
+        persona_id: Persona UUID
+        service: Persona service instance
+        bulk_ops: Bulk operations service instance
+
+    Returns:
+        StreamingResponse with JSON file download
+
+    Raises:
+        HTTPException: If persona not found
+    """
+    persona = await service.get_persona(persona_id)
+    if not persona:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Persona {persona_id} not found",
+        )
+
+    # Get model for export
+    persona_model = service.repo.get_by_id(persona_id)
+    export_data = await bulk_ops.export_single_entity(
+        entity=persona_model,
+        entity_type_name="persona",
+        response_schema=PersonaResponse,
+    )
+
+    json_content = json.dumps(export_data["content"], indent=2, ensure_ascii=False)
+
+    return StreamingResponse(
+        io.BytesIO(json_content.encode("utf-8")),
+        media_type="application/json; charset=utf-8",
+        headers={
+            "Content-Disposition": f'attachment; filename="{export_data["filename"]}"',
+        },
+    )
