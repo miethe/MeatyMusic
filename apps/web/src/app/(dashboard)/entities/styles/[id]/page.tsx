@@ -1,6 +1,6 @@
 /**
  * Style Detail Page
- * View and edit a style entity
+ * View and edit a style entity with export functionality
  */
 
 'use client';
@@ -11,9 +11,9 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { Card } from '@meatymusic/ui';
 import { Button } from '@meatymusic/ui';
 import { Badge } from '@meatymusic/ui';
-import { Edit, Trash2, Copy, Loader2 } from 'lucide-react';
+import { Edit, Trash2, Copy, Loader2, Download } from 'lucide-react';
 import { ROUTES } from '@/config/routes';
-import { useStyle, useDeleteStyle } from '@/hooks/api/useStyles';
+import { useStyle, useDeleteStyle, useExportStyle } from '@/hooks/api/useStyles';
 
 export default function StyleDetailPage() {
   const params = useParams();
@@ -23,6 +23,7 @@ export default function StyleDetailPage() {
   // Fetch style data from API
   const { data: style, isLoading, error } = useStyle(styleId);
   const deleteStyle = useDeleteStyle();
+  const exportStyle = useExportStyle();
 
   const handleDelete = async () => {
     if (confirm('Are you sure you want to delete this style?')) {
@@ -42,6 +43,14 @@ export default function StyleDetailPage() {
   const handleClone = () => {
     // TODO: Implement clone functionality
     console.log('Clone style:', styleId);
+  };
+
+  const handleExport = async () => {
+    try {
+      await exportStyle.mutateAsync(styleId);
+    } catch (error) {
+      console.error('Failed to export style:', error);
+    }
   };
 
   // Loading state
@@ -92,6 +101,14 @@ export default function StyleDetailPage() {
         description="Style specification details"
         actions={
           <>
+            <Button
+              variant="outline"
+              onClick={handleExport}
+              disabled={exportStyle.isPending}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              {exportStyle.isPending ? 'Exporting...' : 'Export'}
+            </Button>
             <Button variant="outline" onClick={handleClone}>
               <Copy className="w-4 h-4 mr-2" />
               Clone
@@ -220,6 +237,23 @@ export default function StyleDetailPage() {
                   <dd className="text-xs font-mono break-all text-text-secondary">{style.id}</dd>
                 </div>
               </dl>
+            </Card>
+
+            {/* Export Section */}
+            <Card className="p-6 bg-bg-surface border-border-default shadow-elevation-1">
+              <h3 className="text-lg font-semibold text-text-primary mb-4">Export</h3>
+              <p className="text-sm text-text-secondary mb-4">
+                Download this style as a JSON file for backup or sharing.
+              </p>
+              <Button
+                variant="primary"
+                onClick={handleExport}
+                disabled={exportStyle.isPending}
+                className="w-full"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                {exportStyle.isPending ? 'Exporting...' : 'Export as JSON'}
+              </Button>
             </Card>
           </div>
         </div>

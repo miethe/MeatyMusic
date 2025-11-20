@@ -6,6 +6,7 @@
  */
 
 import { apiClient } from './client';
+import { downloadBlob, getFilenameFromHeaders } from './utils';
 import type {
   Lyrics,
   LyricsCreate,
@@ -86,5 +87,42 @@ export const lyricsApi = {
       },
     });
     return data;
+  },
+
+  /**
+   * Export a single lyrics as JSON
+   */
+  export: async (id: UUID): Promise<void> => {
+    const response = await apiClient.get(`/lyrics/${id}/export`, {
+      responseType: 'blob',
+    });
+
+    const filename = getFilenameFromHeaders(response.headers, `lyrics-${id}.json`);
+    downloadBlob(response.data, filename);
+  },
+
+  /**
+   * Bulk delete lyrics
+   */
+  bulkDelete: async (ids: UUID[]): Promise<{ deleted: number; errors: string[] }> => {
+    const { data } = await apiClient.post<{ deleted: number; errors: string[] }>(
+      '/lyrics/bulk-delete',
+      { ids }
+    );
+    return data;
+  },
+
+  /**
+   * Bulk export lyrics as ZIP
+   */
+  bulkExport: async (ids: UUID[]): Promise<void> => {
+    const response = await apiClient.post(
+      '/lyrics/bulk-export',
+      { ids },
+      { responseType: 'blob' }
+    );
+
+    const filename = getFilenameFromHeaders(response.headers, 'lyrics-export.zip');
+    downloadBlob(response.data, filename);
   },
 };

@@ -6,6 +6,7 @@
  */
 
 import { apiClient } from './client';
+import { downloadBlob, getFilenameFromHeaders } from './utils';
 import type {
   ProducerNotes,
   ProducerNotesCreate,
@@ -84,5 +85,42 @@ export const producerNotesApi = {
       },
     });
     return data;
+  },
+
+  /**
+   * Export a single producer notes as JSON
+   */
+  export: async (id: UUID): Promise<void> => {
+    const response = await apiClient.get(`/producer-notes/${id}/export`, {
+      responseType: 'blob',
+    });
+
+    const filename = getFilenameFromHeaders(response.headers, `producer-notes-${id}.json`);
+    downloadBlob(response.data, filename);
+  },
+
+  /**
+   * Bulk delete producer notes
+   */
+  bulkDelete: async (ids: UUID[]): Promise<{ deleted: number; errors: string[] }> => {
+    const { data } = await apiClient.post<{ deleted: number; errors: string[] }>(
+      '/producer-notes/bulk-delete',
+      { ids }
+    );
+    return data;
+  },
+
+  /**
+   * Bulk export producer notes as ZIP
+   */
+  bulkExport: async (ids: UUID[]): Promise<void> => {
+    const response = await apiClient.post(
+      '/producer-notes/bulk-export',
+      { ids },
+      { responseType: 'blob' }
+    );
+
+    const filename = getFilenameFromHeaders(response.headers, 'producer-notes-export.zip');
+    downloadBlob(response.data, filename);
   },
 };

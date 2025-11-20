@@ -103,3 +103,55 @@ export function useImportStyle() {
     },
   });
 }
+
+export function useExportStyle() {
+  const { addToast } = useUIStore();
+
+  return useMutation({
+    mutationFn: (id: UUID) => stylesApi.export(id),
+    onSuccess: () => {
+      addToast('Style exported successfully', 'success');
+    },
+    onError: (error: any) => {
+      addToast(error?.message || 'Failed to export style', 'error');
+    },
+  });
+}
+
+export function useBulkDeleteStyles() {
+  const queryClient = useQueryClient();
+  const { addToast } = useUIStore();
+
+  return useMutation({
+    mutationFn: (ids: UUID[]) => stylesApi.bulkDelete(ids),
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.styles.lists() });
+
+      if (result.errors.length > 0) {
+        addToast(
+          `${result.deleted} style(s) deleted, ${result.errors.length} failed`,
+          'warning'
+        );
+      } else {
+        addToast(`${result.deleted} style(s) deleted successfully`, 'success');
+      }
+    },
+    onError: (error: any) => {
+      addToast(error?.message || 'Failed to delete styles', 'error');
+    },
+  });
+}
+
+export function useBulkExportStyles() {
+  const { addToast } = useUIStore();
+
+  return useMutation({
+    mutationFn: (ids: UUID[]) => stylesApi.bulkExport(ids),
+    onSuccess: () => {
+      addToast('Styles exported successfully', 'success');
+    },
+    onError: (error: any) => {
+      addToast(error?.message || 'Failed to export styles', 'error');
+    },
+  });
+}

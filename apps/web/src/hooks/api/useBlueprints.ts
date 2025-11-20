@@ -103,3 +103,54 @@ export function useImportBlueprint() {
     },
   });
 }
+export function useExportBlueprint() {
+  const { addToast } = useUIStore();
+
+  return useMutation({
+    mutationFn: (id: UUID) => blueprintsApi.export(id),
+    onSuccess: () => {
+      addToast('Blueprint exported successfully', 'success');
+    },
+    onError: (error: any) => {
+      addToast(error?.message || 'Failed to export blueprint', 'error');
+    },
+  });
+}
+
+export function useBulkDeleteBlueprints() {
+  const queryClient = useQueryClient();
+  const { addToast } = useUIStore();
+
+  return useMutation({
+    mutationFn: (ids: UUID[]) => blueprintsApi.bulkDelete(ids),
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.blueprints.lists() });
+
+      if (result.errors.length > 0) {
+        addToast(
+          `${result.deleted} blueprint(s) deleted, ${result.errors.length} failed`,
+          'warning'
+        );
+      } else {
+        addToast(`${result.deleted} blueprint(s) deleted successfully`, 'success');
+      }
+    },
+    onError: (error: any) => {
+      addToast(error?.message || 'Failed to delete blueprints', 'error');
+    },
+  });
+}
+
+export function useBulkExportBlueprints() {
+  const { addToast } = useUIStore();
+
+  return useMutation({
+    mutationFn: (ids: UUID[]) => blueprintsApi.bulkExport(ids),
+    onSuccess: () => {
+      addToast('Blueprints exported successfully', 'success');
+    },
+    onError: (error: any) => {
+      addToast(error?.message || 'Failed to export blueprints', 'error');
+    },
+  });
+}

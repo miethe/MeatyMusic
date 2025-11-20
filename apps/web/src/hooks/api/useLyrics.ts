@@ -103,3 +103,54 @@ export function useImportLyrics() {
     },
   });
 }
+export function useExportLyrics() {
+  const { addToast } = useUIStore();
+
+  return useMutation({
+    mutationFn: (id: UUID) => lyricsApi.export(id),
+    onSuccess: () => {
+      addToast('Lyrics exported successfully', 'success');
+    },
+    onError: (error: any) => {
+      addToast(error?.message || 'Failed to export lyrics', 'error');
+    },
+  });
+}
+
+export function useBulkDeleteLyrics() {
+  const queryClient = useQueryClient();
+  const { addToast } = useUIStore();
+
+  return useMutation({
+    mutationFn: (ids: UUID[]) => lyricsApi.bulkDelete(ids),
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.lyrics.lists() });
+
+      if (result.errors.length > 0) {
+        addToast(
+          `${result.deleted} lyrics deleted, ${result.errors.length} failed`,
+          'warning'
+        );
+      } else {
+        addToast(`${result.deleted} lyrics deleted successfully`, 'success');
+      }
+    },
+    onError: (error: any) => {
+      addToast(error?.message || 'Failed to delete lyrics', 'error');
+    },
+  });
+}
+
+export function useBulkExportLyrics() {
+  const { addToast } = useUIStore();
+
+  return useMutation({
+    mutationFn: (ids: UUID[]) => lyricsApi.bulkExport(ids),
+    onSuccess: () => {
+      addToast('Lyrics exported successfully', 'success');
+    },
+    onError: (error: any) => {
+      addToast(error?.message || 'Failed to export lyrics', 'error');
+    },
+  });
+}
