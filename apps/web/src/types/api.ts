@@ -14,13 +14,27 @@
 export * from './api/index';
 
 /**
- * Legacy User Type (from MeatyPrompts)
- * TODO: Replace with AMCS-specific user/auth types in Phase 6
+ * User Role Type
+ * Matches backend: app/models/enums.py - UserRole
+ */
+export type UserRole = 'user' | 'admin';
+
+/**
+ * User Type (from backend User model)
+ * Matches backend: app/models/user.py - User
+ * TODO: Add more fields as needed from backend schema
  */
 export interface User {
   id: string;
   email: string;
   name?: string;
+  first_name?: string;
+  last_name?: string;
+  username?: string;
+  role: UserRole;
+  is_active: boolean;
+  email_verified: boolean;
   created_at: string;
   updated_at: string;
+  last_login_at?: string;
 }

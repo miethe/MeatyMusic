@@ -6,6 +6,7 @@
  */
 
 import { apiClient } from './client';
+import { downloadBlob, getFilenameFromHeaders } from './utils';
 import type {
   Blueprint,
   BlueprintCreate,
@@ -83,5 +84,42 @@ export const blueprintsApi = {
       },
     });
     return data;
+  },
+
+  /**
+   * Export a single blueprint as JSON
+   */
+  export: async (id: UUID): Promise<void> => {
+    const response = await apiClient.get(`/blueprints/${id}/export`, {
+      responseType: 'blob',
+    });
+
+    const filename = getFilenameFromHeaders(response.headers, `blueprint-${id}.json`);
+    downloadBlob(response.data, filename);
+  },
+
+  /**
+   * Bulk delete blueprints
+   */
+  bulkDelete: async (ids: UUID[]): Promise<{ deleted: number; errors: string[] }> => {
+    const { data } = await apiClient.post<{ deleted: number; errors: string[] }>(
+      '/blueprints/bulk-delete',
+      { ids }
+    );
+    return data;
+  },
+
+  /**
+   * Bulk export blueprints as ZIP
+   */
+  bulkExport: async (ids: UUID[]): Promise<void> => {
+    const response = await apiClient.post(
+      '/blueprints/bulk-export',
+      { ids },
+      { responseType: 'blob' }
+    );
+
+    const filename = getFilenameFromHeaders(response.headers, 'blueprints-export.zip');
+    downloadBlob(response.data, filename);
   },
 };

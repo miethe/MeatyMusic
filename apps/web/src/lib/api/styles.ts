@@ -6,6 +6,7 @@
  */
 
 import { apiClient } from './client';
+import { downloadBlob, getFilenameFromHeaders } from './utils';
 import type {
   Style,
   StyleCreate,
@@ -88,5 +89,42 @@ export const stylesApi = {
       },
     });
     return data;
+  },
+
+  /**
+   * Export a single style as JSON
+   */
+  export: async (id: UUID): Promise<void> => {
+    const response = await apiClient.get(`/styles/${id}/export`, {
+      responseType: 'blob',
+    });
+
+    const filename = getFilenameFromHeaders(response.headers, `style-${id}.json`);
+    downloadBlob(response.data, filename);
+  },
+
+  /**
+   * Bulk delete styles
+   */
+  bulkDelete: async (ids: UUID[]): Promise<{ deleted: number; errors: string[] }> => {
+    const { data } = await apiClient.post<{ deleted: number; errors: string[] }>(
+      '/styles/bulk-delete',
+      { ids }
+    );
+    return data;
+  },
+
+  /**
+   * Bulk export styles as ZIP
+   */
+  bulkExport: async (ids: UUID[]): Promise<void> => {
+    const response = await apiClient.post(
+      '/styles/bulk-export',
+      { ids },
+      { responseType: 'blob' }
+    );
+
+    const filename = getFilenameFromHeaders(response.headers, 'styles-export.zip');
+    downloadBlob(response.data, filename);
   },
 };

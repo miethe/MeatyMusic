@@ -103,3 +103,54 @@ export function useImportPersona() {
     },
   });
 }
+export function useExportPersona() {
+  const { addToast } = useUIStore();
+
+  return useMutation({
+    mutationFn: (id: UUID) => personasApi.export(id),
+    onSuccess: () => {
+      addToast('Persona exported successfully', 'success');
+    },
+    onError: (error: any) => {
+      addToast(error?.message || 'Failed to export persona', 'error');
+    },
+  });
+}
+
+export function useBulkDeletePersonas() {
+  const queryClient = useQueryClient();
+  const { addToast } = useUIStore();
+
+  return useMutation({
+    mutationFn: (ids: UUID[]) => personasApi.bulkDelete(ids),
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.personas.lists() });
+
+      if (result.errors.length > 0) {
+        addToast(
+          `${result.deleted} persona(s) deleted, ${result.errors.length} failed`,
+          'warning'
+        );
+      } else {
+        addToast(`${result.deleted} persona(s) deleted successfully`, 'success');
+      }
+    },
+    onError: (error: any) => {
+      addToast(error?.message || 'Failed to delete personas', 'error');
+    },
+  });
+}
+
+export function useBulkExportPersonas() {
+  const { addToast } = useUIStore();
+
+  return useMutation({
+    mutationFn: (ids: UUID[]) => personasApi.bulkExport(ids),
+    onSuccess: () => {
+      addToast('Personas exported successfully', 'success');
+    },
+    onError: (error: any) => {
+      addToast(error?.message || 'Failed to export personas', 'error');
+    },
+  });
+}

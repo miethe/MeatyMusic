@@ -6,6 +6,7 @@
  */
 
 import { apiClient } from './client';
+import { downloadBlob, getFilenameFromHeaders } from './utils';
 import type {
   Persona,
   PersonaCreate,
@@ -83,5 +84,42 @@ export const personasApi = {
       },
     });
     return data;
+  },
+
+  /**
+   * Export a single persona as JSON
+   */
+  export: async (id: UUID): Promise<void> => {
+    const response = await apiClient.get(`/personas/${id}/export`, {
+      responseType: 'blob',
+    });
+
+    const filename = getFilenameFromHeaders(response.headers, `persona-${id}.json`);
+    downloadBlob(response.data, filename);
+  },
+
+  /**
+   * Bulk delete personas
+   */
+  bulkDelete: async (ids: UUID[]): Promise<{ deleted: number; errors: string[] }> => {
+    const { data } = await apiClient.post<{ deleted: number; errors: string[] }>(
+      '/personas/bulk-delete',
+      { ids }
+    );
+    return data;
+  },
+
+  /**
+   * Bulk export personas as ZIP
+   */
+  bulkExport: async (ids: UUID[]): Promise<void> => {
+    const response = await apiClient.post(
+      '/personas/bulk-export',
+      { ids },
+      { responseType: 'blob' }
+    );
+
+    const filename = getFilenameFromHeaders(response.headers, 'personas-export.zip');
+    downloadBlob(response.data, filename);
   },
 };

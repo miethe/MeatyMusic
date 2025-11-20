@@ -31,6 +31,7 @@ from app.repositories import (
 )
 from app.services import (
     BlueprintService,
+    BulkOperationsService,
     LyricsService,
     PersonaService,
     ProducerNotesService,
@@ -242,19 +243,27 @@ def get_producer_notes_service(
     )
 
 
+def get_bulk_operations_service(
+    db: Session = Depends(get_db),
+) -> BulkOperationsService:
+    """Get BulkOperationsService instance."""
+    return BulkOperationsService(session=db)
+
+
 __all__ = [
     "get_db",
     "get_db_session",
     "get_blueprint_repository",
+    "get_lyrics_repository",
     "get_persona_repository",
+    "get_producer_notes_repository",
     "get_source_repository",
     "get_style_repository",
     "get_song_repository",
-    "get_lyrics_repository",
-    "get_producer_notes_repository",
     "get_workflow_run_repository",
     "get_composed_prompt_repository",
     "get_blueprint_service",
+    "get_bulk_operations_service",
     "get_lyrics_service",
     "get_persona_service",
     "get_producer_notes_service",

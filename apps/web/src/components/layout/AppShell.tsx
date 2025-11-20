@@ -21,6 +21,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { NAV_ITEMS } from '@/config/routes';
+import { useAuth } from '@/hooks/useAuth';
 
 export interface AppShellProps {
   children: React.ReactNode;
@@ -29,6 +30,7 @@ export interface AppShellProps {
 export function AppShell({ children }: AppShellProps) {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const pathname = usePathname();
+  const { user, isAdmin } = useAuth();
 
   return (
     <div className="min-h-screen bg-bg-base">
@@ -68,7 +70,12 @@ export function AppShell({ children }: AppShellProps) {
           <nav className="flex-1 px-3 py-4 overflow-y-auto">
             <ul className="space-y-1">
               {NAV_ITEMS.map((item) => (
-                <NavItem key={item.name} item={item} pathname={pathname} />
+                <NavItem
+                  key={item.name}
+                  item={item}
+                  pathname={pathname}
+                  isAdmin={isAdmin}
+                />
               ))}
             </ul>
           </nav>
@@ -77,11 +84,20 @@ export function AppShell({ children }: AppShellProps) {
           <div className="border-t border-border-default px-4 py-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center">
-                <span className="text-sm font-semibold text-white">U</span>
+                <span className="text-sm font-semibold text-white">
+                  {user?.first_name?.charAt(0) || user?.username?.charAt(0) || user?.email?.charAt(0) || 'U'}
+                </span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-text-primary truncate">User</p>
-                <p className="text-xs text-text-muted truncate">user@example.com</p>
+                <p className="text-sm font-medium text-text-primary truncate">
+                  {user?.username || user?.first_name || 'User'}
+                  {isAdmin && (
+                    <span className="ml-2 text-xs text-primary font-semibold">ADMIN</span>
+                  )}
+                </p>
+                <p className="text-xs text-text-muted truncate">
+                  {user?.email || 'user@example.com'}
+                </p>
               </div>
             </div>
           </div>
@@ -120,9 +136,10 @@ export function AppShell({ children }: AppShellProps) {
 interface NavItemProps {
   item: (typeof NAV_ITEMS)[number];
   pathname: string;
+  isAdmin: boolean;
 }
 
-function NavItem({ item, pathname }: NavItemProps) {
+function NavItem({ item, pathname, isAdmin }: NavItemProps) {
   const [expanded, setExpanded] = React.useState(false);
   const hasChildren = 'children' in item && item.children && item.children.length > 0;
 
@@ -140,6 +157,20 @@ function NavItem({ item, pathname }: NavItemProps) {
 
   if (hasChildren && item.children) {
     const Icon = getIcon(item.icon);
+
+    // Filter children based on admin status
+    const visibleChildren = item.children.filter((child) => {
+      // Hide Blueprints and Sources for non-admin users
+      if (child.name === 'Blueprints' || child.name === 'Sources') {
+        return isAdmin;
+      }
+      return true;
+    });
+
+    // Don't render parent if no visible children
+    if (visibleChildren.length === 0) {
+      return null;
+    }
 
     return (
       <li>
@@ -162,7 +193,7 @@ function NavItem({ item, pathname }: NavItemProps) {
 
         {expanded && (
           <ul className="mt-1 ml-8 space-y-1">
-            {item.children.map((child) => {
+            {visibleChildren.map((child) => {
               const isActive = pathname.startsWith(child.href);
               return (
                 <li key={child.name}>

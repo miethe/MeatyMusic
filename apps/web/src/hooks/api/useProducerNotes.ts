@@ -103,3 +103,54 @@ export function useImportProducerNotes() {
     },
   });
 }
+export function useExportProducerNotes() {
+  const { addToast } = useUIStore();
+
+  return useMutation({
+    mutationFn: (id: UUID) => producerNotesApi.export(id),
+    onSuccess: () => {
+      addToast('Producer notes exported successfully', 'success');
+    },
+    onError: (error: any) => {
+      addToast(error?.message || 'Failed to export producer notes', 'error');
+    },
+  });
+}
+
+export function useBulkDeleteProducerNotes() {
+  const queryClient = useQueryClient();
+  const { addToast } = useUIStore();
+
+  return useMutation({
+    mutationFn: (ids: UUID[]) => producerNotesApi.bulkDelete(ids),
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.producerNotes.lists() });
+
+      if (result.errors.length > 0) {
+        addToast(
+          `${result.deleted} producer notes deleted, ${result.errors.length} failed`,
+          'warning'
+        );
+      } else {
+        addToast(`${result.deleted} producer notes deleted successfully`, 'success');
+      }
+    },
+    onError: (error: any) => {
+      addToast(error?.message || 'Failed to delete producer notes', 'error');
+    },
+  });
+}
+
+export function useBulkExportProducerNotes() {
+  const { addToast } = useUIStore();
+
+  return useMutation({
+    mutationFn: (ids: UUID[]) => producerNotesApi.bulkExport(ids),
+    onSuccess: () => {
+      addToast('Producer notes exported successfully', 'success');
+    },
+    onError: (error: any) => {
+      addToast(error?.message || 'Failed to export producer notes', 'error');
+    },
+  });
+}

@@ -7,7 +7,7 @@ authentication provider (e.g., Clerk).
 
 from __future__ import annotations
 
-from sqlalchemy import String, DateTime, Boolean, ForeignKey
+from sqlalchemy import String, DateTime, Boolean, ForeignKey, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 from datetime import datetime
@@ -15,6 +15,7 @@ from typing import TYPE_CHECKING
 from uuid import UUID
 
 from app.models.base import Base
+from app.models.enums import UserRole
 
 if TYPE_CHECKING:
     from app.models.tenant import Tenant
@@ -44,6 +45,14 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     email_verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
+    # Role-based access control
+    role: Mapped[UserRole] = mapped_column(
+        Enum(UserRole, native_enum=False, length=20),
+        default=UserRole.USER,
+        nullable=False,
+        index=True,
+    )
+
     # Timestamps
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
@@ -66,7 +75,7 @@ class User(Base):
 
     def __repr__(self) -> str:
         """Return string representation."""
-        return f"<User(id={self.id}, email={self.email}, clerk_user_id={self.clerk_user_id})>"
+        return f"<User(id={self.id}, email={self.email}, role={self.role.value})>"
 
     @property
     def full_name(self) -> str:
@@ -79,6 +88,15 @@ class User(Base):
     def display_name(self) -> str:
         """Return user's display name (username or full name or email)."""
         return self.username or self.full_name
+
+    @property
+    def is_admin(self) -> bool:
+        """Check if user has admin role.
+
+        Returns:
+            True if user role is ADMIN, False otherwise
+        """
+        return self.role == UserRole.ADMIN
 
 
 # Alias for backward compatibility

@@ -6,18 +6,25 @@ and generated lyric content for songs.
 
 from __future__ import annotations
 
+import io
 import json
 from datetime import datetime, timezone
 from typing import Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
+from fastapi.responses import StreamingResponse
 from pydantic import ValidationError
 
-from app.api.dependencies import get_lyrics_service
+from app.api.dependencies import get_lyrics_service, get_bulk_operations_service
 from app.errors import BadRequestError
-from app.services import LyricsService
+from app.models.lyrics import Lyrics
+from app.repositories import LyricsRepository
+from app.services import LyricsService, BulkOperationsService
 from app.schemas import (
+    BulkDeleteRequest,
+    BulkDeleteResponse,
+    BulkExportRequest,
     ErrorResponse,
     LyricsCreate,
     LyricsResponse,
@@ -305,6 +312,153 @@ async def delete_lyrics(
         )
 
 
+@router.post(
+    "/bulk-delete",
+    response_model=BulkDeleteResponse,
+    summary="Bulk delete lyrics",
+    description="Delete multiple lyrics by IDs",
+    responses={
+        200: {"description": "Bulk delete completed (check response for failures)"},
+        400: {"model": ErrorResponse, "description": "Invalid request"},
+    },
+)
+async def bulk_delete_lyrics(
+    request: BulkDeleteRequest,
+    service: LyricsService = Depends(get_lyrics_service),
+    bulk_ops: BulkOperationsService = Depends(get_bulk_operations_service),
+) -> BulkDeleteResponse:
+    """Bulk delete lyrics by IDs.
+
+    Args:
+        request: Request containing list of lyrics IDs to delete
+        service: Lyrics service instance
+        bulk_ops: Bulk operations service instance
+
+    Returns:
+        Response with deleted_count, failed_ids, and errors
+    """
+    result = await bulk_ops.bulk_delete_entities(
+        model_class=Lyrics,
+        repository=service.repo,
+        entity_ids=request.ids,
+        entity_type_name="lyrics",
+    )
+    return BulkDeleteResponse(**result)
+
+
+@router.post(
+    "/bulk-export",
+    response_class=StreamingResponse,
+    summary="Bulk export lyrics as ZIP",
+    description="Export multiple lyrics as a ZIP file containing JSON files",
+    responses={
+        200: {
+            "description": "ZIP file with exported lyrics",
+            "content": {"application/zip": {}},
+        },
+        400: {"model": ErrorResponse, "description": "No lyrics found or all exports failed"},
+    },
+)
+async def bulk_export_lyrics(
+    request: BulkExportRequest,
+    service: LyricsService = Depends(get_lyrics_service),
+    bulk_ops: BulkOperationsService = Depends(get_bulk_operations_service),
+) -> StreamingResponse:
+    """Bulk export lyrics as ZIP file.
+
+    Args:
+        request: Request containing list of lyrics IDs to export
+        service: Lyrics service instance
+        bulk_ops: Bulk operations service instance
+
+    Returns:
+        StreamingResponse with ZIP file download
+
+    Raises:
+        HTTPException: If no lyrics found or all exports fail
+    """
+    try:
+        zip_buffer = await bulk_ops.bulk_export_entities_zip(
+            model_class=Lyrics,
+            repository=service.repo,
+            entity_ids=request.ids,
+            entity_type_name="lyrics",
+            response_schema=LyricsResponse,
+        )
+
+        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        filename = f"lyrics-bulk-export-{timestamp}.zip"
+
+        return StreamingResponse(
+            zip_buffer,
+            media_type="application/zip",
+            headers={
+                "Content-Disposition": f'attachment; filename="{filename}"',
+            },
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
+
+
+@router.get(
+    "/{lyrics_id}/export",
+    response_class=StreamingResponse,
+    summary="Export lyrics as JSON file",
+    description="Download a single lyrics as a formatted JSON file",
+    responses={
+        200: {
+            "description": "Lyrics exported successfully as JSON file",
+            "content": {"application/json": {}},
+        },
+        404: {"model": ErrorResponse, "description": "Lyrics not found"},
+    },
+)
+async def export_lyrics(
+    lyrics_id: UUID,
+    service: LyricsService = Depends(get_lyrics_service),
+    bulk_ops: BulkOperationsService = Depends(get_bulk_operations_service),
+) -> StreamingResponse:
+    """Export a single lyrics as JSON file.
+
+    Args:
+        lyrics_id: Lyrics UUID
+        service: Lyrics service instance
+        bulk_ops: Bulk operations service instance
+
+    Returns:
+        StreamingResponse with JSON file download
+
+    Raises:
+        HTTPException: If lyrics not found
+    """
+    lyrics = await service.get_lyrics(lyrics_id)
+    if not lyrics:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Lyrics {lyrics_id} not found",
+        )
+
+    # Convert to model for export (get_lyrics returns DTO)
+    lyrics_model = service.repo.get_by_id(lyrics_id)
+    export_data = await bulk_ops.export_single_entity(
+        entity=lyrics_model,
+        entity_type_name="lyrics",
+        response_schema=LyricsResponse,
+    )
+
+    json_content = json.dumps(export_data["content"], indent=2, ensure_ascii=False)
+
+    return StreamingResponse(
+        io.BytesIO(json_content.encode("utf-8")),
+        media_type="application/json; charset=utf-8",
+        headers={
+            "Content-Disposition": f'attachment; filename="{export_data["filename"]}"',
+        },
+    )
+  
 @router.post(
     "/check-profanity",
     response_model=ProfanityCheckResult,

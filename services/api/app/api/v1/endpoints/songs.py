@@ -23,6 +23,7 @@ from app.api.dependencies import (
     get_sds_compiler_service,
     get_blueprint_validator_service,
     get_cross_entity_validator,
+    get_bulk_operations_service,
 )
 from app.models.song import Song
 from app.repositories import SongRepository
@@ -31,8 +32,12 @@ from app.services import (
     SDSCompilerService,
     BlueprintValidatorService,
     CrossEntityValidator,
+    BulkOperationsService,
 )
 from app.schemas import (
+    BulkDeleteRequest,
+    BulkDeleteResponse,
+    BulkExportRequest,
     ErrorResponse,
     PageInfo,
     PaginatedResponse,
@@ -682,3 +687,108 @@ async def export_song_sds(
         media_type="application/json; charset=utf-8",
         headers=headers,
     )
+
+
+@router.post(
+    "/bulk-delete",
+    response_model=BulkDeleteResponse,
+    summary="Bulk delete songs",
+    description="Delete multiple songs by IDs",
+    responses={
+        200: {"description": "Bulk delete completed (check response for failures)"},
+        400: {"model": ErrorResponse, "description": "Invalid request"},
+    },
+)
+async def bulk_delete_songs(
+    request: BulkDeleteRequest,
+    repo: SongRepository = Depends(get_song_repository),
+    bulk_ops: BulkOperationsService = Depends(get_bulk_operations_service),
+) -> BulkDeleteResponse:
+    """Bulk delete songs by IDs.
+
+    Deletes multiple songs in a single request. Returns counts of successful
+    and failed deletions with error details for failures.
+
+    Args:
+        request: Request containing list of song IDs to delete
+        repo: Song repository instance
+        bulk_ops: Bulk operations service instance
+
+    Returns:
+        Response with deleted_count, failed_ids, and errors
+
+    Example:
+        Request: {"ids": ["uuid1", "uuid2", "uuid3"]}
+        Response: {"deleted_count": 2, "failed_ids": ["uuid3"], "errors": ["Song uuid3 not found"]}
+    """
+    result = await bulk_ops.bulk_delete_entities(
+        model_class=Song,
+        repository=repo,
+        entity_ids=request.ids,
+        entity_type_name="song",
+    )
+    return BulkDeleteResponse(**result)
+
+
+@router.post(
+    "/bulk-export",
+    response_class=StreamingResponse,
+    summary="Bulk export songs as ZIP",
+    description="Export multiple songs (with SDS) as a ZIP file containing JSON files",
+    responses={
+        200: {
+            "description": "ZIP file with exported songs",
+            "content": {"application/zip": {}},
+        },
+        400: {"model": ErrorResponse, "description": "No songs found or all exports failed"},
+    },
+)
+async def bulk_export_songs(
+    request: BulkExportRequest,
+    repo: SongRepository = Depends(get_song_repository),
+    bulk_ops: BulkOperationsService = Depends(get_bulk_operations_service),
+) -> StreamingResponse:
+    """Bulk export songs as ZIP file.
+
+    Exports multiple songs as JSON files packaged in a ZIP archive.
+    Each song is exported as {entity-type}-{name}-{id}.json.
+
+    Note: Exported songs include metadata but not the full compiled SDS.
+    Use GET /songs/{id}/sds to retrieve the complete SDS separately.
+
+    Args:
+        request: Request containing list of song IDs to export
+        repo: Song repository instance
+        bulk_ops: Bulk operations service instance
+
+    Returns:
+        StreamingResponse with ZIP file download
+
+    Raises:
+        HTTPException: If no songs found or all exports fail
+    """
+    try:
+        zip_buffer = await bulk_ops.bulk_export_entities_zip(
+            model_class=Song,
+            repository=repo,
+            entity_ids=request.ids,
+            entity_type_name="song",
+            response_schema=SongResponse,
+        )
+
+        # Generate filename with timestamp
+        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        filename = f"songs-bulk-export-{timestamp}.zip"
+
+        return StreamingResponse(
+            zip_buffer,
+            media_type="application/zip",
+            headers={
+                "Content-Disposition": f'attachment; filename="{filename}"',
+            },
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )

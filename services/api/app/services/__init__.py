@@ -16,6 +16,7 @@ from app.services.sds_compiler_service import SDSCompilerService
 from app.services.blueprint_validator_service import BlueprintValidatorService
 from app.services.cross_entity_validator import CrossEntityValidator
 from app.services.tag_conflict_resolver import TagConflictResolver
+from app.services.bulk_operations_service import BulkOperationsService
 
 __all__ = [
     "BaseService",
@@ -34,4 +35,5 @@ __all__ = [
     "BlueprintValidatorService",
     "CrossEntityValidator",
     "TagConflictResolver",
+    "BulkOperationsService",
 ]

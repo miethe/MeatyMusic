@@ -6,18 +6,24 @@ characteristics for song creation.
 
 from __future__ import annotations
 
+import io
 import json
 from datetime import datetime, timezone
 from typing import List, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
+from fastapi.responses import StreamingResponse
 from pydantic import ValidationError
 
-from app.api.dependencies import get_style_repository, get_style_service
+from app.api.dependencies import get_style_repository, get_style_service, get_bulk_operations_service
+from app.models.style import Style
 from app.repositories import StyleRepository
-from app.services import StyleService
+from app.services import StyleService, BulkOperationsService
 from app.schemas import (
+    BulkDeleteRequest,
+    BulkDeleteResponse,
+    BulkExportRequest,
     ErrorResponse,
     PageInfo,
     PaginatedResponse,
@@ -425,3 +431,166 @@ async def search_styles(
         results = repo.list(limit=50)
 
     return [StyleResponse.model_validate(s) for s in results]
+
+
+@router.post(
+    "/bulk-delete",
+    response_model=BulkDeleteResponse,
+    summary="Bulk delete styles",
+    description="Delete multiple styles by IDs",
+    responses={
+        200: {"description": "Bulk delete completed (check response for failures)"},
+        400: {"model": ErrorResponse, "description": "Invalid request"},
+    },
+)
+async def bulk_delete_styles(
+    request: BulkDeleteRequest,
+    repo: StyleRepository = Depends(get_style_repository),
+    bulk_ops: BulkOperationsService = Depends(get_bulk_operations_service),
+) -> BulkDeleteResponse:
+    """Bulk delete styles by IDs.
+
+    Deletes multiple styles in a single request. Returns counts of successful
+    and failed deletions with error details for failures.
+
+    Args:
+        request: Request containing list of style IDs to delete
+        repo: Style repository instance
+        bulk_ops: Bulk operations service instance
+
+    Returns:
+        Response with deleted_count, failed_ids, and errors
+
+    Example:
+        Request: {"ids": ["uuid1", "uuid2", "uuid3"]}
+        Response: {"deleted_count": 2, "failed_ids": ["uuid3"], "errors": ["Style uuid3 not found"]}
+    """
+    result = await bulk_ops.bulk_delete_entities(
+        model_class=Style,
+        repository=repo,
+        entity_ids=request.ids,
+        entity_type_name="style",
+    )
+    return BulkDeleteResponse(**result)
+
+
+@router.post(
+    "/bulk-export",
+    response_class=StreamingResponse,
+    summary="Bulk export styles as ZIP",
+    description="Export multiple styles as a ZIP file containing JSON files",
+    responses={
+        200: {
+            "description": "ZIP file with exported styles",
+            "content": {"application/zip": {}},
+        },
+        400: {"model": ErrorResponse, "description": "No styles found or all exports failed"},
+    },
+)
+async def bulk_export_styles(
+    request: BulkExportRequest,
+    repo: StyleRepository = Depends(get_style_repository),
+    bulk_ops: BulkOperationsService = Depends(get_bulk_operations_service),
+) -> StreamingResponse:
+    """Bulk export styles as ZIP file.
+
+    Exports multiple styles as JSON files packaged in a ZIP archive.
+    Each style is exported as {entity-type}-{name}-{id}.json.
+
+    Args:
+        request: Request containing list of style IDs to export
+        repo: Style repository instance
+        bulk_ops: Bulk operations service instance
+
+    Returns:
+        StreamingResponse with ZIP file download
+
+    Raises:
+        HTTPException: If no styles found or all exports fail
+    """
+    try:
+        zip_buffer = await bulk_ops.bulk_export_entities_zip(
+            model_class=Style,
+            repository=repo,
+            entity_ids=request.ids,
+            entity_type_name="style",
+            response_schema=StyleResponse,
+        )
+
+        # Generate filename with timestamp
+        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        filename = f"styles-bulk-export-{timestamp}.zip"
+
+        return StreamingResponse(
+            zip_buffer,
+            media_type="application/zip",
+            headers={
+                "Content-Disposition": f'attachment; filename="{filename}"',
+            },
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
+
+
+@router.get(
+    "/{style_id}/export",
+    response_class=StreamingResponse,
+    summary="Export style as JSON file",
+    description="Download a single style as a formatted JSON file",
+    responses={
+        200: {
+            "description": "Style exported successfully as JSON file",
+            "content": {"application/json": {}},
+        },
+        404: {"model": ErrorResponse, "description": "Style not found"},
+    },
+)
+async def export_style(
+    style_id: UUID,
+    repo: StyleRepository = Depends(get_style_repository),
+    bulk_ops: BulkOperationsService = Depends(get_bulk_operations_service),
+) -> StreamingResponse:
+    """Export a single style as JSON file.
+
+    Downloads the style data as a formatted JSON file with proper filename.
+
+    Args:
+        style_id: Style UUID
+        repo: Style repository instance
+        bulk_ops: Bulk operations service instance
+
+    Returns:
+        StreamingResponse with JSON file download
+
+    Raises:
+        HTTPException: If style not found
+    """
+    # Fetch style
+    style = repo.get_by_id(style_id)
+    if not style:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Style {style_id} not found",
+        )
+
+    # Export using bulk operations service
+    export_data = await bulk_ops.export_single_entity(
+        entity=style,
+        entity_type_name="style",
+        response_schema=StyleResponse,
+    )
+
+    # Format as JSON
+    json_content = json.dumps(export_data["content"], indent=2, ensure_ascii=False)
+
+    # Create streaming response
+    return StreamingResponse(
+        io.BytesIO(json_content.encode("utf-8")),
+        media_type="application/json; charset=utf-8",
+        headers={
+            "Content-Disposition": f'attachment; filename="{export_data["filename"]}"',
+        },
+    )

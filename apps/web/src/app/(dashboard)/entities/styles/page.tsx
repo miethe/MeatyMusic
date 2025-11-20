@@ -1,6 +1,6 @@
 /**
  * Styles List Page
- * Display all style entities with filters
+ * Display all style entities with filters, multi-select, and bulk operations
  * Updated to use MeatyMusic Design System
  */
 
@@ -13,23 +13,99 @@ import { Button } from '@meatymusic/ui';
 import { Card } from '@meatymusic/ui';
 import { Badge } from '@meatymusic/ui';
 import { Input } from '@meatymusic/ui';
-import { Plus, Filter, Palette, Loader2, Upload, Music, Clock, Key } from 'lucide-react';
+import { BulkActions } from '@meatymusic/ui';
+import { Checkbox } from '@meatymusic/ui';
+import type { BulkAction } from '@meatymusic/ui';
+import { Plus, Filter, Palette, Loader2, Upload, Music, Clock, Key, Trash2, Download } from 'lucide-react';
 import { ROUTES } from '@/config/routes';
-import { useStyles } from '@/hooks/api/useStyles';
+import { useStyles, useBulkDeleteStyles, useBulkExportStyles, useExportStyle } from '@/hooks/api/useStyles';
 import type { Style } from '@/types/api/entities';
 import { ImportModal } from '@/components/import/ImportModal';
 
 export default function StylesPage() {
   const [search, setSearch] = React.useState('');
   const [importModalOpen, setImportModalOpen] = React.useState(false);
+  const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
 
   // Fetch styles from API
-  const { data, isLoading, error } = useStyles({
+  const { data, isLoading, error, refetch } = useStyles({
     q: search || undefined,
     limit: 50,
   });
 
+  // Bulk operations mutations
+  const bulkDelete = useBulkDeleteStyles();
+  const bulkExport = useBulkExportStyles();
+
   const styles = data?.items || [];
+
+  // Select/deselect all
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(new Set(styles.map((s) => s.id)));
+    } else {
+      setSelectedIds(new Set());
+    }
+  };
+
+  // Toggle individual selection
+  const handleToggleSelect = (id: string) => {
+    const newSelected = new Set(selectedIds);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedIds(newSelected);
+  };
+
+  // Handle bulk delete with confirmation
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+
+    const confirmed = window.confirm(
+      `Are you sure you want to delete ${selectedIds.size} style(s)? This action cannot be undone.`
+    );
+
+    if (confirmed) {
+      await bulkDelete.mutateAsync(Array.from(selectedIds));
+      setSelectedIds(new Set());
+      refetch();
+    }
+  };
+
+  // Handle bulk export
+  const handleBulkExport = async () => {
+    if (selectedIds.size === 0) return;
+    await bulkExport.mutateAsync(Array.from(selectedIds));
+  };
+
+  // Clear selection
+  const handleClearSelection = () => {
+    setSelectedIds(new Set());
+  };
+
+  // Bulk actions configuration
+  const bulkActions: BulkAction[] = [
+    {
+      label: 'Export',
+      icon: Download,
+      onClick: handleBulkExport,
+      variant: 'outline',
+      disabled: bulkExport.isPending,
+    },
+    {
+      label: 'Delete',
+      icon: Trash2,
+      onClick: handleBulkDelete,
+      variant: 'destructive',
+      disabled: bulkDelete.isPending,
+    },
+  ];
+
+  // Check if all visible items are selected
+  const allSelected = styles.length > 0 && styles.every((s) => selectedIds.has(s.id));
+  const someSelected = styles.some((s) => selectedIds.has(s.id)) && !allSelected;
 
   return (
     <div className="min-h-screen">
@@ -116,108 +192,179 @@ export default function StylesPage() {
           </Card>
         )}
 
-        {/* Styles Grid */}
+        {/* Styles Table/Grid */}
         {!isLoading && !error && styles.length > 0 && (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
-            {styles.map((style) => (
-              <StyleCard key={style.id} style={style} />
-            ))}
+          <div className="animate-fade-in">
+            {/* Select All */}
+            <div className="mb-4 flex items-center gap-2 px-2">
+              <Checkbox
+                checked={allSelected}
+                onCheckedChange={handleSelectAll}
+                aria-label="Select all styles"
+                className={someSelected ? 'data-[state=checked]:bg-[var(--mm-color-primary)]' : ''}
+              />
+              <span className="text-sm text-[var(--mm-color-text-secondary)]">
+                Select all ({styles.length})
+              </span>
+            </div>
+
+            {/* Grid */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {styles.map((style) => (
+                <StyleCard
+                  key={style.id}
+                  style={style}
+                  selected={selectedIds.has(style.id)}
+                  onToggleSelect={() => handleToggleSelect(style.id)}
+                />
+              ))}
+            </div>
           </div>
         )}
       </div>
 
+      {/* Bulk Actions Toolbar */}
+      <BulkActions
+        selectedCount={selectedIds.size}
+        onClearSelection={handleClearSelection}
+        actions={bulkActions}
+      />
+
+      {/* Import Modal */}
       <ImportModal
         open={importModalOpen}
         onOpenChange={setImportModalOpen}
         entityType="style"
         onImportSuccess={() => {
           setImportModalOpen(false);
+          refetch();
         }}
       />
     </div>
   );
 }
 
-function StyleCard({ style }: { style: Style }) {
+interface StyleCardProps {
+  style: Style;
+  selected: boolean;
+  onToggleSelect: () => void;
+}
+
+function StyleCard({ style, selected, onToggleSelect }: StyleCardProps) {
+  const exportStyle = useExportStyle();
+
+  const handleExport = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    await exportStyle.mutateAsync(style.id);
+  };
+
   return (
-    <Link href={ROUTES.ENTITIES.STYLE_DETAIL(style.id)}>
-      <Card
-        variant="elevated"
-        padding="md"
-        interactive
-        className="h-full"
-      >
-        {/* Header */}
-        <div className="mb-4">
-          <div className="flex items-start justify-between mb-2">
-            <h3 className="text-lg font-semibold text-[var(--mm-color-text-primary)] group-hover:text-[var(--mm-color-primary)] transition-colors">
-              {style.name}
-            </h3>
-            {style.genre && (
-              <Badge variant="secondary" size="sm">
-                <Music className="w-3 h-3" />
-                {style.genre}
-              </Badge>
-            )}
-          </div>
-        </div>
+    <div className="relative">
+      {/* Selection Checkbox */}
+      <div className="absolute top-2 left-2 z-10">
+        <Checkbox
+          checked={selected}
+          onCheckedChange={onToggleSelect}
+          onClick={(e) => e.stopPropagation()}
+          aria-label={`Select ${style.name}`}
+          className="bg-white/90 backdrop-blur-sm"
+        />
+      </div>
 
-        {/* Details */}
-        <div className="space-y-3">
-          {/* BPM and Key */}
-          <div className="flex flex-wrap gap-2">
-            {style.bpm_min && style.bpm_max && (
-              <Badge variant="outline" size="sm">
-                <Clock className="w-3 h-3" />
-                {style.bpm_min}-{style.bpm_max} BPM
-              </Badge>
-            )}
-            {style.key && (
-              <Badge variant="outline" size="sm">
-                <Key className="w-3 h-3" />
-                {style.key}
-              </Badge>
-            )}
-          </div>
-
-          {/* Mood Tags */}
-          {style.mood && style.mood.length > 0 && (
-            <div className="flex flex-wrap gap-1.5">
-              {style.mood.slice(0, 4).map((moodItem) => (
-                <Badge
-                  key={moodItem}
-                  variant="outline"
-                  size="sm"
-                  className="text-xs"
-                >
-                  {moodItem}
-                </Badge>
-              ))}
-              {style.mood.length > 4 && (
-                <Badge
-                  variant="secondary"
-                  size="sm"
-                  className="text-xs"
-                >
-                  +{style.mood.length - 4}
+      <Link href={ROUTES.ENTITIES.STYLE_DETAIL(style.id)}>
+        <Card
+          variant="elevated"
+          padding="md"
+          interactive
+          className={selected ? 'ring-2 ring-[var(--mm-color-primary)]' : ''}
+        >
+          {/* Header */}
+          <div className="mb-4">
+            <div className="flex items-start justify-between mb-2">
+              <h3 className="text-lg font-semibold text-[var(--mm-color-text-primary)] group-hover:text-[var(--mm-color-primary)] transition-colors">
+                {style.name}
+              </h3>
+              {style.genre && (
+                <Badge variant="secondary" size="sm">
+                  <Music className="w-3 h-3" />
+                  {style.genre}
                 </Badge>
               )}
             </div>
-          )}
+          </div>
 
-          {/* Energy Level */}
-          {style.energy && (
-            <div className="pt-2 border-t border-[var(--mm-color-border-subtle)]">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-[var(--mm-color-text-tertiary)]">Energy</span>
-                <span className="text-[var(--mm-color-text-secondary)] font-medium">
-                  {style.energy}
-                </span>
-              </div>
+          {/* Details */}
+          <div className="space-y-3">
+            {/* BPM and Key */}
+            <div className="flex flex-wrap gap-2">
+              {style.bpm_min && style.bpm_max && (
+                <Badge variant="outline" size="sm">
+                  <Clock className="w-3 h-3" />
+                  {style.bpm_min}-{style.bpm_max} BPM
+                </Badge>
+              )}
+              {style.key && (
+                <Badge variant="outline" size="sm">
+                  <Key className="w-3 h-3" />
+                  {style.key}
+                </Badge>
+              )}
             </div>
-          )}
-        </div>
-      </Card>
-    </Link>
+
+            {/* Mood Tags */}
+            {style.mood && style.mood.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {style.mood.slice(0, 4).map((moodItem) => (
+                  <Badge
+                    key={moodItem}
+                    variant="outline"
+                    size="sm"
+                    className="text-xs"
+                  >
+                    {moodItem}
+                  </Badge>
+                ))}
+                {style.mood.length > 4 && (
+                  <Badge
+                    variant="secondary"
+                    size="sm"
+                    className="text-xs"
+                  >
+                    +{style.mood.length - 4}
+                  </Badge>
+                )}
+              </div>
+            )}
+
+            {/* Energy Level */}
+            {style.energy_level && (
+              <div className="pt-2 border-t border-[var(--mm-color-border-subtle)]">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-[var(--mm-color-text-tertiary)]">Energy</span>
+                  <span className="text-[var(--mm-color-text-secondary)] font-medium">
+                    {style.energy_level}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="pt-2 border-t border-[var(--mm-color-border-subtle)]">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleExport}
+                disabled={exportStyle.isPending}
+                className="w-full"
+              >
+                <Download className="w-3 h-3" />
+                Export
+              </Button>
+            </div>
+          </div>
+        </Card>
+      </Link>
+    </div>
   );
 }
