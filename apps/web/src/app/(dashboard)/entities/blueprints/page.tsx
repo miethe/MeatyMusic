@@ -1,6 +1,7 @@
 /**
  * Blueprints List Page
  * Display all blueprint entities with filters
+ * Admin-only page
  */
 
 'use client';
@@ -16,6 +17,7 @@ import { ROUTES } from '@/config/routes';
 import { useBlueprints } from '@/hooks/api/useBlueprints';
 import type { Blueprint } from '@/types/api/entities';
 import { ImportModal } from '@/components/import/ImportModal';
+import { AdminGuard } from '@/components/auth/AdminGuard';
 
 export default function BlueprintsPage() {
   const [search, setSearch] = React.useState('');
@@ -30,105 +32,114 @@ export default function BlueprintsPage() {
   const blueprints = data?.items || [];
 
   return (
-    <div className="min-h-screen">
-      <PageHeader
-        title="Blueprints"
-        description="Genre-specific composition rules and evaluation rubrics"
-        actions={
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setImportModalOpen(true)}>
-              <Upload className="w-4 h-4 mr-2" />
-              Import
-            </Button>
-            <Link href={ROUTES.ENTITIES.BLUEPRINT_NEW}>
-              <Button>
-                <Plus className="w-4 h-4 mr-2" />
-                Create Blueprint
-              </Button>
-            </Link>
-          </div>
-        }
-      />
-
-      <div className="container mx-auto px-4 py-8">
-        {/* Filters */}
-        <div className="mb-6 flex items-center gap-4 animate-fade-in">
-          <div className="flex-1">
-            <input
-              type="search"
-              placeholder="Search blueprints..."
-              className="w-full px-4 py-2 rounded-lg border border-border-default bg-bg-elevated text-text-primary placeholder:text-text-muted focus:border-border-accent focus:ring-2 focus:ring-primary/20 transition-all duration-ui"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-          <Button variant="outline">
-            <Filter className="w-4 h-4 mr-2" />
-            Filters
-          </Button>
+    <AdminGuard
+      message="Blueprint management is only accessible to administrators."
+      loadingFallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </div>
-
-        {/* Loading State */}
-        {isLoading && (
-          <Card className="bg-bg-surface border-border-default shadow-elevation-1 p-12 text-center animate-fade-in">
-            <Loader2 className="w-16 h-16 mx-auto text-text-muted mb-4 animate-spin" />
-            <p className="text-text-secondary">Loading blueprints...</p>
-          </Card>
-        )}
-
-        {/* Error State */}
-        {error && (
-          <Card className="bg-bg-surface border-border-default shadow-elevation-1 p-12 text-center animate-fade-in">
-            <div className="text-destructive mb-4">
-              <p className="font-medium">Failed to load blueprints</p>
-              <p className="text-sm text-text-secondary mt-2">{error.message}</p>
-            </div>
-          </Card>
-        )}
-
-        {/* Empty State */}
-        {!isLoading && !error && blueprints.length === 0 && (
-          <Card className="bg-bg-surface border-border-default shadow-elevation-1 p-12 text-center animate-fade-in">
-            <BookOpen className="w-16 h-16 mx-auto text-text-muted mb-4" />
-            <h3 className="text-lg font-medium text-text-primary mb-2">
-              {search ? 'No blueprints found' : 'No blueprints yet'}
-            </h3>
-            <p className="text-text-secondary mb-6">
-              {search
-                ? 'Try adjusting your search terms'
-                : 'Define genre-specific rules, rubrics, and composition constraints'
-              }
-            </p>
-            {!search && (
+      }
+    >
+      <div className="min-h-screen">
+        <PageHeader
+          title="Blueprints"
+          description="Genre-specific composition rules and evaluation rubrics"
+          actions={
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setImportModalOpen(true)}>
+                <Upload className="w-4 h-4 mr-2" />
+                Import
+              </Button>
               <Link href={ROUTES.ENTITIES.BLUEPRINT_NEW}>
-                <Button className="bg-gradient-primary shadow-accent-glow hover:shadow-accent-glow-lg transition-all duration-ui">
+                <Button>
                   <Plus className="w-4 h-4 mr-2" />
-                  Create First Blueprint
+                  Create Blueprint
                 </Button>
               </Link>
-            )}
-          </Card>
-        )}
+            </div>
+          }
+        />
 
-        {/* Blueprints Grid */}
-        {!isLoading && !error && blueprints.length > 0 && (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
-            {blueprints.map((blueprint) => (
-              <BlueprintCard key={blueprint.id} blueprint={blueprint} />
-            ))}
+        <div className="container mx-auto px-4 py-8">
+          {/* Filters */}
+          <div className="mb-6 flex items-center gap-4 animate-fade-in">
+            <div className="flex-1">
+              <input
+                type="search"
+                placeholder="Search blueprints..."
+                className="w-full px-4 py-2 rounded-lg border border-border-default bg-bg-elevated text-text-primary placeholder:text-text-muted focus:border-border-accent focus:ring-2 focus:ring-primary/20 transition-all duration-ui"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+            <Button variant="outline">
+              <Filter className="w-4 h-4 mr-2" />
+              Filters
+            </Button>
           </div>
-        )}
-      </div>
 
-      <ImportModal
-        open={importModalOpen}
-        onOpenChange={setImportModalOpen}
-        entityType="blueprint"
-        onImportSuccess={() => {
-          setImportModalOpen(false);
-        }}
-      />
-    </div>
+          {/* Loading State */}
+          {isLoading && (
+            <Card className="bg-bg-surface border-border-default shadow-elevation-1 p-12 text-center animate-fade-in">
+              <Loader2 className="w-16 h-16 mx-auto text-text-muted mb-4 animate-spin" />
+              <p className="text-text-secondary">Loading blueprints...</p>
+            </Card>
+          )}
+
+          {/* Error State */}
+          {error && (
+            <Card className="bg-bg-surface border-border-default shadow-elevation-1 p-12 text-center animate-fade-in">
+              <div className="text-destructive mb-4">
+                <p className="font-medium">Failed to load blueprints</p>
+                <p className="text-sm text-text-secondary mt-2">{error.message}</p>
+              </div>
+            </Card>
+          )}
+
+          {/* Empty State */}
+          {!isLoading && !error && blueprints.length === 0 && (
+            <Card className="bg-bg-surface border-border-default shadow-elevation-1 p-12 text-center animate-fade-in">
+              <BookOpen className="w-16 h-16 mx-auto text-text-muted mb-4" />
+              <h3 className="text-lg font-medium text-text-primary mb-2">
+                {search ? 'No blueprints found' : 'No blueprints yet'}
+              </h3>
+              <p className="text-text-secondary mb-6">
+                {search
+                  ? 'Try adjusting your search terms'
+                  : 'Define genre-specific rules, rubrics, and composition constraints'
+                }
+              </p>
+              {!search && (
+                <Link href={ROUTES.ENTITIES.BLUEPRINT_NEW}>
+                  <Button className="bg-gradient-primary shadow-accent-glow hover:shadow-accent-glow-lg transition-all duration-ui">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create First Blueprint
+                  </Button>
+                </Link>
+              )}
+            </Card>
+          )}
+
+          {/* Blueprints Grid */}
+          {!isLoading && !error && blueprints.length > 0 && (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
+              {blueprints.map((blueprint) => (
+                <BlueprintCard key={blueprint.id} blueprint={blueprint} />
+              ))}
+            </div>
+          )}
+        </div>
+
+        <ImportModal
+          open={importModalOpen}
+          onOpenChange={setImportModalOpen}
+          entityType="blueprint"
+          onImportSuccess={() => {
+            setImportModalOpen(false);
+          }}
+        />
+      </div>
+    </AdminGuard>
   );
 }
 

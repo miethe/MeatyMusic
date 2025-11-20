@@ -2,12 +2,22 @@
  * Authentication utility functions
  */
 
+import type { User } from '@/types/api';
+
 /**
  * Check if a route requires authentication
  */
 export function isProtectedRoute(pathname: string): boolean {
   const protectedPrefixes = ['/dashboard', '/songs', '/library', '/settings'];
   return protectedPrefixes.some((prefix) => pathname.startsWith(prefix));
+}
+
+/**
+ * Check if a route requires admin role
+ */
+export function isAdminRoute(pathname: string): boolean {
+  const adminPrefixes = ['/entities/blueprints', '/entities/sources'];
+  return adminPrefixes.some((prefix) => pathname.startsWith(prefix));
 }
 
 /**
@@ -38,4 +48,26 @@ export function getUnauthenticatedRedirect(pathname: string): string {
     return `/sign-in?redirect=${encodeURIComponent(pathname)}`;
   }
   return '/sign-in';
+}
+
+/**
+ * Check if user has admin role
+ */
+export function isUserAdmin(user: User | null | undefined): boolean {
+  return user?.role === 'admin';
+}
+
+/**
+ * Check if user has required role for a route
+ */
+export function hasRequiredRole(
+  user: User | null | undefined,
+  pathname: string
+): boolean {
+  // If route requires admin, check admin role
+  if (isAdminRoute(pathname)) {
+    return isUserAdmin(user);
+  }
+  // All other protected routes just need authentication
+  return !!user;
 }

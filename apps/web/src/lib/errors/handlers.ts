@@ -31,9 +31,20 @@ export function parseApiError(error: unknown): ApplicationError {
     const errorData = response.data;
 
     if (errorData) {
+      // Map HTTP status codes to error codes
+      let errorCode = errorData.error || 'UNKNOWN_ERROR';
+
+      if (response.status === 401) {
+        errorCode = ERROR_CODES.UNAUTHORIZED;
+      } else if (response.status === 403) {
+        errorCode = ERROR_CODES.FORBIDDEN;
+      } else if (response.status === 404) {
+        errorCode = ERROR_CODES.NOT_FOUND;
+      }
+
       return new ApplicationError({
-        code: errorData.error || 'UNKNOWN_ERROR',
-        message: errorData.detail || errorData.error || 'An error occurred',
+        code: errorCode,
+        message: errorData.detail || errorData.error || getDefaultErrorMessage(response.status),
         details: errorData.field ? { field: errorData.field } : undefined,
         status: response.status,
       });
@@ -75,6 +86,34 @@ export function parseApiError(error: unknown): ApplicationError {
 }
 
 /**
+ * Get default error message for HTTP status codes
+ */
+function getDefaultErrorMessage(status: number): string {
+  switch (status) {
+    case 400:
+      return 'Bad request. Please check your input.';
+    case 401:
+      return 'You are not authenticated. Please sign in.';
+    case 403:
+      return 'You do not have permission to access this resource.';
+    case 404:
+      return 'The requested resource was not found.';
+    case 409:
+      return 'Conflict with existing data.';
+    case 422:
+      return 'Validation error. Please check your input.';
+    case 429:
+      return 'Too many requests. Please try again later.';
+    case 500:
+      return 'Internal server error. Please try again.';
+    case 503:
+      return 'Service temporarily unavailable. Please try again later.';
+    default:
+      return 'An error occurred';
+  }
+}
+
+/**
  * Get user-friendly error message
  */
 export function getErrorMessage(error: unknown): string {
@@ -87,6 +126,26 @@ export function getErrorMessage(error: unknown): string {
   }
 
   return 'An unexpected error occurred';
+}
+
+/**
+ * Check if error is a 403 Forbidden error
+ */
+export function isForbiddenError(error: unknown): boolean {
+  if (error instanceof ApplicationError) {
+    return error.status === 403 || error.code === ERROR_CODES.FORBIDDEN;
+  }
+  return false;
+}
+
+/**
+ * Check if error is a 401 Unauthorized error
+ */
+export function isUnauthorizedError(error: unknown): boolean {
+  if (error instanceof ApplicationError) {
+    return error.status === 401 || error.code === ERROR_CODES.UNAUTHORIZED;
+  }
+  return false;
 }
 
 /**

@@ -1,6 +1,6 @@
 /**
  * Authentication hook
- * Fetches user data from backend
+ * Fetches user data from backend and provides role-based access checks
  * Note: Authentication is handled by backend via JWT tokens
  */
 
@@ -28,11 +28,24 @@ export function useAuth() {
     retry: false, // Don't retry on 401/403
   });
 
+  // Compute isAdmin from user role
+  const isAdmin = user?.role === 'admin';
+
   return {
     user,
     isLoaded: !isLoading,
     isSignedIn: !!user,
+    isAdmin,
     isLoading,
     error,
   };
+}
+
+/**
+ * Hook to check if current user is an admin
+ * Convenience hook for conditional rendering based on admin role
+ */
+export function useIsAdmin(): boolean {
+  const { isAdmin } = useAuth();
+  return isAdmin;
 }
