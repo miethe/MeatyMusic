@@ -261,3 +261,10 @@
 | Fix | Updated function signature to accept Record<string, string \| string[] \| undefined> \| any for axios compatibility |
 | File | apps/web/src/lib/api/utils.ts:30 |
 | Commit | efd8e7c |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | Python ImportError: cannot import ProfanityCheckResult from app.schemas - lyrics endpoint failed to start |
+| Fix | Added ProfanityCheckResult and ProfanityViolation to schema package exports (both import block and __all__ list). Types were defined in common.py but not exported from __init__.py |
+| File | services/api/app/schemas/__init__.py:20-21,111-112 |
+| Commit | e8941c0 |
