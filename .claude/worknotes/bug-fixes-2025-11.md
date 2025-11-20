@@ -282,4 +282,4 @@
 | Bug | ModuleNotFoundError: No module named 'app.models.workflow_run' - workflow_runs endpoint failed to import |
 | Fix | Changed import from 'app.models.workflow_run' to 'app.models.song' (WorkflowRun is co-located with Song model, not in separate module) |
 | File | services/api/app/api/v1/endpoints/workflow_runs.py:15 |
-| Commit | Pending |
+| Commit | 2667592 |
