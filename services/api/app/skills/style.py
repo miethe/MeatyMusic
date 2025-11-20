@@ -8,14 +8,18 @@ Contract: .claude/skills/workflow/style/SKILL.md
 """
 
 from typing import Any, Dict, List, Tuple
+from uuid import UUID
 
 import structlog
 
 from app.workflows.skill import WorkflowContext, compute_hash, workflow_skill
 from app.repositories.blueprint_repo import BlueprintRepository
-from app.core.security_context import SecurityContext
+from app.core.security import SecurityContext
 
 logger = structlog.get_logger(__name__)
+
+# System UUID for accessing system-level blueprints
+SYSTEM_UUID = UUID('00000000-0000-0000-0000-000000000000')
 
 
 # Fallback tempo ranges if blueprint not found
@@ -58,8 +62,8 @@ def _load_blueprint(genre: str, context: WorkflowContext):
             logger.warning("style.no_db_session", genre=genre)
             return None
 
-        # Create repository with system security context
-        security_context = SecurityContext(tenant_id=None, owner_id=None)
+        # Create repository with system security context to access system blueprints
+        security_context = SecurityContext(user_id=SYSTEM_UUID, tenant_id=SYSTEM_UUID)
         blueprint_repo = BlueprintRepository(
             db=db_session,
             security_context=security_context
