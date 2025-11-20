@@ -31,6 +31,7 @@ from app.schemas import (
     LyricsUpdate,
     PageInfo,
     PaginatedResponse,
+    ProfanityCheckResult,
 )
 
 router = APIRouter(prefix="/lyrics", tags=["Lyrics"])
@@ -457,3 +458,84 @@ async def export_lyrics(
             "Content-Disposition": f'attachment; filename="{export_data["filename"]}"',
         },
     )
+  
+@router.post(
+    "/check-profanity",
+    response_model=ProfanityCheckResult,
+    status_code=status.HTTP_200_OK,
+    summary="Check lyrics for profanity",
+    description="Check lyrics sections for profanity with detailed violation reporting",
+    responses={
+        200: {"description": "Profanity check completed"},
+        400: {"model": ErrorResponse, "description": "Invalid request"},
+    },
+)
+async def check_lyrics_profanity(
+    sections: list[dict],
+    explicit_allowed: bool = Query(False, description="Whether explicit content is allowed"),
+    service: LyricsService = Depends(get_lyrics_service),
+) -> ProfanityCheckResult:
+    """Check lyrics sections for profanity with detailed violation reporting.
+
+    This endpoint uses the enhanced profanity filter which detects:
+    - Exact profanity matches
+    - L33t speak variations (e.g., "sh1t" → "shit")
+    - Common misspellings and variations
+    - Word boundary detection (avoids false positives)
+
+    The response includes:
+    - Detailed violations with line numbers and context
+    - Category-based scoring (mild: 0.3, moderate: 0.6, severe: 1.0)
+    - Total and maximum scores
+    - Categories of profanity found
+
+    Args:
+        sections: List of section dicts with 'lines' field
+        explicit_allowed: Whether explicit content is allowed
+        service: Lyrics service instance
+
+    Returns:
+        ProfanityCheckResult with violations and scores
+
+    Example request:
+        ```json
+        {
+            "sections": [
+                {"type": "Verse", "lines": ["Line 1", "Line 2"]},
+                {"type": "Chorus", "lines": ["Clean lyrics here"]}
+            ]
+        }
+        ```
+
+    Example response:
+        ```json
+        {
+            "is_clean": false,
+            "violations": [
+                {
+                    "word": "sh1t",
+                    "category": "moderate",
+                    "score": 0.6,
+                    "line_number": 3,
+                    "context": "...this is bad sh1t...",
+                    "position": 15
+                }
+            ],
+            "total_score": 0.6,
+            "max_score": 0.6,
+            "violation_count": 1,
+            "categories_found": ["moderate"]
+        }
+        ```
+
+    Raises:
+        HTTPException: If request is invalid
+    """
+    try:
+        result = service.check_lyrics_profanity(sections, explicit_allowed)
+        return result
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Profanity check failed: {str(e)}",
+        )

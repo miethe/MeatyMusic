@@ -1,0 +1,76 @@
+{
+  "id": "synthetic-kids-185",
+  "title": "Kids Song 185",
+  "blueprint_ref": {
+    "genre": "Kids",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "kids",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 102,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "C major",
+      "modulations": []
+    },
+    "mood": [
+      "playful",
+      "friendly"
+    ],
+    "energy": "anthemic",
+    "instrumentation": [
+      "xylophone",
+      "drums",
+      "ukulele",
+      "claps",
+      "synth"
+    ],
+    "vocal_profile": "animated",
+    "tags": [
+      "educational",
+      "catchy",
+      "simple"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "future",
+    "themes": [
+      "kids",
+      "love"
+    ],
+    "rhyme_scheme": "ABCB",
+    "section_order": [
+      "verse1",
+      "chorus1",
+      "verse2",
+      "chorus2",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 30
+    }
+  },
+  "producer_notes": {
+    "structure": "Simple",
+    "hooks": 3
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 18542
+}

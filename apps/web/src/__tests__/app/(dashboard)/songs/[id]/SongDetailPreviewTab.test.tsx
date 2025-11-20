@@ -55,6 +55,21 @@ jest.mock('@/components/layout/PageHeader', () => ({
   ),
 }));
 
+jest.mock('@/components/songs/SDSPreview', () => ({
+  SDSPreview: ({ data, testId }: { data: any; testId: string }) => (
+    <div data-testid={testId}>
+      <div data-testid={`${testId}-json-viewer`}>JSON Viewer Placeholder - Awaiting Task SDS-PREVIEW-010</div>
+      <div>Song ID</div>
+      <div>{data.song_id}</div>
+      <div>Title</div>
+      <div>{data.title}</div>
+      <div>Global Seed</div>
+      <div>{data.global_seed}</div>
+      <pre>{JSON.stringify(data, null, 2)}</pre>
+    </div>
+  ),
+}));
+
 const mockUseSong = useSong as jest.MockedFunction<typeof useSong>;
 const mockUseDeleteSong = useDeleteSong as jest.MockedFunction<typeof useDeleteSong>;
 const mockUseSDS = useSDS as jest.MockedFunction<typeof useSDS>;

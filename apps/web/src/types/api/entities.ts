@@ -49,6 +49,32 @@ export interface PaginatedResponse<T> {
 }
 
 /**
+ * Individual profanity violation with context
+ * Backend: app/schemas/common.py - ProfanityViolation
+ */
+export interface ProfanityViolation {
+  word: string;
+  category: 'mild' | 'moderate' | 'severe';
+  score: number;
+  line_number?: number;
+  context?: string;
+  position?: number;
+}
+
+/**
+ * Result of profanity content check
+ * Backend: app/schemas/common.py - ProfanityCheckResult
+ */
+export interface ProfanityCheckResult {
+  is_clean: boolean;
+  violations: ProfanityViolation[];
+  total_score: number;
+  max_score: number;
+  violation_count: number;
+  categories_found: string[];
+}
+
+/**
  * Song Entity Types
  * Backend: app/schemas/song.py
  */

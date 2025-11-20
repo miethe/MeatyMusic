@@ -19,6 +19,11 @@ import { WorkflowHeader } from '@/components/workflow/WorkflowHeader';
 import { WorkflowGraph, type WorkflowNodeState } from '@/components/workflow/WorkflowGraph';
 import { MetricsPanel } from '@/components/workflow/MetricsPanel';
 import { ArtifactPreview, type ArtifactData } from '@/components/workflow/ArtifactPreview';
+import { WorkflowProgress } from '@/components/workflow-progress';
+import { WorkflowDAG, type WorkflowNodeStatus } from '@/components/workflow-dag';
+import { WorkflowMetrics } from '@/components/workflow-metrics';
+import { useWorkflowEvents } from '@/hooks/useWorkflowEvents';
+import { useWorkflowStore } from '@/stores/workflowStore';
 import { WorkflowNode, WorkflowRunStatus, SongStatus, type Song, type WorkflowSummary } from '@/types/api';
 
 /**
@@ -167,11 +172,58 @@ export default function WorkflowDashboardPage() {
   const params = useParams();
   const workflowId = params.id as string;
 
+  // WebSocket connection for real-time updates (P1.3)
+  const { events, isLoading: wsLoading, error: wsError } = useWorkflowEvents(workflowId, {
+    enabled: true,
+    enableNotifications: true,
+    onEvent: (event) => {
+      console.log('Workflow event received:', event);
+    },
+  });
+
+  // Get workflow state from store (updated via WebSocket)
+  const workflowRun = useWorkflowStore((state) => state.runs[workflowId]);
+  const isConnected = useWorkflowStore((state) => state.isConnected);
+
   // Placeholder state (will be replaced with API calls in Wave 3)
+  // For now, use mock data if WebSocket data is not available
   const [song] = React.useState<Song>(MOCK_SONG);
-  const [workflowNodes] = React.useState<WorkflowNodeState[]>(MOCK_WORKFLOW_NODES);
   const [summary] = React.useState<WorkflowSummary>(MOCK_SUMMARY);
   const [artifacts] = React.useState<ArtifactData>(MOCK_ARTIFACTS);
+
+  // Use WebSocket data if available, otherwise fall back to mock
+  const workflowNodes: WorkflowNodeState[] = React.useMemo(() => {
+    if (workflowRun?.nodes) {
+      return Object.entries(workflowRun.nodes).map(([nodeId, nodeState]) => ({
+        id: nodeId as WorkflowNode,
+        status: nodeState.status,
+        startedAt: nodeState.startedAt,
+        completedAt: nodeState.completedAt,
+        durationMs: nodeState.durationMs,
+        error: nodeState.error,
+      }));
+    }
+    return MOCK_WORKFLOW_NODES;
+  }, [workflowRun]);
+
+  // Update summary with WebSocket data if available
+  const effectiveSummary: WorkflowSummary = React.useMemo(() => {
+    if (workflowRun) {
+      return {
+        ...summary,
+        status: workflowRun.status || summary.status,
+        nodes_executed: workflowNodes
+          .filter(n => n.status !== 'pending')
+          .map(n => ({
+            node: n.id,
+            status: n.status === 'success' ? 'success' : n.status === 'failed' ? 'failed' : 'skipped',
+            duration_ms: n.durationMs || 0,
+            output: {},
+          })),
+      };
+    }
+    return summary;
+  }, [workflowRun, summary, workflowNodes]);
 
   // Placeholder callbacks (will be wired to API in Wave 3)
   const handleDownloadArtifacts = () => {
@@ -201,28 +253,74 @@ export default function WorkflowDashboardPage() {
   return (
     <div className="min-h-screen bg-background-primary p-6">
       <div className="max-w-7xl mx-auto space-y-6">
+        {/* WebSocket Connection Status */}
+        {!isConnected && !wsLoading && (
+          <div className="p-4 bg-accent-warning/10 border border-accent-warning rounded-lg">
+            <p className="text-sm text-accent-warning">
+              ⚠ WebSocket disconnected. Reconnecting...
+            </p>
+          </div>
+        )}
+
+        {wsError && (
+          <div className="p-4 bg-accent-error/10 border border-accent-error rounded-lg">
+            <p className="text-sm text-accent-error">
+              ✗ WebSocket error: {wsError.message}
+            </p>
+          </div>
+        )}
+
         {/* Header */}
         <WorkflowHeader
           song={song}
-          status={summary.status as WorkflowRunStatus}
-          runId={summary.run_id}
+          status={effectiveSummary.status as WorkflowRunStatus}
+          runId={effectiveSummary.run_id}
           onDownloadArtifacts={handleDownloadArtifacts}
           onRetryWorkflow={handleRetryWorkflow}
         />
 
-        {/* Workflow Graph */}
-        <WorkflowGraph
+        {/* Progress Bar - NEW P1.3 Component */}
+        <div className="p-6 bg-background-secondary rounded-xl border border-border/10">
+          <WorkflowProgress
+            status={effectiveSummary.status as WorkflowRunStatus}
+            currentNode={workflowNodes.find(n => n.status === 'running')?.id}
+            completedNodes={workflowNodes.filter(n => n.status === 'success').length}
+            totalNodes={9}
+            estimatedCompletion={
+              effectiveSummary.status === WorkflowRunStatus.RUNNING
+                ? new Date(Date.now() + 30000) // Mock: 30s remaining
+                : undefined
+            }
+          />
+        </div>
+
+        {/* Workflow DAG - NEW P1.3 Component */}
+        <div className="p-6 bg-background-secondary rounded-xl border border-border/10">
+          <h3 className="text-lg font-semibold text-text-primary mb-4">Workflow DAG</h3>
+          <WorkflowDAG
+            nodes={workflowNodes}
+            orientation="horizontal"
+            showMetrics
+            onNodeClick={handleNodeClick}
+          />
+        </div>
+
+        {/* Legacy Workflow Graph (can be removed if DAG is preferred) */}
+        {/* <WorkflowGraph
           nodes={workflowNodes}
           orientation="horizontal"
           showMetrics
           onNodeClick={handleNodeClick}
-        />
+        /> */}
 
         {/* Metrics and Artifacts - Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Metrics Panel - 1/3 width on desktop */}
+          {/* Metrics Cards - NEW P1.3 Component - 1/3 width on desktop */}
           <div className="lg:col-span-1">
-            <MetricsPanel summary={summary} />
+            <WorkflowMetrics
+              scores={effectiveSummary.validation_scores}
+              detailed
+            />
           </div>
 
           {/* Artifact Preview Panel - 2/3 width on desktop */}
@@ -230,6 +328,11 @@ export default function WorkflowDashboardPage() {
             <ArtifactPreview artifacts={artifacts} defaultTab="lyrics" />
           </div>
         </div>
+
+        {/* Legacy Metrics Panel (can be removed if new metrics component is preferred) */}
+        {/* <div className="lg:col-span-1">
+          <MetricsPanel summary={summary} />
+        </div> */}
       </div>
     </div>
   );

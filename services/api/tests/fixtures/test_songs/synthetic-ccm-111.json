@@ -1,0 +1,78 @@
+{
+  "id": "synthetic-ccm-111",
+  "title": "Ccm Song 111",
+  "blueprint_ref": {
+    "genre": "Ccm",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "ccm",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 81,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "D major",
+      "modulations": []
+    },
+    "mood": [
+      "worshipful",
+      "joyful",
+      "hopeful"
+    ],
+    "energy": "medium",
+    "instrumentation": [
+      "acoustic guitar",
+      "keys",
+      "choir",
+      "drums"
+    ],
+    "vocal_profile": "choir-like",
+    "tags": [
+      "heartfelt",
+      "inspiring"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "present",
+    "themes": [
+      "ccm",
+      "dreams"
+    ],
+    "rhyme_scheme": "AABB",
+    "section_order": [
+      "intro",
+      "verse1",
+      "chorus1",
+      "verse2",
+      "chorus2",
+      "bridge",
+      "chorus3",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": true,
+      "max_lines": 48
+    }
+  },
+  "producer_notes": {
+    "structure": "Standard",
+    "hooks": 5
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 11142
+}

@@ -1,0 +1,78 @@
+{
+  "id": "synthetic-indie_alternative-080",
+  "title": "Indie Alternative Song 80",
+  "blueprint_ref": {
+    "genre": "Indie Alternative",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "indie_alternative",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 111,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "A minor",
+      "modulations": []
+    },
+    "mood": [
+      "dreamy",
+      "melancholic"
+    ],
+    "energy": "high",
+    "instrumentation": [
+      "synth",
+      "drums",
+      "keys",
+      "guitar",
+      "bass"
+    ],
+    "vocal_profile": "ethereal",
+    "tags": [
+      "lo-fi",
+      "introspective"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "2nd",
+    "tense": "future",
+    "themes": [
+      "indie_alternative",
+      "memories"
+    ],
+    "rhyme_scheme": "AAAA",
+    "section_order": [
+      "intro",
+      "verse1",
+      "chorus1",
+      "verse2",
+      "chorus2",
+      "bridge",
+      "chorus3",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": true,
+      "max_lines": 64
+    }
+  },
+  "producer_notes": {
+    "structure": "Standard",
+    "hooks": 2
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 8042
+}

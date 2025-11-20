@@ -1,0 +1,76 @@
+{
+  "id": "synthetic-ccm-112",
+  "title": "Ccm Song 112",
+  "blueprint_ref": {
+    "genre": "Ccm",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "ccm",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 101,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "G major",
+      "modulations": []
+    },
+    "mood": [
+      "uplifting",
+      "reverent"
+    ],
+    "energy": "anthemic",
+    "instrumentation": [
+      "bass",
+      "keys",
+      "choir",
+      "drums"
+    ],
+    "vocal_profile": "emotive",
+    "tags": [
+      "heartfelt",
+      "anthemic",
+      "worshipful",
+      "uplifting"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "future",
+    "themes": [
+      "ccm",
+      "dreams"
+    ],
+    "rhyme_scheme": "ABCB",
+    "section_order": [
+      "verse1",
+      "chorus1",
+      "verse2",
+      "chorus2",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 40
+    }
+  },
+  "producer_notes": {
+    "structure": "Simple",
+    "hooks": 6
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 11242
+}

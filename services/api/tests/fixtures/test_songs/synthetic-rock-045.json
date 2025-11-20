@@ -1,0 +1,82 @@
+{
+  "id": "synthetic-rock-045",
+  "title": "Rock Song 45",
+  "blueprint_ref": {
+    "genre": "Rock",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "rock",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 118,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "G major",
+      "modulations": []
+    },
+    "mood": [
+      "angst",
+      "triumphant",
+      "rebellious"
+    ],
+    "energy": "high",
+    "instrumentation": [
+      "bass",
+      "electric guitar",
+      "drums",
+      "vocals"
+    ],
+    "vocal_profile": "powerful",
+    "tags": [
+      "powerful",
+      "raw"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "2nd",
+    "tense": "past",
+    "themes": [
+      "rock",
+      "love"
+    ],
+    "rhyme_scheme": "AABB",
+    "section_order": [
+      "intro",
+      "verse1",
+      "pre-chorus1",
+      "chorus1",
+      "verse2",
+      "pre-chorus2",
+      "chorus2",
+      "interlude",
+      "bridge",
+      "breakdown",
+      "chorus3",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 96
+    }
+  },
+  "producer_notes": {
+    "structure": "Extended",
+    "hooks": 4
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 4542
+}

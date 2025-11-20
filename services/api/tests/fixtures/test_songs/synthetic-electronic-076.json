@@ -1,0 +1,79 @@
+{
+  "id": "synthetic-electronic-076",
+  "title": "Electronic Song 76",
+  "blueprint_ref": {
+    "genre": "Electronic",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "electronic",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 125,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "D minor",
+      "modulations": []
+    },
+    "mood": [
+      "dark",
+      "futuristic"
+    ],
+    "energy": "low",
+    "instrumentation": [
+      "pads",
+      "bass",
+      "electronic drums"
+    ],
+    "vocal_profile": "processed",
+    "tags": [
+      "hypnotic",
+      "rhythmic",
+      "atmospheric"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "3rd",
+    "tense": "future",
+    "themes": [
+      "electronic",
+      "dreams"
+    ],
+    "rhyme_scheme": "Free",
+    "section_order": [
+      "intro",
+      "verse1",
+      "pre-chorus1",
+      "chorus1",
+      "verse2",
+      "pre-chorus2",
+      "chorus2",
+      "bridge",
+      "chorus3",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 60
+    }
+  },
+  "producer_notes": {
+    "structure": "Complex",
+    "hooks": 5
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 7642
+}

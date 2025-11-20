@@ -1,0 +1,81 @@
+{
+  "id": "synthetic-ccm-107",
+  "title": "Ccm Song 107",
+  "blueprint_ref": {
+    "genre": "Ccm",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "ccm",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 92,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "C major",
+      "modulations": []
+    },
+    "mood": [
+      "joyful",
+      "reverent"
+    ],
+    "energy": "medium",
+    "instrumentation": [
+      "choir",
+      "drums",
+      "bass",
+      "acoustic guitar",
+      "keys"
+    ],
+    "vocal_profile": "smooth",
+    "tags": [
+      "worshipful",
+      "heartfelt",
+      "uplifting"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "3rd",
+    "tense": "future",
+    "themes": [
+      "ccm",
+      "emotion"
+    ],
+    "rhyme_scheme": "ABAB",
+    "section_order": [
+      "intro",
+      "verse1",
+      "pre-chorus1",
+      "chorus1",
+      "verse2",
+      "pre-chorus2",
+      "chorus2",
+      "bridge",
+      "chorus3",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 40
+    }
+  },
+  "producer_notes": {
+    "structure": "Complex",
+    "hooks": 4
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 10742
+}

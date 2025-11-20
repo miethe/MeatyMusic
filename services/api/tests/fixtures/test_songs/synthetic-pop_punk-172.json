@@ -1,0 +1,81 @@
+{
+  "id": "synthetic-pop_punk-172",
+  "title": "Pop Punk Song 172",
+  "blueprint_ref": {
+    "genre": "Pop Punk",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "pop_punk",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 193,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "G major",
+      "modulations": []
+    },
+    "mood": [
+      "rebellious",
+      "energetic",
+      "defiant"
+    ],
+    "energy": "medium",
+    "instrumentation": [
+      "bass",
+      "drums",
+      "electric guitar",
+      "power chords"
+    ],
+    "vocal_profile": "shouted",
+    "tags": [
+      "fast-paced",
+      "energetic",
+      "catchy"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "3rd",
+    "tense": "future",
+    "themes": [
+      "pop_punk",
+      "emotion"
+    ],
+    "rhyme_scheme": "Free",
+    "section_order": [
+      "intro",
+      "verse1",
+      "pre-chorus1",
+      "chorus1",
+      "verse2",
+      "pre-chorus2",
+      "chorus2",
+      "bridge",
+      "chorus3",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 40
+    }
+  },
+  "producer_notes": {
+    "structure": "Complex",
+    "hooks": 2
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 17242
+}

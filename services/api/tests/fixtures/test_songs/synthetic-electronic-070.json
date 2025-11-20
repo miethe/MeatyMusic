@@ -1,0 +1,81 @@
+{
+  "id": "synthetic-electronic-070",
+  "title": "Electronic Song 70",
+  "blueprint_ref": {
+    "genre": "Electronic",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "electronic",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 121,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "C major",
+      "modulations": []
+    },
+    "mood": [
+      "energetic",
+      "futuristic"
+    ],
+    "energy": "high",
+    "instrumentation": [
+      "pads",
+      "bass",
+      "synth",
+      "effects"
+    ],
+    "vocal_profile": "powerful",
+    "tags": [
+      "atmospheric",
+      "rhythmic",
+      "synth-driven",
+      "progressive"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "3rd",
+    "tense": "past",
+    "themes": [
+      "electronic",
+      "love"
+    ],
+    "rhyme_scheme": "ABCB",
+    "section_order": [
+      "intro",
+      "verse1",
+      "pre-chorus1",
+      "chorus1",
+      "verse2",
+      "pre-chorus2",
+      "chorus2",
+      "bridge",
+      "chorus3",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 80
+    }
+  },
+  "producer_notes": {
+    "structure": "Complex",
+    "hooks": 5
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 7042
+}

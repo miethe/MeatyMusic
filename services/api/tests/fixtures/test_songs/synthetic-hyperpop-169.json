@@ -1,0 +1,77 @@
+{
+  "id": "synthetic-hyperpop-169",
+  "title": "Hyperpop Song 169",
+  "blueprint_ref": {
+    "genre": "Hyperpop",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "hyperpop",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 169,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "G major",
+      "modulations": []
+    },
+    "mood": [
+      "experimental",
+      "euphoric",
+      "intense"
+    ],
+    "energy": "high",
+    "instrumentation": [
+      "effects",
+      "electronic drums",
+      "autotune"
+    ],
+    "vocal_profile": "layered",
+    "tags": [
+      "chaotic",
+      "maximalist"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "future",
+    "themes": [
+      "hyperpop",
+      "emotion"
+    ],
+    "rhyme_scheme": "Free",
+    "section_order": [
+      "intro",
+      "verse1",
+      "chorus1",
+      "verse2",
+      "chorus2",
+      "bridge",
+      "chorus3",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 56
+    }
+  },
+  "producer_notes": {
+    "structure": "Standard",
+    "hooks": 5
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 16942
+}

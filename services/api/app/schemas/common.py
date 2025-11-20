@@ -74,6 +74,26 @@ class BulkExportRequest(BaseModel):
     """Request model for bulk export operations."""
 
     ids: List[UUID] = Field(..., description="List of entity IDs to export", min_length=1)
+class ProfanityViolation(BaseModel):
+    """Individual profanity violation with context."""
+
+    word: str = Field(..., description="The profanity word detected")
+    category: str = Field(..., description="Profanity category (mild, moderate, severe)")
+    score: float = Field(..., description="Severity score (0.3, 0.6, or 1.0)")
+    line_number: Optional[int] = Field(None, description="Line number where violation occurred")
+    context: Optional[str] = Field(None, description="Surrounding text context")
+    position: Optional[int] = Field(None, description="Character position in text")
+
+
+class ProfanityCheckResult(BaseModel):
+    """Result of profanity content check."""
+
+    is_clean: bool = Field(..., description="Whether text passed profanity check")
+    violations: List[ProfanityViolation] = Field(default_factory=list, description="List of violations found")
+    total_score: float = Field(0.0, description="Total profanity score (sum of all violations)")
+    max_score: float = Field(0.0, description="Maximum individual violation score")
+    violation_count: int = Field(0, description="Total number of violations")
+    categories_found: List[str] = Field(default_factory=list, description="Categories of profanity found")
 
 
 __all__ = [
@@ -85,4 +105,6 @@ __all__ = [
     "BulkDeleteRequest",
     "BulkDeleteResponse",
     "BulkExportRequest",
+    "ProfanityViolation",
+    "ProfanityCheckResult",
 ]

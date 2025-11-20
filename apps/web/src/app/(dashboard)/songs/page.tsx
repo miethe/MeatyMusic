@@ -12,18 +12,25 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@meatymusic/ui';
 import { SongList, type SongFilters } from '@/components/songs/SongList';
 import { useSongs } from '@/hooks/api/useSongs';
-import { Plus, Filter, Loader2 } from 'lucide-react';
+import { Plus, Loader2 } from 'lucide-react';
 import { ROUTES } from '@/config/routes';
 import type { Song } from '@/types/api';
+import { SearchInput } from '@/components/search-input';
+import { SongsFilters } from '@/components/songs-filters';
+import type { SongFilters as ApiSongFilters } from '@/lib/api/songs';
 
 export default function SongsPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = React.useState('');
-  const [filters, setFilters] = React.useState<SongFilters>({
-    q: '',
-  });
+  const [filters, setFilters] = React.useState<ApiSongFilters>({});
 
-  const { data, isLoading, error } = useSongs(filters);
+  // Combine search query with filters
+  const apiFilters = React.useMemo(() => ({
+    ...filters,
+    q: searchQuery || undefined,
+  }), [filters, searchQuery]);
+
+  const { data, isLoading, error } = useSongs(apiFilters);
 
   // Navigation handlers
   const handleSongClick = React.useCallback((song: Song) => {
@@ -49,6 +56,10 @@ export default function SongsPage() {
     console.log('Delete song:', song.id);
   }, []);
 
+  const handleClearFilters = React.useCallback(() => {
+    setFilters({});
+  }, []);
+
   return (
     <div className="min-h-screen">
       <PageHeader
@@ -65,24 +76,19 @@ export default function SongsPage() {
       />
 
       <div className="container mx-auto px-4 py-8">
-        {/* Filters Bar */}
+        {/* Search and Filters Bar */}
         <div className="mb-6 flex items-center gap-4 animate-fade-in">
-          <div className="flex-1">
-            <input
-              type="search"
-              placeholder="Search songs..."
-              className="w-full px-4 py-2 rounded-lg border border-border-default bg-bg-elevated text-text-primary placeholder:text-text-muted focus:border-border-accent focus:ring-2 focus:ring-primary/20 transition-all duration-ui"
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setFilters({ ...filters, q: e.target.value });
-              }}
-            />
-          </div>
-          <Button variant="outline">
-            <Filter className="w-4 h-4 mr-2" />
-            Filters
-          </Button>
+          <SearchInput
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search songs..."
+            debounce={300}
+          />
+          <SongsFilters
+            filters={filters}
+            onFiltersChange={setFilters}
+            onClear={handleClearFilters}
+          />
         </div>
 
         {/* Loading State */}
@@ -104,7 +110,6 @@ export default function SongsPage() {
         {!isLoading && !error && (
           <SongList
             songs={data?.items || []}
-            filters={filters}
             onSongClick={handleSongClick}
             onViewWorkflow={handleViewWorkflow}
             onEdit={handleEdit}

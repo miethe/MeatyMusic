@@ -1,0 +1,81 @@
+{
+  "id": "synthetic-rnb-055",
+  "title": "Rnb Song 55",
+  "blueprint_ref": {
+    "genre": "Rnb",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "rnb",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 83,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "Eb major",
+      "modulations": []
+    },
+    "mood": [
+      "emotional",
+      "groovy",
+      "smooth"
+    ],
+    "energy": "medium",
+    "instrumentation": [
+      "drums",
+      "keys",
+      "synth"
+    ],
+    "vocal_profile": "smooth",
+    "tags": [
+      "melodic",
+      "groovy",
+      "sultry",
+      "soulful"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "future",
+    "themes": [
+      "rnb",
+      "dreams"
+    ],
+    "rhyme_scheme": "Free",
+    "section_order": [
+      "intro",
+      "verse1",
+      "pre-chorus1",
+      "chorus1",
+      "verse2",
+      "pre-chorus2",
+      "chorus2",
+      "bridge",
+      "chorus3",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": true,
+      "max_lines": 50
+    }
+  },
+  "producer_notes": {
+    "structure": "Complex",
+    "hooks": 5
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 5542
+}

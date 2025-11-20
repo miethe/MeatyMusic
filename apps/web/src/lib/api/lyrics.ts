@@ -12,6 +12,7 @@ import type {
   LyricsCreate,
   LyricsUpdate,
   PaginatedResponse,
+  ProfanityCheckResult,
   UUID,
 } from '@/types/api';
 
@@ -124,5 +125,22 @@ export const lyricsApi = {
 
     const filename = getFilenameFromHeaders(response.headers, 'lyrics-export.zip');
     downloadBlob(response.data, filename);
+  },
+    
+  /**
+   * Check lyrics sections for profanity
+   */
+  checkProfanity: async (
+    sections: Array<{ type: string; lines: string[] }>,
+    explicit_allowed: boolean = false
+  ): Promise<ProfanityCheckResult> => {
+    const { data } = await apiClient.post<ProfanityCheckResult>(
+      '/lyrics/check-profanity',
+      sections,
+      {
+        params: { explicit_allowed },
+      }
+    );
+    return data;
   },
 };
