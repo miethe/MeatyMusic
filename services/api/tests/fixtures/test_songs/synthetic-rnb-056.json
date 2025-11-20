@@ -1,0 +1,84 @@
+{
+  "id": "synthetic-rnb-056",
+  "title": "Rnb Song 56",
+  "blueprint_ref": {
+    "genre": "Rnb",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "rnb",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 76,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "F major",
+      "modulations": []
+    },
+    "mood": [
+      "groovy",
+      "smooth",
+      "romantic"
+    ],
+    "energy": "medium",
+    "instrumentation": [
+      "guitar",
+      "synth",
+      "bass",
+      "drums"
+    ],
+    "vocal_profile": "soulful",
+    "tags": [
+      "groovy",
+      "smooth",
+      "melodic",
+      "soulful"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "2nd",
+    "tense": "present",
+    "themes": [
+      "rnb",
+      "emotion"
+    ],
+    "rhyme_scheme": "ABCB",
+    "section_order": [
+      "intro",
+      "verse1",
+      "pre-chorus1",
+      "chorus1",
+      "verse2",
+      "pre-chorus2",
+      "chorus2",
+      "interlude",
+      "bridge",
+      "breakdown",
+      "chorus3",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 96
+    }
+  },
+  "producer_notes": {
+    "structure": "Extended",
+    "hooks": 4
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 5642
+}

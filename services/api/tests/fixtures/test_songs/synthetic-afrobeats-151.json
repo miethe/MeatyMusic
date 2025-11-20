@@ -1,0 +1,77 @@
+{
+  "id": "synthetic-afrobeats-151",
+  "title": "Afrobeats Song 151",
+  "blueprint_ref": {
+    "genre": "Afrobeats",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "afrobeats",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 119,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "G major",
+      "modulations": []
+    },
+    "mood": [
+      "groovy",
+      "rhythmic",
+      "uplifting"
+    ],
+    "energy": "low",
+    "instrumentation": [
+      "drums",
+      "guitar",
+      "bass",
+      "synth",
+      "percussion"
+    ],
+    "vocal_profile": "rhythmic",
+    "tags": [
+      "percussion-heavy",
+      "vibrant",
+      "groovy"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "2nd",
+    "tense": "present",
+    "themes": [
+      "afrobeats",
+      "love"
+    ],
+    "rhyme_scheme": "Free",
+    "section_order": [
+      "verse1",
+      "chorus1",
+      "verse2",
+      "chorus2",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": true,
+      "max_lines": 20
+    }
+  },
+  "producer_notes": {
+    "structure": "Simple",
+    "hooks": 2
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 15142
+}

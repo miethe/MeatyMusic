@@ -11,23 +11,35 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@meatymusic/ui';
 import { Card } from '@meatymusic/ui';
 import { Badge } from '@meatymusic/ui';
-import { Plus, Filter, FileText, Loader2, Upload } from 'lucide-react';
+import { Plus, FileText, Loader2, Upload } from 'lucide-react';
 import { ROUTES } from '@/config/routes';
 import { useLyricsList } from '@/hooks/api/useLyrics';
 import type { Lyrics } from '@/types/api/entities';
 import { ImportModal } from '@/components/import/ImportModal';
+import { SearchInput } from '@/components/search-input';
+import { LyricsFilters } from '@/components/lyrics-filters';
+import type { LyricsFilters as ApiLyricsFilters } from '@/lib/api/lyrics';
 
 export default function LyricsPage() {
   const [search, setSearch] = React.useState('');
+  const [filters, setFilters] = React.useState<ApiLyricsFilters>({});
   const [importModalOpen, setImportModalOpen] = React.useState(false);
 
-  // Fetch lyrics from API
-  const { data, isLoading, error } = useLyricsList({
+  // Combine search query with filters
+  const apiFilters = React.useMemo(() => ({
+    ...filters,
     q: search || undefined,
     limit: 50,
-  });
+  }), [filters, search]);
+
+  // Fetch lyrics from API
+  const { data, isLoading, error } = useLyricsList(apiFilters);
 
   const lyricsList = data?.items || [];
+
+  const handleClearFilters = React.useCallback(() => {
+    setFilters({});
+  }, []);
 
   return (
     <div className="min-h-screen">
@@ -51,21 +63,19 @@ export default function LyricsPage() {
       />
 
       <div className="container mx-auto px-4 py-8">
-        {/* Filters */}
+        {/* Search and Filters */}
         <div className="mb-6 flex items-center gap-4 animate-fade-in">
-          <div className="flex-1">
-            <input
-              type="search"
-              placeholder="Search lyrics..."
-              className="w-full px-4 py-2 rounded-lg border border-border-default bg-bg-elevated text-text-primary placeholder:text-text-muted focus:border-border-accent focus:ring-2 focus:ring-primary/20 transition-all duration-ui"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-          <Button variant="outline">
-            <Filter className="w-4 h-4 mr-2" />
-            Filters
-          </Button>
+          <SearchInput
+            value={search}
+            onChange={setSearch}
+            placeholder="Search lyrics..."
+            debounce={300}
+          />
+          <LyricsFilters
+            filters={filters}
+            onFiltersChange={setFilters}
+            onClear={handleClearFilters}
+          />
         </div>
 
         {/* Loading State */}

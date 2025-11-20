@@ -1,0 +1,76 @@
+{
+  "id": "synthetic-hyperpop-159",
+  "title": "Hyperpop Song 159",
+  "blueprint_ref": {
+    "genre": "Hyperpop",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "hyperpop",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 155,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "C major",
+      "modulations": []
+    },
+    "mood": [
+      "experimental",
+      "intense",
+      "euphoric"
+    ],
+    "energy": "medium",
+    "instrumentation": [
+      "bass",
+      "effects",
+      "electronic drums",
+      "synth"
+    ],
+    "vocal_profile": "processed",
+    "tags": [
+      "distorted",
+      "chaotic",
+      "experimental"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "3rd",
+    "tense": "present",
+    "themes": [
+      "hyperpop",
+      "life"
+    ],
+    "rhyme_scheme": "ABCB",
+    "section_order": [
+      "verse1",
+      "chorus1",
+      "verse2",
+      "chorus2",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 20
+    }
+  },
+  "producer_notes": {
+    "structure": "Simple",
+    "hooks": 6
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 15942
+}

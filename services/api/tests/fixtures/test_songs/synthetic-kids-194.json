@@ -1,0 +1,79 @@
+{
+  "id": "synthetic-kids-194",
+  "title": "Kids Song 194",
+  "blueprint_ref": {
+    "genre": "Kids",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "kids",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 125,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "G major",
+      "modulations": []
+    },
+    "mood": [
+      "energetic",
+      "educational"
+    ],
+    "energy": "low",
+    "instrumentation": [
+      "drums",
+      "synth",
+      "claps",
+      "ukulele"
+    ],
+    "vocal_profile": "friendly",
+    "tags": [
+      "educational",
+      "catchy"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "2nd",
+    "tense": "past",
+    "themes": [
+      "kids",
+      "memories"
+    ],
+    "rhyme_scheme": "ABCB",
+    "section_order": [
+      "intro",
+      "verse1",
+      "pre-chorus1",
+      "chorus1",
+      "verse2",
+      "pre-chorus2",
+      "chorus2",
+      "bridge",
+      "chorus3",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 40
+    }
+  },
+  "producer_notes": {
+    "structure": "Complex",
+    "hooks": 3
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 19442
+}

@@ -1,0 +1,65 @@
+{
+  "id": "synthetic-edge-020",
+  "title": "Minimalist",
+  "blueprint_ref": {
+    "genre": "Electronic",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "minimal techno",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 120,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "C minor",
+      "modulations": []
+    },
+    "mood": [
+      "hypnotic",
+      "minimal",
+      "repetitive"
+    ],
+    "energy": "medium",
+    "instrumentation": [
+      "synth",
+      "kick"
+    ],
+    "vocal_profile": "none",
+    "tags": [
+      "minimal",
+      "hypnotic",
+      "repetitive"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "present",
+    "themes": [
+      "minimal",
+      "rhythm"
+    ],
+    "rhyme_scheme": "Free",
+    "section_order": [
+      "verse1"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 5
+    }
+  },
+  "producer_notes": {
+    "structure": "Minimal",
+    "hooks": 0
+  },
+  "sources": [],
+  "prompt_controls": {},
+  "render": {
+    "engine": "none"
+  },
+  "seed": 90062
+}

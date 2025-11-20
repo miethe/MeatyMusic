@@ -35,6 +35,7 @@ from .common import (
     check_explicit_content,
     compute_citation_hash,
     normalize_weights,
+    get_profanity_filter,
 )
 
 logger = structlog.get_logger(__name__)
@@ -558,6 +559,69 @@ class LyricsService(BaseService[Lyrics, LyricsResponse, LyricsCreate, LyricsUpda
         )
 
         return True
+
+    # =========================================================================
+    # PROFANITY CHECKING (Enhanced)
+    # =========================================================================
+
+    def check_lyrics_profanity(
+        self,
+        sections: List[Dict[str, Any]],
+        explicit_allowed: bool = False
+    ) -> "ProfanityCheckResult":
+        """Check lyrics for profanity with detailed violation reporting.
+
+        Uses the enhanced ProfanityFilter to detect profanity including:
+        - L33t speak variations (e.g., "sh1t")
+        - Common misspellings
+        - Word boundary detection
+        - Category-based scoring (mild: 0.3, moderate: 0.6, severe: 1.0)
+
+        Args:
+            sections: List of section dicts with 'lines' field
+            explicit_allowed: Whether explicit content is allowed
+
+        Returns:
+            ProfanityCheckResult with violations, scores, and metadata
+
+        Example:
+            >>> sections = [
+            ...     {"type": "Verse", "lines": ["Line 1", "Line 2"]},
+            ...     {"type": "Chorus", "lines": ["This is bad sh1t"]}
+            ... ]
+            >>> result = service.check_lyrics_profanity(sections, explicit_allowed=False)
+            >>> result.is_clean
+            False
+            >>> result.violations[0].word
+            "sh1t"
+            >>> result.violations[0].category
+            "moderate"
+            >>> result.violations[0].line_number
+            3
+
+        Note:
+            This method provides more detail than the legacy check_explicit_content().
+            Use this for frontend integration where detailed violation context is needed.
+        """
+        from app.schemas.common import ProfanityCheckResult
+
+        # Extract full text from sections
+        full_text = self._extract_text_from_sections(sections)
+
+        # Use enhanced profanity filter
+        profanity_filter = get_profanity_filter()
+        result = profanity_filter.check_text(full_text, explicit_allowed)
+
+        logger.debug(
+            "lyrics.profanity_checked",
+            section_count=len(sections),
+            violation_count=result.violation_count,
+            total_score=result.total_score,
+            is_clean=result.is_clean,
+            categories_found=result.categories_found
+        )
+
+        return result
 
     # =========================================================================
     # HELPER METHODS

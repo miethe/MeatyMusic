@@ -1,0 +1,74 @@
+{
+  "id": "synthetic-rnb-053",
+  "title": "Rnb Song 53",
+  "blueprint_ref": {
+    "genre": "Rnb",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "rnb",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 108,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "Eb major",
+      "modulations": []
+    },
+    "mood": [
+      "emotional",
+      "romantic",
+      "sensual"
+    ],
+    "energy": "medium",
+    "instrumentation": [
+      "keys",
+      "drums",
+      "guitar"
+    ],
+    "vocal_profile": "melismatic",
+    "tags": [
+      "groovy",
+      "soulful"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "present",
+    "themes": [
+      "rnb",
+      "life"
+    ],
+    "rhyme_scheme": "ABCB",
+    "section_order": [
+      "verse1",
+      "chorus1",
+      "verse2",
+      "chorus2",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 35
+    }
+  },
+  "producer_notes": {
+    "structure": "Simple",
+    "hooks": 2
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 5342
+}

@@ -1,0 +1,81 @@
+{
+  "id": "synthetic-rock-050",
+  "title": "Rock Song 50",
+  "blueprint_ref": {
+    "genre": "Rock",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "rock",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 107,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "B minor",
+      "modulations": []
+    },
+    "mood": [
+      "energetic",
+      "rebellious"
+    ],
+    "energy": "high",
+    "instrumentation": [
+      "electric guitar",
+      "bass",
+      "drums",
+      "vocals"
+    ],
+    "vocal_profile": "raspy",
+    "tags": [
+      "guitar-driven",
+      "raw"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "present",
+    "themes": [
+      "rock",
+      "memories"
+    ],
+    "rhyme_scheme": "AABB",
+    "section_order": [
+      "intro",
+      "verse1",
+      "pre-chorus1",
+      "chorus1",
+      "verse2",
+      "pre-chorus2",
+      "chorus2",
+      "interlude",
+      "bridge",
+      "breakdown",
+      "chorus3",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": true,
+      "max_lines": 96
+    }
+  },
+  "producer_notes": {
+    "structure": "Extended",
+    "hooks": 6
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 5042
+}

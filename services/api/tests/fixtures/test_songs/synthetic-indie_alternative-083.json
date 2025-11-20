@@ -1,0 +1,79 @@
+{
+  "id": "synthetic-indie_alternative-083",
+  "title": "Indie Alternative Song 83",
+  "blueprint_ref": {
+    "genre": "Indie Alternative",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "indie_alternative",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 91,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "G major",
+      "modulations": []
+    },
+    "mood": [
+      "mellow",
+      "authentic"
+    ],
+    "energy": "low",
+    "instrumentation": [
+      "bass",
+      "guitar",
+      "synth"
+    ],
+    "vocal_profile": "conversational",
+    "tags": [
+      "authentic",
+      "introspective",
+      "experimental"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "3rd",
+    "tense": "future",
+    "themes": [
+      "indie_alternative",
+      "life"
+    ],
+    "rhyme_scheme": "AABB",
+    "section_order": [
+      "intro",
+      "verse1",
+      "pre-chorus1",
+      "chorus1",
+      "verse2",
+      "pre-chorus2",
+      "chorus2",
+      "bridge",
+      "chorus3",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 50
+    }
+  },
+  "producer_notes": {
+    "structure": "Complex",
+    "hooks": 4
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 8342
+}

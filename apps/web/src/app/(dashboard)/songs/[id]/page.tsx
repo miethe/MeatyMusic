@@ -17,7 +17,7 @@ import { useSong, useDeleteSong, useSDS } from '@/hooks/api';
 import { songsApi } from '@/lib/api/songs';
 import { useUIStore } from '@/stores';
 import { EntityDetailSection } from '@/components/songs/EntityDetailSection';
-import { JsonViewer } from '@/components/common/JsonViewer';
+import { SDSPreview } from '@/components/songs/SDSPreview';
 import { PersonaKind } from '@/types/api/entities';
 import {
   Edit,
@@ -367,66 +367,31 @@ export default function SongDetailPage() {
           </TabsContent>
 
           <TabsContent value="preview" className="mt-6">
-            <Card className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-semibold">Song Design Spec (SDS)</h3>
-                <Button onClick={handleExport} variant="outline" size="sm" disabled={exporting}>
-                  {exporting ? (
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  ) : (
-                    <Download className="w-4 h-4 mr-2" />
-                  )}
-                  Export SDS
-                </Button>
+            {isSdsLoading && (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                <span className="ml-3 text-muted-foreground">Loading SDS...</span>
               </div>
+            )}
 
-              {isSdsLoading && (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                  <span className="ml-3 text-muted-foreground">Loading SDS...</span>
-                </div>
-              )}
+            {sdsError && (
+              <div className="bg-destructive/10 border-2 border-destructive/30 rounded-lg p-6 text-center">
+                <AlertCircle className="w-12 h-12 mx-auto text-destructive mb-3" />
+                <p className="text-destructive font-medium mb-2">Failed to load SDS</p>
+                <p className="text-sm text-muted-foreground">
+                  {sdsError?.message || 'Unable to compile Song Design Spec'}
+                </p>
+              </div>
+            )}
 
-              {sdsError && (
-                <div className="bg-destructive/10 border-2 border-destructive/30 rounded-lg p-6 text-center">
-                  <AlertCircle className="w-12 h-12 mx-auto text-destructive mb-3" />
-                  <p className="text-destructive font-medium mb-2">Failed to load SDS</p>
-                  <p className="text-sm text-muted-foreground">
-                    {sdsError?.message || 'Unable to compile Song Design Spec'}
-                  </p>
-                </div>
-              )}
-
-              {sdsData && !isSdsLoading && !sdsError && (
-                <div className="space-y-4">
-                  {/* JSON Viewer with syntax highlighting and collapsible sections */}
-                  <JsonViewer
-                    data={sdsData}
-                    collapsed={1}
-                    theme="dark"
-                    showLineNumbers={true}
-                    enableClipboard={true}
-                    maxHeight="600px"
-                  />
-
-                  {/* SDS Metadata Summary */}
-                  <div className="grid md:grid-cols-3 gap-4 mt-6">
-                    <Card className="p-4">
-                      <div className="text-sm text-muted-foreground mb-1">Song ID</div>
-                      <div className="font-mono text-xs truncate">{sdsData.song_id}</div>
-                    </Card>
-                    <Card className="p-4">
-                      <div className="text-sm text-muted-foreground mb-1">Title</div>
-                      <div className="font-semibold truncate">{sdsData.title}</div>
-                    </Card>
-                    <Card className="p-4">
-                      <div className="text-sm text-muted-foreground mb-1">Global Seed</div>
-                      <div className="font-mono text-sm">{sdsData.global_seed}</div>
-                    </Card>
-                  </div>
-                </div>
-              )}
-            </Card>
+            {sdsData && !isSdsLoading && !sdsError && (
+              <SDSPreview
+                data={sdsData}
+                targetEngine="suno"
+                songTitle={song.title}
+                testId="song-sds-preview"
+              />
+            )}
           </TabsContent>
         </Tabs>
       </div>

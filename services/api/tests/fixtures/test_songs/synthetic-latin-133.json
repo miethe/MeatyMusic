@@ -1,0 +1,80 @@
+{
+  "id": "synthetic-latin-133",
+  "title": "Latin Song 133",
+  "blueprint_ref": {
+    "genre": "Latin",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "latin",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 126,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "E major",
+      "modulations": []
+    },
+    "mood": [
+      "romantic",
+      "celebratory"
+    ],
+    "energy": "low",
+    "instrumentation": [
+      "bass",
+      "brass",
+      "percussion",
+      "keys",
+      "guitar"
+    ],
+    "vocal_profile": "emotive",
+    "tags": [
+      "passionate",
+      "latin"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "3rd",
+    "tense": "present",
+    "themes": [
+      "latin",
+      "life"
+    ],
+    "rhyme_scheme": "AAAA",
+    "section_order": [
+      "intro",
+      "verse1",
+      "pre-chorus1",
+      "chorus1",
+      "verse2",
+      "pre-chorus2",
+      "chorus2",
+      "bridge",
+      "chorus3",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 40
+    }
+  },
+  "producer_notes": {
+    "structure": "Complex",
+    "hooks": 4
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 13342
+}

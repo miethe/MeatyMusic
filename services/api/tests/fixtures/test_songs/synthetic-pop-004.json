@@ -1,0 +1,82 @@
+{
+  "id": "synthetic-pop-004",
+  "title": "Pop Song 4",
+  "blueprint_ref": {
+    "genre": "Pop",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "pop",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 113,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "F major",
+      "modulations": []
+    },
+    "mood": [
+      "joyful",
+      "nostalgic",
+      "energetic"
+    ],
+    "energy": "anthemic",
+    "instrumentation": [
+      "drums",
+      "keys",
+      "guitar",
+      "bass"
+    ],
+    "vocal_profile": "smooth",
+    "tags": [
+      "catchy",
+      "anthemic"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "3rd",
+    "tense": "present",
+    "themes": [
+      "pop",
+      "dreams"
+    ],
+    "rhyme_scheme": "AAAA",
+    "section_order": [
+      "intro",
+      "verse1",
+      "pre-chorus1",
+      "chorus1",
+      "verse2",
+      "pre-chorus2",
+      "chorus2",
+      "interlude",
+      "bridge",
+      "breakdown",
+      "chorus3",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 84
+    }
+  },
+  "producer_notes": {
+    "structure": "Extended",
+    "hooks": 3
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 442
+}

@@ -1,0 +1,77 @@
+{
+  "id": "synthetic-electronic-075",
+  "title": "Electronic Song 75",
+  "blueprint_ref": {
+    "genre": "Electronic",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "electronic",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 139,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "C major",
+      "modulations": []
+    },
+    "mood": [
+      "dark",
+      "energetic"
+    ],
+    "energy": "medium",
+    "instrumentation": [
+      "effects",
+      "bass",
+      "electronic drums",
+      "pads"
+    ],
+    "vocal_profile": "ethereal",
+    "tags": [
+      "atmospheric",
+      "hypnotic"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "3rd",
+    "tense": "present",
+    "themes": [
+      "electronic",
+      "life"
+    ],
+    "rhyme_scheme": "ABCB",
+    "section_order": [
+      "intro",
+      "verse1",
+      "chorus1",
+      "verse2",
+      "chorus2",
+      "bridge",
+      "chorus3",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 48
+    }
+  },
+  "producer_notes": {
+    "structure": "Standard",
+    "hooks": 2
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 7542
+}

@@ -1,0 +1,84 @@
+{
+  "id": "synthetic-afrobeats-012",
+  "title": "Afrobeats Song 12",
+  "blueprint_ref": {
+    "genre": "Afrobeats",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "afrobeats",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 102,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "A minor",
+      "modulations": []
+    },
+    "mood": [
+      "groovy",
+      "energetic",
+      "celebratory"
+    ],
+    "energy": "anthemic",
+    "instrumentation": [
+      "drums",
+      "bass",
+      "guitar",
+      "synth"
+    ],
+    "vocal_profile": "call-and-response",
+    "tags": [
+      "groovy",
+      "rhythmic",
+      "danceable",
+      "vibrant"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "2nd",
+    "tense": "present",
+    "themes": [
+      "afrobeats",
+      "memories"
+    ],
+    "rhyme_scheme": "ABCB",
+    "section_order": [
+      "intro",
+      "verse1",
+      "pre-chorus1",
+      "chorus1",
+      "verse2",
+      "pre-chorus2",
+      "chorus2",
+      "interlude",
+      "bridge",
+      "breakdown",
+      "chorus3",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": true,
+      "max_lines": 60
+    }
+  },
+  "producer_notes": {
+    "structure": "Extended",
+    "hooks": 4
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 1242
+}

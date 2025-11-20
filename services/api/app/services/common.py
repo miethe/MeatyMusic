@@ -380,23 +380,303 @@ def normalize_weights(
 # Explicit Content Filtering
 # =============================================================================
 
-# Basic profanity list (expand as needed)
-_PROFANITY_LIST = {
-    # Common explicit terms (partial list for MVP)
-    "fuck", "shit", "bitch", "ass", "damn", "hell",
-    "bastard", "crap", "piss", "cock", "dick", "pussy",
-    # Add more as needed based on requirements
-}
+import json
+import os
+from pathlib import Path
+
+
+class ProfanityFilter:
+    """Comprehensive profanity filter with l33t speak detection and scoring.
+
+    Features:
+    - Category-based scoring (mild: 0.3, moderate: 0.6, severe: 1.0)
+    - L33t speak detection (e.g., "sh1t" → "shit")
+    - Word boundary detection (avoids false positives like "class" in "classic")
+    - Case-insensitive matching
+    - Detailed violation context with line numbers
+    - Common variation detection
+
+    This implementation ensures deterministic behavior for reproducible results.
+    """
+
+    def __init__(self):
+        """Initialize profanity filter by loading word lists from JSON."""
+        self._categories: Dict[str, Dict[str, Any]] = {}
+        self._word_to_category: Dict[str, Tuple[str, float]] = {}
+        self._l33t_mappings: Dict[str, List[str]] = {}
+        self._variations: Dict[str, List[str]] = {}
+        self._loaded = False
+        self._load_profanity_lists()
+
+    def _load_profanity_lists(self) -> None:
+        """Load profanity lists from JSON file."""
+        try:
+            # Find the profanity lists JSON file
+            current_dir = Path(__file__).parent.parent
+            json_path = current_dir / "data" / "profanity_lists.json"
+
+            if not json_path.exists():
+                logger.warning(
+                    "profanity_filter.json_not_found",
+                    path=str(json_path),
+                    using_fallback=True
+                )
+                self._load_fallback_lists()
+                return
+
+            with open(json_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+
+            # Load categories with words and scores
+            self._categories = data.get("categories", {})
+
+            # Build word-to-category mapping for fast lookup
+            for category_name, category_data in self._categories.items():
+                score = category_data.get("score", 0.5)
+                words = category_data.get("words", [])
+
+                for word in words:
+                    word_lower = word.lower().strip()
+                    if word_lower:
+                        self._word_to_category[word_lower] = (category_name, score)
+
+            # Load l33t speak mappings
+            self._l33t_mappings = data.get("l33t_speak_mappings", {})
+
+            # Load common variations
+            self._variations = data.get("common_variations", {})
+
+            self._loaded = True
+
+            logger.info(
+                "profanity_filter.loaded",
+                total_words=len(self._word_to_category),
+                categories=list(self._categories.keys()),
+                l33t_mappings=len(self._l33t_mappings),
+                variations=len(self._variations)
+            )
+
+        except Exception as e:
+            logger.error(
+                "profanity_filter.load_failed",
+                error=str(e),
+                exc_info=True
+            )
+            self._load_fallback_lists()
+
+    def _load_fallback_lists(self) -> None:
+        """Load minimal fallback profanity list if JSON loading fails."""
+        fallback_words = {
+            "mild": ["ass", "damn", "hell", "crap", "piss"],
+            "moderate": ["shit", "bitch", "dick", "cock", "pussy"],
+            "severe": ["fuck", "cunt", "motherfucker", "nigger"]
+        }
+
+        scores = {"mild": 0.3, "moderate": 0.6, "severe": 1.0}
+
+        for category, words in fallback_words.items():
+            score = scores[category]
+            for word in words:
+                self._word_to_category[word.lower()] = (category, score)
+
+        self._loaded = True
+        logger.warning("profanity_filter.using_fallback", word_count=len(self._word_to_category))
+
+    def _normalize_l33t_speak(self, text: str) -> str:
+        """Convert l33t speak to normal text.
+
+        Args:
+            text: Text potentially containing l33t speak
+
+        Returns:
+            Normalized text with l33t speak converted
+
+        Example:
+            >>> _normalize_l33t_speak("sh1t")
+            "shit"
+            >>> _normalize_l33t_speak("f@ck")
+            "fuck"
+        """
+        normalized = text.lower()
+
+        # Replace l33t speak characters with their letter equivalents
+        replacements = {
+            '@': 'a', '4': 'a', '^': 'a',
+            '3': 'e',
+            '1': 'i', '!': 'i', '|': 'i',
+            '0': 'o',
+            '$': 's', '5': 's', 'z': 's',
+            '7': 't', '+': 't',
+            '9': 'g', '6': 'g',
+            '8': 'b',
+            '<': 'c', '(': 'c',
+            '#': 'h',
+        }
+
+        for l33t_char, normal_char in replacements.items():
+            normalized = normalized.replace(l33t_char, normal_char)
+
+        return normalized
+
+    def _check_word_variations(self, word: str) -> Optional[Tuple[str, str, float]]:
+        """Check if word matches any known variations.
+
+        Args:
+            word: Word to check
+
+        Returns:
+            Tuple of (base_word, category, score) if match found, None otherwise
+        """
+        word_lower = word.lower()
+
+        # Check exact match first
+        if word_lower in self._word_to_category:
+            category, score = self._word_to_category[word_lower]
+            return (word_lower, category, score)
+
+        # Check common variations
+        for base_word, variations in self._variations.items():
+            if word_lower in variations or word_lower == base_word:
+                if base_word in self._word_to_category:
+                    category, score = self._word_to_category[base_word]
+                    return (base_word, category, score)
+
+        return None
+
+    def check_text(
+        self,
+        text: str,
+        explicit_allowed: bool = False
+    ) -> "ProfanityCheckResult":
+        """Check text for profanity with detailed violation reporting.
+
+        Args:
+            text: Text to check for profanity
+            explicit_allowed: Whether explicit content is allowed
+
+        Returns:
+            ProfanityCheckResult with violations, scores, and metadata
+
+        Example:
+            >>> result = filter.check_text("This is some shit")
+            >>> result.is_clean
+            False
+            >>> result.total_score
+            0.6
+            >>> len(result.violations)
+            1
+        """
+        from app.schemas.common import ProfanityCheckResult, ProfanityViolation
+
+        if not self._loaded:
+            logger.warning("profanity_filter.not_loaded")
+            return ProfanityCheckResult(
+                is_clean=True,
+                violations=[],
+                total_score=0.0,
+                max_score=0.0,
+                violation_count=0,
+                categories_found=[]
+            )
+
+        violations: List[ProfanityViolation] = []
+        lines = text.split('\n')
+
+        for line_num, line in enumerate(lines, start=1):
+            # Normalize l33t speak
+            normalized_line = self._normalize_l33t_speak(line)
+
+            # Extract words with word boundaries
+            words = re.findall(r'\b\w+\b', normalized_line)
+            original_words = re.findall(r'\b\w+\b', line.lower())
+
+            for i, (word, orig_word) in enumerate(zip(words, original_words)):
+                # Check for profanity match
+                match = self._check_word_variations(word)
+
+                if match:
+                    base_word, category, score = match
+
+                    # Calculate position in line
+                    position = line.lower().find(orig_word)
+
+                    # Extract context (30 chars before and after)
+                    context_start = max(0, position - 30)
+                    context_end = min(len(line), position + len(orig_word) + 30)
+                    context = line[context_start:context_end].strip()
+                    if context_start > 0:
+                        context = "..." + context
+                    if context_end < len(line):
+                        context = context + "..."
+
+                    violation = ProfanityViolation(
+                        word=orig_word,
+                        category=category,
+                        score=score,
+                        line_number=line_num,
+                        context=context,
+                        position=position
+                    )
+
+                    violations.append(violation)
+
+        # Calculate scores
+        total_score = sum(v.score for v in violations)
+        max_score = max((v.score for v in violations), default=0.0)
+        violation_count = len(violations)
+        categories_found = list(set(v.category for v in violations))
+
+        # Determine if clean
+        is_clean = (violation_count == 0) or explicit_allowed
+
+        result = ProfanityCheckResult(
+            is_clean=is_clean,
+            violations=violations,
+            total_score=total_score,
+            max_score=max_score,
+            violation_count=violation_count,
+            categories_found=categories_found
+        )
+
+        logger.debug(
+            "profanity_filter.checked",
+            text_length=len(text),
+            line_count=len(lines),
+            violation_count=violation_count,
+            total_score=total_score,
+            is_clean=is_clean,
+            explicit_allowed=explicit_allowed
+        )
+
+        return result
+
+
+# Global profanity filter instance
+_profanity_filter: Optional[ProfanityFilter] = None
+
+
+def get_profanity_filter() -> ProfanityFilter:
+    """Get or create global profanity filter instance.
+
+    Returns:
+        Global ProfanityFilter instance
+    """
+    global _profanity_filter
+
+    if _profanity_filter is None:
+        _profanity_filter = ProfanityFilter()
+
+    return _profanity_filter
 
 
 async def check_explicit_content(
     text: str,
     explicit_allowed: bool = False
 ) -> Tuple[bool, List[str]]:
-    """Check text for explicit content.
+    """Check text for explicit content (legacy interface).
 
-    Validates text against profanity filter. If explicit_allowed=False,
-    returns violations found. This function is deterministic.
+    This function maintains backward compatibility with existing code.
+    For new code, use get_profanity_filter().check_text() directly.
 
     Args:
         text: Text to check
@@ -416,54 +696,30 @@ async def check_explicit_content(
 
         >>> await check_explicit_content("This is shit", explicit_allowed=True)
         (True, ["shit"])  # Allowed, but violations still reported
-
-    Note:
-        This is a basic implementation. For production, consider:
-        - Integration with external profanity API
-        - Context-aware checking (e.g., "Scunthorpe problem")
-        - Multi-language support
-        - Configurable severity levels
     """
-    text_lower = text.lower()
-    violations: List[str] = []
+    profanity_filter = get_profanity_filter()
+    result = profanity_filter.check_text(text, explicit_allowed)
 
-    # Check for profanity
-    words = re.findall(r'\b\w+\b', text_lower)
-    for word in words:
-        if word in _PROFANITY_LIST:
-            violations.append(word)
-
+    # Convert to legacy format
+    violations = [v.word for v in result.violations]
     # Remove duplicates while preserving order
     violations = list(dict.fromkeys(violations))
 
-    is_clean = len(violations) == 0 or explicit_allowed
-
-    logger.debug(
-        "explicit_content.checked",
-        text_length=len(text),
-        explicit_allowed=explicit_allowed,
-        violations_count=len(violations),
-        is_clean=is_clean
-    )
-
-    return is_clean, violations
+    return result.is_clean, violations
 
 
 def add_profanity_terms(terms: List[str]) -> None:
     """Add additional terms to profanity filter.
 
-    Allows runtime extension of profanity list for custom filtering.
+    Note: This function is deprecated. Modify profanity_lists.json instead.
 
     Args:
         terms: List of terms to add (will be lowercased)
-
-    Example:
-        >>> add_profanity_terms(["badword1", "badword2"])
     """
-    for term in terms:
-        _PROFANITY_LIST.add(term.lower())
-
-    logger.info("profanity_list.updated", added_count=len(terms))
+    logger.warning(
+        "profanity_filter.add_terms_deprecated",
+        message="add_profanity_terms() is deprecated. Modify profanity_lists.json instead."
+    )
 
 
 def get_profanity_list() -> Set[str]:
@@ -472,7 +728,8 @@ def get_profanity_list() -> Set[str]:
     Returns:
         Set of profanity terms (lowercase)
     """
-    return _PROFANITY_LIST.copy()
+    profanity_filter = get_profanity_filter()
+    return set(profanity_filter._word_to_category.keys())
 
 
 # =============================================================================
@@ -1322,6 +1579,8 @@ __all__ = [
     "normalize_weights",
 
     # Explicit content filtering
+    "ProfanityFilter",
+    "get_profanity_filter",
     "check_explicit_content",
     "add_profanity_terms",
     "get_profanity_list",

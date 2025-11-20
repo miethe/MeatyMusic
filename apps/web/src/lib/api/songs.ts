@@ -37,6 +37,7 @@ export interface SDS {
   song_id: UUID;
   title: string;
   global_seed: number;
+  composed_prompt?: string;
   style?: Record<string, unknown>;
   lyrics?: Record<string, unknown>;
   persona?: Record<string, unknown>;

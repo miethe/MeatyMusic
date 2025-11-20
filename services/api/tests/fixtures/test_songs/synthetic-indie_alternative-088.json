@@ -1,0 +1,82 @@
+{
+  "id": "synthetic-indie_alternative-088",
+  "title": "Indie Alternative Song 88",
+  "blueprint_ref": {
+    "genre": "Indie Alternative",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "indie_alternative",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 96,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "G major",
+      "modulations": []
+    },
+    "mood": [
+      "authentic",
+      "introspective",
+      "mellow"
+    ],
+    "energy": "low",
+    "instrumentation": [
+      "keys",
+      "synth",
+      "guitar"
+    ],
+    "vocal_profile": "emotive",
+    "tags": [
+      "atmospheric",
+      "authentic",
+      "lo-fi"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "1st",
+    "tense": "future",
+    "themes": [
+      "indie_alternative",
+      "emotion"
+    ],
+    "rhyme_scheme": "AABB",
+    "section_order": [
+      "intro",
+      "verse1",
+      "pre-chorus1",
+      "chorus1",
+      "verse2",
+      "pre-chorus2",
+      "chorus2",
+      "interlude",
+      "bridge",
+      "breakdown",
+      "chorus3",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": true,
+      "max_lines": 72
+    }
+  },
+  "producer_notes": {
+    "structure": "Extended",
+    "hooks": 3
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 8842
+}

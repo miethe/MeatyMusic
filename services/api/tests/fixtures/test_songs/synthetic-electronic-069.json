@@ -1,0 +1,77 @@
+{
+  "id": "synthetic-electronic-069",
+  "title": "Electronic Song 69",
+  "blueprint_ref": {
+    "genre": "Electronic",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "electronic",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 120,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "D minor",
+      "modulations": []
+    },
+    "mood": [
+      "dark",
+      "euphoric"
+    ],
+    "energy": "high",
+    "instrumentation": [
+      "pads",
+      "effects",
+      "bass",
+      "synth"
+    ],
+    "vocal_profile": "robotic",
+    "tags": [
+      "atmospheric",
+      "progressive"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "2nd",
+    "tense": "past",
+    "themes": [
+      "electronic",
+      "dreams"
+    ],
+    "rhyme_scheme": "Free",
+    "section_order": [
+      "intro",
+      "verse1",
+      "chorus1",
+      "verse2",
+      "chorus2",
+      "bridge",
+      "chorus3",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 64
+    }
+  },
+  "producer_notes": {
+    "structure": "Standard",
+    "hooks": 2
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 6942
+}

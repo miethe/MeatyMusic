@@ -1,0 +1,75 @@
+{
+  "id": "synthetic-ccm-105",
+  "title": "Ccm Song 105",
+  "blueprint_ref": {
+    "genre": "Ccm",
+    "version": "2025.11"
+  },
+  "style": {
+    "genre_detail": {
+      "primary": "ccm",
+      "subgenres": [],
+      "fusions": []
+    },
+    "tempo_bpm": 77,
+    "time_signature": "4/4",
+    "key": {
+      "primary": "C major",
+      "modulations": []
+    },
+    "mood": [
+      "reverent",
+      "joyful"
+    ],
+    "energy": "high",
+    "instrumentation": [
+      "acoustic guitar",
+      "choir",
+      "drums",
+      "keys"
+    ],
+    "vocal_profile": "choir-like",
+    "tags": [
+      "worshipful",
+      "inspiring",
+      "uplifting"
+    ],
+    "negative_tags": []
+  },
+  "lyrics": {
+    "language": "en",
+    "pov": "3rd",
+    "tense": "future",
+    "themes": [
+      "ccm",
+      "dreams"
+    ],
+    "rhyme_scheme": "ABAB",
+    "section_order": [
+      "verse1",
+      "chorus1",
+      "verse2",
+      "chorus2",
+      "outro"
+    ],
+    "constraints": {
+      "explicit": false,
+      "max_lines": 30
+    }
+  },
+  "producer_notes": {
+    "structure": "Simple",
+    "hooks": 4
+  },
+  "sources": [],
+  "prompt_controls": {
+    "positive_tags": [],
+    "negative_tags": [],
+    "max_style_chars": 1000,
+    "max_prompt_chars": 5000
+  },
+  "render": {
+    "engine": "none"
+  },
+  "seed": 10542
+}
