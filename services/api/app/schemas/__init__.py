@@ -17,6 +17,8 @@ from app.schemas.common import (
     NodeOutputUpdate,
     PageInfo,
     PaginatedResponse,
+    ProfanityCheckResult,
+    ProfanityViolation,
     StatusUpdateRequest,
 )
 
@@ -106,6 +108,8 @@ __all__ = [
     "NodeOutputUpdate",
     "PageInfo",
     "PaginatedResponse",
+    "ProfanityCheckResult",
+    "ProfanityViolation",
     "StatusUpdateRequest",
     # ComposedPrompt
     "ComposedPromptBase",
