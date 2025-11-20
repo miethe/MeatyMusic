@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@meatymusic/ui';
-import { SongList, type SongFilters } from '@/components/songs/SongList';
+import { SongList } from '@/components/songs/SongList';
 import { useSongs } from '@/hooks/api/useSongs';
 import { Plus, Loader2 } from 'lucide-react';
 import { ROUTES } from '@/config/routes';

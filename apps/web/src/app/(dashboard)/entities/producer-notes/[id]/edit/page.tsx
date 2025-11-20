@@ -23,12 +23,12 @@ interface EditProducerNotesPageProps {
 export default function EditProducerNotesPage({ params }: EditProducerNotesPageProps) {
   const router = useRouter();
   const { data: producerNotes, isLoading } = useProducerNotesById(params.id);
-  const updateProducerNotes = useUpdateProducerNotes();
+  const updateProducerNotes = useUpdateProducerNotes(params.id);
 
   const handleSave = async (updates: ProducerNotesUpdate) => {
     try {
-      await updateProducerNotes.mutateAsync({ id: params.id, data: updates });
-      router.push(ROUTES.ENTITIES.PRODUCER_NOTES_DETAIL(params.id));
+      await updateProducerNotes.mutateAsync(updates);
+      router.push(ROUTES.ENTITIES.PRODUCER_NOTE_DETAIL(params.id));
     } catch (error) {
       // Error is handled by React Query and displayed via toast
       console.error('Failed to update producer notes:', error);
@@ -36,7 +36,7 @@ export default function EditProducerNotesPage({ params }: EditProducerNotesPageP
   };
 
   const handleCancel = () => {
-    router.push(ROUTES.ENTITIES.PRODUCER_NOTES_DETAIL(params.id));
+    router.push(ROUTES.ENTITIES.PRODUCER_NOTE_DETAIL(params.id));
   };
 
   if (isLoading || !producerNotes) {

@@ -239,3 +239,11 @@
 | Fix | Pass songId to useUpdateSong(songId) hook, update mutateAsync to only pass data, add type assertions for extra_metadata fields |
 | File | apps/web/src/app/(dashboard)/songs/[id]/edit/page.tsx:25,41-44,68 |
 | Commit | 8666155 |
+
+## 2025-11-20
+| Aspect | Value |
+|--------|-------|
+| Bug | TypeScript errors: Invalid Button component size/variant types - "default" and "premium" not valid |
+| Fix | Replaced invalid types: size="default"→"md", variant="default"→"primary", variant="premium"→"primary" across 8 UI components. Updated type interfaces to only allow valid variants |
+| Files | BulkActions.tsx, ConfirmDialog.tsx, DatePicker.tsx, EmptyState.tsx, ErrorDisplay.tsx, error-fallback.tsx, error-layout.tsx, session-warning.tsx |
+| Commit | d1dfed5 |

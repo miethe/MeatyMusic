@@ -298,7 +298,7 @@ export function StyleEditor({
             maxSelections={3}
             allowCreate
             placeholder="Add subgenres..."
-            helpText="Maximum 3 subgenres recommended"
+            helperText="Maximum 3 subgenres recommended"
           />
 
           <RangeSlider
@@ -314,7 +314,7 @@ export function StyleEditor({
             unit=" BPM"
             presets={BPM_PRESETS}
             required
-            helpText="Select a single value or range for tempo flexibility"
+            helperText="Select a single value or range for tempo flexibility"
           />
 
           <RangeSlider
@@ -324,7 +324,7 @@ export function StyleEditor({
             value={formData.energy_level || 5}
             onChange={(value) => updateField('energy_level', typeof value === 'number' ? value : value[0])}
             allowRange={false}
-            helpText="1 = Low, 10 = Anthemic"
+            helperText="1 = Low, 10 = Anthemic"
           />
 
           <ChipSelector
@@ -335,7 +335,7 @@ export function StyleEditor({
             maxSelections={5}
             allowCreate
             placeholder="Add mood tags..."
-            helpText="Describe the emotional tone"
+            helperText="Describe the emotional tone"
           />
 
           <ChipSelector
@@ -351,7 +351,7 @@ export function StyleEditor({
                 : undefined
             }
             placeholder="Add instruments..."
-            helpText="Primary instruments in the arrangement"
+            helperText="Primary instruments in the arrangement"
           />
 
           <div className="space-y-4">
@@ -362,7 +362,7 @@ export function StyleEditor({
               options={[]}
               allowCreate
               placeholder="Add style tags..."
-              helpText="Tags to include in the composition"
+              helperText="Tags to include in the composition"
             />
 
             <ChipSelector
@@ -372,7 +372,7 @@ export function StyleEditor({
               options={[]}
               allowCreate
               placeholder="Add exclusion tags..."
-              helpText="Tags to avoid or exclude"
+              helperText="Tags to avoid or exclude"
             />
           </div>
         </div>

@@ -23,11 +23,11 @@ interface EditLyricsPageProps {
 export default function EditLyricsPage({ params }: EditLyricsPageProps) {
   const router = useRouter();
   const { data: lyrics, isLoading } = useLyricsById(params.id);
-  const updateLyrics = useUpdateLyrics();
+  const updateLyrics = useUpdateLyrics(params.id);
 
   const handleSave = async (updates: LyricsUpdate) => {
     try {
-      await updateLyrics.mutateAsync({ id: params.id, data: updates });
+      await updateLyrics.mutateAsync(updates);
       router.push(ROUTES.ENTITIES.LYRICS_DETAIL(params.id));
     } catch (error) {
       // Error is handled by React Query and displayed via toast

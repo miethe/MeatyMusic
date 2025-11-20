@@ -270,7 +270,7 @@ export function BlueprintEditor({
               onChange={(value) => updateRuleField('banned_terms', value)}
               suggestions={[]}
               placeholder="Add banned terms..."
-              helpText="Terms to avoid in generated content"
+              helperText="Terms to avoid in generated content"
             />
 
             <ChipSelector

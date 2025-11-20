@@ -16,11 +16,10 @@
 import * as React from 'react';
 import { useParams } from 'next/navigation';
 import { WorkflowHeader } from '@/components/workflow/WorkflowHeader';
-import { WorkflowGraph, type WorkflowNodeState } from '@/components/workflow/WorkflowGraph';
-import { MetricsPanel } from '@/components/workflow/MetricsPanel';
+import type { WorkflowNodeState } from '@/components/workflow/WorkflowGraph';
 import { ArtifactPreview, type ArtifactData } from '@/components/workflow/ArtifactPreview';
 import { WorkflowProgress } from '@/components/workflow-progress';
-import { WorkflowDAG, type WorkflowNodeStatus } from '@/components/workflow-dag';
+import { WorkflowDAG } from '@/components/workflow-dag';
 import { WorkflowMetrics } from '@/components/workflow-metrics';
 import { useWorkflowEvents } from '@/hooks/useWorkflowEvents';
 import { useWorkflowStore } from '@/stores/workflowStore';
@@ -173,7 +172,7 @@ export default function WorkflowDashboardPage() {
   const workflowId = params.id as string;
 
   // WebSocket connection for real-time updates (P1.3)
-  const { events, isLoading: wsLoading, error: wsError } = useWorkflowEvents(workflowId, {
+  const { isLoading: wsLoading, error: wsError } = useWorkflowEvents(workflowId, {
     enabled: true,
     enableNotifications: true,
     onEvent: (event) => {
@@ -182,7 +181,7 @@ export default function WorkflowDashboardPage() {
   });
 
   // Get workflow state from store (updated via WebSocket)
-  const workflowRun = useWorkflowStore((state) => state.runs[workflowId]);
+  const workflowRun = useWorkflowStore((state) => state.activeRuns.get(workflowId));
   const isConnected = useWorkflowStore((state) => state.isConnected);
 
   // Placeholder state (will be replaced with API calls in Wave 3)

@@ -36,7 +36,6 @@ const SECTION_TYPES = [
 export function CollapsibleSectionEditor({
   sections,
   onChange,
-  validationErrors = [],
 }: CollapsibleSectionEditorProps) {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
@@ -99,8 +98,9 @@ export function CollapsibleSectionEditor({
     }
 
     const reordered = [...sections];
-    const [removed] = reordered.splice(draggedIndex, 1);
+    const removed = reordered[draggedIndex];
     if (removed) {
+      reordered.splice(draggedIndex, 1);
       reordered.splice(dropIndex, 0, removed);
       // Update order numbers
       const withOrder = reordered.map((s, i) => ({ ...s, order: i + 1 }));
@@ -116,12 +116,12 @@ export function CollapsibleSectionEditor({
   };
 
   const getSectionType = (type: string) => {
-    return SECTION_TYPES.find((st) => st.value === type) || SECTION_TYPES[1];
+    return SECTION_TYPES.find((st) => st.value === type) || SECTION_TYPES[1]!;
   };
 
   const getSectionStatus = (section: LyricSection) => {
     const hasLines = section.lines.length > 0 || (section.text && section.text.trim().length > 0);
-    const isRequired = getSectionType(section.type).required;
+    const isRequired = getSectionType(section.type)?.required ?? false;
 
     if (isRequired && !hasLines) {
       return { status: 'error', message: 'Required section is empty' };

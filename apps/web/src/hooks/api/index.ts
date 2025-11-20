@@ -19,6 +19,7 @@ export { useSDS, isValidSDS } from './useSDS';
 export {
   useStyles,
   useStyle,
+  useStyleById,
   useCreateStyle,
   useUpdateStyle,
   useDeleteStyle,
@@ -28,6 +29,7 @@ export {
 export {
   useLyricsList,
   useLyrics,
+  useLyricsById,
   useCreateLyrics,
   useUpdateLyrics,
   useDeleteLyrics,
@@ -37,6 +39,7 @@ export {
 export {
   usePersonas,
   usePersona,
+  usePersonaById,
   useCreatePersona,
   useUpdatePersona,
   useDeletePersona,
@@ -46,6 +49,7 @@ export {
 export {
   useProducerNotesList,
   useProducerNotes,
+  useProducerNotesById,
   useCreateProducerNotes,
   useUpdateProducerNotes,
   useDeleteProducerNotes,

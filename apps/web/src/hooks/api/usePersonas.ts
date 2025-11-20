@@ -154,3 +154,6 @@ export function useBulkExportPersonas() {
     },
   });
 }
+
+// Alias for backward compatibility with edit pages
+export const usePersonaById = usePersona;

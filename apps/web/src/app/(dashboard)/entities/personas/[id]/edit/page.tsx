@@ -23,11 +23,11 @@ interface EditPersonaPageProps {
 export default function EditPersonaPage({ params }: EditPersonaPageProps) {
   const router = useRouter();
   const { data: persona, isLoading } = usePersonaById(params.id);
-  const updatePersona = useUpdatePersona();
+  const updatePersona = useUpdatePersona(params.id);
 
   const handleSave = async (updates: PersonaUpdate) => {
     try {
-      await updatePersona.mutateAsync({ id: params.id, data: updates });
+      await updatePersona.mutateAsync(updates);
       router.push(ROUTES.ENTITIES.PERSONA_DETAIL(params.id));
     } catch (error) {
       // Error is handled by React Query and displayed via toast

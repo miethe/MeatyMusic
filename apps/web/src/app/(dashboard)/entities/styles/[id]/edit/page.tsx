@@ -23,11 +23,11 @@ interface EditStylePageProps {
 export default function EditStylePage({ params }: EditStylePageProps) {
   const router = useRouter();
   const { data: style, isLoading } = useStyleById(params.id);
-  const updateStyle = useUpdateStyle();
+  const updateStyle = useUpdateStyle(params.id);
 
   const handleSave = async (updates: StyleUpdate) => {
     try {
-      await updateStyle.mutateAsync({ id: params.id, data: updates });
+      await updateStyle.mutateAsync(updates);
       router.push(ROUTES.ENTITIES.STYLE_DETAIL(params.id));
     } catch (error) {
       // Error is handled by React Query and displayed via toast

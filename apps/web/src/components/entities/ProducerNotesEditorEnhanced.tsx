@@ -334,7 +334,7 @@ export function ProducerNotesEditorEnhanced({
             onChange={setSections}
             sectionTypes={STRUCTURE_TYPES}
             showDuration
-            helpText="Define the production arrangement flow. Durations are in seconds."
+            helperText="Define the production arrangement flow. Durations are in seconds."
           />
 
           {/* Duration Budget */}

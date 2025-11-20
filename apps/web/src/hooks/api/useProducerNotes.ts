@@ -154,3 +154,6 @@ export function useBulkExportProducerNotes() {
     },
   });
 }
+
+// Alias for backward compatibility with edit pages
+export const useProducerNotesById = useProducerNotes;

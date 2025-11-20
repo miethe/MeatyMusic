@@ -268,7 +268,7 @@ export function PersonaEditor({
             options={DELIVERY_OPTIONS.map((d) => ({ value: d, label: d.charAt(0).toUpperCase() + d.slice(1) }))}
             allowCreate
             placeholder="Add delivery styles..."
-            helpText="How the persona delivers vocals"
+            helperText="How the persona delivers vocals"
           />
 
           <ChipSelector
@@ -283,7 +283,7 @@ export function PersonaEditor({
                 ? 'Public releases may require generic influence language'
                 : undefined
             }
-            helpText="Musical influences and inspirations"
+            helperText="Musical influences and inspirations"
           />
 
           <div className="space-y-3 p-4 rounded-lg bg-background-tertiary border border-border-secondary">

@@ -155,3 +155,6 @@ export function useBulkExportStyles() {
     },
   });
 }
+
+// Alias for backward compatibility with edit pages
+export const useStyleById = useStyle;

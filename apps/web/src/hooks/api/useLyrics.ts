@@ -166,3 +166,6 @@ export function useCheckProfanity() {
     }): Promise<ProfanityCheckResult> => lyricsApi.checkProfanity(sections, explicit_allowed),
   });
 }
+
+// Alias for backward compatibility with edit pages
+export const useLyricsById = useLyrics;
