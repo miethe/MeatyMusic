@@ -253,11 +253,11 @@
 | Bug | TypeScript error: Module '@/types/api' has no exported member 'ProfanityCheckResult' - type defined but not exported from barrel |
 | Fix | Added ProfanityViolation and ProfanityCheckResult to type exports in index.ts. Types were defined in entities.ts but missing from central barrel export |
 | File | apps/web/src/types/api/index.ts:25-26 |
-| Commit | Pending |
+| Commit | efd8e7c |
 
 | Aspect | Value |
 |--------|-------|
 | Bug | TypeScript error: Axios headers type incompatible with getFilenameFromHeaders - expected Record<string, string> but got complex axios header type |
 | Fix | Updated function signature to accept Record<string, string \| string[] \| undefined> \| any for axios compatibility |
 | File | apps/web/src/lib/api/utils.ts:30 |
-| Commit | Pending |
+| Commit | efd8e7c |
