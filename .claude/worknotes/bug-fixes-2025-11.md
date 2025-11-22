@@ -283,3 +283,46 @@
 | Fix | Changed import from 'app.models.workflow_run' to 'app.models.song' (WorkflowRun is co-located with Song model, not in separate module) |
 | File | services/api/app/api/v1/endpoints/workflow_runs.py:15 |
 | Commit | 2667592 |
+
+## 2025-11-22
+| Aspect | Value |
+|--------|-------|
+| Bug | Persona import failed with 422 Unprocessable Entity - complex vocal ranges like "low baritone + baritone + high baritone/tenor" rejected |
+| Fix | Enhanced vocal_range validation to parse multi-voice ranges with modifiers (low, high, upper, lower, mid, deep) and separators (+, /, "and"). Maintains backward compatibility with canonical ranges |
+| File | services/api/app/services/persona_service.py:407-447 |
+| Commit | 9e29d2e |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | Frontend sending parsed JSON instead of file to /api/v1/personas/import - API expects multipart/form-data with "file" field |
+| Fix | Modified ImportModal to send original File via FormData with proper Content-Type header instead of parsing and sending JSON body |
+| File | apps/web/src/components/import/ImportModal.tsx:154-216 |
+| Commit | 9e29d2e |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | Import modal shows horizontal scrollbar on entire dialog when previewing long JSON files |
+| Fix | Added max-w-3xl and overflow-x-hidden to DialogContent, wrapped JsonViewer to contain overflow. Only preview pane scrolls horizontally, not entire modal |
+| Files | ImportModal.tsx:220, ImportPreview.tsx:113-122, JsonViewer.tsx:186,194,198 |
+| Commit | 9e29d2e |
+
+| Aspect | Value |
+|--------|-------|
+| Enhancement | Import modal had no error message display when validation fails |
+| Fix | Added error state with red text display next to Import button showing actual API error message. Uses ARIA role="alert" for accessibility |
+| File | apps/web/src/components/import/ImportModal.tsx:91,158,194,208,265-273 |
+| Commit | 9e29d2e |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | TypeError: BaseRepository.create() missing 1 required positional argument 'data' - persona import failed |
+| Fix | Added Persona model_class as first parameter to repo.create() call. BaseRepository.create() requires (model_class, data), not just (data). Converted PersonaCreate to dict via model_dump() |
+| File | services/api/app/services/persona_service.py:142-145 |
+| Commit | 85213a3 |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | JSON preview pane missing horizontal scrollbar - modal scrolled instead, making wide JSON hard to view |
+| Fix | Changed overflow-x-hidden to overflow-x-auto in ImportPreview wrapper div, removed overflow-x-hidden from ImportModal DialogContent to allow inner scroll |
+| Files | apps/web/src/components/import/ImportPreview.tsx:113, apps/web/src/components/import/ImportModal.tsx:220 |
+| Commit | 85213a3 |
