@@ -7,6 +7,7 @@ detection, and policy enforcement for public releases.
 
 from typing import List, Optional, Tuple
 from uuid import UUID
+import re
 import structlog
 
 from sqlalchemy.orm import Session
@@ -396,7 +397,8 @@ class PersonaService(BaseService[Persona, PersonaResponse, PersonaCreate, Person
         """Validate vocal range against canonical ranges.
 
         Accepts single ranges (soprano, tenor) and combined ranges
-        for duos/bands (soprano + tenor).
+        for duos/bands (soprano + tenor). Also accepts complex multi-voice
+        ranges with modifiers (e.g., "low baritone + baritone + high tenor").
 
         Args:
             vocal_range: Range classification string
@@ -405,7 +407,44 @@ class PersonaService(BaseService[Persona, PersonaResponse, PersonaCreate, Person
             True if valid, False otherwise
         """
         range_lower = vocal_range.lower().strip()
-        return range_lower in self.VALID_VOCAL_RANGES
+
+        # First check exact match against canonical ranges
+        if range_lower in self.VALID_VOCAL_RANGES:
+            return True
+
+        # For complex ranges, validate that all components are recognized vocal types
+        # Extract base range types, handling modifiers like "low", "high", "upper", "lower"
+        # and separators like "+", "/", "and"
+        parts = re.split(r'[\+/]|\band\b', range_lower)
+
+        # Known modifiers that can prefix vocal ranges
+        modifiers = {'low', 'high', 'upper', 'lower', 'mid', 'deep'}
+
+        # Base vocal range types
+        base_ranges = {
+            'soprano', 'mezzo-soprano', 'alto', 'contralto',
+            'tenor', 'baritone', 'bass', 'countertenor'
+        }
+
+        for part in parts:
+            part = part.strip()
+            if not part:
+                continue
+
+            # Remove modifiers
+            tokens = part.split()
+            # Filter out modifiers, keep the base range type
+            range_tokens = [t for t in tokens if t not in modifiers]
+
+            # Rejoin in case of multi-word ranges like "mezzo-soprano"
+            base_range = ' '.join(range_tokens).replace(' ', '-')
+
+            # Check if any base range is recognized
+            if not any(base_range.startswith(br) or base_range.endswith(br) or br in base_range
+                      for br in base_ranges):
+                return False
+
+        return True
 
     def validate_delivery_styles(
         self,

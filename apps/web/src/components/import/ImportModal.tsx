@@ -88,6 +88,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
   const [validationErrors, setValidationErrors] = React.useState<ValidationError[]>([]);
   const [isValid, setIsValid] = React.useState(false);
   const [isImporting, setIsImporting] = React.useState(false);
+  const [importError, setImportError] = React.useState<string | undefined>();
 
   // Reset state when modal closes
   React.useEffect(() => {
@@ -98,6 +99,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
       setValidationErrors([]);
       setIsValid(false);
       setIsImporting(false);
+      setImportError(undefined);
       if (!initialEntityType) {
         setSelectedEntityType(undefined);
       }
@@ -150,19 +152,29 @@ export const ImportModal: React.FC<ImportModalProps> = ({
   }, [selectedFile]);
 
   const handleImport = async () => {
-    if (!jsonData || !selectedEntityType) return;
+    if (!selectedFile || !selectedEntityType) return;
 
     setIsImporting(true);
+    setImportError(undefined);
 
     try {
       const endpoint = ENTITY_METADATA[selectedEntityType].endpoint;
-      const { data } = await apiClient.post(endpoint, jsonData);
+
+      // Create FormData and append the file with the expected field name "file"
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+
+      const { data } = await apiClient.post(endpoint, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
 
       toast.success(`${ENTITY_METADATA[selectedEntityType].label} imported successfully`);
       onImportSuccess(data);
       onOpenChange(false);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to import';
+      let errorMessage = 'Failed to import';
 
       // Check if error has validation details
       if (error && typeof error === 'object' && 'response' in error) {
@@ -178,13 +190,22 @@ export const ImportModal: React.FC<ImportModalProps> = ({
             }));
             setValidationErrors(errors);
             setIsValid(false);
-            toast.error('Validation failed - please check the errors');
+            errorMessage = 'Validation failed - please check the errors below';
+            setImportError(errorMessage);
+            toast.error(errorMessage);
             setIsImporting(false);
             return;
+          } else if (typeof detail === 'string') {
+            errorMessage = detail;
           }
         }
       }
 
+      if (error instanceof Error && error.message) {
+        errorMessage = error.message;
+      }
+
+      setImportError(errorMessage);
       toast.error(errorMessage);
       onImportError?.(error instanceof Error ? error : new Error(errorMessage));
     } finally {
@@ -192,11 +213,11 @@ export const ImportModal: React.FC<ImportModalProps> = ({
     }
   };
 
-  const canImport = selectedEntityType && isValid && jsonData && !isImporting;
+  const canImport = selectedEntityType && isValid && selectedFile && !isImporting;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent size="lg" className="max-h-[90vh] overflow-y-auto">
+      <DialogContent size="lg" className="max-h-[90vh] max-w-3xl overflow-y-auto overflow-x-hidden">
         <DialogHeader>
           <DialogTitle>Import Entity</DialogTitle>
           <DialogDescription>
@@ -251,22 +272,33 @@ export const ImportModal: React.FC<ImportModalProps> = ({
         </div>
 
         <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={isImporting}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="default"
-            onClick={handleImport}
-            disabled={!canImport}
-            loading={isImporting}
-            loadingText="Importing..."
-          >
-            Import
-          </Button>
+          <div className="flex items-center justify-between w-full gap-4">
+            <div className="flex-1">
+              {importError && (
+                <p className="text-sm text-error-strong" role="alert">
+                  {importError}
+                </p>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                disabled={isImporting}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="default"
+                onClick={handleImport}
+                disabled={!canImport}
+                loading={isImporting}
+                loadingText="Importing..."
+              >
+                Import
+              </Button>
+            </div>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

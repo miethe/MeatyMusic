@@ -183,7 +183,7 @@ const CollapsibleJsonViewer: React.FC<{
         </div>
       )}
       <div
-        className="overflow-auto rounded-lg"
+        className="overflow-x-auto overflow-y-auto rounded-lg"
         style={{ maxHeight: maxHeight || '600px' }}
         data-testid={testId ? `${testId}-content` : undefined}
       >
@@ -191,10 +191,11 @@ const CollapsibleJsonViewer: React.FC<{
           language="json"
           style={customStyle}
           showLineNumbers={showLineNumbers}
-          wrapLines
+          wrapLines={false}
           customStyle={{
             margin: 0,
             borderRadius: '0.5rem',
+            whiteSpace: 'pre',
           }}
           lineNumberStyle={{
             minWidth: '3em',

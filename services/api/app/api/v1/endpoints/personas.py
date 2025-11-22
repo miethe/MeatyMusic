@@ -139,15 +139,11 @@ async def import_persona(
             detail={"message": "Validation failed", "errors": errors},
         )
 
-    # Add import metadata
-    persona_dict = persona_data.model_dump()
-    persona_dict["imported_at"] = datetime.now(timezone.utc)
-    persona_dict["import_source_filename"] = file.filename
-
     # Create persona via service (with automatic validation and normalization)
+    # Note: Import metadata (imported_at, import_source_filename) would be added
+    # at the repository/model layer if needed, not here
     try:
-        persona_data_with_import = PersonaCreate.model_validate(persona_dict)
-        return await service.create_persona(persona_data_with_import)
+        return await service.create_persona(persona_data)
     except BadRequestError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
