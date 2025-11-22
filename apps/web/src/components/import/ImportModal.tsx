@@ -217,7 +217,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent size="lg" className="max-h-[90vh] max-w-3xl overflow-y-auto overflow-x-hidden">
+      <DialogContent size="lg" className="max-h-[90vh] max-w-3xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Import Entity</DialogTitle>
           <DialogDescription>

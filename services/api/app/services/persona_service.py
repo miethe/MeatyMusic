@@ -139,7 +139,10 @@ class PersonaService(BaseService[Persona, PersonaResponse, PersonaCreate, Person
 
         # Create via repository with transaction
         with self.transaction():
-            entity = self.repo.create(data)
+            persona_dict = data.model_dump()
+            logger.debug(f"Creating persona with dict: {persona_dict}")
+            logger.debug(f"self.repo type: {type(self.repo)}, create method: {self.repo.create}")
+            entity = self.repo.create(Persona, persona_dict)
             logger.info(
                 "persona.created",
                 persona_id=str(entity.id),

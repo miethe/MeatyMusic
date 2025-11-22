@@ -110,7 +110,7 @@ export const ImportPreview: React.FC<ImportPreviewProps> = ({
       {/* JSON Preview */}
       <div className="space-y-2">
         <h3 className="text-sm font-medium text-text-strong">JSON Preview:</h3>
-        <div className="overflow-x-hidden">
+        <div className="overflow-x-auto">
           <JsonViewer
             data={typeof jsonData === 'object' && jsonData !== null ? jsonData : {}}
             theme="dark"
