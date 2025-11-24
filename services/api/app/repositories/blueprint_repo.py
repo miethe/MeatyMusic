@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, List
+from typing import Optional, List, Dict, Any, Union
 from uuid import UUID
 
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
 
 from app.models.blueprint import Blueprint
 from .base import BaseRepository
@@ -21,6 +22,86 @@ class BlueprintRepository(BaseRepository[Blueprint]):
     """
 
     model_class = Blueprint  # Type annotation for generic list operations
+
+    def get_by_id(self, id: UUID) -> Optional[Blueprint]:
+        """Get blueprint by ID with security filtering.
+
+        Convenience wrapper that uses self.model_class to call BaseRepository.get_by_id().
+
+        Parameters
+        ----------
+        id : UUID
+            The blueprint ID to retrieve
+
+        Returns
+        -------
+        Optional[Blueprint]
+            Blueprint if found and accessible, None otherwise
+        """
+        return super().get_by_id(self.model_class, id)
+
+    def update(self, id: UUID, data: Union[Dict[str, Any], BaseModel]) -> Optional[Blueprint]:
+        """Update blueprint with security filtering.
+
+        Convenience wrapper that uses self.model_class to call BaseRepository.update().
+
+        Parameters
+        ----------
+        id : UUID
+            The blueprint ID to update
+        data : Union[Dict[str, Any], BaseModel]
+            Update data as dictionary or Pydantic model
+
+        Returns
+        -------
+        Optional[Blueprint]
+            Updated blueprint if found and accessible, None otherwise
+        """
+        # Convert Pydantic model to dict if needed
+        if isinstance(data, BaseModel):
+            data_dict = data.model_dump(exclude_unset=True)
+        else:
+            data_dict = data
+        return super().update(self.model_class, id, data_dict)
+
+    def delete(self, id: UUID) -> bool:
+        """Delete blueprint with security filtering (soft delete).
+
+        Convenience wrapper that uses self.model_class to call BaseRepository.delete().
+
+        Parameters
+        ----------
+        id : UUID
+            The blueprint ID to delete
+
+        Returns
+        -------
+        bool
+            True if deleted, False if not found
+        """
+        return super().delete(self.model_class, id)
+
+    def create(self, data: Union[Dict[str, Any], BaseModel]) -> Blueprint:
+        """Create blueprint with security filtering.
+
+        Convenience wrapper that uses self.model_class to call BaseRepository.create().
+
+        Parameters
+        ----------
+        data : Union[Dict[str, Any], BaseModel]
+            Create data as dictionary or Pydantic model
+
+        Returns
+        -------
+        Blueprint
+            Created blueprint
+        """
+        # Convert Pydantic model to dict if needed
+        if isinstance(data, BaseModel):
+            data_dict = data.model_dump()
+        else:
+            data_dict = data
+        return super().create(self.model_class, data_dict)
 
     def get_by_genre(self, genre: str) -> List[Blueprint]:
         """Get all blueprints for a specific genre with security filtering.

@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, List
+from typing import Optional, List, Dict, Any, Union
 from uuid import UUID
 
 from sqlalchemy.orm import Session, joinedload
+from pydantic import BaseModel
 
 from app.models.lyrics import Lyrics
 from app.models.song import Song
@@ -22,6 +23,86 @@ class LyricsRepository(BaseRepository[Lyrics]):
     """
 
     model_class = Lyrics  # Type annotation for generic list operations
+
+    def get_by_id(self, id: UUID) -> Optional[Lyrics]:
+        """Get lyrics by ID with security filtering.
+
+        Convenience wrapper that uses self.model_class to call BaseRepository.get_by_id().
+
+        Parameters
+        ----------
+        id : UUID
+            The lyrics ID to retrieve
+
+        Returns
+        -------
+        Optional[Lyrics]
+            Lyrics if found and accessible, None otherwise
+        """
+        return super().get_by_id(self.model_class, id)
+
+    def update(self, id: UUID, data: Union[Dict[str, Any], BaseModel]) -> Optional[Lyrics]:
+        """Update lyrics with security filtering.
+
+        Convenience wrapper that uses self.model_class to call BaseRepository.update().
+
+        Parameters
+        ----------
+        id : UUID
+            The lyrics ID to update
+        data : Union[Dict[str, Any], BaseModel]
+            Update data as dictionary or Pydantic model
+
+        Returns
+        -------
+        Optional[Lyrics]
+            Updated lyrics if found and accessible, None otherwise
+        """
+        # Convert Pydantic model to dict if needed
+        if isinstance(data, BaseModel):
+            data_dict = data.model_dump(exclude_unset=True)
+        else:
+            data_dict = data
+        return super().update(self.model_class, id, data_dict)
+
+    def delete(self, id: UUID) -> bool:
+        """Delete lyrics with security filtering (soft delete).
+
+        Convenience wrapper that uses self.model_class to call BaseRepository.delete().
+
+        Parameters
+        ----------
+        id : UUID
+            The lyrics ID to delete
+
+        Returns
+        -------
+        bool
+            True if deleted, False if not found
+        """
+        return super().delete(self.model_class, id)
+
+    def create(self, data: Union[Dict[str, Any], BaseModel]) -> Lyrics:
+        """Create lyrics with security filtering.
+
+        Convenience wrapper that uses self.model_class to call BaseRepository.create().
+
+        Parameters
+        ----------
+        data : Union[Dict[str, Any], BaseModel]
+            Create data as dictionary or Pydantic model
+
+        Returns
+        -------
+        Lyrics
+            Created lyrics
+        """
+        # Convert Pydantic model to dict if needed
+        if isinstance(data, BaseModel):
+            data_dict = data.model_dump()
+        else:
+            data_dict = data
+        return super().create(self.model_class, data_dict)
 
     def get_by_song_id(self, song_id: UUID) -> List[Lyrics]:
         """Get all lyrics for a specific song.
