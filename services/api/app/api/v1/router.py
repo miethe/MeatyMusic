@@ -16,6 +16,7 @@ from app.api.v1.endpoints import (
     songs,
     sources,
     styles,
+    users,
     workflow_runs,
 )
 
@@ -32,6 +33,7 @@ api_router.include_router(runs.router)  # Workflow execution endpoints
 api_router.include_router(songs.router)
 api_router.include_router(sources.router)
 api_router.include_router(styles.router)
+api_router.include_router(users.router)
 api_router.include_router(workflow_runs.router)
 
 __all__ = ["api_router"]

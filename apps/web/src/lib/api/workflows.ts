@@ -6,6 +6,7 @@
  */
 
 import { apiClient } from './client';
+import { API_ENDPOINTS } from '@/config/api';
 import type {
   WorkflowRun,
   WorkflowRunUpdate,
@@ -37,7 +38,7 @@ export const workflowsApi = {
    * List workflow runs with filters and pagination
    */
   list: async (filters?: WorkflowRunFilters): Promise<PaginatedResponse<WorkflowRun>> => {
-    const { data } = await apiClient.get<PaginatedResponse<WorkflowRun>>('/workflows/runs', {
+    const { data } = await apiClient.get<PaginatedResponse<WorkflowRun>>(API_ENDPOINTS.WORKFLOW_RUNS, {
       params: filters,
     });
     return data;
@@ -47,7 +48,7 @@ export const workflowsApi = {
    * Get a single workflow run by ID
    */
   get: async (runId: UUID): Promise<WorkflowRun> => {
-    const { data } = await apiClient.get<WorkflowRun>(`/workflows/runs/${runId}`);
+    const { data } = await apiClient.get<WorkflowRun>(API_ENDPOINTS.WORKFLOW_RUN_DETAIL(runId));
     return data;
   },
 
@@ -63,7 +64,7 @@ export const workflowsApi = {
    * Get workflow run progress
    */
   getProgress: async (runId: UUID): Promise<WorkflowProgress> => {
-    const { data } = await apiClient.get<WorkflowProgress>(`/workflows/runs/${runId}/progress`);
+    const { data } = await apiClient.get<WorkflowProgress>(API_ENDPOINTS.WORKFLOW_RUN_PROGRESS(runId));
     return data;
   },
 
@@ -71,7 +72,7 @@ export const workflowsApi = {
    * Get workflow run summary
    */
   getSummary: async (runId: UUID): Promise<WorkflowSummary> => {
-    const { data } = await apiClient.get<WorkflowSummary>(`/workflows/runs/${runId}/summary`);
+    const { data } = await apiClient.get<WorkflowSummary>(API_ENDPOINTS.WORKFLOW_RUN_SUMMARY(runId));
     return data;
   },
 
@@ -79,14 +80,14 @@ export const workflowsApi = {
    * Cancel a running workflow
    */
   cancel: async (runId: UUID): Promise<void> => {
-    await apiClient.post(`/workflows/runs/${runId}/cancel`);
+    await apiClient.post(API_ENDPOINTS.WORKFLOW_RUN_CANCEL(runId));
   },
 
   /**
    * Update workflow run (internal use)
    */
   update: async (runId: UUID, update: WorkflowRunUpdate): Promise<WorkflowRun> => {
-    const { data } = await apiClient.patch<WorkflowRun>(`/workflows/runs/${runId}`, update);
+    const { data } = await apiClient.patch<WorkflowRun>(API_ENDPOINTS.WORKFLOW_RUN_DETAIL(runId), update);
     return data;
   },
 };

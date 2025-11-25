@@ -351,3 +351,19 @@
 | Fix | Added `./taxonomies:/taxonomies:ro` volume mount to both api and migrations services in docker-compose.yml. The path logic in policy_guards.py correctly resolves to `/taxonomies/profanity_list.json` which now maps to the host taxonomies folder |
 | File | docker-compose.yml:93,155 |
 | Commit | Pending |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | 404 error on /api/v1/workflows/runs - frontend workflows.ts using hardcoded path instead of config constant |
+| Root Cause | workflows.ts used hardcoded `/workflows/runs` path but backend has `/workflow-runs`. Config had correct path but wasn't imported |
+| Fix | Imported API_ENDPOINTS from config and replaced all hardcoded paths with constants (WORKFLOW_RUNS, WORKFLOW_RUN_DETAIL, etc.) |
+| File | apps/web/src/lib/api/workflows.ts:9,40-91 |
+| Commit | 7ac2875 |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | 404 error on /api/v1/users/me - endpoint did not exist in backend |
+| Root Cause | Frontend useAuth hook called /users/me but no user endpoints existed in API |
+| Fix | Created user.py schema with UserResponse model, users.py endpoint with /me route using get_current_user_legacy dependency, registered router in v1/router.py |
+| Files | services/api/app/schemas/user.py (new), services/api/app/api/v1/endpoints/users.py (new), services/api/app/api/v1/router.py:19,36 |
+| Commit | 7ac2875 |
