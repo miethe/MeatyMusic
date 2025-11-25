@@ -1,0 +1,134 @@
+{
+    "name": "Drift Signal",
+    "kind": "band",
+    "bio": "Drift Signal is a Seattle-based grunge revival band formed in 2018. The core quartet is Marcus Reid (lead vocals/rhythm guitar), Derek Thompson (bass/primary harmonies), Aaron Martinez (drums/upper harmonies), and Sadie Chen (lead guitar). They channel the emotional weight and quiet–loud dynamics of 90s alternative rock while keeping modern studio clarity. Their signature is a three-voice blend over melodic grunge and alternative ballads that can move from intimate, fingerpicked acoustic arrangements to full-stack electric catharsis. Lyrically they live in grief, loss, melancholic nostalgia, spiritual and existential questioning, and the fragile beauty of broken people in ordinary places.",
+    "voice": "Tri-vocal male grunge band: emotional baritone lead with vulnerable falsetto peaks, smoky low-tenor harmonies, and raspy high baritone/tenor accents, all kept raw and human rather than over-polished.",
+    "vocal_range": "low baritone + baritone + high baritone/tenor",
+    "delivery": [
+      "restrained, weary crooning in verses",
+      "melodic belting in choruses",
+      "raspy shouts and cracks at climaxes (brief, earned)",
+      "whispered or near-spoken confessions in bridges and breakdowns"
+    ],
+    "influences": [
+      "90s Seattle grunge",
+      "Soundgarden and Audioslave-era Chris Cornell",
+      "Stone Temple Pilots unplugged-era performances",
+      "Pearl Jam",
+      "Alice in Chains",
+      "Red Hot Chili Peppers mid-tempo ballads",
+      "Spacehog",
+      "MTV Unplugged-era alternative rock"
+    ],
+    "style_defaults": {
+      "genre_detail": {
+        "primary": "Rock",
+        "subgenres": [
+          "Grunge",
+          "Alternative Rock"
+        ],
+        "fusions": [
+          "Acoustic",
+          "Singer-Songwriter"
+        ]
+      },
+      "tempo_bpm": [65, 95],
+      "time_signature": "4/4",
+      "key": {
+        "primary": "E minor",
+        "modulations": [
+          "G major",
+          "D minor"
+        ]
+      },
+      "mood": [
+        "melancholic",
+        "cathartic",
+        "nostalgic"
+      ],
+      "energy": "medium",
+      "instrumentation": [
+        "electric guitar",
+        "bass guitar",
+        "drums"
+      ],
+      "vocal_profile": "three male voices: Cornell-adjacent baritone lead, smoky low-tenor harmonies, and raspy high baritone/tenor accents with strong three-part blends",
+      "tags": [
+        "Era:1990s",
+        "Genre:Grunge",
+        "Genre:Alternative Rock",
+        "Dynamics:quiet-loud-quiet",
+        "Vibe:melancholic-ballad",
+        "Mix:natural-roomy",
+        "Vocal:male-trio"
+      ],
+      "negative_tags": [
+        "Genre:NuMetal",
+        "Genre:PostGrungeSheen",
+        "Vocal:metalcore-screaming",
+        "Drums:over-quantized",
+        "Mix:overcompressed"
+      ]
+    },
+    "lyrics_defaults": {
+      "language": "en",
+      "pov": "1st",
+      "tense": "mixed",
+      "themes": [
+        "grief",
+        "loss",
+        "quiet depression",
+        "melancholic nostalgia",
+        "spiritual questioning",
+        "beauty in brokenness"
+      ],
+      "rhyme_scheme": "ABAB",
+      "meter": "4/4 rock ballad",
+      "syllables_per_line": 8,
+      "hook_strategy": "lyrical",
+      "repetition_policy": "moderate",
+      "imagery_density": 0.8,
+      "reading_level": "grade 8",
+      "section_order": [
+        "Intro",
+        "Verse",
+        "Verse",
+        "PreChorus",
+        "Chorus",
+        "Verse",
+        "PreChorus",
+        "Chorus",
+        "Bridge",
+        "Chorus",
+        "Outro"
+      ],
+      "constraints": {
+        "explicit": false,
+        "max_lines": 120,
+        "section_requirements": {
+          "Verse": {
+            "min_lines": 4,
+            "max_lines": 12
+          },
+          "PreChorus": {
+            "min_lines": 2,
+            "max_lines": 6
+          },
+          "Chorus": {
+            "min_lines": 4,
+            "max_lines": 8,
+            "must_end_with_hook": true
+          },
+          "Bridge": {
+            "min_lines": 4,
+            "max_lines": 8
+          }
+        }
+      },
+      "source_citations": []
+    },
+    "policy": {
+      "public_release": true,
+      "disallow_named_style_of": true
+    }
+}
