@@ -35,6 +35,14 @@ export const metadata: Metadata = {
     title: 'MeatyMusic AMCS',
     description: 'Agentic Music Creation System - Transform structured creative intent into validated musical artifacts',
   },
+  icons: {
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/favicon.png', type: 'image/png', sizes: '1024x1024' },
+    ],
+    shortcut: ['/favicon.ico'],
+    apple: ['/favicon.png'],
+  },
   robots: {
     index: process.env.NODE_ENV === 'production',
     follow: process.env.NODE_ENV === 'production',

@@ -6,12 +6,13 @@
 'use client';
 
 import * as React from 'react';
+
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { cn } from '@/lib/utils';
+
 import { Button } from '@meatymusic/ui';
 import {
-  Music2,
   Home,
   Library,
   Settings,
@@ -19,9 +20,12 @@ import {
   X,
   ChevronDown,
   ChevronRight,
+  Music2,
 } from 'lucide-react';
+
 import { NAV_ITEMS } from '@/config/routes';
 import { useAuth } from '@/hooks/useAuth';
+import { cn } from '@/lib/utils';
 
 export interface AppShellProps {
   children: React.ReactNode;
@@ -52,10 +56,18 @@ export function AppShell({ children }: AppShellProps) {
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="flex items-center gap-3 px-6 py-4 border-b border-border-default">
-            <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-              <Music2 className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xl font-bold text-text-primary">MeatyMusic</span>
+              <Link href="/" className="flex items-center gap-3" aria-label="MeatyMusic home">
+                <Image
+                  src="/branding/logo.png"
+                  alt="MeatyMusic logo"
+                  width={32}
+                  height={32}
+                  priority
+                  className="rounded-lg"
+                  sizes="32px"
+                />
+                <span className="text-xl font-bold text-text-primary">MeatyMusic</span>
+              </Link>
             <Button
               variant="ghost"
               size="sm"
