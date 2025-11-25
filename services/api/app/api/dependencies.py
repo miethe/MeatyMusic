@@ -138,9 +138,11 @@ def get_style_service(
     return StyleService(style_repo=style_repo)
 
 
-def get_validation_service() -> ValidationService:
-    """Get ValidationService instance."""
-    return ValidationService()
+def get_validation_service(
+    blueprint_service: BlueprintService = Depends(get_blueprint_service),
+) -> ValidationService:
+    """Get ValidationService instance with BlueprintService for rubric scoring."""
+    return ValidationService(blueprint_service=blueprint_service)
 
 
 def get_song_service(
