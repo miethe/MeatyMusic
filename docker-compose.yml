@@ -90,6 +90,7 @@ services:
       TZ: UTC
     volumes:
       - ./services/api:/app:cached
+      - ./taxonomies:/taxonomies:ro
     networks:
       - meatymusic
     depends_on:
@@ -150,6 +151,8 @@ services:
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-mm_user}:${POSTGRES_PASSWORD:-secure_dev_pw}@postgres:5432/${POSTGRES_DB:-meaty_music_dev}
       PYTHONPATH: /app
+    volumes:
+      - ./taxonomies:/taxonomies:ro
     command: ["sh", "-c", "alembic upgrade head"]
     networks:
       - meatymusic

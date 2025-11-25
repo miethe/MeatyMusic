@@ -326,3 +326,28 @@
 | Fix | Changed overflow-x-hidden to overflow-x-auto in ImportPreview wrapper div, removed overflow-x-hidden from ImportModal DialogContent to allow inner scroll |
 | Files | apps/web/src/components/import/ImportPreview.tsx:113, apps/web/src/components/import/ImportModal.tsx:220 |
 | Commit | 85213a3 |
+
+## 2025-11-24
+| Aspect | Value |
+|--------|-------|
+| Bug | TypeError: BaseRepository.get_by_id() missing 1 required positional argument 'id' - persona loading and CRUD operations failed across all entities |
+| Root Cause | Repositories had incomplete wrapper methods - only get_by_id() wrapped, but create/update/delete missing. Method resolution bypassed child class wrapper and called BaseRepository directly with wrong argument count |
+| Fix | Added complete CRUD wrapper methods (create, update, delete) to PersonaRepository, LyricsRepository, ProducerNotesRepository, StyleRepository, BlueprintRepository. All wrappers now accept simplified signatures and auto-convert Pydantic models to dicts |
+| Files | services/api/app/repositories/{persona,lyrics,producer_notes,style,blueprint}_repo.py, services/api/app/services/persona_service.py |
+| Commit | 956d69a |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | Logo and favicon not loading in Docker (404/400 errors) - works in local dev server |
+| Root Cause | Dockerfile copied public/ to wrong location: `/app/public` instead of `/app/apps/web/public`. Next.js standalone server runs from `apps/web/server.js` and looks for public assets relative to itself |
+| Fix | Changed COPY destination from `./public` to `./apps/web/public` in runner stage. Also added --chown flag and reordered COPY commands |
+| File | apps/web/Dockerfile:76-80 |
+| Commit | Pending |
+
+| Aspect | Value |
+|--------|-------|
+| Bug | Song creation failed with FileNotFoundError: Profanity taxonomy not found: /taxonomies/profanity_list.json |
+| Root Cause | docker-compose.yml only mounts `./services/api:/app`, but policy_guards.py traverses 5 parent directories expecting to find project root. In Docker, this reaches `/` instead of project root where taxonomies/ exists |
+| Fix | Added `./taxonomies:/taxonomies:ro` volume mount to both api and migrations services in docker-compose.yml. The path logic in policy_guards.py correctly resolves to `/taxonomies/profanity_list.json` which now maps to the host taxonomies folder |
+| File | docker-compose.yml:93,155 |
+| Commit | Pending |
