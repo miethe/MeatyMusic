@@ -1,5 +1,8 @@
 # MeatyMusic
 
+[![Run in Smithery](https://smithery.ai/badge/skills/miethe)](https://smithery.ai/skills?ns=miethe&utm_source=github&utm_medium=badge)
+
+
 **Agentic Music Creation System (AMCS)**
 
 A deterministic, constraint-driven music composition system that transforms structured creative intent into validated musical artifacts.
