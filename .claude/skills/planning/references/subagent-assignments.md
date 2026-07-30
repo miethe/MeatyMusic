@@ -1,8 +1,18 @@
 # Subagent Assignment Reference
 
+> **Model policy:** [`docs/agentic-operator/MODEL-ROUTING.md`](../../../../docs/agentic-operator/MODEL-ROUTING.md) (§1.5 scorecard) is canonical. Model/effort tables in this file are derived convenience copies — when they disagree, MODEL-ROUTING wins; update it first, then re-derive here. Resolve provider/model per leg via the `delegation-router` skill; the platform skills (`ica-delegate`, `codex`, `gemini-cli`) only execute the decision.
+
+> **This file is DISPATCH-TIME guidance for the orchestrator, not PLAN-TIME assignment
+> instructions for the planner.** Per `.claude/skills/planning/references/plan-doctrine.md` rule 3
+> (no plan-time model or agent pins), a plan does not name a subagent — it states the capability
+> bar for a milestone/task and the orchestrator (via `delegation-router` + this reference) picks
+> the specialist at dispatch. The `Assigned Subagent(s)` examples below reflect the legacy
+> plan-time-pin shape; in-flight plans still carry it and it still parses/executes, but new plans
+> should not.
+
 ## Task Type to Subagent Mapping
 
-This reference helps assign the appropriate specialist subagents to implementation tasks based on task type and domain.
+This reference helps the orchestrator match a specialist to a task type and domain at dispatch time.
 
 ---
 
@@ -220,6 +230,30 @@ This reference helps assign the appropriate specialist subagents to implementati
 
 ---
 
+## Platform Engineering Tasks
+
+Use `platform-engineer` (Opus model) for tasks involving Backstage/RHDH, Internal Developer Portals (IDPs), golden path templates, and self-service infrastructure tooling.
+
+| Task Type | Primary Subagent(s) | Secondary Subagent(s) | Notes |
+|-----------|-------------------|---------------------|-------|
+| Backstage Plugin Development | platform-engineer | python-backend-engineer | Custom scaffolder actions, backend plugins |
+| RHDH Integration | platform-engineer | - | Red Hat Developer Hub configuration |
+| Golden Path Template Authoring | platform-engineer | documentation-writer | Backstage template.yaml, scaffolder steps |
+| IDP Plugin Development | platform-engineer | backend-architect | Custom Backstage frontend/backend plugins |
+| Service Catalog Configuration | platform-engineer | - | catalog-info.yaml, entity definitions |
+| Docker Compose Demo Environments | platform-engineer | python-backend-engineer | Platform tool demo stacks |
+| Backstage Scaffolder Actions | platform-engineer | python-backend-engineer | Custom action authoring with @backstage/plugin-scaffolder-node |
+| Developer Portal Configuration | platform-engineer | - | Backstage app-config.yaml, auth providers |
+| Self-Service Infrastructure | platform-engineer | backend-architect | Scaffolded repo templates, onboarding automation |
+
+**Example**:
+```markdown
+- [ ] IDP-004: Backstage Plugin Scaffolder Action (3 pts)
+      Assigned Subagent(s): platform-engineer, python-backend-engineer
+```
+
+---
+
 ## Refactoring Tasks
 
 | Task Type | Primary Subagent(s) | Secondary Subagent(s) | Notes |
@@ -294,37 +328,59 @@ This reference helps assign the appropriate specialist subagents to implementati
 
 ---
 
-## Default Assignments by Phase
+## External Models
 
-### Phase 1: Database
+| Task Type | Model | Effort Default | When to Use |
+|-----------|-------|----------------|-------------|
+| Image/asset generation | nano-banana-pro | standard | Icons, sprites, UI assets, marketing images |
+| UI wireframing/SVG | gemini-3.5-flash | medium | Multi-element visual tasks, design exploration |
+| Web research | gemini-3.5-flash | medium | Current documentation, API references, trend analysis |
+| Debug escalation | gpt-5.6-terra | high | After 2+ failed Claude debugging cycles |
+| Plan review (second opinion) | gpt-5.6-terra | medium | Opt-in checkpoint for architecture decisions |
+| PR cross-validation | gemini-3.5-flash | medium | Opt-in checkpoint for code review |
+
+**Note**: External models are opt-in supplements. Configuration: `.claude/config/multi-model.toml`. Routing guidance: `references/multi-model-guidance.md`
+
+---
+
+## Default Assignments by Kind of Work
+
+**DEPRECATED shape (Claude-5 doctrine)** — this section formerly hard-coded an 8-phase spine
+(Phase 1 Database … Phase 8 Deployment) and bound each phase number to a specialist. Under
+`plan-doctrine.md` rule 2, milestones replace phases, and a milestone rarely maps 1:1 to one of
+these eight buckets. The specialist knowledge below still holds; it is now keyed to the **kind of
+work** a milestone or task contains, for the orchestrator to consult at dispatch — never a fixed
+phase index.
+
+### Database / schema work
 - Primary: data-layer-expert
 - Secondary: backend-architect
 
-### Phase 2: Repository
+### Repository / data-access work
 - Primary: python-backend-engineer
 - Secondary: data-layer-expert
 
-### Phase 3: Service
+### Service / business-logic work
 - Primary: backend-architect
 - Secondary: python-backend-engineer
 
-### Phase 4: API
+### API / routing work
 - Primary: python-backend-engineer
 - Secondary: backend-architect
 
-### Phase 5: UI
+### UI / frontend work
 - Primary: ui-engineer-enhanced, frontend-developer
 - Secondary: ui-designer
 
-### Phase 6: Testing
+### Testing work
 - Primary: testing specialist
 - Secondary: Varies by test type
 
-### Phase 7: Documentation
+### Documentation work
 - Primary: documentation-writer
 - Secondary: Varies by doc type
 
-### Phase 8: Deployment
+### Deployment / DevOps work
 - Primary: DevOps
 - Secondary: lead-pm
 
@@ -332,27 +388,47 @@ This reference helps assign the appropriate specialist subagents to implementati
 
 ## Assignment Format
 
-**In Implementation Plans**:
+**DEPRECATED (Claude-5 doctrine)** — the `Assignee` column, `Assigned Subagent(s):` line, and
+per-task agent pins below name a specialist at plan-authoring time. Per `plan-doctrine.md` rule 3,
+plans carry constraints, not identities; the orchestrator resolves the specialist (and, via
+`delegation-router`, the model/provider) at dispatch time. In-flight plans may still carry this
+shape and it still parses/executes:
+
+**Legacy — In Implementation Plans**:
 ```markdown
 | Task ID | Task Name | ... | Assignee | ... |
 |---------|-----------|-----|----------|-----|
 | API-001 | Router Setup | ... | python-backend-engineer | ... |
 ```
 
-**In Progress Tracking**:
+**Legacy — In Progress Tracking**:
 ```markdown
 - [ ] API-001: Router Setup (2 pts)
       Assigned Subagent(s): python-backend-engineer, backend-architect
 ```
 
-**In Phase Breakdowns**:
+**Legacy — In Phase Breakdowns**:
 ```markdown
 **Assigned Subagent(s)**: python-backend-engineer, backend-architect
 ```
 
+**Current shape** — the plan states the capability bar; it names no agent:
+
+```markdown
+| Task ID | Task Name | ... | Capability Bar | ... |
+|---------|-----------|-----|-----------------|-----|
+| API-001 | Router Setup | ... | standard backend implementation | ... |
+```
+
+The orchestrator consults the Task Type to Subagent Mapping tables above (and
+`delegation-router` for the model/provider) to pick the actual specialist when the task is
+dispatched.
+
 ---
 
 ## Available Subagents
+
+May not be all-inclusive; refer to subagent registry in context for full list.
 
 ### Architecture
 - lead-architect
@@ -406,3 +482,6 @@ This reference helps assign the appropriate specialist subagents to implementati
 
 ### DevOps
 - DevOps (not a subagent, but role reference)
+
+### Platform Engineering
+- platform-engineer
