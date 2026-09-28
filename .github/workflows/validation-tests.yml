@@ -2,9 +2,9 @@ name: Validation Tests
 
 on:
   push:
-    branches: [ main, develop, claude/** ]
+    branches: [ main, develop, development, claude/** ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main, develop, development ]
   workflow_dispatch:
 
 jobs:

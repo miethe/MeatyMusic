@@ -2,7 +2,7 @@ name: Determinism Tests
 
 on:
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main, develop, development ]
   schedule:
     # Run determinism tests nightly at 2 AM UTC
     - cron: '0 2 * * *'

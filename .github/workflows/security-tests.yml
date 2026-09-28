@@ -2,9 +2,9 @@ name: Security Testing Framework
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, development ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main, develop, development ]
   schedule:
     # Run security tests nightly at 2 AM UTC
     - cron: '0 2 * * *'
