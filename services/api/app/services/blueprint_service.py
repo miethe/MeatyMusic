@@ -10,21 +10,23 @@ This module implements business logic for blueprint operations including:
 
 from __future__ import annotations
 
-from typing import Optional, Dict, List, Tuple
-from uuid import UUID
-from pathlib import Path
 import json
 import re
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
+from uuid import UUID
+
 import structlog
 
+from app.errors import BadRequestError, NotFoundError
+from app.models.blueprint import Blueprint
 from app.repositories.blueprint_repo import BlueprintRepository
 from app.schemas.blueprint import (
     BlueprintCreate,
-    BlueprintUpdate,
     BlueprintResponse,
+    BlueprintUpdate,
 )
-from app.models.blueprint import Blueprint
-from app.errors import NotFoundError, BadRequestError
+
 from .common import normalize_weights
 
 logger = structlog.get_logger(__name__)
@@ -52,7 +54,7 @@ class BlueprintService:
     BLUEPRINT_DIR = Path("/home/user/MeatyMusic/docs/hit_song_blueprint/AI")
     CONFLICT_MATRIX_PATH = Path("/home/user/MeatyMusic/taxonomies/conflict_matrix.json")
 
-    def __init__(self, blueprint_repo: BlueprintRepository):
+    def __init__(self, blueprint_repo: Optional[BlueprintRepository] = None):
         """Initialize the blueprint service.
 
         Args:
