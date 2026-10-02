@@ -11,21 +11,25 @@ from datetime import datetime
 from typing import Dict, Generator, List
 from unittest.mock import MagicMock
 
-import pytest
-import structlog
-from sqlalchemy import create_engine, event, text
-from sqlalchemy.engine import Engine
-from sqlalchemy.orm import Session, sessionmaker
-from sqlalchemy.pool import StaticPool
-
-from app.core.config import settings
-from app.db.rls import apply_session_context
-from app.models.base import Base
-
 # Set test environment variables
+os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
 os.environ.setdefault("DATABASE_URL_TEST", "sqlite:///:memory:")
+os.environ.setdefault("CLERK_JWKS_URL", "https://test.clerk.accounts.dev/.well-known/jwks.json")
+os.environ.setdefault("CLERK_JWT_ISSUER", "https://test.clerk.accounts.dev")
 os.environ.setdefault("CLERK_JWT_VERIFICATION_KEY", "test-secret")
 os.environ.setdefault("CLERK_WEBHOOK_SECRET", "whsec_test")
+os.environ.setdefault("ENVIRONMENT", "test")
+
+import pytest  # noqa: E402
+import structlog  # noqa: E402
+from sqlalchemy import create_engine, event, text  # noqa: E402
+from sqlalchemy.engine import Engine  # noqa: E402
+from sqlalchemy.orm import Session, sessionmaker  # noqa: E402
+from sqlalchemy.pool import StaticPool  # noqa: E402
+
+from app.core.config import settings  # noqa: E402
+from app.db.rls import apply_session_context  # noqa: E402
+from app.models.base import Base  # noqa: E402
 
 logger = structlog.get_logger(__name__)
 
