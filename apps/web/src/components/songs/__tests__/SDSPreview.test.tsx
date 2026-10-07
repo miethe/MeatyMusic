@@ -61,7 +61,11 @@ describe('SDSPreview', () => {
 
       expect(screen.getByText('Test Song')).toBeInTheDocument();
       expect(screen.getByText('test-song-id-123')).toBeInTheDocument();
-      expect(screen.getByText('42')).toBeInTheDocument();
+      // The "Global Seed" summary card and the raw-JSON preview panel both render the literal
+      // value "42" (the latter now that react-syntax-highlighter actually parses/tokenizes, so
+      // this ambiguity only surfaces once the Jest ESM transform for it is fixed) — assert
+      // presence via getAllByText rather than the single-match getByText.
+      expect(screen.getAllByText('42').length).toBeGreaterThan(0);
     });
 
     it('displays composed prompt section when available', () => {

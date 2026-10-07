@@ -177,10 +177,11 @@ export function PersonaEditor({
           )}
 
           <div>
-            <label className="block text-sm font-medium text-text-primary mb-2">
+            <label htmlFor="persona-name" className="block text-sm font-medium text-text-primary mb-2">
               Persona Name <span className="text-accent-error">*</span>
             </label>
             <input
+              id="persona-name"
               type="text"
               value={formData.name || ''}
               onChange={(e) => updateField('name', e.target.value)}
@@ -218,10 +219,11 @@ export function PersonaEditor({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-text-primary mb-2">
+            <label htmlFor="persona-bio" className="block text-sm font-medium text-text-primary mb-2">
               Bio
             </label>
             <textarea
+              id="persona-bio"
               value={formData.bio || ''}
               onChange={(e) => updateField('bio', e.target.value)}
               placeholder="Brief description of the persona..."
@@ -231,10 +233,11 @@ export function PersonaEditor({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-text-primary mb-2">
+            <label htmlFor="persona-voice" className="block text-sm font-medium text-text-primary mb-2">
               Voice Description
             </label>
             <input
+              id="persona-voice"
               type="text"
               value={formData.voice || ''}
               onChange={(e) => updateField('voice', e.target.value)}
@@ -244,10 +247,11 @@ export function PersonaEditor({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-text-primary mb-2">
+            <label htmlFor="persona-vocal-range" className="block text-sm font-medium text-text-primary mb-2">
               Vocal Range
             </label>
             <select
+              id="persona-vocal-range"
               value={formData.vocal_range || ''}
               onChange={(e) => updateField('vocal_range', e.target.value)}
               className="w-full px-4 py-2 rounded-lg bg-background-tertiary border border-border-secondary text-text-primary focus:outline-none focus:border-border-focus focus:ring-2 focus:ring-border-focus/20 transition-colors"

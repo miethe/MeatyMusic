@@ -1047,7 +1047,15 @@ class ValidationService:
                 "redacted_content": {},
                 "normalized_content": {},
                 "policy_mode": policy_mode,
-                "suggestions": []
+                "suggestions": [],
+                "explicit_allowed": explicit_allowed,
+                "public_release": public_release,
+                "summary": {
+                    "total_violations": 0,
+                    "profanity_count": 0,
+                    "pii_count": 0,
+                    "artist_reference_count": 0
+                }
             }
 
         logger.debug(

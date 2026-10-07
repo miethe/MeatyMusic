@@ -739,14 +739,15 @@ class ProfanityFilter:
             weight = self.severity_weights.get(severity, 0.25)
             total_weight += weight
 
-        # Normalize by text length (violations per 100 words)
+        # Normalize by text length (severity-weighted profanity per word)
         word_count = len(text.split())
         if word_count == 0:
             return 0.0
 
-        # Score = (total_weight / word_count) * 100
-        # This gives a score that scales with density of profanity
-        score = (total_weight / word_count) * 100
+        # Score = total_weight / word_count, so it scales with the density of
+        # profanity ("This damn thing" -> 0.25 / 3 = 0.083). A former "* 100"
+        # factor saturated any text under ~25 words with one mild term at 1.0.
+        score = total_weight / word_count
 
         # Cap at 1.0
         score = min(1.0, score)
@@ -1831,8 +1832,18 @@ class ArtistNormalizer:
         # Add aliases
         all_artist_identifiers.update(self._alias_index.keys())
 
-        # Sort for deterministic ordering
-        sorted_identifiers = sorted(all_artist_identifiers)
+        # Longest first (then alphabetical, for determinism) so a multi-word
+        # name such as "the weeknd" wins over any shorter identifier.
+        sorted_identifiers = sorted(all_artist_identifiers, key=lambda s: (-len(s), s))
+        known_alternation = "|".join(re.escape(i) for i in sorted_identifiers if i)
+
+        # The artist slot matches a known name/alias, or else up to four words
+        # that are fuzzy-matched in detect_artist_references (misspellings).
+        # A lazy "(.+?)\b" here captured only the first word ("Ed", "The").
+        artist_group = (
+            rf"(?:(?P<known>{known_alternation})"
+            r"|(?P<other>[^\W\d_][\w'&.-]*(?:[ \t]+[^\W\d_][\w'&.-]*){0,3}))"
+        )
 
         # Build patterns for each template
         for pattern_config in self.normalization_patterns:
@@ -1845,11 +1856,12 @@ class ArtistNormalizer:
             # Escape special regex characters except {artist}
             escaped_template = pattern_template.replace("{artist}", "ARTIST_PLACEHOLDER")
             escaped_template = re.escape(escaped_template)
-            escaped_template = escaped_template.replace("ARTIST_PLACEHOLDER", "(.+?)")
+            escaped_template = escaped_template.replace("ARTIST_PLACEHOLDER", artist_group)
 
-            # Create pattern that matches the template with artist capture
+            # Create pattern that matches the template with artist capture.
+            # (?!\w) rather than \b so names ending in punctuation still match.
             pattern_regex = re.compile(
-                rf'\b{escaped_template}\b',
+                rf'\b{escaped_template}(?!\w)',
                 re.IGNORECASE
             )
 
@@ -1990,37 +2002,50 @@ class ArtistNormalizer:
         )
 
         references: List[ArtistReference] = []
-        detected_positions: Set[int] = set()
+        detected_spans: List[Tuple[int, int]] = []
 
-        # Check each compiled pattern
+        # Check each compiled pattern (taxonomy order: "sounds like" before "like")
         for pattern_template, pattern_regex, replacement_template in self._compiled_patterns:
             for match in pattern_regex.finditer(text):
                 position = match.start()
 
-                # Skip if we already detected a reference at this position
-                if position in detected_positions:
-                    continue
-
-                # Extract the artist name from the capture group
-                try:
-                    captured_artist = match.group(1)
-                except IndexError:
-                    continue
-
-                # Try to match the captured artist to a known artist
-                artist_name_lower = captured_artist.lower().strip()
-
-                # Try exact match first
-                matched_artist = None
-                if artist_name_lower in self._artist_index:
-                    matched_artist = artist_name_lower
-                elif artist_name_lower in self._alias_index:
-                    matched_artist = self._alias_index[artist_name_lower]
+                # (candidate artist text, end of the reference span)
+                if match.group("known") is not None:
+                    candidates = [(match.group("known"), match.end())]
                 else:
-                    # Try fuzzy match
-                    matched_artist = self._fuzzy_match_artist(captured_artist)
+                    other = match.group("other")
+                    other_start = match.start("other")
+                    word_ends = [m.end() for m in re.finditer(r"\S+", other)]
+                    if match.end("other") == match.end():
+                        # Artist ends the template: try the longest word prefix
+                        # first ("Kendric Lamar with ..." -> "Kendric Lamar")
+                        candidates = [
+                            (other[:end], other_start + end) for end in reversed(word_ends)
+                        ]
+                    else:
+                        # A suffix follows ("{artist} vibes"): the slot is fixed
+                        candidates = [(other, match.end())]
+
+                matched_artist = None
+                span_end = match.end()
+                artist_name_lower = ""
+                for candidate, candidate_end in candidates:
+                    artist_name_lower = candidate.lower().strip()
+                    if artist_name_lower in self._artist_index:
+                        matched_artist = artist_name_lower
+                    elif artist_name_lower in self._alias_index:
+                        matched_artist = self._alias_index[artist_name_lower]
+                    else:
+                        matched_artist = self._fuzzy_match_artist(candidate)
+                    if matched_artist:
+                        span_end = candidate_end
+                        break
 
                 if not matched_artist:
+                    continue
+
+                # Skip a reference overlapping one already detected
+                if any(position < end and start < span_end for start, end in detected_spans):
                     continue
 
                 # Get artist data
@@ -2049,7 +2074,7 @@ class ArtistNormalizer:
                     artist_name=artist_name,
                     position=position,
                     pattern_used=pattern_template,
-                    matched_text=match.group(),
+                    matched_text=text[position:span_end],
                     generic_replacement=generic_replacement,
                     requires_normalization=True,
                     confidence=1.0 if artist_name_lower in self._artist_index else 0.9,
@@ -2058,14 +2083,14 @@ class ArtistNormalizer:
                 )
 
                 references.append(reference)
-                detected_positions.add(position)
+                detected_spans.append((position, span_end))
 
                 logger.debug(
                     "artist_normalizer.reference_detected",
                     artist=artist_name,
                     position=position,
                     pattern=pattern_template,
-                    matched=match.group()
+                    matched=text[position:span_end]
                 )
 
         # Sort by position for deterministic ordering

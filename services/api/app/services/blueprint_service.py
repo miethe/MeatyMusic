@@ -18,6 +18,7 @@ from uuid import UUID
 
 import structlog
 
+from app.core import paths
 from app.errors import BadRequestError, NotFoundError
 from app.models.blueprint import Blueprint
 from app.repositories.blueprint_repo import BlueprintRepository
@@ -50,9 +51,9 @@ class BlueprintService:
         CONFLICT_MATRIX_PATH: Path to conflict matrix JSON file
     """
 
-    # Class-level paths (absolute paths as per requirements)
-    BLUEPRINT_DIR = Path("/home/user/MeatyMusic/docs/hit_song_blueprint/AI")
-    CONFLICT_MATRIX_PATH = Path("/home/user/MeatyMusic/taxonomies/conflict_matrix.json")
+    # Class-level paths, resolved from the repo root (see app.core.paths)
+    BLUEPRINT_DIR = paths.BLUEPRINT_DIR
+    CONFLICT_MATRIX_PATH = paths.CONFLICT_MATRIX_PATH
 
     def __init__(self, blueprint_repo: Optional[BlueprintRepository] = None):
         """Initialize the blueprint service.

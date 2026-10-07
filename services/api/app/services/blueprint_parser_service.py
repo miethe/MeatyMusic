@@ -16,9 +16,10 @@ The parser extracts:
 from __future__ import annotations
 
 import re
-from pathlib import Path
 from typing import Dict, List, Optional, Any
 import structlog
+
+from app.core import paths
 
 logger = structlog.get_logger(__name__)
 
@@ -33,8 +34,8 @@ class BlueprintParserService:
         BLUEPRINT_DIR: Path to blueprint markdown files
     """
 
-    # Class-level path (absolute path as per requirements)
-    BLUEPRINT_DIR = Path("/home/user/MeatyMusic/docs/hit_song_blueprint/AI")
+    # Class-level path, resolved from the repo root (see app.core.paths)
+    BLUEPRINT_DIR = paths.BLUEPRINT_DIR
 
     def __init__(self):
         """Initialize the blueprint parser service."""

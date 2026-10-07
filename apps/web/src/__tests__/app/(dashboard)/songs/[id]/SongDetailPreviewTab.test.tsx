@@ -27,10 +27,13 @@ jest.mock('@/hooks/api', () => ({
   useSDS: jest.fn(),
 }));
 
-// Mock API
-jest.mock('@/lib/api', () => ({
+// Mock API — page.tsx imports songsApi from '@/lib/api/songs' directly (not from '@/lib/api'),
+// so we must mock that exact module path, not the barrel re-export.
+jest.mock('@/lib/api/songs', () => ({
   songsApi: {
     export: jest.fn(),
+    get: jest.fn(),
+    delete: jest.fn(),
   },
 }));
 
@@ -163,8 +166,12 @@ describe('Song Detail Page - Preview Tab', () => {
       error: null,
     } as any);
 
+    // Use a stable mock object so the same `addToast` fn reference is always returned —
+    // if a fresh object is created on every call, the assertion `mockUseUIStore().addToast`
+    // in waitFor gets a different jest.fn() instance from the one the component called.
+    const mockToast = jest.fn();
     mockUseUIStore.mockReturnValue({
-      addToast: jest.fn(),
+      addToast: mockToast,
     } as any);
   });
 
@@ -337,7 +344,8 @@ describe('Song Detail Page - Preview Tab', () => {
       expect(screen.getByText(mockSDS.song_id)).toBeInTheDocument();
 
       expect(screen.getAllByText('Title')[0]).toBeInTheDocument(); // First Title label
-      expect(screen.getByText(mockSDS.title)).toBeInTheDocument();
+      // The song title renders in the page header <h1> and again in the metadata section.
+      expect(screen.getAllByText(mockSDS.title).length).toBeGreaterThanOrEqual(2);
 
       expect(screen.getAllByText('Global Seed')[0]).toBeInTheDocument(); // First Global Seed label
       expect(screen.getByText(String(mockSDS.global_seed))).toBeInTheDocument();
@@ -378,10 +386,15 @@ describe('Song Detail Page - Preview Tab', () => {
         expect(mockSongsApi.export).toHaveBeenCalledWith('song-123');
       });
 
-      expect(mockUseUIStore().addToast).toHaveBeenCalledWith(
-        'SDS exported successfully',
-        'success'
-      );
+      // Use the stable mockToast reference (set in beforeEach), not a fresh object from
+      // mockUseUIStore() — each call to mockUseUIStore() returns the same stable object
+      // now, but chaining .addToast off a new call is the previous-bug shape.
+      await waitFor(() => {
+        expect(mockUseUIStore().addToast).toHaveBeenCalledWith(
+          'SDS exported successfully',
+          'success'
+        );
+      });
     });
 
     it('should show error toast when export fails', async () => {

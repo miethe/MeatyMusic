@@ -12,6 +12,10 @@ import { POV, Tense, HookStrategy } from '@/types/api/entities';
 // Mock the hooks
 jest.mock('@/hooks/api/useLyrics', () => ({
   useLyricsList: jest.fn(() => ({ data: { items: [] }, isLoading: false })),
+  useCheckProfanity: jest.fn(() => ({
+    mutate: jest.fn(),
+    isPending: false,
+  })),
 }));
 
 const createQueryClient = () =>

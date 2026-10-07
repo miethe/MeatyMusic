@@ -154,7 +154,9 @@ describe('ErrorBoundary', () => {
       const showDetailsButton = screen.getByText(/show error details/i);
       fireEvent.click(showDetailsButton);
 
-      expect(screen.getByText(/Detailed error/i)).toBeInTheDocument();
+      // After expansion the error message ("Detailed error") appears both in the human-readable
+      // <p> and in the raw stack trace <pre>, so scope the check to the <p> tag.
+      expect(screen.getByText('Detailed error', { selector: 'p' })).toBeInTheDocument();
     });
 
     it('should hide error details when hide button clicked', () => {
@@ -167,12 +169,12 @@ describe('ErrorBoundary', () => {
       // Show details
       const showDetailsButton = screen.getByText(/show error details/i);
       fireEvent.click(showDetailsButton);
-      expect(screen.getByText(/Detailed error/i)).toBeInTheDocument();
+      expect(screen.getByText('Detailed error', { selector: 'p' })).toBeInTheDocument();
 
       // Hide details
       const hideDetailsButton = screen.getByText(/hide error details/i);
       fireEvent.click(hideDetailsButton);
-      expect(screen.queryByText(/Detailed error/i)).not.toBeInTheDocument();
+      expect(screen.queryByText('Detailed error', { selector: 'p' })).not.toBeInTheDocument();
     });
   });
 
@@ -186,8 +188,9 @@ describe('ErrorBoundary', () => {
 
       expect(screen.getByText(/something went wrong/i)).toBeInTheDocument();
 
-      // Click Try Again (this will attempt to re-render, but component will still error)
-      const tryAgainButton = screen.getByText(/try again/i);
+      // "Try Again" text also appears in the default error message ("Please try again."),
+      // so scope to the button element.
+      const tryAgainButton = screen.getByText('Try Again', { selector: 'button' });
       fireEvent.click(tryAgainButton);
 
       // Since component still errors, we should see error UI again
@@ -208,8 +211,8 @@ describe('ErrorBoundary', () => {
       // Fix the error
       shouldError = false;
 
-      // Click Try Again
-      const tryAgainButton = screen.getByText(/try again/i);
+      // Click Try Again (scope to button to avoid the "Please try again." message match)
+      const tryAgainButton = screen.getByText('Try Again', { selector: 'button' });
       fireEvent.click(tryAgainButton);
 
       // Should show working component now
@@ -348,8 +351,8 @@ describe('ErrorBoundary', () => {
 
       expect(screen.getByText(/something went wrong/i)).toBeInTheDocument();
 
-      // Reset
-      const tryAgainButton = screen.getByText(/try again/i);
+      // "Try Again" matches the "Please try again." message text too, so scope to button.
+      const tryAgainButton = screen.getByText('Try Again', { selector: 'button' });
       fireEvent.click(tryAgainButton);
 
       // New error

@@ -213,10 +213,11 @@ export function BlueprintEditor({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
+              <label htmlFor="blueprint-genre" className="block text-sm font-medium text-text-primary mb-2">
                 Genre <span className="text-accent-error">*</span>
               </label>
               <select
+                id="blueprint-genre"
                 value={formData.genre || ''}
                 onChange={(e) => updateField('genre', e.target.value)}
                 className="w-full px-4 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"
@@ -231,10 +232,11 @@ export function BlueprintEditor({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
+              <label htmlFor="blueprint-version" className="block text-sm font-medium text-text-primary mb-2">
                 Version
               </label>
               <input
+                id="blueprint-version"
                 type="text"
                 value={formData.version || '1.0'}
                 onChange={(e) => updateField('version', e.target.value)}
@@ -323,10 +325,11 @@ export function BlueprintEditor({
             </h3>
 
             <div>
-              <label className="block text-xs font-medium text-text-secondary mb-1">
+              <label htmlFor="blueprint-min-total" className="block text-xs font-medium text-text-secondary mb-1">
                 Minimum Total Score
               </label>
               <input
+                id="blueprint-min-total"
                 type="number"
                 min="0"
                 max="10"
@@ -340,10 +343,11 @@ export function BlueprintEditor({
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-text-secondary mb-1">
+              <label htmlFor="blueprint-max-profanity" className="block text-xs font-medium text-text-secondary mb-1">
                 Maximum Profanity Score
               </label>
               <input
+                id="blueprint-max-profanity"
                 type="number"
                 min="0"
                 max="10"

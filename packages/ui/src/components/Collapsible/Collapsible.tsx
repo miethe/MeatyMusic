@@ -15,18 +15,30 @@ const CollapsibleTrigger = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof CollapsiblePrimitive.CollapsibleTrigger> & {
     showIcon?: boolean;
   }
->(({ className, children, showIcon = true, ...props }, ref) => (
+>(({ className, children, showIcon = true, asChild, ...props }, ref) => (
   <CollapsiblePrimitive.CollapsibleTrigger
     ref={ref}
+    asChild={asChild}
     className={cn(
       "flex w-full items-center justify-between py-4 text-sm font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180",
       className
     )}
     {...props}
   >
-    {children}
-    {showIcon && (
-      <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
+    {/* In `asChild` mode Radix's Slot clones a SINGLE child element and requires exactly
+        one — the caller owns everything that renders, including any icon — so injecting a
+        second ChevronDown sibling here throws "React.Children.only expected to receive a
+        single React element child." Only auto-inject the icon in the normal (non-asChild)
+        rendering path. */}
+    {asChild ? (
+      children
+    ) : (
+      <>
+        {children}
+        {showIcon && (
+          <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
+        )}
+      </>
     )}
   </CollapsiblePrimitive.CollapsibleTrigger>
 ));
