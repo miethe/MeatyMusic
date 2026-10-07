@@ -28,6 +28,14 @@ jest.mock('@/lib/api/songs', () => ({
   },
 }));
 
+// Mock the zustand useUIStore HOOK (not just getState): the component calls
+// `const { addToast } = useUIStore()` at the hook call-site, so spying on `getState`
+// never reaches the component's live addToast reference.
+jest.mock('@/stores', () => ({
+  useUIStore: jest.fn(),
+}));
+const mockUseUIStoreFn = require('@/stores').useUIStore as jest.MockedFunction<typeof useUIStore>;
+
 jest.mock('@/hooks/api/useSongs', () => ({
   useSong: () => ({
     data: mockSong,
@@ -94,16 +102,16 @@ describe('SongExport', () => {
   let mockAppendChild: jest.Mock;
   let mockRemoveChild: jest.Mock;
   let mockClick: jest.Mock;
+  // Stored before any spy is installed, used as the non-'a' fallback inside the mock.
+  let originalCreateElement: typeof document.createElement;
 
   beforeEach(() => {
     // Reset all mocks
     jest.clearAllMocks();
 
-    // Mock toast store
+    // Mock toast store: wire the mock hook to return { addToast: mockFn }
     mockAddToast = jest.fn();
-    jest.spyOn(useUIStore, 'getState').mockReturnValue({
-      addToast: mockAddToast,
-    } as any);
+    mockUseUIStoreFn.mockReturnValue({ addToast: mockAddToast } as any);
 
     // Mock URL methods
     mockCreateObjectURL = jest.fn().mockReturnValue('blob:mock-url');
@@ -111,23 +119,50 @@ describe('SongExport', () => {
     global.URL.createObjectURL = mockCreateObjectURL;
     global.URL.revokeObjectURL = mockRevokeObjectURL;
 
+    // Capture the REAL createElement before the spy is installed so the fallback path
+    // inside the mock does not recurse into itself.
+    originalCreateElement = document.createElement.bind(document);
+
     // Mock DOM methods
     mockAppendChild = jest.fn();
     mockRemoveChild = jest.fn();
     mockClick = jest.fn();
 
-    jest.spyOn(document.body, 'appendChild').mockImplementation(mockAppendChild);
-    jest.spyOn(document.body, 'removeChild').mockImplementation(mockRemoveChild);
-    jest.spyOn(document, 'createElement').mockImplementation((tagName: string) => {
-      if (tagName === 'a') {
-        return {
-          click: mockClick,
-          href: '',
-          download: '',
-        } as any;
+    // NOTE: @testing-library/react's render() creates its container via:
+    //   container = baseElement.appendChild(document.createElement('div'))
+    // If appendChild is mocked to a fn that returns `undefined`, createRoot(undefined) throws.
+    // So only mock appendChild for non-Element arguments (i.e. anchor elements added by export
+    // code) — for real DOM elements, call through so testing-library gets its container back.
+    const realAppendChild = document.body.appendChild.bind(document.body);
+    jest.spyOn(document.body, 'appendChild').mockImplementation((child: Node) => {
+      if (child instanceof HTMLAnchorElement) {
+        return mockAppendChild(child);
       }
-      return document.createElement(tagName);
+      return realAppendChild(child);
     });
+    const realRemoveChild = document.body.removeChild.bind(document.body);
+    jest.spyOn(document.body, 'removeChild').mockImplementation((child: Node) => {
+      if (child instanceof HTMLAnchorElement) {
+        return mockRemoveChild(child);
+      }
+      return realRemoveChild(child);
+    });
+    // Intercept anchor creation only: store a reference to the REAL createElement so the
+    // fallback branch doesn't recurse.  Because jest.spyOn replaces document.createElement,
+    // we capture the original first (done above, before the spy is installed).
+    // We replace document.createElement only on the document-level prototype so React's
+    // internal calls (which use the same function internally) still get real DOM elements.
+    // Strategy: spy returns a fake anchor for 'a', calls original for everything else.
+    jest.spyOn(document, 'createElement').mockImplementation(
+      function(this: Document, tagName: string, options?: ElementCreationOptions) {
+        if (tagName === 'a') {
+          const fakeAnchor = originalCreateElement('a') as HTMLAnchorElement;
+          fakeAnchor.click = mockClick;
+          return fakeAnchor;
+        }
+        return originalCreateElement.call(this, tagName, options);
+      } as typeof document.createElement
+    );
   });
 
   afterEach(() => {
@@ -137,9 +172,11 @@ describe('SongExport', () => {
   it('should render export button in header actions', () => {
     renderWithProviders(<SongDetailPage />);
 
-    const exportButton = screen.getByRole('button', { name: /export sds/i });
-    expect(exportButton).toBeDefined();
-    expect(exportButton).not.toBeDisabled();
+    // The page renders an "Export SDS" button both in the header and in the Quick Actions
+    // section, so use getAllByRole and verify at least one is present.
+    const exportButtons = screen.getAllByRole('button', { name: /export sds/i });
+    expect(exportButtons.length).toBeGreaterThan(0);
+    expect(exportButtons[0]).not.toBeDisabled();
   });
 
   it('should render export button in quick actions', () => {
@@ -164,7 +201,7 @@ describe('SongExport', () => {
 
     renderWithProviders(<SongDetailPage />);
 
-    const exportButton = screen.getByRole('button', { name: /export sds/i });
+    const exportButton = screen.getAllByRole('button', { name: /export sds/i })[0];
     fireEvent.click(exportButton);
 
     await waitFor(() => {
@@ -193,7 +230,7 @@ describe('SongExport', () => {
 
     renderWithProviders(<SongDetailPage />);
 
-    const exportButton = screen.getByRole('button', { name: /export sds/i });
+    const exportButton = screen.getAllByRole('button', { name: /export sds/i })[0];
     fireEvent.click(exportButton);
 
     await waitFor(() => {
@@ -216,7 +253,7 @@ describe('SongExport', () => {
 
     renderWithProviders(<SongDetailPage />);
 
-    const exportButton = screen.getByRole('button', { name: /export sds/i });
+    const exportButton = screen.getAllByRole('button', { name: /export sds/i })[0];
     fireEvent.click(exportButton);
 
     // Should show loading spinner
@@ -248,7 +285,7 @@ describe('SongExport', () => {
 
     renderWithProviders(<SongDetailPage />);
 
-    const exportButton = screen.getByRole('button', { name: /export sds/i });
+    const exportButton = screen.getAllByRole('button', { name: /export sds/i })[0];
     fireEvent.click(exportButton);
 
     await waitFor(() => {
@@ -264,7 +301,7 @@ describe('SongExport', () => {
 
     renderWithProviders(<SongDetailPage />);
 
-    const exportButton = screen.getByRole('button', { name: /export sds/i });
+    const exportButton = screen.getAllByRole('button', { name: /export sds/i })[0];
     fireEvent.click(exportButton);
 
     await waitFor(() => {
@@ -282,7 +319,7 @@ describe('SongExport', () => {
 
     renderWithProviders(<SongDetailPage />);
 
-    const exportButton = screen.getByRole('button', { name: /export sds/i });
+    const exportButton = screen.getAllByRole('button', { name: /export sds/i })[0];
     fireEvent.click(exportButton);
 
     await waitFor(() => {
@@ -297,7 +334,7 @@ describe('SongExport', () => {
 
     renderWithProviders(<SongDetailPage />);
 
-    const exportButton = screen.getByRole('button', { name: /export sds/i });
+    const exportButton = screen.getAllByRole('button', { name: /export sds/i })[0];
     fireEvent.click(exportButton);
 
     await waitFor(() => {
@@ -326,16 +363,23 @@ describe('SongExport', () => {
 
     renderWithProviders(<SongDetailPage />);
 
-    const exportButton = screen.getByRole('button', { name: /export sds/i });
+    const exportButton = screen.getAllByRole('button', { name: /export sds/i })[0];
     fireEvent.click(exportButton);
 
     await waitFor(() => {
       expect(songsApi.export).toHaveBeenCalled();
     });
 
-    // Verify blob contains valid JSON
+    // Verify blob contains valid JSON by decoding it via FileReader (Blob.text() is absent
+    // in jsdom 20, which ships a Blob from the WHATWG spec without the text() convenience
+    // method added later).
     const result = await songsApi.export('test-song-id-123');
-    const text = await result.blob.text();
+    const textPromise = new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.readAsText(result.blob);
+    });
+    const text = await textPromise;
     const parsed = JSON.parse(text);
     expect(parsed).toEqual(validJson);
   });
@@ -350,7 +394,7 @@ describe('SongExport', () => {
 
     renderWithProviders(<SongDetailPage />);
 
-    const exportButton = screen.getByRole('button', { name: /export sds/i });
+    const exportButton = screen.getAllByRole('button', { name: /export sds/i })[0];
 
     // Initially enabled
     expect(exportButton).not.toBeDisabled();
@@ -386,7 +430,7 @@ describe('SongExport', () => {
 
     renderWithProviders(<SongDetailPage />);
 
-    const exportButton = screen.getByRole('button', { name: /export sds/i });
+    const exportButton = screen.getAllByRole('button', { name: /export sds/i })[0];
     fireEvent.click(exportButton);
 
     await waitFor(() => {

@@ -160,8 +160,8 @@ export const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
         <StatusBadge status={status} />
       </div>
 
-      {/* Progress Bar (if running) */}
-      {isRunning && (
+      {/* Progress Bar (while running, or whenever an explicit `progress` prop is given) */}
+      {(isRunning || progressProp !== undefined) && (
         <div className="mb-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-text-secondary">
@@ -220,14 +220,19 @@ export const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
       </div>
 
       {/* Validation Scores (if complete) */}
-      {scores && isComplete && (
+      {/* `scores` may be `{}` before VALIDATE reports; don't render an empty section */}
+      {scores && Object.keys(scores).length > 0 && isComplete && (
         <div className="mt-4 pt-4 border-t border-border/10">
           <div className="text-xs text-text-tertiary mb-3">Validation Scores</div>
           <div className="space-y-2">
             {Object.entries(scores).map(([key, score]) => (
               <div key={key} className="flex items-center justify-between">
-                <span className="text-xs text-text-secondary capitalize">
-                  {key.replace(/_/g, ' ')}
+                {/* Sentence-case in the text itself; CSS `capitalize` only changed the look */}
+                <span className="text-xs text-text-secondary">
+                  {(() => {
+                    const label = key.replace(/_/g, ' ');
+                    return label.charAt(0).toUpperCase() + label.slice(1);
+                  })()}
                 </span>
                 <div className="flex items-center gap-2">
                   <div className="w-24 h-1.5 bg-background-tertiary rounded-full overflow-hidden">
