@@ -712,6 +712,8 @@ def add_profanity_terms(terms: List[str]) -> None:
     """Add additional terms to profanity filter.
 
     Note: This function is deprecated. Modify profanity_lists.json instead.
+    It still extends the global filter at runtime (category "custom") so
+    existing callers keep working.
 
     Args:
         terms: List of terms to add (will be lowercased)
@@ -720,6 +722,16 @@ def add_profanity_terms(terms: List[str]) -> None:
         "profanity_filter.add_terms_deprecated",
         message="add_profanity_terms() is deprecated. Modify profanity_lists.json instead."
     )
+
+    profanity_filter = get_profanity_filter()
+    added = 0
+    for term in terms:
+        term_lower = term.lower().strip()
+        if term_lower and term_lower not in profanity_filter._word_to_category:
+            profanity_filter._word_to_category[term_lower] = ("custom", 0.5)
+            added += 1
+
+    logger.info("profanity_filter.terms_added", added_count=added)
 
 
 def get_profanity_list() -> Set[str]:

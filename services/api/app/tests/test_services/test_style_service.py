@@ -10,7 +10,7 @@ This test suite verifies:
 
 import uuid
 import pytest
-from unittest.mock import MagicMock, Mock, patch, AsyncMock
+from unittest.mock import MagicMock
 
 from app.services.style_service import StyleService
 from app.repositories.style_repo import StyleRepository
@@ -66,14 +66,10 @@ class TestStyleService:
             tenant_id=tenant_id,
             owner_id=owner_id
         )
-        mock_repo.create = AsyncMock(return_value=mock_style)
+        mock_repo.create = MagicMock(return_value=mock_style)
 
         # Call service
-        result = await service.create_style(
-            data=valid_style_create,
-            tenant_id=tenant_id,
-            owner_id=owner_id
-        )
+        result = await service.create_style(data=valid_style_create)
 
         # Verify result
         assert result is not None
@@ -94,13 +90,13 @@ class TestStyleService:
 
     def test_validate_tag_conflicts_era_conflict(self, service):
         """Test tag conflict validation with era conflict."""
-        tags = ["1940s", "1980s"]  # Multiple eras not allowed
+        tags = ["Era:1940s", "Era:1980s"]  # Multiple eras not allowed
 
         # Should raise ValueError
         with pytest.raises(ValueError) as exc_info:
             service._validate_tag_conflicts(tags)
 
-        assert "Only one era tag allowed" in str(exc_info.value)
+        assert "Only one era tag is allowed" in str(exc_info.value)
 
     def test_validate_tag_conflicts_energy_conflict(self, service):
         """Test tag conflict validation with energy conflict."""
@@ -110,7 +106,7 @@ class TestStyleService:
         with pytest.raises(ValueError) as exc_info:
             service._validate_tag_conflicts(tags)
 
-        assert "Conflicting energy tags" in str(exc_info.value)
+        assert "conflicts with" in str(exc_info.value) and "anthemic" in str(exc_info.value)
 
     def test_validate_tag_conflicts_intimate_stadium(self, service):
         """Test tag conflict validation with intimate vs stadium."""
@@ -119,7 +115,7 @@ class TestStyleService:
         with pytest.raises(ValueError) as exc_info:
             service._validate_tag_conflicts(tags)
 
-        assert "Conflicting energy tags" in str(exc_info.value)
+        assert "conflicts with" in str(exc_info.value) and "stadium" in str(exc_info.value)
 
     def test_validate_energy_tempo_coherence_valid(self, service):
         """Test energy/tempo coherence with valid data."""
@@ -146,7 +142,7 @@ class TestStyleService:
                 bpm_max=80
             )
 
-        assert "High energy" in str(exc_info.value) and "slow BPM" in str(exc_info.value)
+        assert "High energy" in str(exc_info.value) and "slow tempo" in str(exc_info.value)
 
     def test_validate_energy_tempo_coherence_low_energy_fast_bpm(self, service):
         """Test low energy with fast BPM (incoherent)."""
@@ -158,7 +154,7 @@ class TestStyleService:
                 bpm_max=170
             )
 
-        assert "Low energy" in str(exc_info.value) and "fast BPM" in str(exc_info.value)
+        assert "Low energy" in str(exc_info.value) and "fast tempo" in str(exc_info.value)
 
     def test_validate_energy_tempo_coherence_no_energy(self, service):
         """Test validation with no energy level (optional)."""
@@ -200,20 +196,13 @@ class TestStyleService:
             bpm_max=130,
             energy_level=8,
             instrumentation=["synth"],
-            tags_positive=["1940s", "1980s"],  # Conflicting eras
+            tags_positive=["Era:1940s", "Era:1980s"],  # Conflicting eras
             tags_negative=[]
         )
 
-        tenant_id = uuid.uuid4()
-        owner_id = uuid.uuid4()
-
         # Should raise ValueError before repository is called
         with pytest.raises(ValueError) as exc_info:
-            await service.create_style(
-                data=style_data,
-                tenant_id=tenant_id,
-                owner_id=owner_id
-            )
+            await service.create_style(data=style_data)
 
         # Repository should not be called
         assert not mock_repo.create.called
@@ -232,16 +221,9 @@ class TestStyleService:
             tags_negative=[]
         )
 
-        tenant_id = uuid.uuid4()
-        owner_id = uuid.uuid4()
-
         # Should raise ValueError before repository is called
         with pytest.raises(ValueError) as exc_info:
-            await service.create_style(
-                data=style_data,
-                tenant_id=tenant_id,
-                owner_id=owner_id
-            )
+            await service.create_style(data=style_data)
 
         # Repository should not be called
         assert not mock_repo.create.called
@@ -265,8 +247,8 @@ class TestStyleService:
             tenant_id=uuid.uuid4(),
             owner_id=uuid.uuid4()
         )
-        mock_repo.get_by_id = AsyncMock(return_value=mock_style)
-        mock_repo.update = AsyncMock(return_value=mock_style)
+        mock_repo.get_by_id = MagicMock(return_value=mock_style)
+        mock_repo.update = MagicMock(return_value=mock_style)
 
         # Call service
         result = await service.update_style(style_id, update_data)

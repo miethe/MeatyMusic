@@ -14,8 +14,8 @@ This test suite verifies:
 import uuid
 import pytest
 from datetime import datetime, timezone
-from unittest.mock import MagicMock, AsyncMock, patch
-from contextlib import asynccontextmanager
+from unittest.mock import MagicMock, patch
+from contextlib import contextmanager
 
 from app.services.producer_notes_service import ProducerNotesService
 from app.repositories.producer_notes_repo import ProducerNotesRepository
@@ -32,11 +32,8 @@ class TestProducerNotesService:
 
     @pytest.fixture
     def mock_session(self):
-        """Mock async session."""
-        session = AsyncMock()
-        session.commit = AsyncMock()
-        session.rollback = AsyncMock()
-        return session
+        """Mock synchronous session."""
+        return MagicMock()
 
     @pytest.fixture
     def mock_repo(self):
@@ -59,8 +56,8 @@ class TestProducerNotesService:
         service = ProducerNotesService(session=mock_session, repo=mock_repo)
 
         # Mock the transaction context manager
-        @asynccontextmanager
-        async def mock_transaction():
+        @contextmanager
+        def mock_transaction():
             yield
 
         service.transaction = mock_transaction
@@ -75,8 +72,8 @@ class TestProducerNotesService:
             blueprint_repo=mock_blueprint_repo
         )
 
-        @asynccontextmanager
-        async def mock_transaction():
+        @contextmanager
+        def mock_transaction():
             yield
 
         service.transaction = mock_transaction
@@ -181,7 +178,7 @@ class TestProducerNotesService:
         # Verify
         assert result is not None
         assert result.id == notes_id
-        mock_repo.get_by_id.assert_called_once_with(ProducerNotes, notes_id)
+        mock_repo.get_by_id.assert_called_once_with(notes_id)
 
     @pytest.mark.asyncio
     async def test_update_producer_notes(self, service, mock_repo):
@@ -254,7 +251,7 @@ class TestProducerNotesService:
 
         # Verify
         assert result is True
-        mock_repo.delete.assert_called_once_with(ProducerNotes, notes_id)
+        mock_repo.delete.assert_called_once_with(notes_id)
 
     @pytest.mark.asyncio
     async def test_get_by_song_id(self, service, mock_repo):

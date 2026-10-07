@@ -57,7 +57,7 @@ class StyleService:
             self._validate_energy_tempo_coherence(data.energy_level, data.bpm_min, data.bpm_max)
 
         # Create via repository
-        style = await self.style_repo.create(data)
+        style = self.style_repo.create(data)
 
         logger.info(
             "style.created",
@@ -82,7 +82,7 @@ class StyleService:
             ValueError: If validation fails
         """
         # Get existing style
-        existing = await self.style_repo.get_by_id(style_id)
+        existing = self.style_repo.get_by_id(style_id)
         if not existing:
             return None
 
@@ -102,7 +102,7 @@ class StyleService:
             self._validate_energy_tempo_coherence(energy, bpm_min, bpm_max)
 
         # Update via repository
-        style = await self.style_repo.update(style_id, data)
+        style = self.style_repo.update(style_id, data)
 
         logger.info(
             "style.updated",
@@ -121,7 +121,7 @@ class StyleService:
         Returns:
             True if deleted, False if not found
         """
-        success = await self.style_repo.delete(style_id)
+        success = self.style_repo.delete(style_id)
 
         if success:
             logger.info("style.deleted", style_id=str(style_id))
@@ -137,12 +137,12 @@ class StyleService:
         Returns:
             List of style entities
         """
-        return await self.style_repo.get_by_genre(genre)
+        return self.style_repo.get_by_genre(genre)
 
     def _validate_tag_conflicts(
         self,
         tags: List[str],
-        blueprint_id: Optional[UUID]
+        blueprint_id: Optional[UUID] = None
     ) -> None:
         """Validate that tags don't conflict with each other.
 
@@ -189,7 +189,7 @@ class StyleService:
 
     def _validate_energy_tempo_coherence(
         self,
-        energy_level: int,
+        energy_level: Optional[int],
         bpm_min: Optional[int],
         bpm_max: Optional[int]
     ) -> None:
@@ -198,14 +198,14 @@ class StyleService:
         High energy songs should not have very slow tempos and vice versa.
 
         Args:
-            energy_level: Energy level (1-10)
+            energy_level: Energy level (1-10), optional
             bpm_min: Minimum BPM
             bpm_max: Maximum BPM (optional)
 
         Raises:
             ValueError: If energy and tempo are incoherent
         """
-        if not bpm_min:
+        if energy_level is None or not bpm_min:
             return
 
         avg_bpm = bpm_max if bpm_max else bpm_min
