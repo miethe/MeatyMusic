@@ -40,7 +40,7 @@ The reconcile command's final summary says `0 deployed`, but the same run update
 
 ## PR and landing blocker
 
-Commits are present locally on `feat/meatymusic-v2-standup` through `733c250fac892b7e3483b9986ccbda5e4c794552`. Publishing the branch through the sanctioned wrapper failed:
+The initial publishing attempt used local head `733c250fac892b7e3483b9986ccbda5e4c794552`; that push failed. Later commits only updated the standup evidence. Publishing the branch through the sanctioned wrapper failed:
 
 ```text
 aos-git push origin HEAD:refs/heads/feat/meatymusic-v2-standup
