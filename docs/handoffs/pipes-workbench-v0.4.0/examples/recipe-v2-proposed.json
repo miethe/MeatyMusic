@@ -1,0 +1,157 @@
+{
+  "schema": "meatymusic.sds",
+  "schema_version": "2.0",
+  "id": "recipe_ridgeline",
+  "revision": 1,
+  "legacy_id": null,
+  "asset_kind": "score",
+  "title": "Sarod on the Ridgeline",
+  "identity_profile_ref": "house-symphonic-candidate",
+  "vocal_mode": "instrumental",
+  "style": {
+    "roots": [
+      "symphonic folk adventure",
+      "progressive bluegrass",
+      "Indian chamber fusion"
+    ],
+    "moods": [
+      "curious",
+      "warm"
+    ],
+    "production": "Tactile acoustic detail, clear soloists, deep natural hall and patient dynamic growth.",
+    "tonality": {
+      "description": "Modal warmth and open fifths",
+      "tonic": null,
+      "mode": null,
+      "tuning_ref": null
+    },
+    "rhythm": {
+      "bpm": 96,
+      "meter": "4/4",
+      "timing_mode": "approximate",
+      "description": "A prompt target, not measured audio."
+    }
+  },
+  "ensemble": [
+    {
+      "part_id": "p1",
+      "instrument_ref": "sarod",
+      "role": "lead",
+      "behavior": "Introduces the central melody"
+    },
+    {
+      "part_id": "p2",
+      "instrument_ref": "mandolin",
+      "role": "answer",
+      "behavior": "Short rhythmic responses"
+    },
+    {
+      "part_id": "p3",
+      "instrument_ref": "cello",
+      "role": "counterline",
+      "behavior": "A longer independent voice"
+    },
+    {
+      "part_id": "p4",
+      "instrument_ref": "upright-bass",
+      "role": "foundation",
+      "behavior": "Maintains the pocket"
+    },
+    {
+      "part_id": "p5",
+      "instrument_ref": "dobro",
+      "role": "color",
+      "behavior": "Connects phrases with slow slides"
+    },
+    {
+      "part_id": "p6",
+      "instrument_ref": "horns",
+      "role": "expansion",
+      "behavior": "Develops the opening material"
+    },
+    {
+      "part_id": "p7",
+      "instrument_ref": "strings",
+      "role": "harmony",
+      "behavior": "Broad supporting harmony"
+    }
+  ],
+  "form": [
+    {
+      "section_id": "opening",
+      "name": "Opening",
+      "intent": "An intimate sarod and mandolin duet.",
+      "active_parts": [
+        "p1",
+        "p2"
+      ],
+      "timing_mode": "relative",
+      "pinned": true
+    },
+    {
+      "section_id": "develop",
+      "name": "Develop",
+      "intent": "Trade the theme; cello adds a longer line.",
+      "active_parts": [
+        "p1",
+        "p2",
+        "p3",
+        "p4",
+        "p5"
+      ],
+      "timing_mode": "relative",
+      "pinned": false
+    },
+    {
+      "section_id": "expansion",
+      "name": "Expansion",
+      "intent": "Strings develop the theme; horns answer softly.",
+      "active_parts": [
+        "p1",
+        "p2",
+        "p3",
+        "p4",
+        "p5",
+        "p6",
+        "p7"
+      ],
+      "timing_mode": "relative",
+      "pinned": false
+    },
+    {
+      "section_id": "return",
+      "name": "Return",
+      "intent": "A quiet reprise returns to the plucked voices.",
+      "active_parts": [
+        "p1",
+        "p2",
+        "p3"
+      ],
+      "timing_mode": "relative",
+      "pinned": false
+    }
+  ],
+  "lyrics": null,
+  "cast_refs": [],
+  "exclusions": [
+    "singing",
+    "lyrics",
+    "spoken word",
+    "choir",
+    "chanting",
+    "vocal samples",
+    "trailer braaams",
+    "festival EDM drops",
+    "constant percussion pounding",
+    "heavily compressed master"
+  ],
+  "references": [],
+  "locks": [
+    "rhythm"
+  ],
+  "provenance": {
+    "fixture": true,
+    "status": "proposed_schema_example_not_migration_output"
+  },
+  "created_at": "2026-10-07T17:02:06.272403+00:00"
+}

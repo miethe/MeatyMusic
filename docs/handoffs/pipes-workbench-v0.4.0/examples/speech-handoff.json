@@ -1,0 +1,12 @@
+{
+  "schema": "meatymusic.speech-handoff.v1",
+  "status": "prepared_not_sent",
+  "operation": "spoken_audition",
+  "voice_catalog_id": "demo:spoken-reference",
+  "voice_id": "fixture-not-a-provider-voice",
+  "provider": "diagnostic",
+  "text": "A quiet idea can become a larger world.",
+  "backend": "dry-run",
+  "confirm_live": false,
+  "notes": "Consumer adapter must resolve its actual aos-tts contract. This export makes no request and is not singing synthesis."
+}

@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pipes-agentic-audio"
+version = "0.2.0"
+description = "Local-first read-only audio inspection and safe draft MIDI/excerpts for MCP agents"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["mcp>=1.0,<3.0", "librosa>=0.10,<2.0", "numpy>=1.24,<3", "soundfile>=0.12", "pretty_midi>=0.2.10"]
+
+[project.scripts]
+pipes-mcp = "pipes_mcp.server:main"
+pipes-cli = "pipes_mcp.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

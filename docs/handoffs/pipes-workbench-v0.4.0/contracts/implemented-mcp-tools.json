@@ -1,0 +1,1038 @@
+{
+  "protocolVersion": "2025-11-25",
+  "server": "meatymusic-review",
+  "version": "0.4.0",
+  "tools": [
+    {
+      "name": "music_workspace",
+      "description": "Read local recipe/take/voice metadata and current sequence.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "music_capabilities",
+      "description": "Read actual prototype capabilities; no remote availability probe.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "music_catalog_search",
+      "description": "Search the local instrument and recipe catalog.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "music_compile",
+      "description": "Compile exact Style/Excludes or an Eleven plan draft. No provider call.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "recipe_id": {
+            "type": "string"
+          },
+          "provider": {
+            "enum": [
+              "suno",
+              "eleven"
+            ]
+          }
+        },
+        "required": [
+          "recipe_id"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "music_variation_plan",
+      "description": "Preview a role-aware recipe patch. Does not change audio.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "recipe_id": {
+            "type": "string"
+          },
+          "transformation": {
+            "enum": [
+              "horn-led",
+              "bowed-lead",
+              "chamber"
+            ]
+          }
+        },
+        "required": [
+          "recipe_id",
+          "transformation"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "music_variation_apply",
+      "description": "Create a new local recipe variation. Parent/audio remain unchanged.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "recipe_id": {
+            "type": "string"
+          },
+          "transformation": {
+            "enum": [
+              "horn-led",
+              "bowed-lead",
+              "chamber"
+            ]
+          },
+          "expected_sequence": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "idempotency_key": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "recipe_id",
+          "transformation",
+          "expected_sequence",
+          "idempotency_key"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "music_handoff_create",
+      "description": "Freeze a local prompt/recipe handoff. Nothing is submitted or charged.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "recipe_id": {
+            "type": "string"
+          },
+          "provider": {
+            "enum": [
+              "suno",
+              "eleven"
+            ]
+          },
+          "expected_sequence": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "idempotency_key": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "recipe_id",
+          "expected_sequence",
+          "idempotency_key"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "music_moment_create",
+      "description": "Save a time-linked human listening observation against an exact take.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "take_id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "start": {
+            "type": "number",
+            "minimum": 0
+          },
+          "end": {
+            "type": "number",
+            "minimum": 0
+          },
+          "note": {
+            "type": "string"
+          },
+          "expected_sequence": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "idempotency_key": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "take_id",
+          "title",
+          "start",
+          "end",
+          "expected_sequence",
+          "idempotency_key"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "music_voice_brief",
+      "description": "Prepare a proposed voice-design brief. No voice creation/promotion.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "singer_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "singer_id"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "music_workbench",
+      "description": "Read nested musical projects, motifs, stories, listening anchors and actual local jobs.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "music_open_rowan_study",
+      "description": "Import the bundled private Rowan WAV, unverified MIDI and authored drafts into this local workspace; no network.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expected_sequence": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "idempotency_key": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "expected_sequence",
+          "idempotency_key"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "music_find_materials",
+      "description": "Discover local music ideas by text/curated synonyms with inclusion reasons. No embedding inference.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "project_id": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "music_context_packet",
+      "description": "Gather selected material with enclosing phrase, earlier callback, source and uncertainty; no binary upload.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 24
+          },
+          "project_id": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 60
+          }
+        },
+        "required": [
+          "ids"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "music_reference_inventory",
+      "description": "Read bundled Rowan waveform and raw MIDI candidates. Metadata is not a verified score or emotion.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "start": {
+            "type": "number",
+            "minimum": 0
+          },
+          "end": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "music_project_create",
+      "description": "Create a nested musical project without creating an IntentTree task.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "parent_id": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "world",
+              "culture",
+              "collection",
+              "project"
+            ]
+          },
+          "expected_sequence": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "idempotency_key": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "expected_sequence",
+          "idempotency_key"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "music_work_create",
+      "description": "Link a cue to the existing recipe authority. Does not create a recording.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "project_id": {
+            "type": "string"
+          },
+          "recipe_id": {
+            "type": "string"
+          },
+          "expected_sequence": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "idempotency_key": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "project_id",
+          "expected_sequence",
+          "idempotency_key"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "music_capture_thought",
+      "description": "Keep a human idea or interpretation without forcing a project or task assignment.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "project_id": {
+            "type": "string"
+          },
+          "work_id": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "idea",
+              "listening_interpretation",
+              "creative_direction",
+              "question",
+              "keeper",
+              "avoid"
+            ]
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 24
+          },
+          "expected_sequence": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "idempotency_key": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "text",
+          "expected_sequence",
+          "idempotency_key"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "music_motif_create",
+      "description": "Create a motif concept or explicitly authored note sketch. Cannot promote a machine transcription to verified.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "project_id": {
+            "type": "string"
+          },
+          "meaning": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "melodic",
+              "rhythmic_melodic",
+              "expressive_arc",
+              "harmonic",
+              "textural"
+            ]
+          },
+          "symbolic": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "const": "authored_sketch"
+              },
+              "pitches": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 127
+                }
+              },
+              "durations": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                }
+              }
+            },
+            "required": [
+              "status",
+              "pitches",
+              "durations"
+            ],
+            "additionalProperties": false
+          },
+          "expected_sequence": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "idempotency_key": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "project_id",
+          "expected_sequence",
+          "idempotency_key"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "music_story_create",
+      "description": "Create or branch relative-time musical intent, leaving source audio untouched.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "project_id": {
+            "type": "string"
+          },
+          "source_story_id": {
+            "type": "string"
+          },
+          "expected_sequence": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "idempotency_key": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "project_id",
+          "expected_sequence",
+          "idempotency_key"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "music_story_update",
+      "description": "Apply a validated story revision. Pinned gestures require explicit unlock; planned coordinates are not measured timing.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "story_id": {
+            "type": "string"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "patch": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "events": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "relationships": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "target_duration_seconds": {
+                "type": "number"
+              },
+              "style_base": {
+                "type": "string"
+              },
+              "excludes": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "expected_sequence": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "idempotency_key": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "story_id",
+          "expected_revision",
+          "patch",
+          "expected_sequence",
+          "idempotency_key"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "music_story_unlock",
+      "description": "Explicitly unpin one gesture before a requested edit.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "story_id": {
+            "type": "string"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "event_id": {
+            "type": "string"
+          },
+          "expected_sequence": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "idempotency_key": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "story_id",
+          "expected_revision",
+          "event_id",
+          "expected_sequence",
+          "idempotency_key"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "music_story_compile",
+      "description": "Compile separate Style, instrumental arrangement, Exclude and contextual references; no submission or inferred notes.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "story_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "story_id"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "music_story_score",
+      "description": "Resolve authored note-backed gestures to an explicit beat clock. Block missing notation instead of inventing an exact score.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "story_id": {
+            "type": "string"
+          },
+          "bpm": {
+            "type": "number"
+          },
+          "total_beats": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "story_id"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "music_story_prepare",
+      "description": "Freeze a local creation handoff, recipe revision, story snapshot and context. No provider request or spend.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "story_id": {
+            "type": "string"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "expected_sequence": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "idempotency_key": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "story_id",
+          "expected_revision",
+          "expected_sequence",
+          "idempotency_key"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "music_story_render",
+      "description": "Create bounded local MIDI and a sine-tone diagnostic WAV from explicit authored notes; not realistic instrument generation.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "story_id": {
+            "type": "string"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "bpm": {
+            "type": "number"
+          },
+          "total_beats": {
+            "type": "number"
+          },
+          "expected_sequence": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "idempotency_key": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "story_id",
+          "expected_revision",
+          "expected_sequence",
+          "idempotency_key"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "music_occurrence_create",
+      "description": "Annotate a heard motif occurrence with source timestamps as human-report evidence, not verified score data.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "take_id": {
+            "type": "string"
+          },
+          "work_id": {
+            "type": "string"
+          },
+          "motif_id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "start": {
+            "type": "number"
+          },
+          "end": {
+            "type": "number"
+          },
+          "note": {
+            "type": "string"
+          },
+          "instrument": {
+            "type": "string"
+          },
+          "parent_occurrence_id": {
+            "type": "string"
+          },
+          "expected_sequence": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "idempotency_key": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "take_id",
+          "work_id",
+          "motif_id",
+          "title",
+          "start",
+          "end",
+          "expected_sequence",
+          "idempotency_key"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "music_relation_create",
+      "description": "Link musical meaning and context dependencies across owned entities, without copying them.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "source_id": {
+            "type": "string"
+          },
+          "target_id": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "recalls",
+              "requires_context",
+              "anchored_in",
+              "transforms",
+              "answers",
+              "supports",
+              "contrasts_with"
+            ]
+          },
+          "note": {
+            "type": "string"
+          },
+          "expected_sequence": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "idempotency_key": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_id",
+          "target_id",
+          "kind",
+          "expected_sequence",
+          "idempotency_key"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "music_review",
+      "description": "Record a human review without inferring emotion, changing original files, or promoting canonical status.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "target_id": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "scope": {
+            "enum": [
+              "listening",
+              "intent",
+              "symbolic_check"
+            ]
+          },
+          "verdict": {
+            "enum": [
+              "keep",
+              "avoid",
+              "keep_exploring"
+            ]
+          },
+          "expected_sequence": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "idempotency_key": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "target_id",
+          "text",
+          "expected_sequence",
+          "idempotency_key"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

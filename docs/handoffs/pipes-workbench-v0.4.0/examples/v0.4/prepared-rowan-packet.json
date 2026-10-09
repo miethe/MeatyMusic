@@ -1,0 +1,442 @@
+{
+  "work_id": "work_rowan_canopy",
+  "id": "packet_b5c87ffd9e9a",
+  "story_id": "story_rowan_return",
+  "story_revision": 1,
+  "handoff_id": "handoff_fa8380af08f1",
+  "recipe_id": "recipe_e59378a1e601",
+  "status": "prepared_not_submitted",
+  "created_at": "2026-10-09T15:49:39.879364+00:00",
+  "context": {
+    "schema": "meatymusic.context-packet.v1",
+    "status": "prepared_local_only",
+    "items": [
+      {
+        "id": "occ_first",
+        "included_because": "explicit selection",
+        "record": {
+          "id": "occ_first",
+          "take_id": "take_rowan_original",
+          "work_id": "work_rowan_canopy",
+          "motif_id": "motif_rowan_theme",
+          "title": "The first promise",
+          "start": 25,
+          "end": 55,
+          "parent_occurrence_id": "occ_full",
+          "instrument": "fiddle",
+          "evidence": "human_report",
+          "timing_precision": "approximate",
+          "note": "Nick identifies a beautiful first fiddle swell near 0:30.",
+          "source": "Nick / conversation 2026-10-09",
+          "verification": "not_score_verified"
+        }
+      },
+      {
+        "id": "occ_reach",
+        "included_because": "explicit selection",
+        "record": {
+          "id": "occ_reach",
+          "take_id": "take_rowan_original",
+          "work_id": "work_rowan_canopy",
+          "motif_id": "motif_rowan_theme",
+          "title": "Recognition and reaching",
+          "start": 85,
+          "end": 94,
+          "parent_occurrence_id": "occ_return",
+          "instrument": "fiddle",
+          "evidence": "human_report",
+          "timing_precision": "approximate",
+          "note": "A gorgeous fiddle line starts to swell before 1:30.",
+          "source": "Nick / conversation 2026-10-09",
+          "verification": "not_score_verified"
+        }
+      },
+      {
+        "id": "occ_retreat",
+        "included_because": "explicit selection",
+        "record": {
+          "id": "occ_retreat",
+          "take_id": "take_rowan_original",
+          "work_id": "work_rowan_canopy",
+          "motif_id": "motif_rowan_return",
+          "title": "The yearning retreat",
+          "start": 94,
+          "end": 98,
+          "parent_occurrence_id": "occ_return",
+          "instrument": "fiddle",
+          "evidence": "human_report",
+          "timing_precision": "approximate",
+          "note": "Nick hears longing and yearning in the downward retreat; approximate timing.",
+          "source": "Nick / conversation 2026-10-09",
+          "verification": "not_score_verified"
+        }
+      },
+      {
+        "id": "occ_rise",
+        "included_because": "explicit selection",
+        "record": {
+          "id": "occ_rise",
+          "take_id": "take_rowan_original",
+          "work_id": "work_rowan_canopy",
+          "motif_id": "motif_rowan_theme",
+          "title": "Hope carries the longing",
+          "start": 98,
+          "end": 105,
+          "parent_occurrence_id": "occ_return",
+          "instrument": "fiddle",
+          "evidence": "human_report",
+          "timing_precision": "approximate",
+          "note": "Nick hears hope, continuance and strength as the phrase rises higher.",
+          "source": "Nick / conversation 2026-10-09",
+          "verification": "not_score_verified"
+        }
+      },
+      {
+        "id": "occ_after",
+        "included_because": "explicit selection",
+        "record": {
+          "id": "occ_after",
+          "take_id": "take_rowan_original",
+          "work_id": "work_rowan_canopy",
+          "motif_id": "motif_rowan_return",
+          "title": "After the high arrival",
+          "start": 105,
+          "end": 112,
+          "parent_occurrence_id": "occ_return",
+          "instrument": "fiddle",
+          "evidence": "human_report",
+          "timing_precision": "approximate",
+          "note": "Contextual aftermath; analytic boundaries are proposed, not precisely ear-aligned.",
+          "source": "Nick / conversation 2026-10-09",
+          "verification": "not_score_verified"
+        }
+      },
+      {
+        "id": "occ_full",
+        "included_because": "parent_occurrence_id of occ_first",
+        "record": {
+          "id": "occ_full",
+          "take_id": "take_rowan_original",
+          "work_id": "work_rowan_canopy",
+          "motif_id": "motif_rowan_theme",
+          "title": "Whole reference performance",
+          "start": 0,
+          "end": 194.8,
+          "parent_occurrence_id": null,
+          "instrument": "ensemble",
+          "evidence": "human_report",
+          "timing_precision": "approximate",
+          "note": "Preserve the full song, not just a favorite excerpt.",
+          "source": "Nick / conversation 2026-10-09",
+          "verification": "not_score_verified"
+        }
+      },
+      {
+        "id": "take_rowan_original",
+        "included_because": "take_id of occ_first",
+        "record": {
+          "id": "take_rowan_original",
+          "recipe_id": "recipe_rowan_anchor",
+          "title": "Above the Rowan Canopy · approved reference",
+          "duration": 194.8,
+          "duration_evidence": "wav_header_measured",
+          "source": "user_provided_reference",
+          "audio": "/api/audio/dc900e042f1bea1fe48ae504106e89a4fd0d6fc53915b121eaddbe55e6fee1c6.wav",
+          "sha256": "dc900e042f1bea1fe48ae504106e89a4fd0d6fc53915b121eaddbe55e6fee1c6",
+          "notes": "Original unchanged. Selected by Nick for listening; note transcription and instrumentation not independently verified.",
+          "requested_instruments": [
+            "fiddle",
+            "cello",
+            "mountain-dulcimer",
+            "mandolin",
+            "upright-bass"
+          ],
+          "observed_instruments": null,
+          "rights": {
+            "local_playback": "user_provided",
+            "local_dsp": "requested",
+            "model_analysis": "unknown",
+            "cross_provider_reference": "unknown",
+            "publication": "unknown"
+          },
+          "approval": {
+            "scope": "listening_reference",
+            "source": "Nick conversation"
+          },
+          "original_name": "Above the Rowan Canopy - OMG.wav"
+        }
+      },
+      {
+        "id": "motif_rowan_theme",
+        "included_because": "motif_id of occ_first",
+        "record": {
+          "id": "motif_rowan_theme",
+          "project_id": "project_rowan_reach",
+          "title": "Rowan theme · performed identity",
+          "kind": "melodic",
+          "meaning": "The melody Nick recognizes in the accepted recording; precise notation remains under review.",
+          "status": "audio_anchor_selected_notation_unverified",
+          "tags": [
+            "fiddle",
+            "home",
+            "recognition",
+            "callback"
+          ],
+          "symbolic": null
+        }
+      },
+      {
+        "id": "occ_return",
+        "included_because": "parent_occurrence_id of occ_reach",
+        "record": {
+          "id": "occ_return",
+          "take_id": "take_rowan_original",
+          "work_id": "work_rowan_canopy",
+          "motif_id": "motif_rowan_return",
+          "title": "The complete Rowan Return",
+          "start": 85,
+          "end": 112,
+          "parent_occurrence_id": "occ_full",
+          "instrument": "fiddle",
+          "evidence": "human_report",
+          "timing_precision": "approximate",
+          "note": "The callback, dip and renewed ascent belong together.",
+          "source": "Nick / conversation 2026-10-09",
+          "verification": "not_score_verified"
+        }
+      },
+      {
+        "id": "motif_rowan_return",
+        "included_because": "motif_id of occ_retreat",
+        "record": {
+          "id": "motif_rowan_return",
+          "project_id": "project_rowan_reach",
+          "title": "Rowan Return · expressive relationship",
+          "kind": "expressive_arc",
+          "meaning": "Reach → yearning retreat → held continuation → wider renewed ascent → aftermath. The earlier promise matters.",
+          "status": "human_interpretation",
+          "tags": [
+            "yearning",
+            "longing",
+            "hope",
+            "continuance",
+            "callback",
+            "dip"
+          ],
+          "symbolic": null
+        }
+      },
+      {
+        "id": "recipe_rowan_anchor",
+        "included_because": "recipe_id of take_rowan_original",
+        "record": {
+          "id": "recipe_rowan_anchor",
+          "revision": 1,
+          "title": "Above the Rowan Canopy",
+          "identity": "The Long Becoming / Rowan Reach",
+          "kind": "score",
+          "vocal_mode": "instrumental",
+          "roots": "cinematic Appalachian chamber folk, lyrical orchestral Americana",
+          "bpm": null,
+          "meter": "6/8 intended, not measured",
+          "tonality": "Warm major-centered melody with minor-colored memories; observed key unverified",
+          "production": "Long expressive bows; fiddle clear in front, cello as independent counterline. Retain intimacy inside an earned orchestral swell.",
+          "parts": [
+            {
+              "id": "rr_p0",
+              "instrument": "fiddle",
+              "role": "lead",
+              "behavior": "Present-tense human voice; long connected bows"
+            },
+            {
+              "id": "rr_p1",
+              "instrument": "cello",
+              "role": "counterline",
+              "behavior": "Answer, memory and support; an independent character"
+            },
+            {
+              "id": "rr_p2",
+              "instrument": "mountain-dulcimer",
+              "role": "answer",
+              "behavior": "Home and a gentle descending reply"
+            },
+            {
+              "id": "rr_p3",
+              "instrument": "mandolin",
+              "role": "pattern",
+              "behavior": "Work and interlocking activity"
+            },
+            {
+              "id": "rr_p4",
+              "instrument": "upright-bass",
+              "role": "foundation",
+              "behavior": "Warm pulse beneath the lead"
+            },
+            {
+              "id": "rr_p5",
+              "instrument": "horns",
+              "role": "expansion",
+              "behavior": "Communal scale; enter late without replacing the fiddle"
+            }
+          ],
+          "sections": [
+            {
+              "id": "opening",
+              "name": "Opening",
+              "description": "Expose a recognizable fiddle phrase; leave breathing room.",
+              "parts": [
+                "rr_p0",
+                "rr_p1",
+                "rr_p2"
+              ],
+              "locked": false
+            },
+            {
+              "id": "develop",
+              "name": "Develop",
+              "description": "Present ordinary life and small instrumental conversations.",
+              "parts": [
+                "rr_p0",
+                "rr_p1",
+                "rr_p3",
+                "rr_p4"
+              ],
+              "locked": false
+            },
+            {
+              "id": "expansion",
+              "name": "Return",
+              "description": "Recall the first ascent; retreat into yearning, then continue in a broader phrase.",
+              "parts": [
+                "rr_p0",
+                "rr_p1",
+                "rr_p4",
+                "rr_p5"
+              ],
+              "locked": false
+            },
+            {
+              "id": "return",
+              "name": "Aftermath",
+              "description": "Keep the longing inside the hope; finish with a small acoustic voice.",
+              "parts": [
+                "rr_p0",
+                "rr_p1",
+                "rr_p2"
+              ],
+              "locked": false
+            }
+          ],
+          "excludes": "vocals, singing, spoken word, chanting, choir, banjo lead, banjo solos, foreground banjo, rapid three-finger banjo rolls, novelty hoedown, generic country jingle, frantic fiddle shredding, trailer braaams, oversized trailer drums, EDM drops, abrupt beat drops, constant maximum intensity, dense pad wash, sugary piano ballad",
+          "lyrics": "[Instrumental only; no sung or spoken text. Original game score, not a traditional tune.]\n[Motif A — ROWAN CALL: D4-F#4-A4-B4-A4-F#4. In lilting 6/8, articulate three rising eighth-notes, sustain high B, then let A and F# fall and leave space. This belongs to the FIDDLE.]\n[Opening: fiddle presents Motif A fully exposed with a real bow swell toward high B. No banjo or percussion in the opening.]\n[Hearth reply: mountain dulcimer answers F#4-E4-D4; cello quietly presents the WORLD motif D4-A4-G4-E4-D4.]\n[Gathering: upright bass establishes gentle 6/8 motion; mandolin adds short A4-E4-F#4-A4 fragments. Add low-mixed clawhammer banjo only as brushed rhythmic texture; it never states Motif A.]\n[Horizon: fiddle reclaims the melody in the high register, doubled an octave lower by cello, with a soft viola inner harmony. Build through the bowing, not drums.]\n[Coda: everyone drops away except fiddle and mountain dulcimer; Rowan Call followed by Hearth Answer; end on warm D resonance.]",
+          "singer_ids": [],
+          "parent": null,
+          "changes": [],
+          "created_at": "2026-10-09T00:00:00Z",
+          "locks": [],
+          "source_prompt": {
+            "style": "Instrumental cinematic Appalachian chamber folk, lyrical old-time fiddle, acoustic post-minimalism, organic orchestral Americana; passionate close-miked solo fiddle is the unmistakable lead, with long legato bows, subtle double-stops, upward swells and natural slides. Resonant cello answers, mountain dulcimer drones softly, mandolin adds occasional syncopated replies, upright bass supports flowing 6/8; quiet low-mixed clawhammer banjo supplies only a soft brush-and-thumb backbeat. D Mixolydian, open fifths, warm suspended harmonies, subtle glass overtones, dark wide acoustic depth. Begin alone, build into interweaving chamber strings, reach one earned fiddle-led crest, finish intimately. Distinct warm humanity, no constant activity.",
+            "arrangement": "[Instrumental only; no sung or spoken text. Original game score, not a traditional tune.]\n[Motif A — ROWAN CALL: D4-F#4-A4-B4-A4-F#4. In lilting 6/8, articulate three rising eighth-notes, sustain high B, then let A and F# fall and leave space. This belongs to the FIDDLE.]\n[Opening: fiddle presents Motif A fully exposed with a real bow swell toward high B. No banjo or percussion in the opening.]\n[Hearth reply: mountain dulcimer answers F#4-E4-D4; cello quietly presents the WORLD motif D4-A4-G4-E4-D4.]\n[Gathering: upright bass establishes gentle 6/8 motion; mandolin adds short A4-E4-F#4-A4 fragments. Add low-mixed clawhammer banjo only as brushed rhythmic texture; it never states Motif A.]\n[Horizon: fiddle reclaims the melody in the high register, doubled an octave lower by cello, with a soft viola inner harmony. Build through the bowing, not drums.]\n[Coda: everyone drops away except fiddle and mountain dulcimer; Rowan Call followed by Hearth Answer; end on warm D resonance.]",
+            "source_context": "rowan_reach_fiddle_first_soundtrack_v2.md / cue 01",
+            "status": "authored_prompt_context_not_submission_receipt"
+          }
+        }
+      },
+      {
+        "id": "project_rowan_reach",
+        "included_because": "project_id of motif_rowan_theme",
+        "record": {
+          "id": "project_rowan_reach",
+          "parent_id": "project_long_becoming",
+          "kind": "culture",
+          "title": "Rowan Reach",
+          "summary": "Fiddle as human voice; cello as an answering character. Hope carries longing.",
+          "tags": [
+            "Appalachian",
+            "fiddle",
+            "cello",
+            "yearning",
+            "hope",
+            "theatrical"
+          ]
+        }
+      },
+      {
+        "id": "project_long_becoming",
+        "included_because": "parent_id of project_rowan_reach",
+        "record": {
+          "id": "project_long_becoming",
+          "parent_id": null,
+          "kind": "world",
+          "title": "The Long Becoming",
+          "summary": "Life, cultures and a shared musical world; exploratory game identity.",
+          "tags": [
+            "worldbuilding",
+            "game score",
+            "emergence",
+            "continuance"
+          ]
+        }
+      }
+    ],
+    "meaning_notes": [
+      {
+        "id": "capture_hope",
+        "project_id": "project_rowan_reach",
+        "work_id": "work_rowan_canopy",
+        "text": "That dip holds so much longing, yearning. But then that following peak arises and brings with it hope, continuance, perhaps some degree of strength even.",
+        "kind": "listening_interpretation",
+        "tags": [
+          "longing",
+          "hope",
+          "return"
+        ],
+        "status": "kept",
+        "source": "Nick / supplied conversation",
+        "created_at": "2026-10-09T00:00:00Z"
+      },
+      {
+        "id": "capture_not_peak",
+        "project_id": "project_rowan_reach",
+        "work_id": "work_rowan_canopy",
+        "text": "It is good, but by itself it is just okay. The portion before the peak makes it amazing.",
+        "kind": "listening_interpretation",
+        "tags": [
+          "preparation",
+          "callback",
+          "context"
+        ],
+        "status": "kept",
+        "source": "Nick / supplied conversation",
+        "created_at": "2026-10-09T00:00:00Z"
+      },
+      {
+        "id": "capture_story",
+        "project_id": "project_rowan_reach",
+        "work_id": null,
+        "text": "Hope does not erase the longing. It arrives carrying it. Treat loss as a possible fictional reading, not fixed autobiography or canon.",
+        "kind": "creative_direction",
+        "tags": [
+          "meaning",
+          "continuance",
+          "narrative"
+        ],
+        "status": "candidate",
+        "source": "Conversation synthesis, not a measured finding",
+        "created_at": "2026-10-09T00:00:00Z"
+      }
+    ],
+    "omitted": [],
+    "external_calls": 0,
+    "binary_uploads": 0,
+    "rules": [
+      "Original recording is unchanged.",
+      "Human interpretations are not analyzer findings.",
+      "Raw Basic Pitch is unverified.",
+      "Earlier authored sketches are not transcriptions.",
+      "Permission for playback does not establish permission for model upload."
+    ],
+    "receipt_note": "This packet supplies references and reasons. It does not prove any reference was sent to a provider."
+  },
+  "sequence": 2
+}

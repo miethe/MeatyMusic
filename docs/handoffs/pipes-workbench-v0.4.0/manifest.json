@@ -1,0 +1,754 @@
+{
+  "name": "MeatyMusic + Pipes \u2014 Musical Story Workbench",
+  "version": "0.4.0",
+  "pipes_version": "0.2.0",
+  "created_at": "2026-10-09",
+  "status": "tested-local-review-build-not-deployed",
+  "privacy": "personal; includes supplied source audio and interpretation notes",
+  "entrypoint": "START_HERE.md",
+  "new_docs": [
+    "docs/08_WORKBENCH_AND_PIPES_ARCHITECTURE.md",
+    "docs/09_MUSICAL_STORY_CANVAS.md",
+    "docs/10_ROWAN_001_EXPERIMENT.md",
+    "docs/11_IMPLEMENTATION_AND_MIGRATION.md",
+    "docs/12_AGENT_IMPLEMENTATION_HANDOFF.md",
+    "docs/13_CAPABILITIES_SOURCES_AND_LIMITS.md"
+  ],
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "bytes": 2019,
+      "sha256": "01d63e061e2fa8c7694c95e950662adc50c6e0ca7e07c18ce906b0c520318b2b"
+    },
+    {
+      "path": "IMPLEMENTATION_STATUS.md",
+      "bytes": 4901,
+      "sha256": "d10a3f813827a2c56864d4c795c83373b1db7898f41f5ddc84d3f1e9e55af651"
+    },
+    {
+      "path": "README.md",
+      "bytes": 261,
+      "sha256": "08ebd87a73fb695b32d116bf92d3367f029f3811144cbc1b1eb84bd4694ac939"
+    },
+    {
+      "path": "START_HERE.md",
+      "bytes": 8920,
+      "sha256": "91682c893b9bc7dbdc9d392e07a9de3cfd2f040031f77bbfe24f035af88577dc"
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.md",
+      "bytes": 927,
+      "sha256": "5ac5d70fbcb9ca18f7ac4e5f725c21b8514efc96f51122a28928d242c686af5f"
+    },
+    {
+      "path": "contracts/README.md",
+      "bytes": 965,
+      "sha256": "43fc32cdfa161d55c97f6fcf7507b0c8eb69f459baee6c443db1a4e09b48db7f"
+    },
+    {
+      "path": "contracts/command-envelope.schema.json",
+      "bytes": 668,
+      "sha256": "425e627fda2946eeefed61df6aa67571393f8aebb3ffc0540d8b1251b5ecd7be"
+    },
+    {
+      "path": "contracts/estate-events.schema.json",
+      "bytes": 1619,
+      "sha256": "7b3c7e24fe7bbe463eaf969b32d4aff96dd6ea6098da4b0d832789f6460c390a"
+    },
+    {
+      "path": "contracts/implemented-mcp-tools.json",
+      "bytes": 26275,
+      "sha256": "9fb0cec3bc28e8416dfedfd91097e758e1761a03453328b161bd8086990f716f"
+    },
+    {
+      "path": "contracts/prototype-openapi.json",
+      "bytes": 23382,
+      "sha256": "e7657c1adb912f37ae94242c93805d112682438348b3031cbb85d1ef8d89c7a8"
+    },
+    {
+      "path": "contracts/prototype-recipe.schema.json",
+      "bytes": 4061,
+      "sha256": "f4d366ee505be49d7baec2a2c15721b7cbe651931a610960d4cbd3146e8e7ffd"
+    },
+    {
+      "path": "contracts/provider-capability.schema.json",
+      "bytes": 2965,
+      "sha256": "a847e791b50c72dd08e6539f22a7ca8ab171783aa03c7b404d9330ac2a575cd0"
+    },
+    {
+      "path": "contracts/singer-direction.schema.json",
+      "bytes": 1110,
+      "sha256": "a0e9422aa48926eb8e8420eca38575f8b71255c99c4b1e9ffe4a0d897406d10b"
+    },
+    {
+      "path": "contracts/sonic-recipe-v2.schema.json",
+      "bytes": 7590,
+      "sha256": "b7b883ab7d61bd75fa0c2b6af5d3505bd29a382e4af04c7a005b0c5526ae8c31"
+    },
+    {
+      "path": "contracts/speech-handoff.schema.json",
+      "bytes": 1100,
+      "sha256": "208945cd8570d8a6216b3a7da9000337468b91304a339e1c11238ff8a589ebe4"
+    },
+    {
+      "path": "contracts/voice-design-brief.schema.json",
+      "bytes": 2171,
+      "sha256": "a57ae215246957cb57185c03effee734392787f38181918f4ac2130d29801e9d"
+    },
+    {
+      "path": "contracts/workbench-v1.schema.json",
+      "bytes": 13230,
+      "sha256": "a04bb695d7e656db3b2ee9badea9f3275009ef1ba3a9fdf444f043d4f0039179"
+    },
+    {
+      "path": "designs/01-workshop.png",
+      "bytes": 193315,
+      "sha256": "32fc8ab613811232cda78e464a7a7bd0b51457a1f5f96a3c5a83be870c927729"
+    },
+    {
+      "path": "designs/02-variation-diff.png",
+      "bytes": 225724,
+      "sha256": "35f865396058a2f140c26863e7104c1996273b2835d8044194b77028f4653266"
+    },
+    {
+      "path": "designs/03-variations.png",
+      "bytes": 190278,
+      "sha256": "34491194b5e87e9365f98565198b1009d1720577903860bfc6a386539c79eb5a"
+    },
+    {
+      "path": "designs/04-suno-handoff.png",
+      "bytes": 266145,
+      "sha256": "7ed85e36a95ec095b733a64f5dc7153632851f1b66b181ec8f076d8d8f35ad06"
+    },
+    {
+      "path": "designs/05-listening-room.png",
+      "bytes": 190446,
+      "sha256": "03bcb699fbe0d2b39d8802730da547f544b6c036bce2767187b6bfd196d5376d"
+    },
+    {
+      "path": "designs/06-singers-and-voices.png",
+      "bytes": 214059,
+      "sha256": "1a5fe35637e72afd64f70605f6c17babf38977c17cc03ad4f97e14f2a33615c2"
+    },
+    {
+      "path": "designs/07-connections.png",
+      "bytes": 187618,
+      "sha256": "082e9f0c4a084e04b83f341550425d6f4437e58de9526e09a636789e5de28898"
+    },
+    {
+      "path": "designs/08-library.png",
+      "bytes": 344436,
+      "sha256": "3bad6e06864157a76ef708462bc36a34e9a8077ec2699b34340285fbb6637440"
+    },
+    {
+      "path": "designs/09-instrument-atlas.png",
+      "bytes": 182368,
+      "sha256": "24a1a9aefb976e3c0990efdef3326da87f5b0e3fddb115518808f819f38b2779"
+    },
+    {
+      "path": "designs/10-mobile-voices.png",
+      "bytes": 67197,
+      "sha256": "8ce75e7f27e106f4090c9c7c611ed6f14df10025de751710e053158fa83fd6ca"
+    },
+    {
+      "path": "designs/11-mobile-workshop.png",
+      "bytes": 66202,
+      "sha256": "1594df14327bf4f15a9ee1c75f55adfa206c93f19cdbf3a613040595565adb39"
+    },
+    {
+      "path": "designs/README.md",
+      "bytes": 1657,
+      "sha256": "7c846a38715c1695eecd9d3699d9bdfe6901d7421faa8bfde3c2aa071e79e126"
+    },
+    {
+      "path": "designs/review.html",
+      "bytes": 2842992,
+      "sha256": "ce20de090b4b6154b8ac0d116b0e0ec4db796e40685c74b722f7fa452c278e21"
+    },
+    {
+      "path": "designs/tokens.json",
+      "bytes": 938,
+      "sha256": "fbe8a29895611fe59918ec52f222dec016d77ee33588f2e4fb7d8e157d5f6317"
+    },
+    {
+      "path": "docs/01-product-and-ux.md",
+      "bytes": 11399,
+      "sha256": "bf9370e4295e293bc8b9f822b42939c7107e60e6c7a3ff04f8bb03560296aec7"
+    },
+    {
+      "path": "docs/02-architecture-and-estate.md",
+      "bytes": 10042,
+      "sha256": "03ad7ead2b7103a1436d48585c37359969c135209c22658db3fe48ebf50e8eb1"
+    },
+    {
+      "path": "docs/03-provider-and-voice-contracts.md",
+      "bytes": 11023,
+      "sha256": "6ab7b2e984bbd6336536f27dbd7d47c5ad3f82d56efeb42831d6b3258e431a48"
+    },
+    {
+      "path": "docs/04-implementation-handoff.md",
+      "bytes": 11299,
+      "sha256": "402372082852d2990792b600858ff2f5f59bb14c83d066c922e5f2d199569584"
+    },
+    {
+      "path": "docs/05-sources-and-decisions.md",
+      "bytes": 7449,
+      "sha256": "14c10109af63aa1479e05aaaa9b6eb47766327ba34e6d5bf73304a54ca3ffac8"
+    },
+    {
+      "path": "docs/06-agent-implementer-prompt.md",
+      "bytes": 5976,
+      "sha256": "c3ee4447f91494de5063000f59ee8e70909c5a17d71fec45eb31722b93ba0a85"
+    },
+    {
+      "path": "docs/07-validation-and-limitations.md",
+      "bytes": 6645,
+      "sha256": "0ed36e6ac5c7e87ad3ce2621e6010d5e26c7f372db7725b31c06be82c45ba4fa"
+    },
+    {
+      "path": "docs/08_WORKBENCH_AND_PIPES_ARCHITECTURE.md",
+      "bytes": 14879,
+      "sha256": "0ca108fb4cfab5e6250ba51ec286626b457df48c4800b5cefb38e9253a445aae"
+    },
+    {
+      "path": "docs/09_MUSICAL_STORY_CANVAS.md",
+      "bytes": 10610,
+      "sha256": "6e009a5d48aef2139e561c5875570f76b6a75d79e646c3c95432379cadda2d85"
+    },
+    {
+      "path": "docs/10_ROWAN_001_EXPERIMENT.md",
+      "bytes": 7529,
+      "sha256": "e884468f2008ea030344b714db230f8a1637d1535b5ff61506abe19293fff4ab"
+    },
+    {
+      "path": "docs/11_IMPLEMENTATION_AND_MIGRATION.md",
+      "bytes": 9515,
+      "sha256": "0ee66b5adee06ccdc1cf955f70f726c186c271f6b85958a8e63d3a74a08adbfd"
+    },
+    {
+      "path": "docs/12_AGENT_IMPLEMENTATION_HANDOFF.md",
+      "bytes": 6008,
+      "sha256": "88211da28a4f94d111c8300cbcd8e27a2f6011a44ae00e48d649f4af183cefae"
+    },
+    {
+      "path": "docs/13_CAPABILITIES_SOURCES_AND_LIMITS.md",
+      "bytes": 5952,
+      "sha256": "ce9f0a12aff13229e23ffc6b7b3638fc21f95e96de478fb932a670e438cfef1e"
+    },
+    {
+      "path": "docs/inherited-v0.3/AGENTS.md",
+      "bytes": 977,
+      "sha256": "823937ac7cf1816cb26f8a9e0da438c5a71c3f4050a988c5a368549e3f8a0c01"
+    },
+    {
+      "path": "docs/inherited-v0.3/CHECKSUMS.sha256",
+      "bytes": 8048,
+      "sha256": "cc8b62f9ae6f8d62e5489824965453e34ec06acf575c1e95e738ae5445688bf6"
+    },
+    {
+      "path": "docs/inherited-v0.3/IMPLEMENTATION_STATUS.md",
+      "bytes": 3881,
+      "sha256": "2e53c269706c11fd602de625ec19da53fe28a6905a1013851c8c357586333458"
+    },
+    {
+      "path": "docs/inherited-v0.3/START_HERE.md",
+      "bytes": 8588,
+      "sha256": "b2199ebee6a9a8720bdb0d35ab9e23309d4b60e836ca306b18b07bc3fd72a2ea"
+    },
+    {
+      "path": "docs/inherited-v0.3/manifest.json",
+      "bytes": 14171,
+      "sha256": "97af09de2fa89d990075282dd2457f70ac31b7546c5b52d69cccada590a5ada9"
+    },
+    {
+      "path": "examples/README.md",
+      "bytes": 980,
+      "sha256": "ebd99b3e2380760863622e523125194c3d27fe1bafa68bd3e23cb93beb6e58b4"
+    },
+    {
+      "path": "examples/compile-request.json",
+      "bytes": 114,
+      "sha256": "5a1810cf6edcc8371d08251fa9327d472f19027f98873fed575dd6a7e9f04452"
+    },
+    {
+      "path": "examples/compiled-suno.json",
+      "bytes": 1530,
+      "sha256": "c870a16e1dd75fae4068c5373aff7447eb6e435ce3eddd624f600aee2e228fa1"
+    },
+    {
+      "path": "examples/eleven-plan-draft.json",
+      "bytes": 4424,
+      "sha256": "fae0e006347295619348526123fc019b698e17f2c777ec79f4387e4ee28e71a9"
+    },
+    {
+      "path": "examples/estate-event-proposed.json",
+      "bytes": 411,
+      "sha256": "2f8fb699764f5e6661b100c4a73b7023440c24bcd7e46e8cf897dcd0f37785e5"
+    },
+    {
+      "path": "examples/frozen-handoff.json",
+      "bytes": 4933,
+      "sha256": "e4a18fc5ac3b0933c8117157fcae192e8d4d9ce00a1905647a039620bd5dc682"
+    },
+    {
+      "path": "examples/mcp-config.template.json",
+      "bytes": 369,
+      "sha256": "208246f98131a8c172b52cbe0872ec857ef71ea13ea176b10ead8934a305bfd9"
+    },
+    {
+      "path": "examples/provider-capability-proposed.json",
+      "bytes": 870,
+      "sha256": "f55f0f6d7f45e497742e7678b74f66c57a27aeb3bf7a570497d9b64e7e97453d"
+    },
+    {
+      "path": "examples/recipe-prototype.json",
+      "bytes": 2686,
+      "sha256": "e3b6a51a3e311f29256e3690fc708d456aced4b8d363f6480cdf41dcf7304129"
+    },
+    {
+      "path": "examples/recipe-v2-proposed.json",
+      "bytes": 3509,
+      "sha256": "9f451a77111c255f8776f97c16d3548ba692cf5b8c27f126e799039ea4d705a5"
+    },
+    {
+      "path": "examples/singer-direction.json",
+      "bytes": 383,
+      "sha256": "772ae2e1a77dd47771d0b0e017e4ebe7660d1b03b1e8186b87ae162d1fabfbff"
+    },
+    {
+      "path": "examples/speech-handoff.json",
+      "bytes": 469,
+      "sha256": "856bc77124725516900d53cacb467cd38142f9b0b68cc1eca9e6fb36728e2a80"
+    },
+    {
+      "path": "examples/v0.4/a3b32c07a3c0c1203a3e0fefd0b25ac9d6cda0af2dbfeb864af97f1ab6c6c3e3.mid",
+      "bytes": 207,
+      "sha256": "6afcd04038abee177f63f4dcd5631f5b2eb93b2339680c0dc2e1009f3c5be748"
+    },
+    {
+      "path": "examples/v0.4/a3b32c07a3c0c1203a3e0fefd0b25ac9d6cda0af2dbfeb864af97f1ab6c6c3e3.wav",
+      "bytes": 1160044,
+      "sha256": "21fb01193ccd42473ce325aa9f4dfeff67d9bdceff70f4f87208d89db7856d7e"
+    },
+    {
+      "path": "examples/v0.4/authored-score-plan.json",
+      "bytes": 2809,
+      "sha256": "3f730afb22de90af3250fe4da6fabd31660a53c32814b3e2882bada16850547b"
+    },
+    {
+      "path": "examples/v0.4/diagnostic-render-receipt.json",
+      "bytes": 3846,
+      "sha256": "9c3bd88ddef1645c2e60da6de66cf100529e8ffd590cce6f91e957dbacb627e0"
+    },
+    {
+      "path": "examples/v0.4/prepared-rowan-packet.json",
+      "bytes": 18492,
+      "sha256": "2674816fa07572e991eecadc239854db8cbcf44e3f720cae12f9ff82b08c0acc"
+    },
+    {
+      "path": "examples/v0.4/read-rowan-context-command.json",
+      "bytes": 133,
+      "sha256": "412e39d0f8e0110cfd5d44101b99fca22076ef235a4bb55f063c8c12e42c37fb"
+    },
+    {
+      "path": "examples/v0.4/rowan-exact-score-blocked.json",
+      "bytes": 796,
+      "sha256": "4c07d26f2f0e8bb79877daef5c77ece798b9ac87eda76631b6f22037afc02421"
+    },
+    {
+      "path": "examples/v0.4/rowan-peak-context.json",
+      "bytes": 15234,
+      "sha256": "2a67b3890d27baf3a39d65591ff68545897e97cde6b68a6e4c1a35fd90916ac0"
+    },
+    {
+      "path": "examples/v0.4/rowan-story-prompt.json",
+      "bytes": 26353,
+      "sha256": "da9e5529130868711bcbb97e07412785f19f2faf976acde6fb47a965b52052f8"
+    },
+    {
+      "path": "examples/variation-apply-request.json",
+      "bytes": 197,
+      "sha256": "bbda33326c1d817d5ca925a7e40e3d7ae32dd343fbb7e3a14e1a90994c46d8fa"
+    },
+    {
+      "path": "examples/variation-plan-request.json",
+      "bytes": 124,
+      "sha256": "e4004c35e3f0a7ff6c12025879798c8a5d889bb77186b2d0eb994f66d9dad384"
+    },
+    {
+      "path": "examples/voice-design-brief.json",
+      "bytes": 966,
+      "sha256": "77671e4937c717c64b3d5bf2475703eb00516dc48cce164b527ed5b7c9070d5a"
+    },
+    {
+      "path": "examples/voice-lab-demo-promotion.json",
+      "bytes": 841,
+      "sha256": "638798b86d7fc8a398b55c33d4b6462dba1ce3d820db609203bfa6259dfdf7ec"
+    },
+    {
+      "path": "pipes/README.md",
+      "bytes": 2025,
+      "sha256": "afe7e5707f57193c14c6a6eb4fad45d361d24199b5d06c290eaad125fe62f96b"
+    },
+    {
+      "path": "pipes/README_v0.1.md",
+      "bytes": 3785,
+      "sha256": "25583e7f8f126dc1ec4c7add310793a2d8dfee08bf7b29f5be6671f4ee016515"
+    },
+    {
+      "path": "pipes/pyproject.toml",
+      "bytes": 551,
+      "sha256": "cdc7e9da9e9fc700b82f8484755047c28f3400070762bf75923158b2b4bdef96"
+    },
+    {
+      "path": "pipes/src/pipes_mcp/__init__.py",
+      "bytes": 100,
+      "sha256": "f5e51cfaea3dad957a80dfeaa19f9620646c1bfb36dd878e49535064121418c6"
+    },
+    {
+      "path": "pipes/src/pipes_mcp/cli.py",
+      "bytes": 572,
+      "sha256": "79620cc548e7e16761bf7a7c349400f623ede579377404199733e983b045ce90"
+    },
+    {
+      "path": "pipes/src/pipes_mcp/core.py",
+      "bytes": 7199,
+      "sha256": "9e4a735660ed436a9ffbdc3fa90a4410f23fa336aa5d969f452ceb52553e22f0"
+    },
+    {
+      "path": "pipes/src/pipes_mcp/server.py",
+      "bytes": 2233,
+      "sha256": "fa19dec3e770d6202a40e3e2aadd33a745c327a7f832be33148a63c412589fb2"
+    },
+    {
+      "path": "pipes/src/pipes_mcp/story.py",
+      "bytes": 12989,
+      "sha256": "c0e7129e4d40019533539cda7193390515f7ffaaa394c3b4ee3f0799fa9fb433"
+    },
+    {
+      "path": "pipes/tests/test_core.py",
+      "bytes": 1857,
+      "sha256": "98bd8e8a0539d61eb0b570eb4100fe95332a9731bcb92673aea79c180f2ba738"
+    },
+    {
+      "path": "prompt-catalog/suno_house_sound_score_atlas_24_prompts.md",
+      "bytes": 30743,
+      "sha256": "9ba9cc824e1a921fab956f86c441d78ef3151f5aed754b7846f36892d2c76a0d"
+    },
+    {
+      "path": "prompt-catalog/suno_symphonic_expeditions_14_prompts.md",
+      "bytes": 25563,
+      "sha256": "d08fc0b48092c183e7f0340d160679c8e31ef381ca169105ad06c7a1a3005a1a"
+    },
+    {
+      "path": "prompt-catalog/suno_unlikely_ensembles_prompt_pack.md",
+      "bytes": 25146,
+      "sha256": "8175900c32573d2ab4ca2ed86dc74385bc2ff83c378e50eb0521d2589cc90fde"
+    },
+    {
+      "path": "prototype/.gitignore",
+      "bytes": 32,
+      "sha256": "11a92529044d5293440e18294d517ea14d2f271d4fc1df1bb2d0cd6839b0c4e6"
+    },
+    {
+      "path": "prototype/README.md",
+      "bytes": 1179,
+      "sha256": "9c38b3be05ad7d404b15c75bad7d1a662b9353f1c3f5f6f7dcf87234aa76c2ce"
+    },
+    {
+      "path": "prototype/app/__init__.py",
+      "bytes": 31,
+      "sha256": "1dfe59bf53929198c92f256576d5a80e291331a392145c9f516c954a55d8ddfc"
+    },
+    {
+      "path": "prototype/app/domain.py",
+      "bytes": 32682,
+      "sha256": "4df36fca8bf6622dbbc3044c9fdb72de300107a3be281891863239ee4f3440b7"
+    },
+    {
+      "path": "prototype/app/rowan_seed.json",
+      "bytes": 214062,
+      "sha256": "981c192c2f09fcb9dcf96c799bdee33b0e77d6f60e0cff9aba6097231ec0eba3"
+    },
+    {
+      "path": "prototype/app/workbench.py",
+      "bytes": 26318,
+      "sha256": "6667ae2c404a3f52841fa0e226a1f80b495b5837947aa58e50486ab5740c3c17"
+    },
+    {
+      "path": "prototype/requirements.txt",
+      "bytes": 186,
+      "sha256": "48ac961728ba9891483d82759c6f9adbb540d7e21a8e81f2b831ea9d63f24d3f"
+    },
+    {
+      "path": "prototype/serve.py",
+      "bytes": 10856,
+      "sha256": "25da5941de76d46ee968f11d13b6acd24acf1c9951cb33fe64b14913ad677959"
+    },
+    {
+      "path": "prototype/static/app.js",
+      "bytes": 61466,
+      "sha256": "ee28e531d7a8cb251a65be9daed4c223949d4dfdf45d0534f0034ad46b7fe6e4"
+    },
+    {
+      "path": "prototype/static/fixtures/diagnostic-a.wav",
+      "bytes": 1536044,
+      "sha256": "bf1a3ad0d7e1f61f4a79e75240114da1cd95fd20148bf79beea9cb528c352de6"
+    },
+    {
+      "path": "prototype/static/fixtures/diagnostic-b.wav",
+      "bytes": 1664044,
+      "sha256": "318cfe25c72f5f805c6c7247955385950e07e719f22e3867f0afee852af6991b"
+    },
+    {
+      "path": "prototype/static/index.html",
+      "bytes": 700,
+      "sha256": "ab8d30d544f4ab1ad6233b82b72bf71b95cc35fedcf8dabebb09a489662fa076"
+    },
+    {
+      "path": "prototype/static/style.css",
+      "bytes": 35571,
+      "sha256": "3f72833550e2acda397d79ab7f56f04c6cb387cbe6fafd05760859883b8db1d8"
+    },
+    {
+      "path": "prototype/static/workbench.css",
+      "bytes": 11793,
+      "sha256": "80dc13661acf1824d3168cc5a53f0545e494fde5b86e2259b18af3d15b1905cb"
+    },
+    {
+      "path": "prototype/static/workbench.js",
+      "bytes": 39736,
+      "sha256": "95b3d6e69e9835fcb31998f31770a9c586e50b409db73603756d27494ba216cc"
+    },
+    {
+      "path": "prototype/study_inputs/manifest.json",
+      "bytes": 1004,
+      "sha256": "d8e45ef354649f9c3e23bd282b73b73cd59b3d661fdb2426894f375c37cb0927"
+    },
+    {
+      "path": "prototype/study_inputs/rowan-notes.json",
+      "bytes": 94387,
+      "sha256": "c3ff04840e2c1e3cdc405482edb5e90fecd3046de53b703439099b5edcae7fdf"
+    },
+    {
+      "path": "prototype/study_inputs/rowan-original.wav",
+      "bytes": 37415440,
+      "sha256": "dc900e042f1bea1fe48ae504106e89a4fd0d6fc53915b121eaddbe55e6fee1c6"
+    },
+    {
+      "path": "prototype/study_inputs/rowan-raw.mid",
+      "bytes": 3797,
+      "sha256": "093ed09746ae3d8555e2868e7028b7a50ab82dbc26d6175570cd7c158d579ac3"
+    },
+    {
+      "path": "prototype/tests/test_domain.py",
+      "bytes": 8639,
+      "sha256": "eb1907732e1742b464a9245850accd1694ee96ad8886a5d7416f670f073d9420"
+    },
+    {
+      "path": "prototype/tests/test_transport.py",
+      "bytes": 6912,
+      "sha256": "c0e6009e92ae222d06a484e03df3354cb356da167d11fa2a512b6196723d76a3"
+    },
+    {
+      "path": "prototype/tests/test_workbench.py",
+      "bytes": 10799,
+      "sha256": "cf9cbdcee98ea155b2665819eaffe3c3884b7fa1cf544aa81855abb4f4679a5a"
+    },
+    {
+      "path": "prototype/tools/browser_review.py",
+      "bytes": 9762,
+      "sha256": "5877915e9da9c2925f407e26b7b2ebc0201c1afcec1cc44af9102219bf3f432c"
+    },
+    {
+      "path": "prototype/tools/client.py",
+      "bytes": 1160,
+      "sha256": "80ecfaaef82bb98c382ae9087b076a8ddf62a44ac5dc26d8a2d9dbc68a263856"
+    },
+    {
+      "path": "prototype/tools/make_fixtures.py",
+      "bytes": 1063,
+      "sha256": "8cc2cbbe66672476e9892183b04a60f874cd2376c6db5bbde23f0679874bf51c"
+    },
+    {
+      "path": "prototype/tools/mcp_stdio.py",
+      "bytes": 10534,
+      "sha256": "82d1ba4ba56d30c206d0478e506b56bc20865d0fc854b95a2494795c32652eda"
+    },
+    {
+      "path": "prototype/tools/music.py",
+      "bytes": 862,
+      "sha256": "04d4d26e569ed1f1077410cb9f2f4485288b8d9b88e07ba72284a4aed4e3311e"
+    },
+    {
+      "path": "prototype/tools/review_browser_bridge.py",
+      "bytes": 6871,
+      "sha256": "aaad412ded5126c3f2d6c8f789d9f5189ff7e587cd9d0bde6ef89e6f669c7a94"
+    },
+    {
+      "path": "prototype/tools/validate_contracts.py",
+      "bytes": 2437,
+      "sha256": "6d4023e715b755e61be291097fc219c76119c328b7e4b83c5946902546e07167"
+    },
+    {
+      "path": "qa/automated-tests.txt",
+      "bytes": 4292,
+      "sha256": "25dd2b80422d0d8a4a7cbeec0a800ff603a63a558c41935670f743c4dab9d1d8"
+    },
+    {
+      "path": "qa/browser-review.json",
+      "bytes": 1744,
+      "sha256": "9cab5f0c48b11e6d1b3ef31823610a57eb40ffb9e70c53234c61a143ea2c6e93"
+    },
+    {
+      "path": "qa/contract-validation.json",
+      "bytes": 1445,
+      "sha256": "787d052cf9ba6a6eea15f4fd051707d84ca47d9a9bf47e2ae503105c0b9138d7"
+    },
+    {
+      "path": "qa/v0.4/00-welcome.png",
+      "bytes": 123025,
+      "sha256": "8d1a9adffd1619f85bd7aac41d7eb9a621caf9eb30bfb0b478cf3461a26e7963"
+    },
+    {
+      "path": "qa/v0.4/01-listen.png",
+      "bytes": 301966,
+      "sha256": "74e4a28953d8bfafcd88c2bcc11cd726011159870b7c37b176edb31bc499ac7e"
+    },
+    {
+      "path": "qa/v0.4/02-paint.png",
+      "bytes": 213121,
+      "sha256": "ade5cf5c917070e9462e2a4a8acca313995f250c53ba42e947d6d87974d00cf8"
+    },
+    {
+      "path": "qa/v0.4/03-motifs.png",
+      "bytes": 285098,
+      "sha256": "8f26ced7fea1b037702873846090b289dd771282f37f622d7b00ce6b2dd84ae7"
+    },
+    {
+      "path": "qa/v0.4/04-discover.png",
+      "bytes": 234628,
+      "sha256": "baed36b9e57a89b499d7c7bb08a07527293c43bfa46f9d99426efe8ea30462ee"
+    },
+    {
+      "path": "qa/v0.4/05-projects.png",
+      "bytes": 228604,
+      "sha256": "b01bc5dbdbfabb77bbf79a86d1871c6fe850436820bb808af8afbf4619901c13"
+    },
+    {
+      "path": "qa/v0.4/06-rendered-sketch.png",
+      "bytes": 230473,
+      "sha256": "e64cfc9806bc145a582afe1d8a67444752093b70f44071dbcb7453cf7e4e5f60"
+    },
+    {
+      "path": "qa/v0.4/07-creation-packet.png",
+      "bytes": 305189,
+      "sha256": "ec2289c2126495a21042199569c74b1bbbf40aabe66990d5eaec27bca3d8d91f"
+    },
+    {
+      "path": "qa/v0.4/08-experiments.png",
+      "bytes": 208186,
+      "sha256": "57ab92072f0234e1275f81dfd2ccb6d00aa5bca2d92b4be4121807e2dbed1db3"
+    },
+    {
+      "path": "qa/v0.4/09-mobile.png",
+      "bytes": 197723,
+      "sha256": "6408b4bc0234aabe2bb5501a219f5f854ac8b468709336d50a7e382cf6724941"
+    },
+    {
+      "path": "qa/v0.4/VALIDATION_REPORT.json",
+      "bytes": 1876,
+      "sha256": "527fcc525056555514dfe320af2fdc21b9eadccfc559bc7f6bba13e67e2ace57"
+    },
+    {
+      "path": "qa/v0.4/VALIDATION_REPORT.md",
+      "bytes": 1674,
+      "sha256": "8e389081188c1c22b96acce6525d15c456e2666c61c1fab69f38517d320f4a26"
+    },
+    {
+      "path": "qa/v0.4/all-tests.txt",
+      "bytes": 8438,
+      "sha256": "96a1cf3e02ec3202b08d1d2e497968e0e1ea563d18a89a135b6d2dc4283b8b61"
+    },
+    {
+      "path": "qa/v0.4/baseline-tests.txt",
+      "bytes": 4292,
+      "sha256": "50a78dddf6fc1343526c3e75ff21658b69eabf27fa45f40245d2e7dad2a314ab"
+    },
+    {
+      "path": "qa/v0.4/browser-console.txt",
+      "bytes": 658,
+      "sha256": "dbce77ad37b790cef887359916a6abaaf1fb77c71bc9c5f9118d6c7acbf0bd55"
+    },
+    {
+      "path": "qa/v0.4/browser-review.json",
+      "bytes": 657,
+      "sha256": "b6b866b1ea223269354acc854c9239cad22f11877f8ecd68199da3929d20568c"
+    },
+    {
+      "path": "qa/v0.4/pipes-core-tests.txt",
+      "bytes": 904,
+      "sha256": "010e70e9ad508c3d07a4d505dcf9cc79a8ba7d85f3221609d054d99e9a1cc766"
+    },
+    {
+      "path": "qa/v0.4/schema-check.json",
+      "bytes": 166,
+      "sha256": "80e4ada357875e55cd2512d2d4497161a87bd7fc294a762308c841acd5919242"
+    },
+    {
+      "path": "reference/meatymusic-sonic-workshop-direction-v0.1.md",
+      "bytes": 31046,
+      "sha256": "0da70fa4fa0e80bd5c4b5c0ed5f7e37fd6516761c39d35808681b934d7b7b206"
+    },
+    {
+      "path": "reference/prior-ux/01_arrange.png",
+      "bytes": 278149,
+      "sha256": "441f37c93ca8ce06ea9c455c7cedd0bf61b5bbe6d966886ab5c2e9440db0abcb"
+    },
+    {
+      "path": "reference/prior-ux/02_variations_handoff.png",
+      "bytes": 287373,
+      "sha256": "278153d2b810fba38992e2ff7a740915c60fcbd274614bc628e2a600fab8337d"
+    },
+    {
+      "path": "reference/prior-ux/03_listen_moments.png",
+      "bytes": 235793,
+      "sha256": "a6be2c684c6cad35da3920d345ee56548b8f0dfa148cef9703dc1a8b8292e606"
+    },
+    {
+      "path": "reference/prior-ux/meatymusic-experience-design-v0.2.md",
+      "bytes": 21378,
+      "sha256": "16242c56c80af981097b73a48ae0d4b2346fb3f60d96cb1bb1c01f8e2edb2b58"
+    },
+    {
+      "path": "reference/prior-ux/mockup-fixtures.json",
+      "bytes": 1137,
+      "sha256": "36b6c2fee171c297c7a5609603d50617af89a07f649ea70a725442320560e3ed"
+    },
+    {
+      "path": "sources/PIPES_AGENTIC_MUSIC_V0.1.md",
+      "bytes": 10008,
+      "sha256": "94288aabddb3b4066ff6683365ba279e15e6c7342aad5853555211ecb7376af3"
+    },
+    {
+      "path": "sources/ROWAN_FIDDLE_MIDI_STUDY.md",
+      "bytes": 2243,
+      "sha256": "b90975511947e01f52854475c19ab156c5cc99a1363d3783548b8815d4d8e60f"
+    },
+    {
+      "path": "sources/Rowan_Reach_What_We_Carry_v3.md",
+      "bytes": 31382,
+      "sha256": "06f42ecaf8162292d009612e552fbbf14d4f59e80e743f0f135f0aa0bb983728"
+    },
+    {
+      "path": "sources/rowan_reach_fiddle_first_soundtrack_v2.md",
+      "bytes": 26876,
+      "sha256": "22d521473c993e3c387d3be37b92c3b2e2489302cd285ae8c4282a5da38500ce"
+    },
+    {
+      "path": "sources/source-manifest.json",
+      "bytes": 1723,
+      "sha256": "5c4c95e8be93afd11905a6c993eba43eb6aa89d99914e55f20b0cc71de82147c"
+    }
+  ]
+}

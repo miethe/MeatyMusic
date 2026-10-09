@@ -8,6 +8,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Mission**: Deterministically convert structured creative intent into validated musical artifacts with full traceability and reproducibility.
 
+## MeatyMusic v2 scope and module boundaries
+
+MeatyMusic remains the system of record for musical projects, works, recipes, takes, stories, motifs, interpretations, and creative decisions. The v0.4.0 handoff in `docs/handoffs/pipes-workbench-v0.4.0/` is a behavior reference to port in slices; its local JSON store and review server are not production components.
+
+`pipes/` is a separable execution module inside this repository for bounded audio inspection, symbolic transforms, rendering, and execution receipts. It is not an estate service until a second consumer exists. Keep Voice Lab and `aos-tts` behind adapters using their actual versioned contracts; voice metadata does not establish singing identity. A later Aural Geometry Lab adapter must preserve exact symbolic timing and provenance without inferring musical meaning.
+
 ### North Star Principles
 
 1. **Determinism**: Same inputs + seed ⇒ same outputs

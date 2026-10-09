@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "meatymusic-review": {
+      "command": "python3",
+      "args": [
+        "/ABSOLUTE/PATH/meatymusic-sonic-workshop-handoff-v0.3.0/prototype/tools/mcp_stdio.py"
+      ],
+      "env": {
+        "MM_URL": "http://127.0.0.1:8786",
+        "MM_DATA_DIR": "/ABSOLUTE/PATH/meatymusic-sonic-workshop-handoff-v0.3.0/prototype/data"
+      }
+    }
+  }
+}

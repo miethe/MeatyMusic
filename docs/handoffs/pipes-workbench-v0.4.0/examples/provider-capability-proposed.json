@@ -1,0 +1,35 @@
+{
+  "provider": "suno",
+  "model": null,
+  "operation": "music_generation",
+  "access_mode": "manual",
+  "entitlement": "unverified",
+  "checked_at": "2026-10-07T00:00:00Z",
+  "source_refs": [
+    "P1",
+    "P3"
+  ],
+  "fields": {
+    "style": {
+      "support": "prompt_only",
+      "limit": 1000,
+      "count_unit": "utf16_code_units",
+      "notes": "Current MeatyMusic project target; verify account/model surface."
+    },
+    "excludes": {
+      "support": "prompt_only",
+      "limit": null,
+      "count_unit": null,
+      "notes": "Separate export field."
+    }
+  },
+  "supports_singing": "unknown",
+  "supports_identity_binding": "unknown",
+  "binding_operation": null,
+  "billing": {
+    "currency_or_unit": null,
+    "estimate": null,
+    "status": "unknown"
+  },
+  "evidence_boundary": "Public documentation reviewed; account/model operation not probed."
+}

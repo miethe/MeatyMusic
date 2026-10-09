@@ -1,0 +1,9 @@
+{
+  "operation": "variation.apply",
+  "input": {
+    "recipe_id": "recipe_ridgeline",
+    "transformation": "horn-led"
+  },
+  "expected_sequence": 0,
+  "idempotency_key": "example-variation-001"
+}

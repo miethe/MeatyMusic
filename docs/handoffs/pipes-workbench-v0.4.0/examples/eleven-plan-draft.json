@@ -1,0 +1,109 @@
+{
+  "schema": "meatymusic.prompt.v1",
+  "provider": "eleven",
+  "recipe_id": "recipe_ridgeline",
+  "recipe_revision": 1,
+  "style": "Instrumental symphonic folk adventure, progressive bluegrass, Indian chamber fusion; 96 BPM, 4/4. Sarod: lead, Introduces the central melody. Mandolin: answer, Short rhythmic responses. Cello: counterline, A longer independent voice. Upright bass: foundation, Maintains the pocket. Dobro: color, Connects phrases with slow slides. French horns: expansion, Develops the opening material. Divided strings: harmony, Broad supporting harmony. Opening: An intimate sarod and mandolin duet. Develop: Trade the theme; cello adds a longer line. Expansion: Strings develop the theme; horns answer softly. Return: A quiet reprise returns to the plucked voices. Modal warmth and open fifths Tactile acoustic detail, clear soloists, deep natural hall and patient dynamic growth.",
+  "excludes": "singing, lyrics, spoken word, choir, chanting, vocal samples, trailer braaams, festival EDM drops, constant percussion pounding, heavily compressed master",
+  "lyrics": "",
+  "style_count": 766,
+  "count_unit": "utf16_code_units",
+  "limit": 1000,
+  "omitted": [],
+  "warnings": [
+    "Arrangement, instrument identity, tempo and motif preservation are prompt targets, not verified audio properties.",
+    "Plan draft uses editable 30-second section placeholders; it is not a submitted provider request. Assign lyrics to sections before vocal submission."
+  ],
+  "compiler_version": "0.3.0",
+  "has_override": false,
+  "capability_snapshot": "reviewed-2026-10-07; account/model not probed",
+  "composition_plan": {
+    "chunks": [
+      {
+        "text": "[Opening] {instrumental: An intimate sarod and mandolin duet.}",
+        "duration_ms": 30000,
+        "positive_styles": [
+          "symphonic folk adventure, progressive bluegrass, Indian chamber fusion",
+          "Modal warmth and open fifths",
+          "An intimate sarod and mandolin duet."
+        ],
+        "negative_styles": [
+          "singing",
+          "lyrics",
+          "spoken word",
+          "choir",
+          "chanting",
+          "vocal samples",
+          "trailer braaams",
+          "festival EDM drops",
+          "constant percussion pounding",
+          "heavily compressed master"
+        ]
+      },
+      {
+        "text": "[Develop] {instrumental: Trade the theme; cello adds a longer line.}",
+        "duration_ms": 30000,
+        "positive_styles": [
+          "symphonic folk adventure, progressive bluegrass, Indian chamber fusion",
+          "Modal warmth and open fifths",
+          "Trade the theme; cello adds a longer line."
+        ],
+        "negative_styles": [
+          "singing",
+          "lyrics",
+          "spoken word",
+          "choir",
+          "chanting",
+          "vocal samples",
+          "trailer braaams",
+          "festival EDM drops",
+          "constant percussion pounding",
+          "heavily compressed master"
+        ]
+      },
+      {
+        "text": "[Expansion] {instrumental: Strings develop the theme; horns answer softly.}",
+        "duration_ms": 30000,
+        "positive_styles": [
+          "symphonic folk adventure, progressive bluegrass, Indian chamber fusion",
+          "Modal warmth and open fifths",
+          "Strings develop the theme; horns answer softly."
+        ],
+        "negative_styles": [
+          "singing",
+          "lyrics",
+          "spoken word",
+          "choir",
+          "chanting",
+          "vocal samples",
+          "trailer braaams",
+          "festival EDM drops",
+          "constant percussion pounding",
+          "heavily compressed master"
+        ]
+      },
+      {
+        "text": "[Return] {instrumental: A quiet reprise returns to the plucked voices.}",
+        "duration_ms": 30000,
+        "positive_styles": [
+          "symphonic folk adventure, progressive bluegrass, Indian chamber fusion",
+          "Modal warmth and open fifths",
+          "A quiet reprise returns to the plucked voices."
+        ],
+        "negative_styles": [
+          "singing",
+          "lyrics",
+          "spoken word",
+          "choir",
+          "chanting",
+          "vocal samples",
+          "trailer braaams",
+          "festival EDM drops",
+          "constant percussion pounding",
+          "heavily compressed master"
+        ]
+      }
+    ]
+  },
+  "hash": "3b6e6df316c2b0a306890fa663cb246d4f7f3be28818a8bc08d79c9135ed7807"
+}
