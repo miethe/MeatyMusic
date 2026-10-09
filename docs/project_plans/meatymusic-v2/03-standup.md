@@ -55,3 +55,5 @@ pull request create failed: GraphQL: Head sha can't be blank, Base sha can't be 
 ```
 
 No PR URL, exact-head receipt, or landing-queue entry exists yet. The queue operation is deliberately pending until a remote PR exists; the already-read `landing-enqueue --help` says the existing `MeatyMusic.jsonl` queue is used without `--new-repo`. Follow-up node: `node_01M4H07H6CAPDN5T2NNFM9M3WM` (`waiting_human`).
+
+The existing `$AOS_STATE_DIR/landing-queue/MeatyMusic.jsonl` queue was verified to exist, so a future enqueue must omit `--new-repo`. The queue was not changed because no remote PR exists. The fleet app registry and seam map are in `agentic_meta_dev`, outside this leg's writable root; follow-up `node_01M4H09CE1XBBJHZ6RJ0GA5HHS` records those remaining updates.
