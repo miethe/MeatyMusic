@@ -37,3 +37,21 @@ The report identifies 15 `context_module` entries as unsatisfiable because Skill
 - Singability request `req_01M4A9XT2C5BKP6ZD94Q8ZB5TH` is live and already `answered` (keep current weights); it was not modified or linked.
 
 The reconcile command's final summary says `0 deployed`, but the same run updated `.claude/.skillmeat-deployed.toml` and changed the local `notebooklm-skill` copy (including three script diffs and new helper files). This partial side effect is retained and listed for review; the Enterprise result remains failed and the manifest is not described as reconciled. Follow-up finding: `node_01M4GZT1BRYHZ7F91DB23SV9FA`.
+
+## PR and landing blocker
+
+Commits are present locally on `feat/meatymusic-v2-standup` through `733c250fac892b7e3483b9986ccbda5e4c794552`. Publishing the branch through the sanctioned wrapper failed:
+
+```text
+aos-git push origin HEAD:refs/heads/feat/meatymusic-v2-standup
+fatal: could not read Username for 'https://github.com': Device not configured
+```
+
+The authorized PR broker could not create a PR without the remote head:
+
+```text
+aos-gh pr create --base development --head feat/meatymusic-v2-standup ...
+pull request create failed: GraphQL: Head sha can't be blank, Base sha can't be blank, No commits between development and feat/meatymusic-v2-standup, Head ref must be a branch (createPullRequest)
+```
+
+No PR URL, exact-head receipt, or landing-queue entry exists yet. The queue operation is deliberately pending until a remote PR exists; the already-read `landing-enqueue --help` says the existing `MeatyMusic.jsonl` queue is used without `--new-repo`. Follow-up node: `node_01M4H07H6CAPDN5T2NNFM9M3WM` (`waiting_human`).
