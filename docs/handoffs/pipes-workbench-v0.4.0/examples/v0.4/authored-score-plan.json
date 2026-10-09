@@ -1,0 +1,120 @@
+{
+  "schema": "pipes.symbolic-plan.v1",
+  "status": "authored_symbolic_draft",
+  "story_id": "story_original_sketch",
+  "story_revision": 1,
+  "bpm": 80.0,
+  "total_beats": 48.0,
+  "parts": [
+    {
+      "event_id": "os_world",
+      "motif_id": "motif_world",
+      "instrument": "cello",
+      "program": 42,
+      "notes": [
+        {
+          "pitch": 62,
+          "start_beat": 0.0,
+          "duration_beats": 1.44,
+          "velocity": 78
+        },
+        {
+          "pitch": 69,
+          "start_beat": 1.44,
+          "duration_beats": 4.32,
+          "velocity": 78
+        },
+        {
+          "pitch": 67,
+          "start_beat": 5.76,
+          "duration_beats": 1.44,
+          "velocity": 78
+        },
+        {
+          "pitch": 64,
+          "start_beat": 7.2,
+          "duration_beats": 1.44,
+          "velocity": 78
+        },
+        {
+          "pitch": 62,
+          "start_beat": 8.64,
+          "duration_beats": 5.76,
+          "velocity": 78
+        }
+      ]
+    },
+    {
+      "event_id": "os_rowan",
+      "motif_id": "motif_rowan_sketch",
+      "instrument": "fiddle",
+      "program": 40,
+      "notes": [
+        {
+          "pitch": 62,
+          "start_beat": 15.36,
+          "duration_beats": 1.52727273,
+          "velocity": 78
+        },
+        {
+          "pitch": 66,
+          "start_beat": 16.88727273,
+          "duration_beats": 1.52727273,
+          "velocity": 78
+        },
+        {
+          "pitch": 69,
+          "start_beat": 18.41454545,
+          "duration_beats": 1.52727273,
+          "velocity": 78
+        },
+        {
+          "pitch": 71,
+          "start_beat": 19.94181818,
+          "duration_beats": 4.58181818,
+          "velocity": 78
+        },
+        {
+          "pitch": 69,
+          "start_beat": 24.52363636,
+          "duration_beats": 3.05454545,
+          "velocity": 78
+        },
+        {
+          "pitch": 66,
+          "start_beat": 27.57818182,
+          "duration_beats": 4.58181818,
+          "velocity": 78
+        }
+      ]
+    },
+    {
+      "event_id": "os_hearth",
+      "motif_id": "motif_hearth",
+      "instrument": "mountain-dulcimer",
+      "program": 15,
+      "notes": [
+        {
+          "pitch": 66,
+          "start_beat": 33.6,
+          "duration_beats": 2.592,
+          "velocity": 60
+        },
+        {
+          "pitch": 64,
+          "start_beat": 36.192,
+          "duration_beats": 2.592,
+          "velocity": 60
+        },
+        {
+          "pitch": 62,
+          "start_beat": 38.784,
+          "duration_beats": 7.776,
+          "velocity": 60
+        }
+      ]
+    }
+  ],
+  "notice": "Explicit authored notes; GM programs are playback hints, not a realistic performance. Not a transcription.",
+  "sha256": "a3b32c07a3c0c1203a3e0fefd0b25ac9d6cda0af2dbfeb864af97f1ab6c6c3e3"
+}

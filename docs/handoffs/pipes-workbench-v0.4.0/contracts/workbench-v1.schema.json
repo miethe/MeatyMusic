@@ -1,0 +1,646 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:meatymusic:workbench:0.4.0",
+  "title": "Implemented local workbench state",
+  "description": "Structural shape only. Runtime domain validates references, ranges, permissions, immutable media, revisions and locks. No automatic evidence promotion. Production target additions are specified separately.",
+  "type": "object",
+  "properties": {
+    "version": {
+      "const": "0.4.0"
+    },
+    "seeded": {
+      "type": "boolean"
+    },
+    "projects": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Project"
+      }
+    },
+    "works": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Work"
+      }
+    },
+    "motifs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Motif"
+      }
+    },
+    "occurrences": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Occurrence"
+      }
+    },
+    "stories": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Story"
+      }
+    },
+    "relationships": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "story_history": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "captures": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "experiments": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "packets": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "render_jobs": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "reviews": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    }
+  },
+  "required": [
+    "version",
+    "seeded",
+    "projects",
+    "works",
+    "motifs",
+    "occurrences",
+    "stories",
+    "relationships",
+    "story_history",
+    "captures",
+    "experiments",
+    "packets",
+    "render_jobs",
+    "reviews"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "Gesture": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "start": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "end": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "motif_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "instrument": {
+          "enum": [
+            "sarod",
+            "mandolin",
+            "cello",
+            "upright-bass",
+            "dobro",
+            "horns",
+            "strings",
+            "erhu",
+            "oud",
+            "ney",
+            "bansuri",
+            "koto",
+            "shakuhachi",
+            "dan-bau",
+            "sape",
+            "ranat-ek",
+            "khaen",
+            "didgeridoo",
+            "bass-clarinet",
+            "flugelhorn",
+            "mbira",
+            "marimba",
+            "qanun",
+            "santur",
+            "fiddle",
+            "mountain-dulcimer",
+            "hammered-dulcimer",
+            "kora",
+            "autoharp",
+            "viola",
+            "flute",
+            "frame-drum"
+          ]
+        },
+        "role": {
+          "enum": [
+            "lead",
+            "answer",
+            "counterline",
+            "foundation",
+            "pattern",
+            "color",
+            "expansion",
+            "silence"
+          ]
+        },
+        "gesture": {
+          "enum": [
+            "introduce",
+            "reach",
+            "recall",
+            "withdraw",
+            "hold",
+            "support",
+            "rise",
+            "release",
+            "settle",
+            "answer",
+            "absence"
+          ]
+        },
+        "level": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 1200
+        },
+        "locked": {
+          "type": "boolean"
+        },
+        "source_occurrence_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "transpose": {
+          "type": "integer",
+          "minimum": -24,
+          "maximum": 24
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "start",
+        "end",
+        "motif_id",
+        "instrument",
+        "role",
+        "gesture",
+        "level",
+        "note",
+        "locked"
+      ],
+      "additionalProperties": false
+    },
+    "StoryRelationship": {
+      "type": "object",
+      "properties": {
+        "source_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "target_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "kind": {
+          "enum": [
+            "recalls",
+            "answers",
+            "grows_from",
+            "supports",
+            "withholds",
+            "contrasts_with",
+            "coincides"
+          ]
+        }
+      },
+      "required": [
+        "source_id",
+        "target_id",
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "Story": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "project_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "work_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "based_on_take_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "clock": {
+          "const": "relative"
+        },
+        "status": {
+          "const": "intent_draft"
+        },
+        "target_duration_seconds": {
+          "type": "number",
+          "minimum": 4,
+          "maximum": 1200
+        },
+        "style_base": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "excludes": {
+          "type": "string",
+          "maxLength": 3000
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Gesture"
+          },
+          "maxItems": 32
+        },
+        "relationships": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/StoryRelationship"
+          },
+          "maxItems": 64
+        },
+        "parent_story": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "created_at": {
+          "type": "string",
+          "minLength": 1
+        },
+        "updated_at": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "title",
+        "project_id",
+        "clock",
+        "status",
+        "target_duration_seconds",
+        "style_base",
+        "excludes",
+        "events",
+        "relationships"
+      ],
+      "additionalProperties": false
+    },
+    "Project": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "parent_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "kind": {
+          "enum": [
+            "world",
+            "culture",
+            "collection",
+            "project"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "maxItems": 24
+        }
+      },
+      "required": [
+        "id",
+        "parent_id",
+        "kind",
+        "title",
+        "summary",
+        "tags"
+      ],
+      "additionalProperties": false
+    },
+    "Work": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "project_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recipe_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "recipe_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        },
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "take_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        }
+      },
+      "required": [
+        "id",
+        "project_id",
+        "title",
+        "recipe_id",
+        "kind",
+        "status",
+        "take_ids"
+      ],
+      "additionalProperties": true
+    },
+    "Symbolic": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "authored_sketch",
+            "human_verified_score"
+          ]
+        },
+        "pitches": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 127
+          }
+        },
+        "durations": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          }
+        }
+      },
+      "required": [
+        "status",
+        "pitches",
+        "durations"
+      ],
+      "additionalProperties": false
+    },
+    "Motif": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "project_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "melodic",
+            "rhythmic_melodic",
+            "expressive_arc",
+            "harmonic",
+            "textural"
+          ]
+        },
+        "meaning": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "maxItems": 24
+        },
+        "symbolic": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/Symbolic"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "project_id",
+        "title",
+        "kind",
+        "meaning",
+        "status",
+        "tags",
+        "symbolic"
+      ],
+      "additionalProperties": true
+    },
+    "Occurrence": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "take_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "work_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "motif_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "start": {
+          "type": "number",
+          "minimum": 0
+        },
+        "end": {
+          "type": "number",
+          "minimum": 0
+        },
+        "parent_occurrence_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "instrument": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence": {
+          "const": "human_report"
+        },
+        "timing_precision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "note": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "verification": {
+          "const": "not_score_verified"
+        }
+      },
+      "required": [
+        "id",
+        "take_id",
+        "work_id",
+        "motif_id",
+        "title",
+        "start",
+        "end",
+        "parent_occurrence_id",
+        "instrument",
+        "evidence",
+        "timing_precision",
+        "note",
+        "source",
+        "verification"
+      ],
+      "additionalProperties": true
+    }
+  }
+}

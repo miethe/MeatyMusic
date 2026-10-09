@@ -1,0 +1,14 @@
+{
+  "transport": "about:blank DOM with Python loopback HTTP bridge; native browser navigation blocked by environment policy",
+  "checks": [
+    "Bridged browser seed and waveform loaded through real domain/HTTP service",
+    "Gesture revision persisted via shared domain API",
+    "Six distinct motif identities and evidence types visible",
+    "Recognition query maps to local yearning/context materials",
+    "Root/culture/collection scope reveals 9 works, only 1 recorded",
+    "Authored note-backed story creates playable diagnostic WAV and MIDI; no provider used",
+    "Mobile evidence canvas rendered"
+  ],
+  "errors": [],
+  "mobile_overflow": false
+}

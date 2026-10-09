@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Prototype command envelope",
+  "description": "Implemented transport envelope. Mutations additionally require sequence and idempotency; operation validation lives in domain handlers.",
+  "type": "object",
+  "properties": {
+    "operation": {
+      "type": "string",
+      "minLength": 1
+    },
+    "input": {
+      "type": "object"
+    },
+    "expected_sequence": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    }
+  },
+  "required": [
+    "operation"
+  ],
+  "additionalProperties": false
+}

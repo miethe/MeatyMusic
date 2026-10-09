@@ -1,0 +1,44 @@
+{
+  "checked_at": "2026-10-09",
+  "sources": [
+    {
+      "name": "meatymusic-sonic-workshop-handoff-v0.3.0(1).zip",
+      "role": "additive application baseline",
+      "sha256": "d61b4b17461ef38c82127d4b1e2788f754cc33423a85774f3dc69f3a58205963",
+      "bytes": 7739884,
+      "status": "supplied_source_not_proof_of_deployment"
+    },
+    {
+      "name": "Pipes_Music_MCP_Starter_v0.1.zip",
+      "role": "original execution starter",
+      "sha256": "e673c1cf285ae9870aea2f12fa642ae023145363ed70283b5384480ff5a64853",
+      "bytes": 9094,
+      "status": "supplied_source_not_proof_of_deployment"
+    },
+    {
+      "name": "Above the Rowan Canopy - OMG.wav",
+      "role": "immutable user-selected full reference",
+      "sha256": "dc900e042f1bea1fe48ae504106e89a4fd0d6fc53915b121eaddbe55e6fee1c6",
+      "bytes": 37415440,
+      "status": "supplied_source_not_proof_of_deployment"
+    },
+    {
+      "name": "basic_pitch_transcription.mid",
+      "role": "user-supplied unverified transcription",
+      "sha256": "093ed09746ae3d8555e2868e7028b7a50ab82dbc26d6175570cd7c158d579ac3",
+      "bytes": 3797,
+      "status": "supplied_source_not_proof_of_deployment"
+    },
+    {
+      "name": "Rowan_Reach_What_We_Carry_v3.zip",
+      "role": "creative constitution and eight cue briefs",
+      "sha256": "93953107ff2427fd1ae7452f24edd715fdb1c53550b0f5d6618a37e386a2fc05",
+      "bytes": 10404220,
+      "status": "supplied_source_not_proof_of_deployment"
+    }
+  ],
+  "new_work": "Additive workbench/Pipes code, contracts, docs and private seed derived from supplied context; no live repo edits or provider calls.",
+  "source_audio_unchanged": true,
+  "interpretation_author": "Nick",
+  "full_recording_precedence": true
+}

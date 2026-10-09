@@ -1,0 +1,368 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Proposed production SDS v2",
+  "description": "Design target, not the implemented prototype store or a deployed MeatyMusic schema. Migrator must preserve legacy IDs and unknown fields. Semantic reference/timing checks are separate.",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "meatymusic.sds"
+    },
+    "schema_version": {
+      "const": "2.0"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "legacy_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "asset_kind": {
+      "enum": [
+        "score",
+        "song",
+        "motif",
+        "loop",
+        "one_shot",
+        "texture",
+        "stem"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "identity_profile_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "vocal_mode": {
+      "enum": [
+        "instrumental",
+        "solo",
+        "duet",
+        "ensemble"
+      ]
+    },
+    "style": {
+      "type": "object",
+      "properties": {
+        "roots": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "moods": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "production": {
+          "type": "string"
+        },
+        "tonality": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "description": {
+              "type": "string"
+            },
+            "tonic": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "mode": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "tuning_ref": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "rhythm": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "bpm": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "exclusiveMinimum": 0
+            },
+            "meter": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "timing_mode": {
+              "enum": [
+                "free",
+                "relative",
+                "approximate",
+                "exact"
+              ]
+            },
+            "description": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "roots",
+        "moods",
+        "production",
+        "tonality",
+        "rhythm"
+      ],
+      "additionalProperties": false
+    },
+    "ensemble": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "part_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "instrument_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "role": {
+            "enum": [
+              "lead",
+              "answer",
+              "counterline",
+              "foundation",
+              "color",
+              "expansion",
+              "harmony",
+              "drone",
+              "texture",
+              "punctuation",
+              "rhythm",
+              "unspecified"
+            ]
+          },
+          "behavior": {
+            "type": "string"
+          },
+          "articulation": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "register_intent": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "part_id",
+          "instrument_ref",
+          "role",
+          "behavior"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "form": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "section_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "intent": {
+            "type": "string"
+          },
+          "active_parts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "timing_mode": {
+            "enum": [
+              "relative",
+              "approximate",
+              "exact"
+            ]
+          },
+          "duration_target_seconds": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "exclusiveMinimum": 0
+          },
+          "role_overrides": {
+            "type": "object",
+            "additionalProperties": {
+              "enum": [
+                "lead",
+                "answer",
+                "counterline",
+                "foundation",
+                "color",
+                "expansion",
+                "harmony",
+                "drone",
+                "texture",
+                "punctuation",
+                "rhythm",
+                "unspecified"
+              ]
+            }
+          },
+          "pinned": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "section_id",
+          "name",
+          "intent",
+          "active_parts",
+          "timing_mode",
+          "pinned"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "lyrics": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "cast_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "exclusions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "purpose": {
+            "enum": [
+              "pacing",
+              "timbre",
+              "structure",
+              "melody",
+              "phrasing",
+              "inspiration"
+            ]
+          },
+          "asset_ref": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "notes": {
+            "type": "string"
+          },
+          "permission_state": {
+            "enum": [
+              "allowed",
+              "denied",
+              "unknown"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "purpose",
+          "notes",
+          "permission_state"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "locks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "provenance": {
+      "type": "object"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "schema",
+    "schema_version",
+    "id",
+    "revision",
+    "asset_kind",
+    "title",
+    "vocal_mode",
+    "style",
+    "ensemble",
+    "form",
+    "lyrics",
+    "cast_refs",
+    "exclusions",
+    "references",
+    "locks",
+    "provenance",
+    "created_at"
+  ],
+  "additionalProperties": false
+}

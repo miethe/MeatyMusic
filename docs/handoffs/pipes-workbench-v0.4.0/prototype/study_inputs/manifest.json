@@ -1,0 +1,37 @@
+{
+  "schema": "pipes.source-receipt.v1",
+  "files": [
+    {
+      "name": "rowan-original.wav",
+      "sha256": "dc900e042f1bea1fe48ae504106e89a4fd0d6fc53915b121eaddbe55e6fee1c6",
+      "type": "audio",
+      "media": {
+        "duration": 194.8,
+        "sample_rate": 48000,
+        "channels": 2,
+        "sample_width": 2,
+        "frames": 9350400
+      }
+    },
+    {
+      "name": "rowan-raw.mid",
+      "sha256": "093ed09746ae3d8555e2868e7028b7a50ab82dbc26d6175570cd7c158d579ac3",
+      "type": "midi",
+      "origin_seconds": 0,
+      "tempo_status": "not_recording_tempo"
+    }
+  ],
+  "analysis": {
+    "waveform_method": "720 full-recording peak and RMS bins; no emotional inference",
+    "midi_parser": "pipes_mcp.story.midi_inventory",
+    "midi_note_count": 434,
+    "external_calls": 0
+  },
+  "permissions": {
+    "local_playback": "user_provided",
+    "local_dsp": "requested",
+    "model_analysis": "unknown",
+    "cross_provider_reference": "unknown",
+    "publication": "unknown"
+  }
+}

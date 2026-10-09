@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-09",
+  "artifact": "MeatyMusic + Pipes v0.4.0",
+  "prototype_tests": {
+    "passed": 81,
+    "failed": 0
+  },
+  "pipes_core_tests": {
+    "passed": 5,
+    "failed": 0
+  },
+  "browser": {
+    "transport": "about:blank DOM with Python loopback HTTP bridge; native browser navigation blocked by environment policy",
+    "checks": [
+      "Bridged browser seed and waveform loaded through real domain/HTTP service",
+      "Gesture revision persisted via shared domain API",
+      "Six distinct motif identities and evidence types visible",
+      "Recognition query maps to local yearning/context materials",
+      "Root/culture/collection scope reveals 9 works, only 1 recorded",
+      "Authored note-backed story creates playable diagnostic WAV and MIDI; no provider used",
+      "Mobile evidence canvas rendered"
+    ],
+    "errors": [],
+    "mobile_overflow": false
+  },
+  "syntax": "Python source compiled; both JS modules node --check passed",
+  "schema": "Draft2020-12 checked; resulting seeded/prepared/rendered workbench state validated",
+  "mcp": "28 tools; lifecycle/list/compile and real local workbench read/write exercised",
+  "source_sha256": "dc900e042f1bea1fe48ae504106e89a4fd0d6fc53915b121eaddbe55e6fee1c6",
+  "source_unchanged": true,
+  "midi_events": 434,
+  "midi_parser_validation": "Every event matched PrettyMIDI pitch/start/end within 1e-5 seconds; same-pitch overlap policy documented; not transcription verification",
+  "prompt_counts": {
+    "style": 506,
+    "arrangement": 1642
+  },
+  "context_dependency_check": "peak includes enclosing full return, earlier swell and exact source",
+  "live_daw_connected": false,
+  "remote_models_called": 0,
+  "deployed_to_user_estate": false,
+  "standalone_pipes_sdk_handshake": "not tested",
+  "native_browser_bootstrap": "requires user-local smoke test; browser flows used test-only bridge"
+}

@@ -1,0 +1,7 @@
+{
+  "operation": "variation.plan",
+  "input": {
+    "recipe_id": "recipe_ridgeline",
+    "transformation": "horn-led"
+  }
+}

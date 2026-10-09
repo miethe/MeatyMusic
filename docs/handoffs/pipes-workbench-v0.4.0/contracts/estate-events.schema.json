@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Proposed estate outbox event",
+  "description": "Future outbox contract. Prototype event history is local and does not publish this contract to other services.",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "meatymusic.estate-event.v1"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "type": {
+      "type": "string",
+      "minLength": 1
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "actor_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "subject_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "subject_revision": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "correlation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "effect_scope": {
+      "enum": [
+        "local",
+        "external_requested",
+        "external_confirmed",
+        "external_unknown"
+      ]
+    },
+    "evidence_class": {
+      "enum": [
+        "declared",
+        "human_attested",
+        "measured",
+        "provider_confirmed",
+        "unknown"
+      ]
+    },
+    "artifact_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "producer": {
+      "const": "MeatyMusic"
+    }
+  },
+  "required": [
+    "schema",
+    "id",
+    "type",
+    "occurred_at",
+    "actor_ref",
+    "subject_ref",
+    "subject_revision",
+    "correlation_id",
+    "effect_scope",
+    "evidence_class",
+    "artifact_refs",
+    "producer"
+  ],
+  "additionalProperties": false
+}

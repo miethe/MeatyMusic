@@ -1,0 +1,38 @@
+{
+  "transport": "about:blank DOM + loopback HTTP bridge",
+  "checks": [
+    "Initial arrangement loads seven role-aware parts.",
+    "Preview/apply creates a separate horn-led variation.",
+    "Suno handoff freezes under-budget style and records prepared/not-submitted state.",
+    "Audio import through UI stores original bytes and shows a measured waveform.",
+    "A bounded time region and note persist against the exact imported take.",
+    "Diagnostic audio plays from the selected range through an in-memory audio Blob.",
+    "Singer direction updates without claiming verified singing identity.",
+    "Voice Lab promotion bundle imports as speech-scoped metadata only.",
+    "Six explicit provider/estate routes visible with no live connection claims.",
+    "Instrument atlas filters by family/context.",
+    "430px voice workspace has no horizontal overflow.",
+    "430px arrangement workspace has no horizontal overflow.",
+    "Keyboard Escape dismisses dialog."
+  ],
+  "page_errors": [],
+  "screens": [
+    "01-workshop.png",
+    "02-variation-diff.png",
+    "03-variations.png",
+    "04-suno-handoff.png",
+    "05-listening-room.png",
+    "06-singers-and-voices.png",
+    "07-connections.png",
+    "08-library.png",
+    "09-instrument-atlas.png",
+    "10-mobile-voices.png",
+    "11-mobile-workshop.png"
+  ],
+  "status": "passed",
+  "limits": [
+    "Native browser loopback navigation was blocked by managed browser policy in the authoring environment. Screens and interactions were tested with a local HTTP transport bridge.",
+    "Clipboard permission and native download behavior require a local browser acceptance pass.",
+    "No remote provider, singer identity, live estate service, or production deployment was tested."
+  ]
+}

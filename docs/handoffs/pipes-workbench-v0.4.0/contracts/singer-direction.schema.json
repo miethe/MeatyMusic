@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Implemented singer direction",
+  "description": "Creative intent only. A linked speech resource does not change singing identity status.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "role": {
+      "type": "string"
+    },
+    "register": {
+      "type": "string"
+    },
+    "character": {
+      "type": "string"
+    },
+    "phrasing": {
+      "type": "string"
+    },
+    "vibrato": {
+      "type": "string"
+    },
+    "language": {
+      "type": "string"
+    },
+    "identity_status": {
+      "const": "direction_only"
+    },
+    "voice_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "id",
+    "revision",
+    "name",
+    "role",
+    "register",
+    "character",
+    "phrasing",
+    "vibrato",
+    "language",
+    "identity_status",
+    "voice_ref"
+  ],
+  "additionalProperties": false
+}
