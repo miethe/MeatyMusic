@@ -12,6 +12,7 @@ from app.models.lyrics import Lyrics
 from app.models.persona import Persona
 from app.models.producer_notes import ProducerNotes
 from app.models.song import Song, WorkflowRun
+from app.models.story import SongStory, SongMotif, IdempotencyRecord
 from app.models.source import Source
 from app.models.style import Style
 from app.models.workflow import NodeExecution, WorkflowEvent
@@ -33,6 +34,9 @@ __all__ = [
     "ProducerNotes",
     "Song",
     "WorkflowRun",
+    "SongStory",
+    "SongMotif",
+    "IdempotencyRecord",
     "Source",
     "Style",
     # Workflow execution models
