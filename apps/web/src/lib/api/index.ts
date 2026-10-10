@@ -25,3 +25,5 @@ export type { BlueprintFilters } from './blueprints';
 
 export { workflowsApi } from './workflows';
 export type { WorkflowRunFilters } from './workflows';
+
+export { storiesApi, StoryRevisionConflictError } from './stories';

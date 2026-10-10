@@ -129,6 +129,39 @@ export interface Song extends SongBase {
   deleted_at?: ISODateTime;
 }
 
+/** Song story and motif records returned by the stories API. */
+export interface SongStory {
+  id: UUID;
+  song_id: UUID;
+  take_id: UUID | null;
+  title: string;
+  body_text: string;
+  revision: number;
+  motifs?: SongMotif[];
+  created_at: ISODateTime;
+  updated_at: ISODateTime;
+  deleted_at?: ISODateTime | null;
+}
+
+export interface SongMotif {
+  id: UUID;
+  song_id: UUID;
+  story_id: UUID;
+  take_id: UUID | null;
+  label: string;
+  notes: string | null;
+  anchor: Record<string, unknown> | null;
+  revision: number;
+  created_at: ISODateTime;
+  updated_at: ISODateTime;
+  deleted_at?: ISODateTime | null;
+}
+
+export interface SongStoryCreate { title: string; body_text: string; take_id?: UUID | null }
+export interface SongStoryPatch { expected_revision: number; title?: string; body_text?: string; take_id?: UUID | null }
+export interface SongMotifCreate { label: string; notes?: string | null; anchor?: Record<string, unknown> | null; take_id?: UUID | null }
+export interface SongMotifPatch { expected_revision: number; label?: string; notes?: string | null; anchor?: Record<string, unknown> | null; take_id?: UUID | null }
+
 /**
  * Style Entity Types
  * Backend: app/schemas/style.py

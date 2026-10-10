@@ -65,6 +65,8 @@ export {
 } from './useBlueprints';
 
 // Workflow hooks
+export { useSongStories, useStory, useCreateStory, useUpdateStory, useCreateMotif, useUpdateMotif } from './useStories';
+
 export {
   useWorkflowRuns,
   useWorkflowRun,

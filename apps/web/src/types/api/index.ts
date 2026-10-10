@@ -72,6 +72,12 @@ export type {
   ComposedPromptUpdate,
   ComposedPrompt,
   ComposedPromptMeta,
+  SongStory,
+  SongMotif,
+  SongStoryCreate,
+  SongStoryPatch,
+  SongMotifCreate,
+  SongMotifPatch,
 } from './entities';
 
 export {
@@ -149,7 +155,7 @@ export {
  * Re-export all types as a namespace for convenience
  */
 import * as Entities from './entities';
-import * as Workflows from './workflows';
 import * as Events from './events';
+import * as Workflows from './workflows';
 
 export { Entities, Workflows, Events };
