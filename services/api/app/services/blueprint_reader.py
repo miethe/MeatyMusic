@@ -14,10 +14,10 @@ and database operations. BlueprintReaderService is optimized for:
 from __future__ import annotations
 
 from typing import Dict, List, Any, Optional
-from pathlib import Path
 import re
 import structlog
 
+from app.core import paths
 from app.errors import NotFoundError, BadRequestError
 
 logger = structlog.get_logger(__name__)
@@ -44,8 +44,8 @@ class BlueprintReaderService:
         BLUEPRINT_DIR: Path to blueprint markdown files
     """
 
-    # Absolute path to blueprint directory (per project requirements)
-    BLUEPRINT_DIR = Path("/home/user/MeatyMusic/docs/hit_song_blueprint/AI")
+    # Blueprint directory, resolved from the repo root (see app.core.paths)
+    BLUEPRINT_DIR = paths.BLUEPRINT_DIR
 
     def __init__(self):
         """Initialize the blueprint reader service."""

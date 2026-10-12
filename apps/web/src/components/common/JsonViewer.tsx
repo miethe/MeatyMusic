@@ -17,7 +17,10 @@
 
 import * as React from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+// Use the CJS style bundle (matching the main `Prism` import above), not the ESM one: the latter
+// ships bare `export` syntax that Jest/CJS cannot require() unmodified, and mixing an ESM subpath
+// import with the package's CJS main import was the actual root cause of the Jest parse failure.
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import { cn } from '@/lib/utils';
 import { Button } from '@meatymusic/ui';
 import { toast } from 'sonner';

@@ -123,7 +123,10 @@ describe('ConnectionStatus', () => {
       userEvent.hover(badge);
 
       await waitFor(() => {
-        expect(screen.getByText('Connection timeout')).toBeInTheDocument();
+        // Radix Tooltip renders the content twice by design: once in the visible popper
+        // bubble, and again inside a visually-hidden `role="tooltip"` span used for screen
+        // readers (associated via aria-describedby) — so assert presence via getAllByText.
+        expect(screen.getAllByText('Connection timeout').length).toBeGreaterThan(0);
       });
     });
   });

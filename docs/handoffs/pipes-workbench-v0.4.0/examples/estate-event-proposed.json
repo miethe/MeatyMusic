@@ -1,0 +1,16 @@
+{
+  "schema": "meatymusic.estate-event.v1",
+  "id": "event_example",
+  "type": "moment.saved",
+  "occurred_at": "2026-10-07T00:00:00Z",
+  "actor_ref": "local-operator",
+  "subject_ref": "moment_example",
+  "subject_revision": 1,
+  "correlation_id": "correlation_example",
+  "effect_scope": "local",
+  "evidence_class": "human_attested",
+  "artifact_refs": [
+    "take_example"
+  ],
+  "producer": "MeatyMusic"
+}

@@ -842,12 +842,13 @@ class RubricScorer:
 
         if "verse" in section_lower:
             return "verse"
+        # Pre-chorus must be checked before chorus, which it contains
+        elif "pre" in section_lower and "chorus" in section_lower:
+            return "prechorus"
         elif "chorus" in section_lower:
             return "chorus"
         elif "bridge" in section_lower:
             return "bridge"
-        elif "pre" in section_lower and "chorus" in section_lower:
-            return "prechorus"
         elif "intro" in section_lower:
             return "intro"
         elif "outro" in section_lower:
@@ -1159,7 +1160,43 @@ class RubricScorer:
                 if word1[-3:] == word2[-3:]:
                     return True
 
+        # Spelling differs but the sound matches (complete / seat / street)
+        key1 = self._rhyme_key(word1)
+        if len(key1) >= 2 and key1 == self._rhyme_key(word2):
+            return True
+
         return False
+
+    # Long-vowel spellings that sound alike (ee/ea -> E, ai/ay -> A, ...)
+    _VOWEL_TEAMS = {
+        "ee": "E", "ea": "E", "ie": "E", "ei": "E",
+        "ai": "A", "ay": "A", "ey": "A",
+        "oa": "O", "oe": "O", "ow": "O",
+        "oo": "U", "ue": "U", "ew": "U",
+    }
+
+    def _rhyme_key(self, word: str) -> str:
+        """Approximate the rhyming sound of a word: last vowel sound + coda.
+
+        Folds a silent-e long vowel (complete -> "Et") and common vowel teams
+        (seat -> "Et") onto one token so that different spellings compare equal.
+        """
+        word = re.sub(r'[^a-z]', '', word.lower())
+
+        # Vowel + single consonant + silent e is a long vowel (complete, time)
+        magic_e = re.search(r'([aeiou])([^aeiouy])e$', word)
+        if magic_e:
+            return magic_e.group(1).upper() + magic_e.group(2)
+
+        # Any other final silent e (dance -> danc), unless it is the only vowel
+        if word.endswith('e') and len(re.findall(r'[aeiouy]+', word)) > 1:
+            word = word[:-1]
+
+        rime = re.search(r'([aeiouy]+)([^aeiouy]*)$', word)
+        if not rime:
+            return word
+        vowels, coda = rime.groups()
+        return self._VOWEL_TEAMS.get(vowels[-2:], vowels) + coda
 
     # =========================================================================
     # Section Completeness Metric

@@ -1,0 +1,50 @@
+test_bad_url_rejected (test_domain.DomainTests.test_bad_url_rejected) ... ok
+test_chamber_removes_dangling_role_overrides (test_domain.DomainTests.test_chamber_removes_dangling_role_overrides) ... ok
+test_compiler_deterministic (test_domain.DomainTests.test_compiler_deterministic) ... ok
+test_export_never_contains_local_credential (test_domain.DomainTests.test_export_never_contains_local_credential) ... ok
+test_handoff_immutable_recipe_snapshot (test_domain.DomainTests.test_handoff_immutable_recipe_snapshot) ... ok
+test_horn_addition_assigns_section_lead (test_domain.DomainTests.test_horn_addition_assigns_section_lead) ... ok
+test_idempotency_conflict (test_domain.DomainTests.test_idempotency_conflict) ... ok
+test_idempotent_replay (test_domain.DomainTests.test_idempotent_replay) ... ok
+test_initial_seed (test_domain.DomainTests.test_initial_seed) ... ok
+test_link_only_no_waveform (test_domain.DomainTests.test_link_only_no_waveform) ... ok
+test_live_render_explicitly_not_implemented (test_domain.DomainTests.test_live_render_explicitly_not_implemented) ... ok
+test_locked_part_update (test_domain.DomainTests.test_locked_part_update) ... ok
+test_lyrics_limit (test_domain.DomainTests.test_lyrics_limit) ... ok
+test_moment_bounds (test_domain.DomainTests.test_moment_bounds) ... ok
+test_moment_to_recipe_no_audio_copy (test_domain.DomainTests.test_moment_to_recipe_no_audio_copy) ... ok
+test_mutation_rollback (test_domain.DomainTests.test_mutation_rollback) ... ok
+test_no_silent_truncation (test_domain.DomainTests.test_no_silent_truncation) ... ok
+test_override_exact (test_domain.DomainTests.test_override_exact) ... ok
+test_override_whitespace_preserved (test_domain.DomainTests.test_override_whitespace_preserved) ... ok
+test_pinned_lead_protected (test_domain.DomainTests.test_pinned_lead_protected) ... ok
+test_prompt_separate_limits (test_domain.DomainTests.test_prompt_separate_limits) ... ok
+test_rhythm_pinned (test_domain.DomainTests.test_rhythm_pinned) ... ok
+test_section_role_overrides (test_domain.DomainTests.test_section_role_overrides) ... ok
+test_singer_profile_is_direction (test_domain.DomainTests.test_singer_profile_is_direction) ... ok
+test_stale_sequence (test_domain.DomainTests.test_stale_sequence) ... ok
+test_state_survives_reload (test_domain.DomainTests.test_state_survives_reload) ... ok
+test_submission_state_user_attested (test_domain.DomainTests.test_submission_state_user_attested) ... ok
+test_unpin_then_change (test_domain.DomainTests.test_unpin_then_change) ... ok
+test_utf16_counter (test_domain.DomainTests.test_utf16_counter) ... ok
+test_variation_parent_unchanged (test_domain.DomainTests.test_variation_parent_unchanged) ... ok
+test_vocal_cast_removes_conflicting_excludes (test_domain.DomainTests.test_vocal_cast_removes_conflicting_excludes) ... ok
+test_voice_binding_conflict (test_domain.DomainTests.test_voice_binding_conflict) ... ok
+test_voice_metadata_not_singing_identity (test_domain.DomainTests.test_voice_metadata_not_singing_identity) ... ok
+test_cannot_register_arbitrary_server_path (test_transport.TransportTests.test_cannot_register_arbitrary_server_path) ... ok
+test_cli_compiler (test_transport.TransportTests.test_cli_compiler) ... ok
+test_cross_origin_denied (test_transport.TransportTests.test_cross_origin_denied) ... ok
+test_health_no_provider_claim (test_transport.TransportTests.test_health_no_provider_claim) ... ok
+test_host_denied (test_transport.TransportTests.test_host_denied) ... ok
+test_implemented_openapi_available (test_transport.TransportTests.test_implemented_openapi_available) ... ok
+test_index_has_cookie_and_csrf (test_transport.TransportTests.test_index_has_cookie_and_csrf) ... ok
+test_invalid_audio_signature (test_transport.TransportTests.test_invalid_audio_signature) ... ok
+test_mcp_lifecycle_and_compile (test_transport.TransportTests.test_mcp_lifecycle_and_compile) ... ok
+test_state_requires_auth (test_transport.TransportTests.test_state_requires_auth) ... ok
+test_unsupported_generation_is_501 (test_transport.TransportTests.test_unsupported_generation_is_501) ... ok
+test_upload_original_hash_and_range (test_transport.TransportTests.test_upload_original_hash_and_range) ... ok
+
+----------------------------------------------------------------------
+Ran 45 tests in 1.728s
+
+OK

@@ -209,6 +209,11 @@ export function EntityDetailSection({ entityType, entityId, entityData, editHref
             <div className="space-y-3 mb-4">
               {properties.map(({ label, value, type }) => {
                 if (value === null || value === undefined) return null;
+                // Several entries (e.g. Mood, Delivery Style) default a missing array field to
+                // `[]` so the array-rendering branch below never has to special-case undefined;
+                // that default is neither null nor undefined, so it must be excluded here too,
+                // or a field with genuinely no data still renders its label with a "None" value.
+                if (Array.isArray(value) && value.length === 0) return null;
 
                 return (
                   <div key={label}>

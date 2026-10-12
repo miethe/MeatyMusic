@@ -104,8 +104,15 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     // Store error info in state
     this.setState({ errorInfo });
 
-    // Call custom error callback if provided
-    this.props.onError?.(error, errorInfo);
+    // Call custom error callback if provided. Wrap in try/catch so a bug in the caller's
+    // handler cannot propagate back into React's error-boundary machinery and cause a cascade.
+    if (this.props.onError) {
+      try {
+        this.props.onError(error, errorInfo);
+      } catch (callbackError) {
+        console.error('[ErrorBoundary] Error in onError callback:', callbackError);
+      }
+    }
   }
 
   /**
@@ -244,6 +251,7 @@ function DefaultErrorFallback({
           {/* Actions */}
           <div className="mt-4 flex flex-wrap gap-3">
             <button
+              type="button"
               onClick={onReset}
               className="inline-flex items-center gap-2 rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:bg-red-700 dark:hover:bg-red-600 transition-colors"
               aria-label="Try again"
@@ -253,6 +261,7 @@ function DefaultErrorFallback({
             </button>
 
             <button
+              type="button"
               onClick={onReload}
               className="inline-flex items-center gap-2 rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:border-red-700 dark:bg-red-950 dark:text-red-200 dark:hover:bg-red-900 transition-colors"
               aria-label="Reload page"

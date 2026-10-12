@@ -167,9 +167,12 @@ describe('StyleEditor', () => {
       );
 
       await waitFor(() => {
+        // The warning renders twice by design: inline under the Instrumentation ChipSelector,
+        // and again in the aggregated EntityPreviewPanel issues list — so assert presence via
+        // getAllByText rather than the single-match getByText.
         expect(
-          screen.getByText(/more than 3 instruments may dilute the mix/i)
-        ).toBeInTheDocument();
+          screen.getAllByText(/more than 3 instruments may dilute the mix/i).length
+        ).toBeGreaterThan(0);
       });
     });
 
@@ -356,8 +359,15 @@ describe('StyleEditor', () => {
         <StyleEditor initialValue={{}} onSave={mockOnSave} onCancel={mockOnCancel} />
       );
 
-      const nameLabel = screen.getByText(/style name/i);
-      const requiredIndicator = nameLabel.querySelector('.text-accent-error');
+      // Scope to the <label> itself: a validation message ("Style name is required") also
+      // contains this text, so the unscoped query matches twice.
+      const nameLabel = screen.getByText(/style name/i, { selector: 'label' });
+      // StyleEditor was migrated off the custom `accent-error` design token onto the plain
+      // Tailwind `red-500` palette in 065f7af ("fix: resolve lyrics API, repository, CORS, and
+      // slider rendering issues") — intentional, documented in that commit's message. This test
+      // predates/missed that migration since the suite could not run until the ESM/transform
+      // fixes landed, so it still looked for the retired class name.
+      const requiredIndicator = nameLabel.querySelector('.text-red-500');
       expect(requiredIndicator).toBeInTheDocument();
     });
 
@@ -366,8 +376,9 @@ describe('StyleEditor', () => {
         <StyleEditor initialValue={{}} onSave={mockOnSave} onCancel={mockOnCancel} />
       );
 
-      const genreLabel = screen.getByText(/primary genre/i);
-      const requiredIndicator = genreLabel.querySelector('.text-accent-error');
+      const genreLabel = screen.getByText(/primary genre/i, { selector: 'label' });
+      // See note above (065f7af): `accent-error` -> `red-500`.
+      const requiredIndicator = genreLabel.querySelector('.text-red-500');
       expect(requiredIndicator).toBeInTheDocument();
     });
   });

@@ -1,0 +1,30 @@
+{
+  "schema": "meatymusic.voice-design-brief.v1",
+  "status": "proposed_interchange",
+  "singer": {
+    "id": "singer_ember",
+    "revision": 1,
+    "name": "Ember",
+    "role": "lead",
+    "register": "Warm alto",
+    "character": "Smooth, intimate, lightly smoky",
+    "phrasing": "Patient lines; a slow descending melisma on a sustained hook vowel",
+    "vibrato": "Restrained, arriving late on held notes",
+    "language": "English",
+    "identity_status": "direction_only",
+    "voice_ref": null
+  },
+  "intended_use": "singer_character_design",
+  "speech_and_singing_separate": true,
+  "required_review": [
+    "Speech auditions do not establish singing range or identity.",
+    "No automatic promotion or provider enrollment."
+  ],
+  "probe_plan": [
+    "Spoken character read",
+    "Vowel and pitch study where supported",
+    "Short original sung phrase where supported",
+    "Audition in ensemble"
+  ],
+  "created_at": "2026-10-07T17:02:06.273973+00:00"
+}

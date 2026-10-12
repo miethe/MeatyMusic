@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Proposed provider capability snapshot",
+  "description": "Production adapter-discovery target. Not populated by a live probe in this prototype. Unknown stays unknown.",
+  "type": "object",
+  "properties": {
+    "provider": {
+      "type": "string",
+      "minLength": 1
+    },
+    "model": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "operation": {
+      "type": "string",
+      "minLength": 1
+    },
+    "access_mode": {
+      "enum": [
+        "manual",
+        "official_api",
+        "local",
+        "unverified"
+      ]
+    },
+    "entitlement": {
+      "enum": [
+        "verified",
+        "unverified",
+        "unavailable"
+      ]
+    },
+    "checked_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "fields": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "support": {
+            "enum": [
+              "native_parameter",
+              "prompt_only",
+              "unsupported",
+              "unknown"
+            ]
+          },
+          "limit": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "count_unit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "support",
+          "notes"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "supports_singing": {
+      "enum": [
+        "verified",
+        "unsupported",
+        "unknown"
+      ]
+    },
+    "supports_identity_binding": {
+      "enum": [
+        "verified",
+        "unsupported",
+        "unknown"
+      ]
+    },
+    "binding_operation": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "billing": {
+      "type": "object",
+      "properties": {
+        "currency_or_unit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "estimate": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "status": {
+          "enum": [
+            "verified",
+            "estimate",
+            "unknown"
+          ]
+        }
+      },
+      "required": [
+        "currency_or_unit",
+        "estimate",
+        "status"
+      ],
+      "additionalProperties": false
+    },
+    "evidence_boundary": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "provider",
+    "model",
+    "operation",
+    "access_mode",
+    "entitlement",
+    "checked_at",
+    "source_refs",
+    "fields",
+    "supports_singing",
+    "supports_identity_binding",
+    "binding_operation",
+    "billing",
+    "evidence_boundary"
+  ],
+  "additionalProperties": false
+}

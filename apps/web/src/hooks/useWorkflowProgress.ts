@@ -156,10 +156,17 @@ export function useWorkflowProgress(runId: string): WorkflowProgress {
 
       // Node-level events
       const nodeName = node_name as WorkflowNode;
+      const existingState = nodeStates.get(nodeName);
 
       if (phase === 'start') {
-        nodeStates.set(nodeName, 'running');
-        currentNode = nodeName;
+        // Terminal states (completed/failed) must not regress to "running" if a 'start' event
+        // for the same node is processed afterward — this happens when WebSocket messages
+        // arrive out of chronological order (e.g. a late/duplicate 'start' delivered after its
+        // matching 'end' already landed).
+        if (existingState !== 'completed' && existingState !== 'failed') {
+          nodeStates.set(nodeName, 'running');
+          currentNode = nodeName;
+        }
       } else if (phase === 'end') {
         nodeStates.set(nodeName, 'completed');
 

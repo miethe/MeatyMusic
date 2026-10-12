@@ -440,9 +440,9 @@ class PersonaService(BaseService[Persona, PersonaResponse, PersonaCreate, Person
             # Rejoin in case of multi-word ranges like "mezzo-soprano"
             base_range = ' '.join(range_tokens).replace(' ', '-')
 
-            # Check if any base range is recognized
-            if not any(base_range.startswith(br) or base_range.endswith(br) or br in base_range
-                      for br in base_ranges):
+            # Once modifiers are removed the part must BE a base range; substring
+            # matching accepted unknown prefixes such as "super-bass".
+            if base_range not in base_ranges:
                 return False
 
         return True

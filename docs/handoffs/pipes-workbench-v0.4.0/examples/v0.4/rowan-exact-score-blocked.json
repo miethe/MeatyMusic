@@ -1,0 +1,27 @@
+{
+  "status": "blocked_missing_notation",
+  "missing": [
+    {
+      "event_id": "se_first",
+      "motif_id": "motif_rowan_theme",
+      "reason": "No approved or authored note representation. Intent is not exact music."
+    },
+    {
+      "event_id": "se_recall",
+      "motif_id": "motif_rowan_theme",
+      "reason": "No approved or authored note representation. Intent is not exact music."
+    },
+    {
+      "event_id": "se_retreat",
+      "motif_id": "motif_rowan_return",
+      "reason": "No approved or authored note representation. Intent is not exact music."
+    },
+    {
+      "event_id": "se_return",
+      "motif_id": "motif_rowan_theme",
+      "reason": "No approved or authored note representation. Intent is not exact music."
+    }
+  ],
+  "audio_rendered": false,
+  "parts": []
+}

@@ -12,7 +12,7 @@ import pytest
 from unittest.mock import Mock, MagicMock, patch
 from typing import Dict, Any
 
-from app.services.rubric_scorer import RubricScorer, ScoreReport
+from app.services.rubric_scorer import RubricScorer, ScoreReport, ThresholdDecision
 from app.services.blueprint_service import BlueprintService
 from app.services.policy_guards import ProfanityFilter
 from app.models.blueprint import Blueprint
@@ -67,10 +67,15 @@ def mock_blueprint():
 
 @pytest.fixture
 def scorer(mock_blueprint_service, mock_profanity_filter):
-    """Create RubricScorer instance with mocked dependencies."""
+    """Create RubricScorer instance with mocked dependencies.
+
+    Uses a nonexistent config path so the repo's configs/rubric_overrides.json
+    (which overrides pop weights) does not leak into blueprint-default tests.
+    """
     return RubricScorer(
         blueprint_service=mock_blueprint_service,
-        profanity_filter=mock_profanity_filter
+        profanity_filter=mock_profanity_filter,
+        config_path="/nonexistent/path/config.json"
     )
 
 
@@ -259,9 +264,27 @@ class TestSingability:
 
         score, explanation, details = scorer.calculate_singability(lyrics)
 
-        # Should score low due to complex words
-        assert score < 0.5
+        # Same shape with simple words, to isolate the word-complexity effect
+        simple_score, _, _ = scorer.calculate_singability({
+            "sections": [
+                {
+                    "name": "verse",
+                    "lines": [
+                        "Walking down the road is hard",
+                        "Singing with my friends there too",
+                        "Little songs and stars abound here"
+                    ]
+                }
+            ]
+        })
+
+        # Complex words zero out the word-complexity component (weight 0.3), so
+        # the composite drops below the simple baseline and the "highly singable"
+        # band. Consistent lines keep it above 0.5 under the 0.4/0.3/0.3 weights.
+        assert details["word_complexity"] == 0.0
         assert details["avg_complex_words_per_line"] > 0
+        assert score < simple_score - 0.2
+        assert score < 0.7
 
     def test_syllable_counting(self, scorer):
         """Test syllable counting heuristic."""

@@ -6,19 +6,14 @@
 'use client';
 
 import * as React from 'react';
+
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { PageHeader } from '@/components/layout/PageHeader';
+
 import { Button } from '@meatymusic/ui';
 import { Card } from '@meatymusic/ui';
 import { Badge } from '@meatymusic/ui';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@meatymusic/ui';
-import { useSong, useDeleteSong, useSDS } from '@/hooks/api';
-import { songsApi } from '@/lib/api/songs';
-import { useUIStore } from '@/stores';
-import { EntityDetailSection } from '@/components/songs/EntityDetailSection';
-import { SDSPreview } from '@/components/songs/SDSPreview';
-import { PersonaKind } from '@/types/api/entities';
 import {
   Edit,
   Play,
@@ -29,7 +24,16 @@ import {
   Download,
   AlertCircle,
 } from 'lucide-react';
+
+import { PageHeader } from '@/components/layout/PageHeader';
+import { EntityDetailSection } from '@/components/songs/EntityDetailSection';
+import { SDSPreview } from '@/components/songs/SDSPreview';
+import { SongStoryPanel } from '@/components/songs/SongStoryPanel';
 import { ROUTES } from '@/config/routes';
+import { useSong, useDeleteSong, useSDS } from '@/hooks/api';
+import { songsApi } from '@/lib/api/songs';
+import { useUIStore } from '@/stores';
+import { PersonaKind } from '@/types/api/entities';
 
 export default function SongDetailPage() {
   const params = useParams();
@@ -204,6 +208,7 @@ export default function SongDetailPage() {
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="entities">Entities</TabsTrigger>
+            <TabsTrigger value="story">Story</TabsTrigger>
             <TabsTrigger value="workflow">Workflow</TabsTrigger>
             <TabsTrigger value="history">History</TabsTrigger>
             <TabsTrigger value="preview">Preview</TabsTrigger>
@@ -344,6 +349,10 @@ export default function SongDetailPage() {
                 createHref={ROUTES.ENTITIES.PRODUCER_NOTE_NEW}
               />
             </div>
+          </TabsContent>
+
+          <TabsContent value="story" className="mt-6">
+            <SongStoryPanel songId={songId} />
           </TabsContent>
 
           <TabsContent value="workflow" className="mt-6">

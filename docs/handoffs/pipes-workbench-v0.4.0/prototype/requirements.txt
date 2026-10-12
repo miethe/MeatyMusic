@@ -1,0 +1,2 @@
+# The local web prototype, HTTP API, CLI and domain tests use Python 3.11+ standard library only.
+# Optional MCP adapter: install requirements-mcp.txt in a separate virtual environment.

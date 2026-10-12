@@ -1,0 +1,215 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Prototype recipe 0.3.0",
+  "description": "Implemented review-store shape. Cross-record references/locks and provider budgets are domain validations. Not the proposed production SDS.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "identity": {
+      "type": "string"
+    },
+    "kind": {
+      "enum": [
+        "score",
+        "song",
+        "motif",
+        "loop",
+        "one_shot",
+        "texture"
+      ]
+    },
+    "vocal_mode": {
+      "enum": [
+        "instrumental",
+        "solo",
+        "duet"
+      ]
+    },
+    "roots": {
+      "type": "string"
+    },
+    "bpm": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 20,
+      "maximum": 300
+    },
+    "meter": {
+      "type": "string"
+    },
+    "tonality": {
+      "type": "string"
+    },
+    "production": {
+      "type": "string"
+    },
+    "parts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "instrument": {
+            "type": "string",
+            "minLength": 1
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1
+          },
+          "behavior": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "instrument",
+          "role",
+          "behavior"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          },
+          "parts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "locked": {
+            "type": "boolean"
+          },
+          "roles": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "description",
+          "parts",
+          "locked"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "excludes": {
+      "type": "string"
+    },
+    "lyrics": {
+      "type": "string"
+    },
+    "singer_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "parent": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "required": [
+            "id",
+            "revision"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "changes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "locks": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "rhythm"
+        ]
+      }
+    },
+    "reference_moment": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "id",
+    "revision",
+    "title",
+    "identity",
+    "kind",
+    "vocal_mode",
+    "roots",
+    "bpm",
+    "meter",
+    "tonality",
+    "production",
+    "parts",
+    "sections",
+    "excludes",
+    "lyrics",
+    "singer_ids",
+    "parent",
+    "changes",
+    "created_at",
+    "locks"
+  ],
+  "additionalProperties": false
+}

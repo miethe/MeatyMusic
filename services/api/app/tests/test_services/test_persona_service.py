@@ -11,8 +11,10 @@ This test suite verifies:
 """
 
 import uuid
+from datetime import datetime, timezone
+
 import pytest
-from unittest.mock import MagicMock, AsyncMock
+from unittest.mock import MagicMock
 
 from app.services.persona_service import PersonaService
 from app.repositories.persona_repo import PersonaRepository
@@ -21,16 +23,26 @@ from app.schemas.persona import PersonaCreate, PersonaUpdate, PersonaKind
 from app.errors import BadRequestError, NotFoundError
 
 
+def make_persona(**fields) -> Persona:
+    """Build a Persona as the repository returns it after a flush.
+
+    created_at/updated_at/extra_metadata are filled by server defaults on insert,
+    so a transient Persona() leaves them None and PersonaResponse rejects it.
+    """
+    now = datetime.now(timezone.utc)
+    fields.setdefault("created_at", now)
+    fields.setdefault("updated_at", now)
+    fields.setdefault("extra_metadata", {})
+    return Persona(**fields)
+
+
 class TestPersonaService:
     """Test PersonaService business logic."""
 
     @pytest.fixture
     def mock_session(self):
-        """Mock async session."""
-        session = AsyncMock()
-        session.commit = AsyncMock()
-        session.rollback = AsyncMock()
-        return session
+        """Mock synchronous session."""
+        return MagicMock()
 
     @pytest.fixture
     def mock_repo(self):
@@ -85,7 +97,7 @@ class TestPersonaService:
     async def test_create_persona_valid(self, service, mock_repo, valid_persona_create):
         """Test creating persona with valid data."""
         # Mock repository create
-        mock_persona = Persona(
+        mock_persona = make_persona(
             id=uuid.uuid4(),
             name="Test Artist",
             kind="artist",
@@ -96,7 +108,7 @@ class TestPersonaService:
             influences=["jazz", "pop"],
             policy={"public_release": False, "disallow_named_style_of": True}
         )
-        mock_repo.create = AsyncMock(return_value=mock_persona)
+        mock_repo.create = MagicMock(return_value=mock_persona)
 
         # Call service
         result = await service.create_persona(data=valid_persona_create)
@@ -134,7 +146,7 @@ class TestPersonaService:
     ):
         """Test creating public persona normalizes influences."""
         # Mock repository create
-        mock_persona = Persona(
+        mock_persona = make_persona(
             id=uuid.uuid4(),
             name="Public Artist",
             kind="artist",
@@ -149,7 +161,7 @@ class TestPersonaService:
             ],
             policy={"public_release": True, "disallow_named_style_of": True}
         )
-        mock_repo.create = AsyncMock(return_value=mock_persona)
+        mock_repo.create = MagicMock(return_value=mock_persona)
 
         # Call service
         result = await service.create_persona(data=public_persona_create)
@@ -171,7 +183,7 @@ class TestPersonaService:
         )
 
         # Mock repository create
-        mock_persona = Persona(
+        mock_persona = make_persona(
             id=uuid.uuid4(),
             name="Conflict Artist",
             kind="artist",
@@ -182,7 +194,7 @@ class TestPersonaService:
             influences=["pop"],
             policy={"public_release": False, "disallow_named_style_of": True}
         )
-        mock_repo.create = AsyncMock(return_value=mock_persona)
+        mock_repo.create = MagicMock(return_value=mock_persona)
 
         # Should create but log warning (no exception)
         result = await service.create_persona(data=persona_data)
@@ -192,7 +204,7 @@ class TestPersonaService:
     async def test_get_persona(self, service, mock_repo):
         """Test getting persona by ID."""
         persona_id = uuid.uuid4()
-        mock_persona = Persona(
+        mock_persona = make_persona(
             id=persona_id,
             name="Test Artist",
             kind="artist",
@@ -203,7 +215,7 @@ class TestPersonaService:
             influences=["jazz"],
             policy={"public_release": False, "disallow_named_style_of": True}
         )
-        mock_repo.get_by_id = AsyncMock(return_value=mock_persona)
+        mock_repo.get_by_id = MagicMock(return_value=mock_persona)
 
         # Call service
         result = await service.get_persona(persona_id)
@@ -217,7 +229,7 @@ class TestPersonaService:
     async def test_get_persona_not_found(self, service, mock_repo):
         """Test getting non-existent persona returns None."""
         persona_id = uuid.uuid4()
-        mock_repo.get_by_id = AsyncMock(return_value=None)
+        mock_repo.get_by_id = MagicMock(return_value=None)
 
         # Call service
         result = await service.get_persona(persona_id)
@@ -235,7 +247,7 @@ class TestPersonaService:
         )
 
         # Mock existing persona
-        mock_existing = Persona(
+        mock_existing = make_persona(
             id=persona_id,
             name="Test Artist",
             kind="artist",
@@ -248,7 +260,7 @@ class TestPersonaService:
         )
 
         # Mock updated persona
-        mock_updated = Persona(
+        mock_updated = make_persona(
             id=persona_id,
             name="Test Artist",
             kind="artist",
@@ -260,8 +272,8 @@ class TestPersonaService:
             policy={"public_release": False, "disallow_named_style_of": True}
         )
 
-        mock_repo.get_by_id = AsyncMock(return_value=mock_existing)
-        mock_repo.update = AsyncMock(return_value=mock_updated)
+        mock_repo.get_by_id = MagicMock(return_value=mock_existing)
+        mock_repo.update = MagicMock(return_value=mock_updated)
 
         # Call service
         result = await service.update_persona(persona_id, update_data)
@@ -277,7 +289,7 @@ class TestPersonaService:
         persona_id = uuid.uuid4()
         update_data = PersonaUpdate(vocal_range="baritone")
 
-        mock_repo.get_by_id = AsyncMock(return_value=None)
+        mock_repo.get_by_id = MagicMock(return_value=None)
 
         # Should raise NotFoundError
         with pytest.raises(NotFoundError) as exc_info:
@@ -292,7 +304,7 @@ class TestPersonaService:
         update_data = PersonaUpdate(vocal_range="invalid-range")
 
         # Mock existing persona
-        mock_existing = Persona(
+        mock_existing = make_persona(
             id=persona_id,
             name="Test Artist",
             kind="artist",
@@ -303,7 +315,7 @@ class TestPersonaService:
             influences=["jazz"],
             policy={"public_release": False, "disallow_named_style_of": True}
         )
-        mock_repo.get_by_id = AsyncMock(return_value=mock_existing)
+        mock_repo.get_by_id = MagicMock(return_value=mock_existing)
 
         # Should raise BadRequestError
         with pytest.raises(BadRequestError) as exc_info:
@@ -315,7 +327,7 @@ class TestPersonaService:
     async def test_delete_persona(self, service, mock_repo):
         """Test deleting persona."""
         persona_id = uuid.uuid4()
-        mock_repo.delete = AsyncMock(return_value=True)
+        mock_repo.delete = MagicMock(return_value=True)
 
         # Call service
         result = await service.delete_persona(persona_id)
@@ -328,7 +340,7 @@ class TestPersonaService:
     async def test_delete_persona_not_found(self, service, mock_repo):
         """Test deleting non-existent persona returns False."""
         persona_id = uuid.uuid4()
-        mock_repo.delete = AsyncMock(return_value=False)
+        mock_repo.delete = MagicMock(return_value=False)
 
         # Call service
         result = await service.delete_persona(persona_id)
@@ -455,7 +467,7 @@ class TestPersonaService:
     async def test_get_by_type_artist(self, service, mock_repo):
         """Test getting personas by type (artist)."""
         mock_personas = [
-            Persona(
+            make_persona(
                 id=uuid.uuid4(),
                 name="Artist 1",
                 kind="artist",
@@ -466,7 +478,7 @@ class TestPersonaService:
                 influences=["jazz"],
                 policy={"public_release": False, "disallow_named_style_of": True}
             ),
-            Persona(
+            make_persona(
                 id=uuid.uuid4(),
                 name="Artist 2",
                 kind="artist",
@@ -478,7 +490,7 @@ class TestPersonaService:
                 policy={"public_release": False, "disallow_named_style_of": True}
             )
         ]
-        mock_repo.get_all = AsyncMock(return_value=mock_personas)
+        mock_repo.get_all = MagicMock(return_value=mock_personas)
 
         # Call service
         result = await service.get_by_type("artist")
@@ -490,7 +502,7 @@ class TestPersonaService:
     @pytest.mark.asyncio
     async def test_get_by_name(self, service, mock_repo):
         """Test getting persona by name."""
-        mock_persona = Persona(
+        mock_persona = make_persona(
             id=uuid.uuid4(),
             name="Test Artist",
             kind="artist",
@@ -501,7 +513,7 @@ class TestPersonaService:
             influences=["jazz"],
             policy={"public_release": False, "disallow_named_style_of": True}
         )
-        mock_repo.get_by_name = AsyncMock(return_value=mock_persona)
+        mock_repo.get_by_name = MagicMock(return_value=mock_persona)
 
         # Call service
         result = await service.get_by_name("Test Artist")
@@ -515,7 +527,7 @@ class TestPersonaService:
     async def test_search_by_influences(self, service, mock_repo):
         """Test searching personas by influences."""
         mock_personas = [
-            Persona(
+            make_persona(
                 id=uuid.uuid4(),
                 name="Jazz Artist",
                 kind="artist",
@@ -527,7 +539,7 @@ class TestPersonaService:
                 policy={"public_release": False, "disallow_named_style_of": True}
             )
         ]
-        mock_repo.search_by_influences = AsyncMock(return_value=mock_personas)
+        mock_repo.search_by_influences = MagicMock(return_value=mock_personas)
 
         # Call service
         result = await service.search_by_influences(["jazz"])
@@ -541,7 +553,7 @@ class TestPersonaService:
     async def test_get_by_vocal_range(self, service, mock_repo):
         """Test getting personas by vocal range."""
         mock_personas = [
-            Persona(
+            make_persona(
                 id=uuid.uuid4(),
                 name="Tenor Artist",
                 kind="artist",
@@ -553,7 +565,7 @@ class TestPersonaService:
                 policy={"public_release": False, "disallow_named_style_of": True}
             )
         ]
-        mock_repo.get_by_vocal_range = AsyncMock(return_value=mock_personas)
+        mock_repo.get_by_vocal_range = MagicMock(return_value=mock_personas)
 
         # Call service
         result = await service.get_by_vocal_range(min_range="C3", max_range="C5")

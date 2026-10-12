@@ -12,7 +12,7 @@ This test suite verifies:
 """
 
 import pytest
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import AsyncMock, MagicMock, Mock, patch
 from uuid import uuid4
 from datetime import datetime
 
@@ -29,24 +29,20 @@ from app.errors import BadRequestError
 
 @pytest.fixture
 def mock_repo():
-    """Mock LyricsRepository."""
+    """Mock LyricsRepository (repository methods are synchronous)."""
     repo = Mock()
-    repo.create = AsyncMock()
-    repo.get_by_id = AsyncMock()
-    repo.update = AsyncMock()
-    repo.delete = AsyncMock()
-    repo.get_by_song_id = AsyncMock()
+    repo.create = Mock()
+    repo.get_by_id = Mock()
+    repo.update = Mock()
+    repo.delete = Mock()
+    repo.get_by_song_id = Mock()
     return repo
 
 
 @pytest.fixture
 def mock_session():
-    """Mock async session."""
-    session = AsyncMock()
-    session.commit = AsyncMock()
-    session.rollback = AsyncMock()
-    session.__aenter__ = AsyncMock(return_value=session)
-    session.__aexit__ = AsyncMock(return_value=None)
+    """Mock synchronous session."""
+    session = Mock()
     return session
 
 
@@ -115,9 +111,7 @@ async def test_create_lyrics_success(lyrics_service, mock_repo, valid_lyrics_cre
     mock_repo.create.return_value = mock_lyrics_entity
 
     # Mock transaction context manager
-    mock_transaction = AsyncMock()
-    mock_transaction.__aenter__ = AsyncMock(return_value=None)
-    mock_transaction.__aexit__ = AsyncMock(return_value=None)
+    mock_transaction = MagicMock()
 
     # Mock check_explicit_content
     with patch('app.services.lyrics_service.check_explicit_content',
@@ -198,9 +192,7 @@ async def test_update_lyrics_success(lyrics_service, mock_repo, mock_lyrics_enti
     mock_repo.update.return_value = mock_lyrics_entity
 
     # Mock transaction
-    mock_transaction = AsyncMock()
-    mock_transaction.__aenter__ = AsyncMock(return_value=None)
-    mock_transaction.__aexit__ = AsyncMock(return_value=None)
+    mock_transaction = MagicMock()
 
     with patch.object(lyrics_service, 'transaction', return_value=mock_transaction):
         # Act
@@ -220,9 +212,7 @@ async def test_delete_lyrics_success(lyrics_service, mock_repo):
     mock_repo.delete.return_value = True
 
     # Mock transaction
-    mock_transaction = AsyncMock()
-    mock_transaction.__aenter__ = AsyncMock(return_value=None)
-    mock_transaction.__aexit__ = AsyncMock(return_value=None)
+    mock_transaction = MagicMock()
 
     with patch.object(lyrics_service, 'transaction', return_value=mock_transaction):
         # Act
@@ -481,9 +471,7 @@ async def test_update_lyrics_not_found(lyrics_service, mock_repo):
     mock_repo.update.return_value = None
 
     # Mock transaction
-    mock_transaction = AsyncMock()
-    mock_transaction.__aenter__ = AsyncMock(return_value=None)
-    mock_transaction.__aexit__ = AsyncMock(return_value=None)
+    mock_transaction = MagicMock()
 
     with patch.object(lyrics_service, 'transaction', return_value=mock_transaction):
         # Act
@@ -536,9 +524,7 @@ async def test_create_with_citations_full_workflow(lyrics_service, mock_repo, mo
     mock_repo.create.return_value = mock_lyrics_entity
 
     # Mock transaction and explicit content check
-    mock_transaction = AsyncMock()
-    mock_transaction.__aenter__ = AsyncMock(return_value=None)
-    mock_transaction.__aexit__ = AsyncMock(return_value=None)
+    mock_transaction = MagicMock()
 
     with patch('app.services.lyrics_service.check_explicit_content',
                new=AsyncMock(return_value=(True, []))):
@@ -580,9 +566,7 @@ async def test_update_with_validation_full_workflow(lyrics_service, mock_repo, m
     mock_repo.update.return_value = mock_lyrics_entity
 
     # Mock transaction and explicit content check
-    mock_transaction = AsyncMock()
-    mock_transaction.__aenter__ = AsyncMock(return_value=None)
-    mock_transaction.__aexit__ = AsyncMock(return_value=None)
+    mock_transaction = MagicMock()
 
     with patch('app.services.lyrics_service.check_explicit_content',
                new=AsyncMock(return_value=(True, []))):

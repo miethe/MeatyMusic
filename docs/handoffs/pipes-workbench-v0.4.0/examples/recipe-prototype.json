@@ -1,0 +1,117 @@
+{
+  "id": "recipe_ridgeline",
+  "revision": 1,
+  "title": "Sarod on the Ridgeline",
+  "identity": "House / Symphonic",
+  "kind": "score",
+  "vocal_mode": "instrumental",
+  "roots": "symphonic folk adventure, progressive bluegrass, Indian chamber fusion",
+  "bpm": 96,
+  "meter": "4/4",
+  "tonality": "Modal warmth and open fifths",
+  "production": "Tactile acoustic detail, clear soloists, deep natural hall and patient dynamic growth.",
+  "parts": [
+    {
+      "id": "p1",
+      "instrument": "sarod",
+      "role": "lead",
+      "behavior": "Introduces the central melody"
+    },
+    {
+      "id": "p2",
+      "instrument": "mandolin",
+      "role": "answer",
+      "behavior": "Short rhythmic responses"
+    },
+    {
+      "id": "p3",
+      "instrument": "cello",
+      "role": "counterline",
+      "behavior": "A longer independent voice"
+    },
+    {
+      "id": "p4",
+      "instrument": "upright-bass",
+      "role": "foundation",
+      "behavior": "Maintains the pocket"
+    },
+    {
+      "id": "p5",
+      "instrument": "dobro",
+      "role": "color",
+      "behavior": "Connects phrases with slow slides"
+    },
+    {
+      "id": "p6",
+      "instrument": "horns",
+      "role": "expansion",
+      "behavior": "Develops the opening material"
+    },
+    {
+      "id": "p7",
+      "instrument": "strings",
+      "role": "harmony",
+      "behavior": "Broad supporting harmony"
+    }
+  ],
+  "sections": [
+    {
+      "id": "opening",
+      "name": "Opening",
+      "description": "An intimate sarod and mandolin duet.",
+      "parts": [
+        "p1",
+        "p2"
+      ],
+      "locked": true
+    },
+    {
+      "id": "develop",
+      "name": "Develop",
+      "description": "Trade the theme; cello adds a longer line.",
+      "parts": [
+        "p1",
+        "p2",
+        "p3",
+        "p4",
+        "p5"
+      ],
+      "locked": false
+    },
+    {
+      "id": "expansion",
+      "name": "Expansion",
+      "description": "Strings develop the theme; horns answer softly.",
+      "parts": [
+        "p1",
+        "p2",
+        "p3",
+        "p4",
+        "p5",
+        "p6",
+        "p7"
+      ],
+      "locked": false
+    },
+    {
+      "id": "return",
+      "name": "Return",
+      "description": "A quiet reprise returns to the plucked voices.",
+      "parts": [
+        "p1",
+        "p2",
+        "p3"
+      ],
+      "locked": false
+    }
+  ],
+  "excludes": "singing, lyrics, spoken word, choir, chanting, vocal samples, trailer braaams, festival EDM drops, constant percussion pounding, heavily compressed master",
+  "lyrics": "",
+  "singer_ids": [],
+  "parent": null,
+  "changes": [],
+  "created_at": "2026-10-07T17:02:06.272403+00:00",
+  "locks": [
+    "rhythm"
+  ]
+}

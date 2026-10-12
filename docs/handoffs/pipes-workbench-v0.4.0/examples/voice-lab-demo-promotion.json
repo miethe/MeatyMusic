@@ -1,0 +1,31 @@
+{
+  "schema": "voice-lab.promotion-bundle",
+  "schema_version": "1.0",
+  "bundle_id": "vlb_00000000000000000000000000000000",
+  "exported_at": "2026-10-07T00:00:00Z",
+  "exporter": {
+    "name": "voice-lab",
+    "version": "0.1.0"
+  },
+  "voices": [
+    {
+      "id": "demo:spoken-reference",
+      "name": "Diagnostic speech reference \u00b7 sample metadata",
+      "provider": "diagnostic",
+      "model": null,
+      "voice_id": "fixture-not-a-provider-voice",
+      "voice_type": "stock",
+      "consent_evidence": null,
+      "status": "locked",
+      "styles": {
+        "default": "Warm and unhurried spoken character study."
+      },
+      "default_mood": "default",
+      "source": "voice-lab",
+      "provenance": {
+        "fixture": true,
+        "warning": "Illustrative metadata. Not a real provider voice."
+      }
+    }
+  ]
+}

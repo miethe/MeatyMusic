@@ -39,7 +39,10 @@ describe('SongCard', () => {
     };
 
     render(<SongCard song={mockSong} entities={entities} />);
-    expect(screen.getByText('Pop Summer')).toBeInTheDocument();
+    // The style name renders twice by design: once as a header badge next to the title, and
+    // again in the per-entity "Style" summary button below — so assert presence via
+    // getAllByText rather than the single-match getByText.
+    expect(screen.getAllByText('Pop Summer').length).toBeGreaterThan(0);
     expect(screen.getByText('Summer Vibes')).toBeInTheDocument();
   });
 

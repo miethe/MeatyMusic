@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Exported voice design brief",
+  "description": "Prototype export, proposed cross-app interchange. No existing Voice Lab intake endpoint is asserted.",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "meatymusic.voice-design-brief.v1"
+    },
+    "status": {
+      "const": "proposed_interchange"
+    },
+    "singer": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "type": "string"
+        },
+        "register": {
+          "type": "string"
+        },
+        "character": {
+          "type": "string"
+        },
+        "phrasing": {
+          "type": "string"
+        },
+        "vibrato": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "identity_status": {
+          "const": "direction_only"
+        },
+        "voice_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "name",
+        "role",
+        "register",
+        "character",
+        "phrasing",
+        "vibrato",
+        "language",
+        "identity_status",
+        "voice_ref"
+      ],
+      "additionalProperties": false
+    },
+    "intended_use": {
+      "const": "singer_character_design"
+    },
+    "speech_and_singing_separate": {
+      "const": true
+    },
+    "required_review": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "probe_plan": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "schema",
+    "status",
+    "singer",
+    "intended_use",
+    "speech_and_singing_separate",
+    "required_review",
+    "probe_plan",
+    "created_at"
+  ],
+  "additionalProperties": false
+}

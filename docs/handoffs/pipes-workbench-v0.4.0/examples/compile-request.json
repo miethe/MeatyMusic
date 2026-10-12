@@ -1,0 +1,7 @@
+{
+  "operation": "prompt.compile",
+  "input": {
+    "recipe_id": "recipe_ridgeline",
+    "provider": "suno"
+  }
+}

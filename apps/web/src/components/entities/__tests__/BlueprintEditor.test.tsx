@@ -222,10 +222,15 @@ describe('BlueprintEditor', () => {
       );
 
       expect(screen.getByText(/hook density/i)).toBeInTheDocument();
-      expect(screen.getByText(/singability/i)).toBeInTheDocument();
+      // The raw "singability" rubric key (no underscore) also appears verbatim inside the
+      // live JSON preview <pre> block, so the unscoped query matches twice; scope to the
+      // field label to keep testing what this assertion actually means (the label renders).
+      expect(screen.getByText(/singability/i, { selector: 'label' })).toBeInTheDocument();
       expect(screen.getByText(/rhyme tightness/i)).toBeInTheDocument();
       expect(screen.getByText(/section completeness/i)).toBeInTheDocument();
-      expect(screen.getByText(/profanity score/i)).toBeInTheDocument();
+      // Exact match: the Evaluation Thresholds section below also renders a
+      // "Maximum Profanity Score" label, which a loose /profanity score/i regex also matches.
+      expect(screen.getByText('Profanity Score')).toBeInTheDocument();
     });
   });
 

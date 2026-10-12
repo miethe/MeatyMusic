@@ -4,20 +4,23 @@ Sets up minimal environment variables required for unit test imports.
 """
 
 import os
-import pytest
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker
-from sqlalchemy.pool import StaticPool
 
-from app.models.base import BaseModel as Base
-
-# Set minimal test environment variables required for Settings validation
+# Set minimal test environment variables required for Settings validation.
+# These must be set before any `app` import: app.models imports app.core.config,
+# which instantiates Settings at import time.
 os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
 os.environ.setdefault("DATABASE_URL_TEST", "sqlite:///:memory:")
 os.environ.setdefault("CLERK_WEBHOOK_SECRET", "whsec_test_secret")
 os.environ.setdefault("CLERK_JWKS_URL", "https://test.clerk.accounts.dev/.well-known/jwks.json")
 os.environ.setdefault("CLERK_JWT_ISSUER", "https://test.clerk.accounts.dev")
 os.environ.setdefault("ENVIRONMENT", "test")
+
+import pytest  # noqa: E402
+from sqlalchemy import create_engine  # noqa: E402
+from sqlalchemy.orm import Session, sessionmaker  # noqa: E402
+from sqlalchemy.pool import StaticPool  # noqa: E402
+
+from app.models.base import BaseModel as Base  # noqa: E402
 
 
 @pytest.fixture(scope="function")

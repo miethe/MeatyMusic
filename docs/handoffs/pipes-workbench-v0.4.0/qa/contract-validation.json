@@ -1,0 +1,28 @@
+{
+  "status": "passed",
+  "checks": [
+    "Schema shape: command-envelope.schema.json",
+    "Schema shape: estate-events.schema.json",
+    "Schema shape: prototype-recipe.schema.json",
+    "Schema shape: provider-capability.schema.json",
+    "Schema shape: singer-direction.schema.json",
+    "Schema shape: sonic-recipe-v2.schema.json",
+    "Schema shape: speech-handoff.schema.json",
+    "Schema shape: voice-design-brief.schema.json",
+    "recipe-prototype validates against prototype-recipe",
+    "recipe-v2-proposed validates against sonic-recipe-v2",
+    "singer-direction validates against singer-direction",
+    "voice-design-brief validates against voice-design-brief",
+    "speech-handoff validates against speech-handoff",
+    "provider-capability-proposed validates against provider-capability",
+    "estate-event-proposed validates against estate-events",
+    "compile-request validates against command-envelope",
+    "variation-plan-request validates against command-envelope",
+    "variation-apply-request validates against command-envelope",
+    "Proposed recipe part IDs and section references are consistent.",
+    "compiled-suno exact Style count: 766/1000 UTF-16 units",
+    "eleven-plan-draft exact Style count: 766/1000 UTF-16 units",
+    "Prototype OpenAPI JSON syntax and core route checked (not a full OAS conformance audit)."
+  ],
+  "boundary": "Local schemas/examples only; no remote service or provider validation."
+}

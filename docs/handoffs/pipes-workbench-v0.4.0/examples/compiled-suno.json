@@ -1,0 +1,20 @@
+{
+  "schema": "meatymusic.prompt.v1",
+  "provider": "suno",
+  "recipe_id": "recipe_ridgeline",
+  "recipe_revision": 1,
+  "style": "Instrumental symphonic folk adventure, progressive bluegrass, Indian chamber fusion; 96 BPM, 4/4. Sarod: lead, Introduces the central melody. Mandolin: answer, Short rhythmic responses. Cello: counterline, A longer independent voice. Upright bass: foundation, Maintains the pocket. Dobro: color, Connects phrases with slow slides. French horns: expansion, Develops the opening material. Divided strings: harmony, Broad supporting harmony. Opening: An intimate sarod and mandolin duet. Develop: Trade the theme; cello adds a longer line. Expansion: Strings develop the theme; horns answer softly. Return: A quiet reprise returns to the plucked voices. Modal warmth and open fifths Tactile acoustic detail, clear soloists, deep natural hall and patient dynamic growth.",
+  "excludes": "singing, lyrics, spoken word, choir, chanting, vocal samples, trailer braaams, festival EDM drops, constant percussion pounding, heavily compressed master",
+  "lyrics": "",
+  "style_count": 766,
+  "count_unit": "utf16_code_units",
+  "limit": 1000,
+  "omitted": [],
+  "warnings": [
+    "Arrangement, instrument identity, tempo and motif preservation are prompt targets, not verified audio properties."
+  ],
+  "compiler_version": "0.3.0",
+  "has_override": false,
+  "capability_snapshot": "reviewed-2026-10-07; account/model not probed",
+  "hash": "f229cc8fe832351362e156a78cee522c6b671051b59fa5ed4a6b350375d25e07"
+}

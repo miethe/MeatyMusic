@@ -8,3 +8,5 @@ export type { SongCardProps, EntitySummary, WorkflowState } from './SongCard';
 
 export { SongList } from './SongList';
 export type { SongListProps, SongFilters } from './SongList';
+
+export { SongStoryPanel } from './SongStoryPanel';

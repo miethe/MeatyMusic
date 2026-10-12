@@ -280,10 +280,11 @@ export function LyricsEditor({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
+              <label htmlFor="lyrics-language" className="block text-sm font-medium text-text-primary mb-2">
                 Language
               </label>
               <input
+                id="lyrics-language"
                 type="text"
                 value={formData.language || 'English'}
                 onChange={(e) => updateField('language', e.target.value)}
@@ -292,10 +293,11 @@ export function LyricsEditor({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
+              <label htmlFor="lyrics-meter" className="block text-sm font-medium text-text-primary mb-2">
                 Meter
               </label>
               <select
+                id="lyrics-meter"
                 value={formData.meter || '4/4'}
                 onChange={(e) => updateField('meter', e.target.value)}
                 className="w-full px-4 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"
@@ -318,10 +320,11 @@ export function LyricsEditor({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
+              <label htmlFor="lyrics-pov" className="block text-sm font-medium text-text-primary mb-2">
                 Point of View
               </label>
               <select
+                id="lyrics-pov"
                 value={formData.pov || POV.FIRST_PERSON}
                 onChange={(e) => updateField('pov', e.target.value as POV)}
                 className="w-full px-4 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"
@@ -333,10 +336,11 @@ export function LyricsEditor({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
+              <label htmlFor="lyrics-tense" className="block text-sm font-medium text-text-primary mb-2">
                 Verb Tense
               </label>
               <select
+                id="lyrics-tense"
                 value={formData.tense || Tense.PRESENT}
                 onChange={(e) => updateField('tense', e.target.value as Tense)}
                 className="w-full px-4 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"
@@ -350,10 +354,11 @@ export function LyricsEditor({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-text-primary mb-2">
+            <label htmlFor="lyrics-syllables" className="block text-sm font-medium text-text-primary mb-2">
               Syllables per Line
             </label>
             <input
+              id="lyrics-syllables"
               type="number"
               min="4"
               max="16"
@@ -369,10 +374,11 @@ export function LyricsEditor({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-text-primary mb-2">
+            <label htmlFor="lyrics-hook-strategy" className="block text-sm font-medium text-text-primary mb-2">
               Hook Strategy
             </label>
             <select
+              id="lyrics-hook-strategy"
               value={formData.hook_strategy || HookStrategy.MELODIC}
               onChange={(e) =>
                 updateField('hook_strategy', e.target.value as HookStrategy)

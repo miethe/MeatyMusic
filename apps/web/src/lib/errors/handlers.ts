@@ -10,7 +10,7 @@ import { ApplicationError, ERROR_CODES } from './types';
  */
 interface BackendErrorResponse {
   error: string;
-  detail?: string;
+  detail?: string | Record<string, unknown>;
   field?: string;
 }
 
@@ -27,7 +27,7 @@ export function parseApiError(error: unknown): ApplicationError {
     typeof error.response === 'object' &&
     'data' in error.response
   ) {
-    const response = error.response as { data: BackendErrorResponse; status: number };
+    const response = error.response as { data: BackendErrorResponse & Record<string, unknown>; status: number };
     const errorData = response.data;
 
     if (errorData) {
@@ -44,8 +44,15 @@ export function parseApiError(error: unknown): ApplicationError {
 
       return new ApplicationError({
         code: errorCode,
-        message: errorData.detail || errorData.error || getDefaultErrorMessage(response.status),
-        details: errorData.field ? { field: errorData.field } : undefined,
+        message:
+          (typeof errorData.detail === 'string' ? errorData.detail :
+            typeof errorData.detail === 'object' && errorData.detail !== null && 'detail' in errorData.detail
+              ? String(errorData.detail.detail)
+              : undefined) || errorData.error || getDefaultErrorMessage(response.status),
+        details: {
+          ...(errorData.field ? { field: errorData.field } : {}),
+          ...(errorData.detail && typeof errorData.detail === 'object' ? errorData.detail : {}),
+        },
         status: response.status,
       });
     }

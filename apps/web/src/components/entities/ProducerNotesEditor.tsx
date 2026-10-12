@@ -232,10 +232,11 @@ export function ProducerNotesEditor({
           />
 
           <div>
-            <label className="block text-sm font-medium text-text-primary mb-2">
+            <label htmlFor="producer-notes-hooks" className="block text-sm font-medium text-text-primary mb-2">
               Hook Count
             </label>
             <input
+              id="producer-notes-hooks"
               type="number"
               min="0"
               max="10"
@@ -263,10 +264,11 @@ export function ProducerNotesEditor({
             </h3>
 
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
+              <label htmlFor="producer-notes-lufs" className="block text-sm font-medium text-text-primary mb-2">
                 LUFS Target
               </label>
               <input
+                id="producer-notes-lufs"
                 type="number"
                 min="-24"
                 max="0"
@@ -283,10 +285,11 @@ export function ProducerNotesEditor({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">
+              <label htmlFor="producer-notes-space" className="block text-sm font-medium text-text-primary mb-2">
                 Space
               </label>
               <select
+                id="producer-notes-space"
                 value={formData.mix?.space || 'normal'}
                 onChange={(e) => updateMix('space', e.target.value)}
                 className="w-full px-4 py-2 rounded-lg bg-bg-elevated border border-border-secondary text-text-primary focus:outline-none focus:border-border-accent focus:ring-2 focus:ring-border-accent/20 transition-colors"

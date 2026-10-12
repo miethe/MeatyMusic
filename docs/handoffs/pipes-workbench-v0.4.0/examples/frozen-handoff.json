@@ -1,0 +1,153 @@
+{
+  "id": "handoff_3d27b656fa6e",
+  "recipe_id": "recipe_ridgeline",
+  "recipe_revision": 1,
+  "recipe_snapshot": {
+    "id": "recipe_ridgeline",
+    "revision": 1,
+    "title": "Sarod on the Ridgeline",
+    "identity": "House / Symphonic",
+    "kind": "score",
+    "vocal_mode": "instrumental",
+    "roots": "symphonic folk adventure, progressive bluegrass, Indian chamber fusion",
+    "bpm": 96,
+    "meter": "4/4",
+    "tonality": "Modal warmth and open fifths",
+    "production": "Tactile acoustic detail, clear soloists, deep natural hall and patient dynamic growth.",
+    "parts": [
+      {
+        "id": "p1",
+        "instrument": "sarod",
+        "role": "lead",
+        "behavior": "Introduces the central melody"
+      },
+      {
+        "id": "p2",
+        "instrument": "mandolin",
+        "role": "answer",
+        "behavior": "Short rhythmic responses"
+      },
+      {
+        "id": "p3",
+        "instrument": "cello",
+        "role": "counterline",
+        "behavior": "A longer independent voice"
+      },
+      {
+        "id": "p4",
+        "instrument": "upright-bass",
+        "role": "foundation",
+        "behavior": "Maintains the pocket"
+      },
+      {
+        "id": "p5",
+        "instrument": "dobro",
+        "role": "color",
+        "behavior": "Connects phrases with slow slides"
+      },
+      {
+        "id": "p6",
+        "instrument": "horns",
+        "role": "expansion",
+        "behavior": "Develops the opening material"
+      },
+      {
+        "id": "p7",
+        "instrument": "strings",
+        "role": "harmony",
+        "behavior": "Broad supporting harmony"
+      }
+    ],
+    "sections": [
+      {
+        "id": "opening",
+        "name": "Opening",
+        "description": "An intimate sarod and mandolin duet.",
+        "parts": [
+          "p1",
+          "p2"
+        ],
+        "locked": true
+      },
+      {
+        "id": "develop",
+        "name": "Develop",
+        "description": "Trade the theme; cello adds a longer line.",
+        "parts": [
+          "p1",
+          "p2",
+          "p3",
+          "p4",
+          "p5"
+        ],
+        "locked": false
+      },
+      {
+        "id": "expansion",
+        "name": "Expansion",
+        "description": "Strings develop the theme; horns answer softly.",
+        "parts": [
+          "p1",
+          "p2",
+          "p3",
+          "p4",
+          "p5",
+          "p6",
+          "p7"
+        ],
+        "locked": false
+      },
+      {
+        "id": "return",
+        "name": "Return",
+        "description": "A quiet reprise returns to the plucked voices.",
+        "parts": [
+          "p1",
+          "p2",
+          "p3"
+        ],
+        "locked": false
+      }
+    ],
+    "excludes": "singing, lyrics, spoken word, choir, chanting, vocal samples, trailer braaams, festival EDM drops, constant percussion pounding, heavily compressed master",
+    "lyrics": "",
+    "singer_ids": [],
+    "parent": null,
+    "changes": [],
+    "created_at": "2026-10-07T17:02:06.272403+00:00",
+    "locks": [
+      "rhythm"
+    ]
+  },
+  "prompt": {
+    "schema": "meatymusic.prompt.v1",
+    "provider": "suno",
+    "recipe_id": "recipe_ridgeline",
+    "recipe_revision": 1,
+    "style": "Instrumental symphonic folk adventure, progressive bluegrass, Indian chamber fusion; 96 BPM, 4/4. Sarod: lead, Introduces the central melody. Mandolin: answer, Short rhythmic responses. Cello: counterline, A longer independent voice. Upright bass: foundation, Maintains the pocket. Dobro: color, Connects phrases with slow slides. French horns: expansion, Develops the opening material. Divided strings: harmony, Broad supporting harmony. Opening: An intimate sarod and mandolin duet. Develop: Trade the theme; cello adds a longer line. Expansion: Strings develop the theme; horns answer softly. Return: A quiet reprise returns to the plucked voices. Modal warmth and open fifths Tactile acoustic detail, clear soloists, deep natural hall and patient dynamic growth.",
+    "excludes": "singing, lyrics, spoken word, choir, chanting, vocal samples, trailer braaams, festival EDM drops, constant percussion pounding, heavily compressed master",
+    "lyrics": "",
+    "style_count": 766,
+    "count_unit": "utf16_code_units",
+    "limit": 1000,
+    "omitted": [],
+    "warnings": [
+      "Arrangement, instrument identity, tempo and motif preservation are prompt targets, not verified audio properties."
+    ],
+    "compiler_version": "0.3.0",
+    "has_override": false,
+    "capability_snapshot": "reviewed-2026-10-07; account/model not probed",
+    "hash": "f229cc8fe832351362e156a78cee522c6b671051b59fa5ed4a6b350375d25e07"
+  },
+  "settings": {
+    "model": "record_in_provider",
+    "account_access": "unverified"
+  },
+  "settings_status": "user_recorded_not_provider_verified",
+  "provider": "suno",
+  "status": "prepared",
+  "created_at": "2026-10-07T17:02:06.274310+00:00",
+  "actual_submission": null,
+  "external_calls": 0,
+  "sequence": 1
+}

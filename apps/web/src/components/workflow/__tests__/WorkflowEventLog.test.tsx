@@ -62,7 +62,10 @@ describe('WorkflowEventLog', () => {
 
       render(<WorkflowEventLog runId="run-123" />);
 
-      expect(screen.getAllByText('PLAN')).toHaveLength(2);
+      // The node filter <select> (showFilters defaults to true) also renders an
+      // <option value="PLAN">PLAN</option> among its choices, so the unscoped query matches
+      // the two event badges plus that option; scope to the badge <div>s.
+      expect(screen.getAllByText('PLAN', { selector: 'div' })).toHaveLength(2);
       expect(screen.getByText('START')).toBeInTheDocument();
       expect(screen.getByText('END')).toBeInTheDocument();
     });

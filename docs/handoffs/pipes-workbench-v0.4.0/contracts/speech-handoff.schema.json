@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Exported speech handoff",
+  "description": "Review export only; adapter must map to actual aos-tts catalog and request contract. Not a singing request.",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "meatymusic.speech-handoff.v1"
+    },
+    "status": {
+      "const": "prepared_not_sent"
+    },
+    "operation": {
+      "const": "spoken_audition"
+    },
+    "voice_catalog_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "voice_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "provider": {
+      "type": "string",
+      "minLength": 1
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1
+    },
+    "backend": {
+      "const": "dry-run"
+    },
+    "confirm_live": {
+      "const": false
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema",
+    "status",
+    "operation",
+    "voice_catalog_id",
+    "voice_id",
+    "provider",
+    "text",
+    "backend",
+    "confirm_live",
+    "notes"
+  ],
+  "additionalProperties": false
+}

@@ -350,7 +350,11 @@ describe('JsonViewer', () => {
       render(<JsonViewer data={wideData} />);
 
       const content = screen.getByTestId('json-viewer-content');
-      expect(content).toHaveClass('overflow-auto');
+      // JsonViewer intentionally switched from the single `overflow-auto` class to explicit
+      // `overflow-x-auto overflow-y-auto` in 9e29d2e ("fix(api,ui): fix persona import 422
+      // error and UI issues") specifically to enable horizontal scrolling with line wrapping
+      // disabled; this test still asserted the retired class name.
+      expect(content).toHaveClass('overflow-x-auto', 'overflow-y-auto');
     });
 
     it('should respect maxHeight and scroll vertically', () => {

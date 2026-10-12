@@ -1,0 +1,430 @@
+{
+  "package": "meatymusic-sonic-workshop-handoff",
+  "version": "0.3.0",
+  "review_date": "2026-10-07",
+  "status": "local_prototype_and_additive_design_handoff",
+  "owner": "Nick Miethe",
+  "confidentiality": "personal",
+  "remote_writes": false,
+  "provider_calls": 0,
+  "test_results": {
+    "automated_tests": 45,
+    "browser_checks": 13,
+    "browser_page_errors": 0,
+    "contract_checks": 22,
+    "native_browser_acceptance": "pending"
+  },
+  "file_count_excluding_manifest_and_checksums": 82,
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "bytes": 977,
+      "sha256": "823937ac7cf1816cb26f8a9e0da438c5a71c3f4050a988c5a368549e3f8a0c01"
+    },
+    {
+      "path": "IMPLEMENTATION_STATUS.md",
+      "bytes": 3881,
+      "sha256": "2e53c269706c11fd602de625ec19da53fe28a6905a1013851c8c357586333458"
+    },
+    {
+      "path": "START_HERE.md",
+      "bytes": 8588,
+      "sha256": "b2199ebee6a9a8720bdb0d35ab9e23309d4b60e836ca306b18b07bc3fd72a2ea"
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.md",
+      "bytes": 927,
+      "sha256": "5ac5d70fbcb9ca18f7ac4e5f725c21b8514efc96f51122a28928d242c686af5f"
+    },
+    {
+      "path": "contracts/README.md",
+      "bytes": 965,
+      "sha256": "43fc32cdfa161d55c97f6fcf7507b0c8eb69f459baee6c443db1a4e09b48db7f"
+    },
+    {
+      "path": "contracts/command-envelope.schema.json",
+      "bytes": 668,
+      "sha256": "425e627fda2946eeefed61df6aa67571393f8aebb3ffc0540d8b1251b5ecd7be"
+    },
+    {
+      "path": "contracts/estate-events.schema.json",
+      "bytes": 1619,
+      "sha256": "7b3c7e24fe7bbe463eaf969b32d4aff96dd6ea6098da4b0d832789f6460c390a"
+    },
+    {
+      "path": "contracts/prototype-openapi.json",
+      "bytes": 21683,
+      "sha256": "171e5729cfb0c3ce3e6733499465bd01b4aece147c726fd4fd5bf3bb58efaea0"
+    },
+    {
+      "path": "contracts/prototype-recipe.schema.json",
+      "bytes": 4061,
+      "sha256": "f4d366ee505be49d7baec2a2c15721b7cbe651931a610960d4cbd3146e8e7ffd"
+    },
+    {
+      "path": "contracts/provider-capability.schema.json",
+      "bytes": 2965,
+      "sha256": "a847e791b50c72dd08e6539f22a7ca8ab171783aa03c7b404d9330ac2a575cd0"
+    },
+    {
+      "path": "contracts/singer-direction.schema.json",
+      "bytes": 1110,
+      "sha256": "a0e9422aa48926eb8e8420eca38575f8b71255c99c4b1e9ffe4a0d897406d10b"
+    },
+    {
+      "path": "contracts/sonic-recipe-v2.schema.json",
+      "bytes": 7590,
+      "sha256": "b7b883ab7d61bd75fa0c2b6af5d3505bd29a382e4af04c7a005b0c5526ae8c31"
+    },
+    {
+      "path": "contracts/speech-handoff.schema.json",
+      "bytes": 1100,
+      "sha256": "208945cd8570d8a6216b3a7da9000337468b91304a339e1c11238ff8a589ebe4"
+    },
+    {
+      "path": "contracts/voice-design-brief.schema.json",
+      "bytes": 2171,
+      "sha256": "a57ae215246957cb57185c03effee734392787f38181918f4ac2130d29801e9d"
+    },
+    {
+      "path": "designs/01-workshop.png",
+      "bytes": 193315,
+      "sha256": "32fc8ab613811232cda78e464a7a7bd0b51457a1f5f96a3c5a83be870c927729"
+    },
+    {
+      "path": "designs/02-variation-diff.png",
+      "bytes": 225724,
+      "sha256": "35f865396058a2f140c26863e7104c1996273b2835d8044194b77028f4653266"
+    },
+    {
+      "path": "designs/03-variations.png",
+      "bytes": 190278,
+      "sha256": "34491194b5e87e9365f98565198b1009d1720577903860bfc6a386539c79eb5a"
+    },
+    {
+      "path": "designs/04-suno-handoff.png",
+      "bytes": 266145,
+      "sha256": "7ed85e36a95ec095b733a64f5dc7153632851f1b66b181ec8f076d8d8f35ad06"
+    },
+    {
+      "path": "designs/05-listening-room.png",
+      "bytes": 190446,
+      "sha256": "03bcb699fbe0d2b39d8802730da547f544b6c036bce2767187b6bfd196d5376d"
+    },
+    {
+      "path": "designs/06-singers-and-voices.png",
+      "bytes": 214059,
+      "sha256": "1a5fe35637e72afd64f70605f6c17babf38977c17cc03ad4f97e14f2a33615c2"
+    },
+    {
+      "path": "designs/07-connections.png",
+      "bytes": 187618,
+      "sha256": "082e9f0c4a084e04b83f341550425d6f4437e58de9526e09a636789e5de28898"
+    },
+    {
+      "path": "designs/08-library.png",
+      "bytes": 344436,
+      "sha256": "3bad6e06864157a76ef708462bc36a34e9a8077ec2699b34340285fbb6637440"
+    },
+    {
+      "path": "designs/09-instrument-atlas.png",
+      "bytes": 182368,
+      "sha256": "24a1a9aefb976e3c0990efdef3326da87f5b0e3fddb115518808f819f38b2779"
+    },
+    {
+      "path": "designs/10-mobile-voices.png",
+      "bytes": 67197,
+      "sha256": "8ce75e7f27e106f4090c9c7c611ed6f14df10025de751710e053158fa83fd6ca"
+    },
+    {
+      "path": "designs/11-mobile-workshop.png",
+      "bytes": 66202,
+      "sha256": "1594df14327bf4f15a9ee1c75f55adfa206c93f19cdbf3a613040595565adb39"
+    },
+    {
+      "path": "designs/README.md",
+      "bytes": 1657,
+      "sha256": "7c846a38715c1695eecd9d3699d9bdfe6901d7421faa8bfde3c2aa071e79e126"
+    },
+    {
+      "path": "designs/review.html",
+      "bytes": 2842992,
+      "sha256": "ce20de090b4b6154b8ac0d116b0e0ec4db796e40685c74b722f7fa452c278e21"
+    },
+    {
+      "path": "designs/tokens.json",
+      "bytes": 938,
+      "sha256": "fbe8a29895611fe59918ec52f222dec016d77ee33588f2e4fb7d8e157d5f6317"
+    },
+    {
+      "path": "docs/01-product-and-ux.md",
+      "bytes": 11399,
+      "sha256": "bf9370e4295e293bc8b9f822b42939c7107e60e6c7a3ff04f8bb03560296aec7"
+    },
+    {
+      "path": "docs/02-architecture-and-estate.md",
+      "bytes": 10042,
+      "sha256": "03ad7ead2b7103a1436d48585c37359969c135209c22658db3fe48ebf50e8eb1"
+    },
+    {
+      "path": "docs/03-provider-and-voice-contracts.md",
+      "bytes": 11023,
+      "sha256": "6ab7b2e984bbd6336536f27dbd7d47c5ad3f82d56efeb42831d6b3258e431a48"
+    },
+    {
+      "path": "docs/04-implementation-handoff.md",
+      "bytes": 11299,
+      "sha256": "402372082852d2990792b600858ff2f5f59bb14c83d066c922e5f2d199569584"
+    },
+    {
+      "path": "docs/05-sources-and-decisions.md",
+      "bytes": 7449,
+      "sha256": "14c10109af63aa1479e05aaaa9b6eb47766327ba34e6d5bf73304a54ca3ffac8"
+    },
+    {
+      "path": "docs/06-agent-implementer-prompt.md",
+      "bytes": 5976,
+      "sha256": "c3ee4447f91494de5063000f59ee8e70909c5a17d71fec45eb31722b93ba0a85"
+    },
+    {
+      "path": "docs/07-validation-and-limitations.md",
+      "bytes": 6645,
+      "sha256": "0ed36e6ac5c7e87ad3ce2621e6010d5e26c7f372db7725b31c06be82c45ba4fa"
+    },
+    {
+      "path": "examples/README.md",
+      "bytes": 980,
+      "sha256": "ebd99b3e2380760863622e523125194c3d27fe1bafa68bd3e23cb93beb6e58b4"
+    },
+    {
+      "path": "examples/compile-request.json",
+      "bytes": 114,
+      "sha256": "5a1810cf6edcc8371d08251fa9327d472f19027f98873fed575dd6a7e9f04452"
+    },
+    {
+      "path": "examples/compiled-suno.json",
+      "bytes": 1530,
+      "sha256": "c870a16e1dd75fae4068c5373aff7447eb6e435ce3eddd624f600aee2e228fa1"
+    },
+    {
+      "path": "examples/eleven-plan-draft.json",
+      "bytes": 4424,
+      "sha256": "fae0e006347295619348526123fc019b698e17f2c777ec79f4387e4ee28e71a9"
+    },
+    {
+      "path": "examples/estate-event-proposed.json",
+      "bytes": 411,
+      "sha256": "2f8fb699764f5e6661b100c4a73b7023440c24bcd7e46e8cf897dcd0f37785e5"
+    },
+    {
+      "path": "examples/frozen-handoff.json",
+      "bytes": 4933,
+      "sha256": "e4a18fc5ac3b0933c8117157fcae192e8d4d9ce00a1905647a039620bd5dc682"
+    },
+    {
+      "path": "examples/mcp-config.template.json",
+      "bytes": 369,
+      "sha256": "208246f98131a8c172b52cbe0872ec857ef71ea13ea176b10ead8934a305bfd9"
+    },
+    {
+      "path": "examples/provider-capability-proposed.json",
+      "bytes": 870,
+      "sha256": "f55f0f6d7f45e497742e7678b74f66c57a27aeb3bf7a570497d9b64e7e97453d"
+    },
+    {
+      "path": "examples/recipe-prototype.json",
+      "bytes": 2686,
+      "sha256": "e3b6a51a3e311f29256e3690fc708d456aced4b8d363f6480cdf41dcf7304129"
+    },
+    {
+      "path": "examples/recipe-v2-proposed.json",
+      "bytes": 3509,
+      "sha256": "9f451a77111c255f8776f97c16d3548ba692cf5b8c27f126e799039ea4d705a5"
+    },
+    {
+      "path": "examples/singer-direction.json",
+      "bytes": 383,
+      "sha256": "772ae2e1a77dd47771d0b0e017e4ebe7660d1b03b1e8186b87ae162d1fabfbff"
+    },
+    {
+      "path": "examples/speech-handoff.json",
+      "bytes": 469,
+      "sha256": "856bc77124725516900d53cacb467cd38142f9b0b68cc1eca9e6fb36728e2a80"
+    },
+    {
+      "path": "examples/variation-apply-request.json",
+      "bytes": 197,
+      "sha256": "bbda33326c1d817d5ca925a7e40e3d7ae32dd343fbb7e3a14e1a90994c46d8fa"
+    },
+    {
+      "path": "examples/variation-plan-request.json",
+      "bytes": 124,
+      "sha256": "e4004c35e3f0a7ff6c12025879798c8a5d889bb77186b2d0eb994f66d9dad384"
+    },
+    {
+      "path": "examples/voice-design-brief.json",
+      "bytes": 966,
+      "sha256": "77671e4937c717c64b3d5bf2475703eb00516dc48cce164b527ed5b7c9070d5a"
+    },
+    {
+      "path": "examples/voice-lab-demo-promotion.json",
+      "bytes": 841,
+      "sha256": "638798b86d7fc8a398b55c33d4b6462dba1ce3d820db609203bfa6259dfdf7ec"
+    },
+    {
+      "path": "prompt-catalog/suno_house_sound_score_atlas_24_prompts.md",
+      "bytes": 30743,
+      "sha256": "9ba9cc824e1a921fab956f86c441d78ef3151f5aed754b7846f36892d2c76a0d"
+    },
+    {
+      "path": "prompt-catalog/suno_symphonic_expeditions_14_prompts.md",
+      "bytes": 25563,
+      "sha256": "d08fc0b48092c183e7f0340d160679c8e31ef381ca169105ad06c7a1a3005a1a"
+    },
+    {
+      "path": "prompt-catalog/suno_unlikely_ensembles_prompt_pack.md",
+      "bytes": 25146,
+      "sha256": "8175900c32573d2ab4ca2ed86dc74385bc2ff83c378e50eb0521d2589cc90fde"
+    },
+    {
+      "path": "prototype/.gitignore",
+      "bytes": 32,
+      "sha256": "11a92529044d5293440e18294d517ea14d2f271d4fc1df1bb2d0cd6839b0c4e6"
+    },
+    {
+      "path": "prototype/README.md",
+      "bytes": 1179,
+      "sha256": "9c38b3be05ad7d404b15c75bad7d1a662b9353f1c3f5f6f7dcf87234aa76c2ce"
+    },
+    {
+      "path": "prototype/app/__init__.py",
+      "bytes": 31,
+      "sha256": "1dfe59bf53929198c92f256576d5a80e291331a392145c9f516c954a55d8ddfc"
+    },
+    {
+      "path": "prototype/app/domain.py",
+      "bytes": 31728,
+      "sha256": "1432d63c22fdc1c90d28473ec44c2bf103601c38d0a0e008cc8ded8a8927e4d8"
+    },
+    {
+      "path": "prototype/requirements.txt",
+      "bytes": 186,
+      "sha256": "48ac961728ba9891483d82759c6f9adbb540d7e21a8e81f2b831ea9d63f24d3f"
+    },
+    {
+      "path": "prototype/serve.py",
+      "bytes": 10403,
+      "sha256": "1e790e546bf2f093c14a5f9d1e5b4f5645f9e557643060cd4ab0909d60af0668"
+    },
+    {
+      "path": "prototype/static/app.js",
+      "bytes": 60273,
+      "sha256": "802496e3e3181e52dc47ecb4682f976f5b06ee59d3a17edab3720971a36f7ce4"
+    },
+    {
+      "path": "prototype/static/fixtures/diagnostic-a.wav",
+      "bytes": 1536044,
+      "sha256": "bf1a3ad0d7e1f61f4a79e75240114da1cd95fd20148bf79beea9cb528c352de6"
+    },
+    {
+      "path": "prototype/static/fixtures/diagnostic-b.wav",
+      "bytes": 1664044,
+      "sha256": "318cfe25c72f5f805c6c7247955385950e07e719f22e3867f0afee852af6991b"
+    },
+    {
+      "path": "prototype/static/index.html",
+      "bytes": 655,
+      "sha256": "08b2748d8d511325ffdb12fc6e3947c237220d2989b8ae3d57bdbaa975e273c0"
+    },
+    {
+      "path": "prototype/static/style.css",
+      "bytes": 35571,
+      "sha256": "3f72833550e2acda397d79ab7f56f04c6cb387cbe6fafd05760859883b8db1d8"
+    },
+    {
+      "path": "prototype/tests/test_domain.py",
+      "bytes": 8639,
+      "sha256": "eb1907732e1742b464a9245850accd1694ee96ad8886a5d7416f670f073d9420"
+    },
+    {
+      "path": "prototype/tests/test_transport.py",
+      "bytes": 4983,
+      "sha256": "3460c3e2aa99d7b3d0266e778602ebba723aaed5a2f18711f82b0fc7d1d1153b"
+    },
+    {
+      "path": "prototype/tools/browser_review.py",
+      "bytes": 9762,
+      "sha256": "5877915e9da9c2925f407e26b7b2ebc0201c1afcec1cc44af9102219bf3f432c"
+    },
+    {
+      "path": "prototype/tools/client.py",
+      "bytes": 1160,
+      "sha256": "80ecfaaef82bb98c382ae9087b076a8ddf62a44ac5dc26d8a2d9dbc68a263856"
+    },
+    {
+      "path": "prototype/tools/make_fixtures.py",
+      "bytes": 1063,
+      "sha256": "8cc2cbbe66672476e9892183b04a60f874cd2376c6db5bbde23f0679874bf51c"
+    },
+    {
+      "path": "prototype/tools/mcp_stdio.py",
+      "bytes": 5061,
+      "sha256": "df0e4dc2a3818ccf066f127eaf2dac13880f6c4dde4e9fd4e9051a05ed26aa9a"
+    },
+    {
+      "path": "prototype/tools/music.py",
+      "bytes": 862,
+      "sha256": "04d4d26e569ed1f1077410cb9f2f4485288b8d9b88e07ba72284a4aed4e3311e"
+    },
+    {
+      "path": "prototype/tools/validate_contracts.py",
+      "bytes": 2437,
+      "sha256": "6d4023e715b755e61be291097fc219c76119c328b7e4b83c5946902546e07167"
+    },
+    {
+      "path": "qa/automated-tests.txt",
+      "bytes": 4292,
+      "sha256": "25dd2b80422d0d8a4a7cbeec0a800ff603a63a558c41935670f743c4dab9d1d8"
+    },
+    {
+      "path": "qa/browser-review.json",
+      "bytes": 1744,
+      "sha256": "9cab5f0c48b11e6d1b3ef31823610a57eb40ffb9e70c53234c61a143ea2c6e93"
+    },
+    {
+      "path": "qa/contract-validation.json",
+      "bytes": 1445,
+      "sha256": "787d052cf9ba6a6eea15f4fd051707d84ca47d9a9bf47e2ae503105c0b9138d7"
+    },
+    {
+      "path": "reference/meatymusic-sonic-workshop-direction-v0.1.md",
+      "bytes": 31046,
+      "sha256": "0da70fa4fa0e80bd5c4b5c0ed5f7e37fd6516761c39d35808681b934d7b7b206"
+    },
+    {
+      "path": "reference/prior-ux/01_arrange.png",
+      "bytes": 278149,
+      "sha256": "441f37c93ca8ce06ea9c455c7cedd0bf61b5bbe6d966886ab5c2e9440db0abcb"
+    },
+    {
+      "path": "reference/prior-ux/02_variations_handoff.png",
+      "bytes": 287373,
+      "sha256": "278153d2b810fba38992e2ff7a740915c60fcbd274614bc628e2a600fab8337d"
+    },
+    {
+      "path": "reference/prior-ux/03_listen_moments.png",
+      "bytes": 235793,
+      "sha256": "a6be2c684c6cad35da3920d345ee56548b8f0dfa148cef9703dc1a8b8292e606"
+    },
+    {
+      "path": "reference/prior-ux/meatymusic-experience-design-v0.2.md",
+      "bytes": 21378,
+      "sha256": "16242c56c80af981097b73a48ae0d4b2346fb3f60d96cb1bb1c01f8e2edb2b58"
+    },
+    {
+      "path": "reference/prior-ux/mockup-fixtures.json",
+      "bytes": 1137,
+      "sha256": "36b6c2fee171c297c7a5609603d50617af89a07f649ea70a725442320560e3ed"
+    }
+  ]
+}
